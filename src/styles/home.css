@@ -1,0 +1,283 @@
+.documentation-container .checkContent {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px #eee solid;
+}
+
+.documentation-container .checkContent .check_item {
+  background-color: #ffffff;
+  margin-left: 20px;
+  height: 40px;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  display: flex;
+  align-items: center;
+}
+
+.documentation-container .checkContent .check_item span {
+  font-size: 14px;
+  padding: 0 10px;
+}
+
+.documentation-container .checkContent .check_item .checkBoxStyle {
+  padding-right: 10px;
+}
+
+.documentation-container .trafficHead {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 33px;
+  color: #4d4d4d;
+  padding: 20px 30px 20px;
+  padding-left: 0;
+}
+
+.documentation-container img {
+  width: 11.44px;
+  height: 11.44px;
+  margin-left: 12px;
+  cursor: pointer;
+}
+
+.documentation-container .Overview {
+  margin: 20px;
+  min-height: 200px;
+  background-color: #fafafb;
+}
+
+.documentation-container .Overview .bid-list-page {
+  width: clas(100% -20px);
+  display: flex;
+  flex-direction: column;
+}
+
+.documentation-container .Overview .bid-list-page .bid-list-header {
+  display: flex;
+}
+
+.documentation-container .Overview .bid-list-page .bid-list-header .header-name {
+  width: 12.5%;
+  justify-content: center;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.documentation-container .Overview .bid-list-page .bid-list-header .w156 {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 14px;
+  color: #4d4d4d;
+}
+
+.documentation-container .Overview .bid-list-page .bid-list-record {
+  display: flex;
+}
+
+.documentation-container .Overview .bid-list-page .bid-list-record .bid-list-item1 {
+  width: 12.5%;
+  justify-content: flex-start;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+}
+
+.documentation-container .Overview .bid-list-page .bid-list-record .bid-list-item {
+  width: 12.5%;
+  justify-content: center;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.documentation-container .Overview .bid-list-page .bid-list-record .w157 {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14px;
+  color: #4d4d4d;
+}
+
+.documentation-container .Overview .bid-list-page .bid-list-record .w158 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #3d64e6;
+  line-height: 17px;
+}
+
+.documentation-container .trendHead {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.documentation-container .trendHead .iconFlag {
+  position: absolute;
+  right: 13px;
+  top: 19px;
+  color: #acaaaa;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.documentation-container .chartsIcon {
+  margin: 20px;
+  width: calc(100% -20px);
+  min-height: 300px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.documentation-container .chartsIcon .chartLeft {
+  background-color: #fafafb;
+  padding: 15px;
+  width: 49%;
+  min-height: 400px;
+}
+
+.documentation-container .chartsIcon .chartLeft .point {
+  padding-right: 10px;
+}
+
+.documentation-container .chartsIcon .chartRight {
+  width: 49%;
+  background-color: #fafafb;
+  padding: 15px;
+  padding-top: 13px;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow {
+  display: flex;
+  width: 100%;
+  height: calc(100% - 45px);
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor {
+  width: 60%;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page {
+  width: clas(100% -20px);
+  display: flex;
+  flex-direction: column;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page .bid-list-header {
+  display: flex;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page .bid-list-header .header-name {
+  width: 33%;
+  justify-content: center;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page .bid-list-header .w156 {
+  font-size: 16px;
+  color: #5f5e5e;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page .bid-list-record {
+  display: flex;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page .bid-list-record .lettSpace {
+  margin-top: 10px;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page .bid-list-record .bid-list-item {
+  width: 33%;
+  justify-content: center;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page .bid-list-record .w157 {
+  color: #252424;
+  font-size: 13px;
+  line-height: 14px;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page .bid-list-record .w159 {
+  color: #252424;
+  font-size: 13px;
+  line-height: 14px;
+  color: #3a98e6;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page .bid-list-record .w158 {
+  color: #3a98e6;
+  font-size: 17px;
+  line-height: 17px;
+}
+
+.documentation-container .chartsIcon .chartRight .pieShow .pieIcon {
+  width: 40%;
+  height: 100%;
+}
+
+.documentation-container .comePage .bid-list-page {
+  width: clas(100% -20px);
+  display: flex;
+  flex-direction: column;
+}
+
+.documentation-container .comePage .bid-list-page .header-text {
+  width: 60%;
+}
+
+.documentation-container .comePage .bid-list-page .bid-list-header {
+  display: flex;
+}
+
+.documentation-container .comePage .bid-list-page .bid-list-header .header-name {
+  width: 20%;
+  justify-content: flex-end;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.documentation-container .comePage .bid-list-page .bid-list-header .w156 {
+  font-size: 14px;
+  color: #768fa1;
+}
+
+.documentation-container .comePage .bid-list-page .bid-list-record {
+  display: flex;
+}
+
+.documentation-container .comePage .bid-list-page .bid-list-record .lettSpace {
+  margin-top: 10px;
+}
+
+.documentation-container .comePage .bid-list-page .bid-list-record .bid-list-item {
+  width: 20%;
+  justify-content: flex-end;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.documentation-container .comePage .bid-list-page .bid-list-record .w157 {
+  color: #555353;
+  font-size: 13px;
+  line-height: 14px;
+}
+
+.documentation-container .comePage .bid-list-page .bid-list-record .w159 {
+  color: #555353;
+  font-size: 13px;
+  line-height: 14px;
+  color: #3a98e6;
+}
+
+.documentation-container .comePage .bid-list-page .bid-list-record .w158 {
+  color: #555353;
+  font-size: 17px;
+  line-height: 17px;
+}
