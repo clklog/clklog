@@ -31,7 +31,6 @@ export default {
     getArea() {
       getAreaApi(this.params).then((res) => {
         this.getAreaList = res.data;
-        console.log(res, "区域省份");
       });
     },
   },

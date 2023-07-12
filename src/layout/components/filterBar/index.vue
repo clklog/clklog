@@ -5,7 +5,7 @@
         <div class="check_item">
           <span>时间:</span>
           <el-radio-group
-            v-model="dateList"
+            v-model="timeType"
             class="checkBoxStyle"
             @change="handleChange"
           >
@@ -23,7 +23,6 @@
             v-model="specificTTime"
             style="font-size: 12px; height: 30px"
           >
-            <!-- :disabled="is_commite == 1 ? true:false" -->
             <el-radio-button label="time" :disabled="dayFlag ? true : false"
               >按时</el-radio-button
             >
@@ -74,7 +73,7 @@
             <div>
               <el-popover placement="bottom" width="510" trigger="click">
                 <div>
-                  <el-checkbox-group v-model="areaList">
+                  <!-- <el-checkbox-group v-model="areaList">
                     <el-checkbox
                       @change="handleCheckProvince(item)"
                       v-for="(item, index) in provinceData"
@@ -82,27 +81,23 @@
                       :label="item.provinceName"
                       >{{ item.provinceName }}</el-checkbox
                     >
-                  </el-checkbox-group>
+                  </el-checkbox-group> -->
+                  <el-radio-group
+                    size="mini"
+                    v-model="areaValue"
+                  >
+                    <el-radio
+                    style="margin-top:11px;"
+                      @change="handleCheckProvince(item)"
+                      v-for="(item, index) in provinceData"
+                      :key="index"
+                      :label="item.provinceName"
+                      >{{ item.provinceName }}</el-radio
+                    >
+                  </el-radio-group>
                 </div>
                 <div class="areaBox" slot="reference">
                   {{ areadefault }}
-                  <div
-                    v-if="areadefault && areadefault != '选择'"
-                    style="
-                      color: #4d4d4d;
-                      margin-left: 5px;
-                      border-radius: 50%;
-                      height: 13px;
-                      width: 13px;
-                      border: 1px solid #4d4d4d;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      padding: 2px;
-                    "
-                  >
-                    x
-                  </div>
                 </div>
               </el-popover>
             </div>
@@ -114,18 +109,17 @@
         <div style="display: flex">
           <div class="check_item">
             <span>渠道:</span>
-            <el-radio-group v-model="channelList" style="margin-right: 10px">
+            <el-radio-group v-model="channelValue" style="margin-right: 10px">
               <el-radio
                 v-for="item in allChaneList"
                 :label="item.id"
                 :key="item.id"
-                >{{ item.label }}</el-radio
-              >
+                >{{ item.label }}</el-radio>
             </el-radio-group>
           </div>
           <div class="check_item">
             <span>访客:</span>
-            <el-radio-group v-model="visitorValue" class="checkBoxStyle">
+            <el-radio-group v-model="visitorType" class="checkBoxStyle">
               <el-radio label="">全部</el-radio>
               <el-radio label="新访客">新访客</el-radio>
               <el-radio label="老访客">老访客</el-radio>
@@ -188,7 +182,8 @@ export default {
       ],
       // allChaneList: ["网站", "安卓", "苹果"],
       // areaList: this.$store.state.filterBar.checkList.areaList,
-      areaList: [],
+      // areaList: ["上海市", "北京市"],
+      areaList: '上海市',
       dateList: this.$store.state.filterBar.checkList.dateList,
       visitorValue: this.$store.state.filterBar.checkList.visitorValue,
       dayFlag: true,
@@ -197,86 +192,77 @@ export default {
       checkDateTime: "",
       past7daysStart: "", //最近一周
       timeDifference: "",
+
+      // 接口参数数据
+      timeType: "day",
+      startTime: "2023-06-07",
+      endTime: "2023-06-08",
+      areaValue: '北京市',
+      channelValue: '', //渠道
+      visitorType: '',
     };
   },
   mounted() {
+    // 多选
+    // if (this.areaList) {
+    //   this.areadefault = this.areaList.join("、");
+    // }
+    if (this.areaList) {
+      this.areadefault = this.area;
+    }
     this.handleAdd();
+    this.setTopFilterParams(this.commonParams);
   },
   computed: {
+    channel() {
+      return [this.channelValue ];
+    },
+    area(){
+      return this.areaValue
+    },
     project() {
       return this.$store.getters.project;
     },
     provinceData() {
       return province;
     },
-    // checkList() {
-    //   return this.$store.state.filterBar.checkList;
-    // },
-    changeCheck() {
-      const {
-        dateList,
-        channelList,
-        project,
-        visitorValue,
-        areaList,
-        dateRange,
-      } = this;
-      return {
-        dateList,
-        channelList,
-        project,
-        visitorValue,
-        areaList,
-        dateRange,
-      };
+    // 统一参数的值
+    commonParams() {
+      const { timeType, startTime, endTime, area , channel, visitorType, project , } = this;
+      return { timeType, startTime, endTime, area , channel, visitorType, project };
     },
   },
   watch: {
-    changeCheck(val) {
-      const {
-        dateList,
-        channelList,
-        project,
-        visitorValue,
-        areaList,
-        dateRange,
-      } = this;
-      let channelCheck = "";
-      if (!this.channelList) {
-        channelCheck = [];
-      } else {
-        channelCheck = [this.channelList];
-      }
-      let checkDataList = {
-        dateRange,
-        dateList,
-        channelCheck,
-        project,
-        visitorValue,
-        areaList,
-      };
-      if (dateList != "year") {
-        this.$emit("getFilterBar", checkDataList); // 切换头部
-      } else if (this.dateRange) {
-        this.$emit("getFilterBar", checkDataList);
-      }
-    },
+    commonParams(val){
+      return this.setTopFilterParams(val);
+    }
   },
   methods: {
+    setTopFilterParams(val) {
+      this.$emit("setFilterBarParams", val);
+    },
     // 切换省份
     handleCheckProvince(e) {
-      // console.log(e);
-      console.log(this.areaList, "选中的值");
-      let areaList = this.areaList.join("、");
-      // console.log(areaList);
-      this.areadefault = areaList;
+      this.areadefault = e.provinceName;
+      // 多选操作
+      // let areaList;
+      // if (this.areaList && this.areaList.length > 6) {
+      //   areaList = this.areaList.slice(0, 6).join("、") + "...";
+      //   this.areadefault = areaList;
+      // } else {
+      //   areaList = this.areaList.join("、");
+      //   this.areadefault = areaList;
+      // }
+      // if (this.areaList && this.areaList.length == 0) {
+      //   this.areadefault = "选择";
+      // }
     },
     checkDateEvnet(val) {
-      this.endTime = new Date(val[1]).getTime();
-      this.startTime = new Date(val[0]).getTime();
+      let endTime = new Date(val[1]).getTime();
+      let startTime = new Date(val[0]).getTime();
       let toDay =
         new Date(new Date().toLocaleDateString()).getTime() + 8 * 3600 * 1000;
-      let timeStamp = this.endTime - this.startTime;
+      let timeStamp = endTime - startTime;
       if (timeStamp == 518400000) {
         this.dateList = "week";
       } else if (timeStamp == 2505600000) {
@@ -285,14 +271,14 @@ export default {
         this.dateList = "previous";
       } else if (
         !timeStamp &&
-        this.startTime == toDay &&
-        this.endTime == toDay
+        startTime == toDay &&
+        endTime == toDay
       ) {
         this.dateList = "day";
       } else {
         this.dateList = "";
       }
-      let result = (this.endTime - this.startTime) / (3600 * 24 * 1000);
+      let result = (endTime - startTime) / (3600 * 24 * 1000);
       this.dateTimeCount(result);
     },
     // 日期计算
@@ -315,9 +301,9 @@ export default {
     },
     // 日期初始值
     initDate(val) {
-      this.startTime = val[0].split("-").join("");
-      this.endTime = val[1].split("-").join("");
-      let result = this.endTime - this.startTime;
+     let startTime = val[0].split("-").join("");
+     let endTime = val[1].split("-").join("");
+      let result = endTime - startTime;
       this.dateTimeCount(result);
     },
     // 默认初始日期
@@ -465,8 +451,6 @@ export default {
           border-bottom-right-radius: 5px;
           padding: 0 8px;
           cursor: pointer;
-          display: flex;
-          align-items: center;
         }
       }
     }

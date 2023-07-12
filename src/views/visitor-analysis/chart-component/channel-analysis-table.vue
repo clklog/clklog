@@ -349,14 +349,69 @@ export default {
   },
 };
 </script>
-<style>
-.chartsIcon .flow-indicator .flow-item .el-checkbox {
-  width: 100px !important;
-}
-
-</style>
+<style></style>
 
 <style lang="scss" scoped>
+::v-deep {
+  .chartsIcon .flow-indicator .flow-item .el-checkbox {
+    width: 100px !important;
+  }
+}
+.trafficHead {
+  font-size: 16px;
+  font-weight: 400;
+  padding: 20px 30px 20px;
+}
+img {
+  width: 11.44px;
+  height: 11.44px;
+  margin-left: 12px;
+  cursor: pointer;
+}
+.Overview {
+  margin: 20px;
+  min-height: 200px;
+  background-color: #fafafb;
+  .bid-list-page {
+    width: clas(100% -20px);
+    display: flex;
+    flex-direction: column;
+    .bid-list-header {
+      display: flex;
+      .header-name {
+        width: 14%;
+        justify-content: center;
+        height: 30px;
+        display: flex;
+        align-items: center;
+      }
+      .w156 {
+        font-size: 13px;
+        color: #3f3e3e;
+      }
+    }
+    .bid-list-record {
+      display: flex;
+      .bid-list-item {
+        width: 14%;
+        justify-content: center;
+        height: 30px;
+        display: flex;
+        align-items: center;
+      }
+      .w157 {
+        color: #252424;
+        font-size: 14px;
+        line-height: 14px;
+      }
+      .w158 {
+        color: #3a98e6;
+        font-size: 17px;
+        line-height: 17px;
+      }
+    }
+  }
+}
 .w111 {
   font-size: 10px;
   font-weight: 400;
@@ -423,11 +478,10 @@ export default {
   }
   .block {
     margin: 20px 12px;
-  
   }
 }
 ::v-deep {
-  .el-pagination{
+  .el-pagination {
     position: relative;
     width: 100%;
     display: flex;
@@ -438,6 +492,5 @@ export default {
     position: absolute;
     left: 0;
   }
-  
 }
 </style>

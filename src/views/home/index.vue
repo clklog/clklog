@@ -4,7 +4,7 @@
     <!-- 流量概览 -->
     <FlowView ref="FlowViewRef" :commonParams="commonParams" />
     <div class="block-line">
-      <TrendChart class="left" />
+      <TrendChart ref="TrendChart" :commonParams="commonParams" class="left" />
       <NewOldVisitors ref="NewOldVisitorsRef" :commonParams="commonParams" class="right" />
     </div>
     <div class="block-line">
@@ -78,6 +78,7 @@ export default {
         this.$refs.SourceWebsiteRef.getSourceWebsite();
         this.$refs.NewOldVisitorsRef.getVisitor();
         this.$refs.LocalDistributionRef.getArea();
+        this.$refs.TrendChart.getFlowTrend();
       });
     },
     setTopFilterParams(val) {

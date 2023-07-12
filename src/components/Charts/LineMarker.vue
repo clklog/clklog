@@ -9,13 +9,19 @@ import resize from "./mixins/resize";
 export default {
   mixins: [resize],
   props: {
+    defaultLege:{
+
+    },
+    flowTrendListed: {
+      // default: [],
+    },
     className: {
       type: String,
       default: "chart",
     },
     id: {
       type: String,
-      default: "chart",
+      default: "id",
     },
     width: {
       type: String,
@@ -29,10 +35,33 @@ export default {
   data() {
     return {
       chart: null,
+      pv: [],
+      uv: [],
+      visit: [],
+      ipCount: [],
+      bounceRate: [],
+      time: [],
+      // headLege: ["浏览量", "访问次数"],
+      headLege: [],
+      flowTrendList:[],
     };
+  },
+  watch :{
+    flowTrendListed(val){
+      if (val && val.length > 0) {
+        this.flowTrendList = val
+        this.checkSearchValue(this.defaultLege)
+      }else {
+        this.checkSearchValue([])
+      }
+    }
   },
   mounted() {
     this.initChart();
+    this.flowTrendList = this.flowTrendListed
+    this.headLege = this.defaultLege;
+    this.checkSearchValue(this.defaultLege)
+   
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -42,6 +71,81 @@ export default {
     this.chart = null;
   },
   methods: {
+    changeLegend(val) {
+      this.headLege = val;
+      // console.log(val, "传递的值");
+      this.checkSearchValue(val)
+    },
+    checkSearchValue(val){
+     this.time = []
+      const { time, pv, uv, visit, ipCount, bounceRate } = this;
+      // 时间
+      
+      this.flowTrendList.map((item) => {
+        if (item.time) {
+          return time.push(item.time.slice(11, 13));
+        } else {
+          time.push(0);
+        }
+      });
+      if (val.includes("浏览量")) {
+        this.flowTrendList.map((item) => {
+          if (item.pv) {
+            return pv.push(item.pv);
+          } else {
+            pv.push(0);
+          }
+        });
+      } else {
+        this.pv = [];
+      }
+      if (val.includes("访客数")) {
+        this.flowTrendList.map((item) => {
+          if (item.uv) {
+            return uv.push(item.uv);
+          } else {
+            uv.push(0);
+          }
+        });
+      } else {
+        this.uv = [];
+      }
+      if (val.includes("IP数")) {
+         this.flowTrendList.map((item) => {
+          if (item.ipCount) {
+            return ipCount.push(item.ipCount);
+          } else {
+            ipCount.push(0);
+          }
+        });
+      } else {
+        this.ipCount = [];
+      }
+      if (val.includes("访问次数")) {
+        this.flowTrendList.map((item) => {
+          if (item.visit) {
+            return visit.push(item.visit);
+          } else {
+            visit.push(0);
+          }
+        });
+      } else {
+        this.visit = [];
+      }
+
+      if (val.includes("跳出率")) {
+        this.flowTrendList.map((item) => {
+          if (item.bounceRate) {
+            return bounceRate.push(item.bounceRate);
+          } else {
+            bounceRate.push(0);
+          }
+        });
+      } else {
+        this.bounceRate = [];
+      }
+      this.initChart();
+    },
     initChart() {
       this.chart = echarts.init(document.getElementById(this.id));
 
@@ -62,7 +166,7 @@ export default {
           axisPointer: {
             lineStyle: {
               color: "#C0CADB",
-              width:3,
+              width: 3,
             },
           },
         },
@@ -72,7 +176,7 @@ export default {
           itemWidth: 14,
           itemHeight: 5,
           itemGap: 13,
-          data: ["浏览量(PV)", "访问次数"],
+          data: this.headLege,
           right: "4%",
           textStyle: {
             fontSize: 12,
@@ -90,7 +194,8 @@ export default {
           {
             type: "category",
             boundaryGap: false,
-            data: [0, 4, 8, 12, 16, 20],
+            // data: [0, 4, 8, 12, 16, 20],
+            data:this.time,
             nameTextStyle: {
               fontWeight: 600,
               fontSize: 18,
@@ -115,6 +220,34 @@ export default {
         ],
         series: [
           {
+            name: "浏览量",
+            type: "line",
+            itemStyle: {
+              normal: {
+                color: "#A4C4FE",
+              },
+            },
+            lineStyle: {
+              width: 3,
+            },
+            // data: [120152, 132120, 265235, 144225, 178212, 168885],
+            data: this.pv,
+          },
+          {
+            name: "访客数",
+            type: "line",
+            itemStyle: {
+              normal: {
+                color: "yellow",
+              },
+            },
+            lineStyle: {
+              width: 3,
+            },
+            // data: [120152, 132120, 265235, 144225, 178212, 168885],
+            data: this.uv,
+          },
+          {
             name: "访问次数",
             type: "line",
             itemStyle: {
@@ -127,26 +260,89 @@ export default {
             lineStyle: {
               width: 3,
             },
-            data: [152256, 168925, 120322, 45262, 150698, 125550,],
+            data: this.visit,
           },
           {
-            name: "浏览量(PV)",
+            name: "IP数",
             type: "line",
             itemStyle: {
               normal: {
-                color: "#A4C4FE",
-                // borderColor: "rgba(0,136,212,0.2)",
+                color: "red",
+                // borderColor: "#5fb4db",
                 // borderWidth: 12,
               },
             },
             lineStyle: {
-              // color: "#1791FF",
               width: 3,
             },
-            data: [120152, 132120, 265235, 144225, 178212, 168885],
+            data: this.ipCount,
+          },
+          {
+            name: "跳出率",
+            type: "line",
+            itemStyle: {
+              normal: {
+                color: "pink",
+                // borderColor: "#5fb4db",
+                // borderWidth: 12,
+              },
+            },
+            lineStyle: {
+              width: 3,
+            },
+            data: this.bounceRate,
           },
         ],
       });
+    },
+     // 处理接口数据
+     processData() {
+      const { time, pv, uv, visit, ipCount, bounceRate } = this;
+      // 时间
+      this.flowTrendList.map((item) => {
+        if (item.time) {
+          return time.push(item.time.slice(11, 13));
+        } else {
+          time.push(0);
+        }
+      });
+      // console.log(time, 234);
+      this.flowTrendList.map((item) => {
+        if (item.pv) {
+          return pv.push(item.pv);
+        } else {
+          pv.push(0);
+        }
+      });
+      this.flowTrendList.map((item) => {
+        if (item.uv) {
+          return uv.push(item.uv);
+        } else {
+          uv.push(0);
+        }
+      });
+      this.flowTrendList.map((item) => {
+        if (item.visit) {
+          return visit.push(item.visit);
+        } else {
+          visit.push(0);
+        }
+      });
+      this.flowTrendList.map((item) => {
+        if (item.ipCount) {
+          return ipCount.push(item.ipCount);
+        } else {
+          ipCount.push(0);
+        }
+      });
+      this.flowTrendList.map((item) => {
+        if (item.bounceRate) {
+          return uv.push(item.bounceRate);
+        } else {
+          bounceRate.push(0);
+        }
+      });
+      // console.log(this.bounceRate, "跳出了");
     },
   },
 };

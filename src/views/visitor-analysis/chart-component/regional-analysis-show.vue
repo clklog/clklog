@@ -113,7 +113,6 @@ export default {
       };
       getAreaApi(params).then((res) => {
         this.getAreaList = res.data;
-        console.log(res, "区域省份");
       });
     },
     randomData() {

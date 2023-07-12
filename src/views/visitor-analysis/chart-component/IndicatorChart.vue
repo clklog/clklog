@@ -62,7 +62,6 @@ export default {
     };
   },
   mounted() {
-    console.log(this.$props.flowTrendList);
     this.initChart();
     Bus.$on("trendAnalysis", (res) => {
       // console.log(res,"兄弟传参");
