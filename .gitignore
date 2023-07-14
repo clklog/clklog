@@ -19,6 +19,7 @@ selenium-debug.log
 *.sln
 *.local
 
+.env.production
 .env.development
 .env.staging
 yarn.lock
