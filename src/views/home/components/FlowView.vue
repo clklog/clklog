@@ -157,7 +157,7 @@
           <img v-if="huanbi(current.bounceRate, previous.bounceRate) != '--' && huanbi(current.bounceRate, previous.bounceRate) > 0"  class="riseImg" src="@/assets/images/rise.png" alt="">
         </div>
       </div>
-      <div class="bid-list-record" style="margin-bottom: 18px">
+      <div class="bid-list-record" style="margin-bottom: 0">
         <div class="bid-list-item1 w157">
           <p>同比（今日与同期）</p>
         </div>
@@ -268,7 +268,7 @@ export default {
 <style lang="scss" scoped>
 .FlowView {
   margin: 20px;
-  min-height: 200px;
+  min-height: 215px;
   background-color: #fafafb;
   .bid-list-page {
     width: clas(100% -20px);
@@ -276,6 +276,7 @@ export default {
     flex-direction: column;
     .bid-list-header {
       display: flex;
+      margin-bottom: 21px;
       .header-name {
         width: 12.5%;
         justify-content: center;
@@ -300,6 +301,7 @@ export default {
     }
     .bid-list-record {
       display: flex;
+      margin-bottom: 11px;
       .bid-list-item1 {
         width: 12.5%;
         justify-content: flex-start;

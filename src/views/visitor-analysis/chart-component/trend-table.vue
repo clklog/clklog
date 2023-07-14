@@ -230,11 +230,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-::v-deep {
-  .chartsIcon .flow-indicator .flow-item .el-checkbox {
+.chartsIcon .flow-indicator .flow-item .el-checkbox {
     width: 100px !important;
   }
-}
 .chartsIcon {
   box-sizing: border-box;
   margin: 20px;

@@ -258,6 +258,9 @@ export default {
       // }
     },
     checkDateEvnet(val) {
+      console.log(val,"日期范围");
+      this.startTime = val[0]
+      this.endTime = val[1]
       let endTime = new Date(val[1]).getTime();
       let startTime = new Date(val[0]).getTime();
       let toDay =

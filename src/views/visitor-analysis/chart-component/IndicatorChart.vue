@@ -19,7 +19,7 @@
               v-model="headLege"
               multiple
               placeholder="请选择"
-              style="margin-left: 20px; min-width: 280px"
+              style="min-width: 280px"
               @change="changeChartValue"
             >
               <el-option
@@ -363,7 +363,8 @@ export default {
 .trafficHead {
   font-size: 16px;
   font-weight: 400;
-  padding: 20px 30px 20px;
+  // padding: 20px 30px 20px;
+  padding: 15px 13px 18px 0px
 }
 img {
   width: 11.44px;

@@ -58,7 +58,11 @@
         </div>
       </div>
     </div>
-    <indicatorChart v-if="flowTrendList"  :flowTrendListed="flowTrendList" ref = "indicatorChart"/>
+    <indicatorChart
+      v-if="flowTrendList"
+      :flowTrendListed="flowTrendList"
+      ref="indicatorChart"
+    />
     <trendTable />
   </div>
 </template>
@@ -82,7 +86,7 @@ export default {
     return {
       filterBarValue: {},
       flowTrendList: null,
-      filterBarParams:null,
+      filterBarParams: null,
     };
   },
   created() {
@@ -99,11 +103,20 @@ export default {
   },
   watch: {
     commonParams(val) {
-      this.getFlowTrend()
+      this.getFlowTrend();
+      this.getFlowTrendDetail()
     },
   },
   methods: {
-    setFilterBarParams(val){
+    getFlowTrendDetail() {
+      getFlowTrendDetailApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+          // this.flowTrendList = res.data;
+          console.log(res.data,"详情数据");
+        }
+      });
+    },
+    setFilterBarParams(val) {
       this.filterBarParams = copyObj(val);
     },
     getFlowTrend() {
@@ -120,12 +133,13 @@ export default {
 <style lang="scss" scoped>
 .Overview {
   margin: 20px;
-  min-height: 200px;
+  min-height: 118px;
   background-color: #fafafb;
   .trendAnalysis {
     font-size: 16px;
     font-weight: 400;
-    padding: 20px 30px 20px;
+    // padding: 20px 30px 20px;
+    padding: 14px 13px 18px 13px;
   }
   .bid-list-page {
     width: clas(100% -20px);
