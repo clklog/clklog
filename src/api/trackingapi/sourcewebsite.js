@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const BASE_API = process.env.VUE_APP_BASE_API
+const BASE_API = process.env.VUE_APP_BASE_API ? process.env.VUE_APP_BASE_API : '/api'
 // 获取Top10来源网站
 export function getSourceWebsiteApi(params) {
   return request({

@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const BASE_API = process.env.VUE_APP_BASE_API
+const BASE_API = process.env.VUE_APP_BASE_API ? process.env.VUE_APP_BASE_API : '/api'
 export function getFlowApi(params) {
   return request({
     url: BASE_API + '/flow/getFlow',

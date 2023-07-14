@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const BASE_API = process.env.VUE_APP_BASE_API
+const BASE_API = process.env.VUE_APP_BASE_API ? process.env.VUE_APP_BASE_API : '/api'
 // 获取Top10受访页面
 export function getVisitUriApi(params) {
   return request({
