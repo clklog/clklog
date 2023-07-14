@@ -25,6 +25,8 @@
 
     <div class="table-content">
       <el-table
+        :header-cell-style="{ textAlign: 'center' }"
+        :cell-style="{ textAlign: 'center' }"
         :data="tableData"
         :span-method="arraySpanMethod"
         border
@@ -49,7 +51,7 @@
     </div>
     <div class="block">
       <el-pagination
-         next-text="下一页"
+        next-text="下一页"
         :current-page="currentPage4"
         :page-sizes="[10, 20, 30, 40]"
         :page-size="10"
@@ -227,13 +229,12 @@ export default {
   },
 };
 </script>
-<style>
-.chartsIcon .flow-indicator .flow-item .el-checkbox {
-  width: 100px !important;
-}
-</style>
-
 <style lang="scss" scoped>
+::v-deep {
+  .chartsIcon .flow-indicator .flow-item .el-checkbox {
+    width: 100px !important;
+  }
+}
 .chartsIcon {
   box-sizing: border-box;
   margin: 20px;
@@ -257,6 +258,8 @@ export default {
       margin-top: 12px;
       margin-left: 10px;
       .flow-title {
+        white-space: nowrap;
+        box-sizing: border-box;
         margin-right: 21px;
         font-size: 12px;
         font-weight: 400;
@@ -285,7 +288,7 @@ export default {
         padding: 0 10px;
       }
       .checkBoxStyle {
-        padding-right: 10px;
+        margin-right: 10px;
       }
     }
   }
@@ -294,7 +297,7 @@ export default {
   }
 }
 ::v-deep {
-  .el-pagination{
+  .el-pagination {
     position: relative;
     width: 100%;
     display: flex;
@@ -304,6 +307,5 @@ export default {
     position: absolute;
     left: 0;
   }
-  
 }
 </style>

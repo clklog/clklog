@@ -3,7 +3,7 @@
     <div class="block-head">
       <div class="block-title">地域分布</div>
     </div>
-    <mapArea id="charts3" style="height: 100%" width="100%" />
+    <mapArea ref="mapArea" id="charts3" style="height: 100%" width="100%" />
   </div>
 </template>
 
@@ -29,8 +29,10 @@ export default {
   watch: {},
   methods: {
     getArea() {
+      console.log("触发了");
       getAreaApi(this.params).then((res) => {
         this.getAreaList = res.data;
+        this.$refs.mapArea.getMapChartsData(res.data)
       });
     },
   },
@@ -38,6 +40,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.LocalDistribution {
-}
 </style>

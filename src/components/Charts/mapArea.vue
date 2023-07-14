@@ -9,60 +9,84 @@
 </template>
 
 <script>
+import { validLowerCase } from "@/utils/validate";
 import chinamap from "echarts/map/json/china.json";
 export default {
   data() {
     return {
       myChart: null,
-      dataList: [
-        { name: "北京", value: this.randomData() },
-        { name: "天津", value: this.randomData() },
-        { name: "上海", value: this.randomData() },
-        { name: "重庆", value: this.randomData() },
-        { name: "河北", value: this.randomData() },
-        { name: "河南", value: this.randomData() },
-        { name: "云南", value: this.randomData() },
-        { name: "辽宁", value: this.randomData() },
-        { name: "黑龙江", value: this.randomData() },
-        { name: "湖南", value: this.randomData() },
-        { name: "安徽", value: this.randomData() },
-        { name: "山东", value: this.randomData() },
+      provinceList: [
+        // { name: "北京", value: this.randomData() },
+        { name: "上海", value: 0 },
+        { name: "广东", value: 0 },
+        { name: "北京", value: 0 },
+        { name: "天津", value: 0 },
+        { name: "重庆", value: 0 },
+        { name: "河北", value: 0 },
+        { name: "河南", value: 0 },
+        { name: "云南", value: 0 },
+        { name: "辽宁", value: 0 },
+        { name: "黑龙江", value: 0 },
+        { name: "湖南", value: 0 },
+        { name: "安徽", value: 0 },
+        { name: "山东", value: 0 },
         { name: "新疆", value: 0 },
-        { name: "江苏", value: this.randomData() },
-        { name: "浙江", value: this.randomData() },
-        { name: "江西", value: this.randomData() },
-        { name: "湖北", value: this.randomData() },
-        { name: "广西", value: this.randomData() },
-        { name: "甘肃", value: this.randomData() },
-        { name: "山西", value: this.randomData() },
-        { name: "内蒙古", value: this.randomData() },
-        { name: "陕西", value: this.randomData() },
-        { name: "吉林", value: this.randomData() },
-        { name: "福建", value: this.randomData() },
-        { name: "贵州", value: this.randomData() },
-        { name: "广东", value: this.randomData() },
-        { name: "青海", value: this.randomData() },
-        { name: "西藏", value: this.randomData() },
-        { name: "四川", value: this.randomData() },
-        { name: "宁夏", value: this.randomData() },
-        { name: "海南", value: this.randomData() },
-        { name: "台湾", value: this.randomData() },
-        { name: "香港", value: this.randomData() },
-        { name: "澳门", value: this.randomData() },
+        { name: "江苏", value: 0 },
+        { name: "浙江", value: 0 },
+        { name: "江西", value: 0 },
+        { name: "湖北", value: 0 },
+        { name: "广西", value: 0 },
+        { name: "甘肃", value: 0 },
+        { name: "山西", value: 0 },
+        { name: "内蒙古", value: 0 },
+        { name: "陕西", value: 0 },
+        { name: "吉林", value: 0 },
+        { name: "福建", value: 0 },
+        { name: "贵州", value: 0 },
+        { name: "青海", value: 0 },
+        { name: "西藏", value: 0 },
+        { name: "四川", value: 0 },
+        { name: "宁夏", value: 0 },
+        { name: "海南", value: 0 },
+        { name: "台湾", value: 0 },
+        { name: "香港", value: 0 },
+        { name: "澳门", value: 0 },
       ],
+      getAreaList: null,
     };
   },
   mounted() {
-    this.showScatterInGeo();
+    // this.showScatterInGeo();
   },
   methods: {
+    getMapChartsData(val) {
+      let result = val.reduce((resp, obj) => {
+        var originObj = resp.find((item) => item.province === obj.province);
+        if (originObj) {
+          originObj.pv += obj.pv;
+        } else {
+          resp.push(obj);
+        }
+        return resp;
+      }, []);
+      // 加载接口数据清除
+      this.provinceList.map(item=>{
+        item.value = 0
+      })
+      // 地图数据匹配
+      for (let i = 0; i < this.provinceList.length; i++) {
+        for (let j = 0; j < result.length; j++) {
+          if (this.provinceList[i].name == result[j].province) {
+            this.provinceList[i].value = result[j].pv;
+          }
+        }
+      }
+      // this.getAreaList = val;
+      this.showScatterInGeo();
+    },
     randomData() {
       return Math.round(Math.random() * 500);
     },
-    /*
-        geo:地理坐标系组件( https://echarts.apache.org/zh/option.html#geo)
-        地理坐标系组件用于地图的绘制，支持在地理坐标系上绘制散点图
-      */
     resizeMyChartContainer() {
       this.myChart.height = 100 + "px"; // 页面一半的大小
       this.myChart.width = 100 + "px"; // 页面一半的大小
@@ -93,12 +117,12 @@ export default {
         // },
         visualMap: {
           min: 0,
-          max: 1500,
+          max: 100,
           left: "10%",
           top: "bottom",
           text: ["高", "低"],
           calculable: true,
-          color: ["#0b50b9", "#FFFFFF"],
+          color: ["#0b50b9", "#fff"],
         },
         series: [
           {
@@ -119,7 +143,7 @@ export default {
                 shadowBlur: 20,
                 borderWidth: 0,
                 shadowColor: "rgba(0, 0, 0, 0.5)",
-                areaColor:"pink",
+                // areaColor: "pink",
               },
             },
             label: {
@@ -130,7 +154,7 @@ export default {
                 show: false,
               },
             },
-            data: this.dataList,
+            data: this.provinceList,
           },
         ],
       };

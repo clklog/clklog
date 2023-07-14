@@ -5,15 +5,38 @@
         <div class="trendHead">
           <div class="trafficHead">指示分析图</div>
           <div class="block">
-            <el-cascader
-              v-model="emptyList"
-              style="width: 170px"
+            <!-- <el-cascader
+              v-model="pointValue"
+              style="width: 280px;"
               placeholder="指标 | 选项"
               :options="options"
               :props="{ multiple: true, checkStrictly: true }"
               clearable
-              collapse-tags
-            />
+              @change="changeChartValue"
+            /> -->
+            <el-select
+              class="custom_select"
+              v-model="headLege"
+              multiple
+              placeholder="请选择"
+              style="margin-left: 20px; min-width: 280px"
+              @change="changeChartValue"
+            >
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+                :disabled="disabledSelect.includes(item.value)"
+              >
+                <div style="display: flex; align-items: center">
+                  <span class="checkbox__inner"
+                    ><div class="inner-box"></div
+                  ></span>
+                  <span style="">{{ item.label }}</span>
+                </div>
+              </el-option>
+            </el-select>
           </div>
         </div>
         <div id="indicator" style="height: 350px; width: 97%"></div>
@@ -32,40 +55,63 @@ export default {
   name: "TrendChart",
   components: { Chart, pieChart },
   mixins: [resize],
-  props: ["flowTrendList"],
+  props: ["flowTrendListed"],
   data() {
     return {
+      disabledSelect:[],
+      timeTypeValue: "day",
       chart: null,
-      emptyList: "",
+      pointValue: ["浏览量", "访问次数"],
       options: [
         {
-          value: 1,
+          value: "浏览量",
           label: "浏览量",
         },
         {
-          value: 2,
+          value: "访客数",
           label: "访客数",
         },
         {
-          value: 3,
+          value: "访问次数",
           label: "访问次数",
         },
         {
-          value: 4,
+          value: "IP数",
           label: "IP数",
         },
         {
-          value: 5,
+          value: "跳出率",
           label: "跳出率",
         },
       ],
+      pv: [],
+      uv: [],
+      visit: [],
+      ipCount: [],
+      bounceRate: [],
+      time: [],
+      headLege: [],
+      flowTrendList: [],
     };
+  },
+  watch: {
+    flowTrendListed(val) {
+      if (val && val.length > 0) {
+        this.flowTrendList = val;
+        this.checkSearchValue(this.pointValue);
+      } else {
+        this.checkSearchValue([]);
+      }
+    },
   },
   mounted() {
     this.initChart();
-    Bus.$on("trendAnalysis", (res) => {
-      // console.log(res,"兄弟传参");
-    });
+    this.flowTrendList = this.flowTrendListed;
+    this.headLege = this.pointValue;
+    this.checkSearchValue(this.pointValue);
+    // Bus.$on("trendAnalysis", (res) => {
+    //   // console.log(res,"兄弟传参");
+    // });
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -75,26 +121,111 @@ export default {
     this.chart = null;
   },
   methods: {
+    changeChartValue(e) {
+      let result = [];
+      for (let i = 0; i < this.options.length; i++) {
+        result.push(this.options[i].label);
+        if (e.length > 2) {
+          this.disabledSelect = result.filter((item) => {
+            return e.indexOf(item) == -1;
+          });
+        } else {
+          this.disabledSelect = [];
+        }
+      }
+      this.pointValue = this.headLege = e.flat(Infinity);
+      this.checkSearchValue(this.headLege);
+    },
+    // 指示分析 el-cascader
+    // changeChartValue(val) {
+    //   this.pointValue = this.headLege = val.flat(Infinity);
+    //   this.checkSearchValue(this.headLege);
+    // },
+    checkSearchValue(val) {
+      this.time = [];
+      const { time, pv, uv, visit, ipCount, bounceRate } = this;
+      // this.flowTrendList.map((item) => {
+      //   if (item.time) {
+      //     return time.push(item.time.slice(11, 13));
+      //   } else {
+      //     time.push(0);
+      //   }
+      // });
+      this.flowTrendList.map((item) => {
+        if (item.statHour) {
+          return time.push(item.statHour);
+        } else {
+          time.push(0);
+        }
+      });
+      if (val.includes("浏览量")) {
+        this.flowTrendList.map((item) => {
+          if (item.pv) {
+            return pv.push(item.pv);
+          } else {
+            pv.push(0);
+          }
+        });
+      } else {
+        this.pv = [];
+      }
+      if (val.includes("访客数")) {
+        this.flowTrendList.map((item) => {
+          if (item.uv) {
+            return uv.push(item.uv);
+          } else {
+            uv.push(0);
+          }
+        });
+      } else {
+        this.uv = [];
+      }
+      if (val.includes("IP数")) {
+        this.flowTrendList.map((item) => {
+          if (item.ipCount) {
+            return ipCount.push(item.ipCount);
+          } else {
+            ipCount.push(0);
+          }
+        });
+      } else {
+        this.ipCount = [];
+      }
+      if (val.includes("访问次数")) {
+        this.flowTrendList.map((item) => {
+          if (item.visit) {
+            return visit.push(item.visit);
+          } else {
+            visit.push(0);
+          }
+        });
+      } else {
+        this.visit = [];
+      }
+
+      if (val.includes("跳出率")) {
+        this.flowTrendList.map((item) => {
+          if (item.bounceRate) {
+            return bounceRate.push(item.bounceRate);
+          } else {
+            bounceRate.push(0);
+          }
+        });
+      } else {
+        this.bounceRate = [];
+      }
+      this.initChart();
+    },
     initChart() {
       this.chart = echarts.init(document.getElementById("indicator"));
-
       this.chart.setOption({
         backgroundColor: "#FAFAFB",
-        title: {
-          top: 20,
-          text: "Requests",
-          textStyle: {
-            fontWeight: "normal",
-            fontSize: 16,
-            color: "#F1F1F3",
-          },
-          left: "1%",
-        },
         tooltip: {
           trigger: "axis",
           axisPointer: {
             lineStyle: {
-              color: "#57617B",
+              color: "#C0CADB",
+              width: 3,
             },
           },
         },
@@ -104,11 +235,11 @@ export default {
           itemWidth: 14,
           itemHeight: 5,
           itemGap: 13,
-          data: ["浏览量(PV)", "访问次数"],
+          data: this.headLege,
           right: "4%",
           textStyle: {
             fontSize: 12,
-            color: "#red",
+            color: "black",
           },
         },
         grid: {
@@ -122,128 +253,103 @@ export default {
           {
             type: "category",
             boundaryGap: false,
-            axisLine: {
-              lineStyle: {
-                color: "#57617B",
-              },
+            // data: [0, 4, 8, 12, 16, 20],
+            data: this.time,
+            nameTextStyle: {
+              fontWeight: 600,
+              fontSize: 18,
             },
-            data: [0, 4, 8, 12, 16, 20],
+            axisTick: {
+              show: false,
+            },
           },
         ],
         yAxis: [
           {
             type: "value",
-            // name: '(%)',
+            nameTextStyle: {
+              fontWeight: 600,
+              fontSize: 18,
+            },
             axisTick: {
               show: false,
             },
-            axisLine: {
-              lineStyle: {
-                color: "#57617B",
-              },
-            },
-            axisLabel: {
-              margin: 10,
-              textStyle: {
-                fontSize: 14,
-              },
-            },
-            splitLine: {
-              lineStyle: {
-                color: "#57617B",
-              },
-            },
+            // data: [50000, 100000, 150000, 200000, 250000],
           },
         ],
         series: [
           {
-            name: "访问次数",
+            name: "浏览量",
             type: "line",
-            smooth: true,
-            symbol: "circle",
-            symbolSize: 5,
-            showSymbol: false,
-            lineStyle: {
-              normal: {
-                width: 1,
-              },
-            },
-            areaStyle: {
-              normal: {
-                color: new echarts.graphic.LinearGradient(
-                  0,
-                  0,
-                  0,
-                  1,
-                  [
-                    {
-                      offset: 0,
-                      color: "rgba(137, 189, 27, 0.3)",
-                    },
-                    {
-                      offset: 0.8,
-                      color: "rgba(137, 189, 27, 0)",
-                    },
-                  ],
-                  false
-                ),
-                shadowColor: "rgba(0, 0, 0, 0.1)",
-                shadowBlur: 10,
-              },
-            },
             itemStyle: {
               normal: {
-                color: "rgb(137,189,27)",
-                borderColor: "#5fb4db",
-                borderWidth: 12,
+                color: "#A4C4FE",
               },
             },
-            // data: [220, 182, 191, 134, 150, 120, 110, 125, 145, 122, 165, 122]
-            data: [1522, 16895, 12032, 4562, 150698, 120],
+            lineStyle: {
+              width: 3,
+            },
+            // data: [120152, 132120, 265235, 144225, 178212, 168885],
+            data: this.pv,
           },
           {
-            name: "浏览量(PV)",
+            name: "访客数",
             type: "line",
-            smooth: true,
-            symbol: "circle",
-            symbolSize: 5,
-            showSymbol: false,
-            lineStyle: {
-              normal: {
-                width: 1,
-              },
-            },
-            areaStyle: {
-              normal: {
-                color: new echarts.graphic.LinearGradient(
-                  0,
-                  0,
-                  0,
-                  1,
-                  [
-                    {
-                      offset: 0,
-                      color: "rgba(0, 136, 212, 0.3)",
-                    },
-                    {
-                      offset: 0.8,
-                      color: "rgba(0, 136, 212, 0)",
-                    },
-                  ],
-                  false
-                ),
-                shadowColor: "rgba(0, 0, 0, 0.1)",
-                shadowBlur: 10,
-              },
-            },
             itemStyle: {
               normal: {
-                color: "rgb(0,136,212)",
-                borderColor: "rgba(0,136,212,0.2)",
-                borderWidth: 12,
+                color: "yellow",
               },
             },
-            data: [12012, 13210, 26535, 14425, 17822, 168885],
+            lineStyle: {
+              width: 3,
+            },
+            // data: [120152, 132120, 265235, 144225, 178212, 168885],
+            data: this.uv,
+          },
+          {
+            name: "访问次数",
+            type: "line",
+            itemStyle: {
+              normal: {
+                color: "#3D64E6",
+                // borderColor: "#5fb4db",
+                // borderWidth: 12,
+              },
+            },
+            lineStyle: {
+              width: 3,
+            },
+            data: this.visit,
+          },
+          {
+            name: "IP数",
+            type: "line",
+            itemStyle: {
+              normal: {
+                color: "red",
+                // borderColor: "#5fb4db",
+                // borderWidth: 12,
+              },
+            },
+            lineStyle: {
+              width: 3,
+            },
+            data: this.ipCount,
+          },
+          {
+            name: "跳出率",
+            type: "line",
+            itemStyle: {
+              normal: {
+                color: "pink",
+                // borderColor: "#5fb4db",
+                // borderWidth: 12,
+              },
+            },
+            lineStyle: {
+              width: 3,
+            },
+            data: this.bounceRate,
           },
         ],
       });
@@ -253,6 +359,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/styles/components/custom-select.scss";
 .trafficHead {
   font-size: 16px;
   font-weight: 400;

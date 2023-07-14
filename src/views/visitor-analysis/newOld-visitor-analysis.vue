@@ -1,6 +1,6 @@
 <template>
   <div>
-    <FilterBar></FilterBar>
+    <FilterBar @setFilterBarParams="setFilterBarParams"></FilterBar>
     <div class="Overview">
       <div class="trafficHead" style="padding-left: 15px">新老访客分析</div>
       <div class="bid-list-page">
@@ -47,20 +47,45 @@
         </div>
       </div>
     </div>
-    <newOldAnalysis></newOldAnalysis>
+    <newOldAnalysis ref="newOldAnalysis" :commonParams="commonParams"></newOldAnalysis>
   </div>
 </template>
 
 <script>
 // import Dropzone from '@/components/Dropzone'
 import { FilterBar } from "@/layout/components";
-import newOldAnalysis from "./chart-component/newOld-visitor-analysis";
-
+import newOldAnalysis from "./chart-component/newOld-visitor-analysisTable";
+import { copyObj } from "@/utils/copy";
 export default {
   components: {
     FilterBar,
     newOldAnalysis,
   },
+  computed: {
+    commonParams() {
+      return Object.assign({}, this.filterBarParams);
+    },
+  },
+  watch: {
+    commonParams(val) {
+      this.getIndexData();
+    },
+  },
+  data() {
+    return {
+      filterBarParams:null,
+    };
+  },
+  methods:{
+    setFilterBarParams(val){
+      this.filterBarParams = copyObj(val);
+    },
+    getIndexData() {
+      this.$nextTick(() => {
+        this.$refs.newOldAnalysis.getVisitorDetail();
+      });
+    },
+  }
 };
 </script>
 

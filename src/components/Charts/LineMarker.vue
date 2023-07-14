@@ -81,9 +81,16 @@ export default {
       const { time, pv, uv, visit, ipCount, bounceRate } = this;
       // 时间
       
+      // this.flowTrendList.map((item) => {
+      //   if (item.time) {
+      //     return time.push(item.time.slice(11, 13));
+      //   } else {
+      //     time.push(0);
+      //   }
+      // });
       this.flowTrendList.map((item) => {
-        if (item.time) {
-          return time.push(item.time.slice(11, 13));
+        if (item.statHour) {
+          return time.push(item.statHour);
         } else {
           time.push(0);
         }

@@ -208,7 +208,7 @@ export default {
     //   this.areadefault = this.areaList.join("、");
     // }
     if (this.areaList) {
-      this.areadefault = this.area;
+      this.areadefault = this.areaValue;
     }
     this.handleAdd();
     this.setTopFilterParams(this.commonParams);
@@ -218,7 +218,7 @@ export default {
       return [this.channelValue ];
     },
     area(){
-      return this.areaValue
+      return [this.areaValue]
     },
     project() {
       return this.$store.getters.project;

@@ -2,28 +2,40 @@
   <div class="TrendChart block-main">
     <div class="block-head">
       <div class="block-title">趋势图</div>
-      <el-cascader
+      <!-- collapse-tags -->
+      <!-- <el-cascader
         v-model="headLege"
-        style="width: 170px; margin-left: 20px"
+        style="width: 270px; margin-left: 20px"
         placeholder="指标 | 选项"
         :options="options"
         :props="{ multiple: true, checkStrictly: true }"
         clearable
-        collapse-tags
         @change="handleCheckPointer"
-      ></el-cascader>
-      <div style="margin-left: 20px">
-        <el-radio-group
-          size="small"
-          v-model="specificTTime"
-          style="font-size: 12px"
+      ></el-cascader> -->
+
+      <!-- 调整功能 -->
+      <el-select
+        class="custom_select"
+        v-model="headLege"
+        multiple
+        placeholder="请选择"
+        style="margin-left: 20px; min-width: 280px"
+        @change="handleCheckPointer"
+      >
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+          :disabled="disabledSelect.includes(item.value)"
         >
-          <el-radio-button label="time">按时</el-radio-button>
-          <el-radio-button label="day">按日</el-radio-button>
-          <el-radio-button label="week">按周</el-radio-button>
-          <el-radio-button label="month">按月</el-radio-button>
-        </el-radio-group>
-      </div>
+          <div style="display: flex; align-items: center">
+            <span class="checkbox__inner"><div class="inner-box"></div></span>
+            <span style="">{{ item.label }}</span>
+          </div>
+        </el-option>
+      </el-select>
+
       <div
         class="block-head-icon"
         @click="$router.push('/visitorAnalysis/trendAnalysis')"
@@ -38,8 +50,8 @@
       height="350px"
       width="100%"
       :flowTrendListed="flowTrendList"
-      :defaultLege  = "headLege"
-      ref = "trendChartRef"
+      :defaultLege="headLege"
+      ref="trendChartRef"
     />
   </div>
 </template>
@@ -55,33 +67,38 @@ export default {
   },
   data() {
     return {
-      
       options: [
         {
           value: "浏览量",
           label: "浏览量",
+          disabled: false,
         },
         {
-          value:"访客数",
+          value: "访客数",
           label: "访客数",
+          disabled: false,
         },
         {
           value: "访问次数",
           label: "访问次数",
+          disabled: false,
         },
         {
           value: "IP数",
           label: "IP数",
+          disabled: false,
         },
         {
           value: "跳出率",
           label: "跳出率",
+          disabled: false,
         },
       ],
       flowTrendList: null,
       flag: false,
       specificTTime: "time",
-      headLege:["浏览量", "访问次数"],
+      headLege: ["浏览量", "访问次数"],
+      disabledSelect: [],
     };
   },
   created() {},
@@ -91,9 +108,9 @@ export default {
     },
   },
   watch: {
-    specificTTime(val){
-      this.getFlowTrend()
-    }
+    specificTTime(val) {
+      this.getFlowTrend();
+    },
   },
   methods: {
     getFlowTrend() {
@@ -104,17 +121,30 @@ export default {
         }
       });
     },
-    handleCheckPointer(e){
+    handleCheckPointer(e) {
+      let result = [];
+      for (let i = 0; i < this.options.length; i++) {
+        result.push(this.options[i].label);
+        if (e.length > 2) {
+          this.disabledSelect = result.filter((item) => {
+            return e.indexOf(item) == -1;
+          });
+        } else {
+          this.disabledSelect = [];
+        }
+      }
       this.headLege = e.flat(Infinity);
-      this.$refs.trendChartRef.changeLegend(this.headLege)
+      this.$refs.trendChartRef.changeLegend(this.headLege);
     },
   },
 };
 </script>
-
 <style lang="scss" scoped>
-::v-deep .el-radio-button--mini .el-radio-button__inner {
-  height: 30px;
+@import "~@/styles/components/custom-select.scss";
+::v-deep {
+  .el-radio-button--mini .el-radio-button__inner {
+    height: 30px;
+  }
 }
 .TrendChart {
   .block-head {
@@ -124,5 +154,10 @@ export default {
   .point {
     padding-right: 10px;
   }
+  // .custom_select
+  //     .el-select-dropdown.is-multiple
+  //     .el-select-dropdown__item.selected::after {
+  //     display: none !important;
+  //   }
 }
 </style>

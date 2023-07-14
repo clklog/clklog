@@ -9,3 +9,11 @@ export function getVisitorApi(params) {
     data: params
   })
 }
+// 获取访客详情
+export function getVisitorDetailApi(params) {
+  return request({
+    url: BASE_API + '/visitor/getVisitorDetail',
+    method: 'post',
+    data: params
+  })
+}

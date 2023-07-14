@@ -24,12 +24,10 @@
     </div>
 
     <div class="table-content">
-      <el-table
+      <!-- <el-table
         :header-cell-style="{ textAlign: 'center' }"
         :cell-style="{ textAlign: 'center' }"
         :data="tableData"
-        :span-method="arraySpanMethod"
-        border
         style="width: 100%"
       >
         <el-table-column type="index" label="序号" width="150" />
@@ -42,13 +40,31 @@
         <el-table-column prop="date" label="流量质量指标" width="150">
           <el-table-column prop="amount8" label="跳出率" sortable />
           <el-table-column prop="amount9" label="平均访问时长" sortable />
-          <!-- <el-table-column prop="amount10" label="平均访问页数" sortable /> -->
+        </el-table-column>
+      </el-table> -->
+      <el-table
+        :header-cell-style="{ textAlign: 'center' }"
+        :cell-style="{ textAlign: 'center' }"
+        :data="visitorDetailData"
+        style="width: 100%"
+      >
+        <el-table-column type="index" label="序号" width="150" />
+        <el-table-column prop="visitorType" label="访客类型" width="150" />
+        <el-table-column label="流量基础指标" width="150">
+          <el-table-column prop="pv" label="浏览量(PV)" sortable />
+          <el-table-column prop="uv" label="访客数(UV)" sortable />
+          <el-table-column prop="ipCount" label="IP数" sortable />
+        </el-table-column>
+        <el-table-column label="流量质量指标" width="150">
+          <el-table-column prop="bounceRate" label="跳出率" sortable />
+          <el-table-column prop="avgVisitTime" label="平均访问时长" sortable />
         </el-table-column>
       </el-table>
+      
     </div>
     <div class="block">
       <el-pagination
-         next-text="下一页"
+        next-text="下一页"
         :current-page="currentPage4"
         :page-sizes="[10, 20, 30, 40]"
         :page-size="10"
@@ -62,69 +78,25 @@
 </template>
 
 <script>
+import { getVisitorDetailApi } from "@/api/trackingapi/visitor";
 export default {
+  props: {
+    commonParams: {},
+  },
+  mounted() {},
+  computed: {
+    params() {
+      // delete this.commonParams.project;
+      // this.commonParams.startTime = ''
+      // this.commonParams.endTime = ''
+      return Object.assign({}, this.commonParams);
+    },
+  },
   data() {
     return {
       channelList: ["3", "5"],
       flowQuality: ["9"],
-      tableData1: [
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-08",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 2003233,
-        },
-        {
-          date: "2016-05-06",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-07",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-      ],
+      visitorDetailData: [],
       tableData: [
         {
           dataTime: "总计",
@@ -170,40 +142,26 @@ export default {
     };
   },
   methods: {
-    // 分页器
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
-
-    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
-      //   if (rowIndex % 2 === 0) {
-      //     if (columnIndex === 0) {
-      //       return [1, 2];
-      //     } else if (columnIndex === 1) {
-      //       return [0, 0];
-      //     }
-      //   }
-    },
-
-    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      console.log("降序");
-      if (columnIndex === 0) {
-        if (rowIndex % 2 === 0) {
-          return {
-            rowspan: 2,
-            colspan: 1,
-          };
-        } else {
-          return {
-            rowspan: 0,
-            colspan: 0,
-          };
+    getVisitorDetail() {
+      getVisitorDetailApi(this.params).then((res) => {
+        if (res.data) {
+          this.visitorDetailData = []
+          Object.keys(res.data).forEach((key) => {
+            if (key == "newVisitor") {
+              res.data[key].visitorType = "新访客";
+            } else if (key == "oldVisitor") {
+              res.data[key].visitorType = "老访客";
+            } else if (key == "total") {
+              res.data[key].visitorType = "总计";
+            }
+            this.visitorDetailData.push(res.data[key]);
+          });
         }
-      }
+      });
     },
+    // 分页器
+    handleSizeChange(val) {},
+    handleCurrentChange(val) {},
   },
 };
 </script>
@@ -211,7 +169,6 @@ export default {
 .chartsIcon .flow-indicator .flow-item .el-checkbox {
   width: 100px !important;
 }
-
 </style>
 
 <style lang="scss" scoped>
@@ -274,11 +231,10 @@ export default {
   }
   .block {
     margin: 20px 12px;
-  
   }
 }
 ::v-deep {
-  .el-pagination{
+  .el-pagination {
     position: relative;
     width: 100%;
     display: flex;
@@ -289,6 +245,5 @@ export default {
     position: absolute;
     left: 0;
   }
-  
 }
 </style>

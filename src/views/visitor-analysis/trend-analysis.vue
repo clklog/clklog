@@ -58,7 +58,7 @@
         </div>
       </div>
     </div>
-    <indicatorChart v-if="flowTrendList" :flowTrendList="flowTrendList" />
+    <indicatorChart v-if="flowTrendList"  :flowTrendListed="flowTrendList" ref = "indicatorChart"/>
     <trendTable />
   </div>
 </template>
@@ -88,7 +88,6 @@ export default {
   created() {
     this.filterBarValue = this.checkList;
     this.filterBarValue.projectName = this.$store.state.tracking.project;
-    console.log(this.commonParams,3243);
   },
   computed: {
     checkList() {
@@ -100,34 +99,18 @@ export default {
   },
   watch: {
     commonParams(val) {
-      this.getFlow()
+      this.getFlowTrend()
     },
   },
   methods: {
     setFilterBarParams(val){
-      // console.log(val,"params");
       this.filterBarParams = copyObj(val);
     },
-    getFlow() {
-      const params = {
-        // 测试数据
-        timeType: this.filterBarValue.dateList,
-        channel: this.filterBarValue.channelCheck,
-        area: this.filterBarValue.areaList,
-        visitorType: this.filterBarValue.visitorValue,
-        startTime: "2023-06-08",
-        endTime: "2023-06-10",
-        // startTime: this.filterBarValue.dateRange
-        //   ? this.filterBarValue.dateRange[0]
-        //   : "",
-        // endTime: this.filterBarValue.dateRange
-        //   ? this.filterBarValue.dateRange[1]
-        //   : "",
-        projectName: "在线拍",
-      };
+    getFlowTrend() {
       getFlowTrendApi(this.commonParams).then((res) => {
         if (res.code == 200) {
           this.flowTrendList = res.data;
+          // this.$refs.indicatorChart.changeChartValue(this.flowTrendList)
         }
       });
     },
