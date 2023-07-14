@@ -1,10 +1,9 @@
 import request from '@/utils/request'
 
-const BASE_API = process.env.VUE_APP_BASE_API ? process.env.VUE_APP_BASE_API : '/api'
 //获取访客
 export function getVisitorApi(params) {
   return request({
-    url: BASE_API + '/visitor/getVisitor',
+    url: '/visitor/getVisitor',
     method: 'post',
     data: params
   })
@@ -12,7 +11,7 @@ export function getVisitorApi(params) {
 // 获取访客详情
 export function getVisitorDetailApi(params) {
   return request({
-    url: BASE_API + '/visitor/getVisitorDetail',
+    url: '/visitor/getVisitorDetail',
     method: 'post',
     data: params
   })

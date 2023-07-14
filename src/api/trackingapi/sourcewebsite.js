@@ -1,10 +1,9 @@
 import request from '@/utils/request'
 
-const BASE_API = process.env.VUE_APP_BASE_API ? process.env.VUE_APP_BASE_API : '/api'
 // 获取Top10来源网站
 export function getSourceWebsiteApi(params) {
   return request({
-    url: BASE_API + '/sourcewebsite/getSourceWebsite',
+    url: '/sourcewebsite/getSourceWebsite',
     method: 'post',
     data: params
   })
@@ -13,7 +12,7 @@ export function getSourceWebsiteApi(params) {
 // 获取来源网站详情
 export function getSourceSiteDetailApi(params) {
   return request({
-    url: BASE_API + '/sourcewebsite/getSourceSiteDetail',
+    url: '/sourcewebsite/getSourceSiteDetail',
     method: 'post',
     data: params
   })
