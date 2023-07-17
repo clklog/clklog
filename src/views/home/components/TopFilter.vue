@@ -29,43 +29,55 @@
 
 <script>
 import { timestampToTime } from "@/utils/timestampToTime";
+import { formatDate } from "@/utils/format";
 export default {
   name: "TopFilter",
   data() {
     return {
       timeType: "day",
       channelValue: "",
-      // startTime: "2023-06-07",
-      // endTime: "2023-06-08",
-      startTime:"",
-      endTime:"",
     };
   },
   computed: {
     channel() {
       return [this.channelValue];
     },
+    startTime() {
+      switch (this.timeType) {
+        case "day":
+          break;
+
+        default:
+          break;
+      }
+    },
+    implied() {
+      const { startTime, endTime } = this;
+      return { startTime, endTime };
+    },
     filterParams() {
-      const { timeType, channel, startTime, endTime } = this;
-      return { timeType, channel, startTime, endTime };
+      const { timeType, channel } = this;
+      return { timeType, channel };
     },
   },
   mounted() {
-    this.startTime = new Date().getFullYear() +
-        "-" +
-        (new Date().getMonth() + 1 < 10
-          ? "0" + (new Date().getMonth() + 1)
-          : new Date().getMonth() + 1) +
-        "-" +
-        new Date().getDate()
-    this.endTime = new Date().getFullYear() +
-        "-" +
-        (new Date().getMonth() + 1 < 10
-          ? "0" + (new Date().getMonth() + 1)
-          : new Date().getMonth() + 1) +
-        "-" +
-        new Date().getDate()
-    // this.setTopFilterParams(this.filterParams);
+    this.startTime =
+      new Date().getFullYear() +
+      "-" +
+      (new Date().getMonth() + 1 < 10
+        ? "0" + (new Date().getMonth() + 1)
+        : new Date().getMonth() + 1) +
+      "-" +
+      new Date().getDate();
+    this.endTime =
+      new Date().getFullYear() +
+      "-" +
+      (new Date().getMonth() + 1 < 10
+        ? "0" + (new Date().getMonth() + 1)
+        : new Date().getMonth() + 1) +
+      "-" +
+      new Date().getDate();
+    this.setTopFilterParams(this.filterParams);
   },
   watch: {
     filterParams(val) {
@@ -74,7 +86,8 @@ export default {
   },
   methods: {
     setTopFilterParams(val) {
-      this.$emit("setTopFilterParams", val);
+      let _val = Object.assign(val, this.implied);
+      this.$emit("setTopFilterParams", _val);
     },
     formData(val) {
       return (
@@ -88,16 +101,9 @@ export default {
       );
     },
     handleChange(val) {
-      let date = new Date();
-      let toData = new Date(new Date().toLocaleDateString()).getTime() + 8 * 3600 * 1000;
-      let today =
-        new Date().getFullYear() +
-        "-" +
-        (new Date().getMonth() + 1 < 10
-          ? "0" + (new Date().getMonth() + 1)
-          : new Date().getMonth() + 1) +
-        "-" +
-        new Date().getDate();
+      let toData =
+        new Date(new Date().toLocaleDateString()).getTime() + 8 * 3600 * 1000;
+      let today = formatDate(new Date());
 
       if (val == "day") {
         this.startTime = today;
