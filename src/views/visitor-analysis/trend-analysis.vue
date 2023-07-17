@@ -118,6 +118,7 @@ export default {
     },
     setFilterBarParams(val) {
       this.filterBarParams = copyObj(val);
+      console.log(this.filterBarParams)
     },
     getFlowTrend() {
       getFlowTrendApi(this.commonParams).then((res) => {
