@@ -357,7 +357,6 @@ export default {
   },
 };
 </script>
-
 <style lang="scss" scoped>
 @import "~@/styles/components/custom-select.scss";
 .trafficHead {

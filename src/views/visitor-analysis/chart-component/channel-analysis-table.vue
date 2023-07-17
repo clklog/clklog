@@ -149,18 +149,21 @@
             <el-checkbox label="1">浏览量(PV)</el-checkbox>
             <el-checkbox label="2">浏览量占比</el-checkbox>
             <el-checkbox label="3">访问次数</el-checkbox>
-            <el-checkbox label="4">访客数(UV)</el-checkbox>
-            <el-checkbox label="5">新访客数</el-checkbox>
-            <el-checkbox label="6">新访客比率</el-checkbox>
-            <el-checkbox label="7" style="margin-right: 0">IP数</el-checkbox>
+            <el-checkbox label="4">访问次数占比</el-checkbox>
+            <el-checkbox label="5">访客数(UV)</el-checkbox>
+            <el-checkbox label="6">访客数占比</el-checkbox>
+            <el-checkbox label="7">新访客数</el-checkbox>
+            <el-checkbox label="8">新访客数占比</el-checkbox>
+            <el-checkbox label="9">新访客比率</el-checkbox>
+            <el-checkbox label="10" style="margin-right: 0">IP数</el-checkbox>
           </el-checkbox-group>
         </div>
         <div class="flow-item setSpace">
           <div class="flow-title">流量质量指标</div>
           <el-checkbox-group v-model="flowQuality" class="checkBoxStyle">
-            <el-checkbox label="8">跳出率</el-checkbox>
-            <el-checkbox label="9">平均访问时长</el-checkbox>
-            <el-checkbox label="10">平均访问页数</el-checkbox>
+            <el-checkbox label="11">跳出率</el-checkbox>
+            <el-checkbox label="12">平均访问时长</el-checkbox>
+            <el-checkbox label="13">平均访问页数</el-checkbox>
           </el-checkbox-group>
         </div>
       </div>
@@ -444,6 +447,7 @@ img {
       margin-top: 12px;
       margin-left: 10px;
       .flow-title {
+        white-space: nowrap;
         margin-right: 21px;
         font-size: 12px;
         font-weight: 400;

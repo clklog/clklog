@@ -159,7 +159,7 @@ export default {
     };
   },
   created() {
-    this.getSearchWordDetail();
+    // this.getSearchWordDetail();
   },
   methods: {
     // 关键词详情页

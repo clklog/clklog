@@ -8,53 +8,131 @@
         <div class="header-name w156"></div>
         <div class="header-name w156">
           浏览量(PV)
-          <img
-            class="icon-question"
-            src="@/assets/images/question.png"
-            alt=""
-          />
+          <el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              用户每打开一个页面被记录一次，同一页面打开多次浏览量值累计计算。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
         </div>
         <div class="header-name w156">
-          访问次数<img
-            class="icon-question"
-            src="@/assets/images/question.png"
-            alt=""
-          />
+          访问次数
+          <el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
         </div>
         <div class="header-name w156">
-          访问数<img
-            class="icon-question"
-            src="@/assets/images/question.png"
-            alt=""
-          />
+          访问数<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              访客数以Cookie或设备ID为依据，选定时间段内同一访客多次访问应用只计算为一个访客。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
         </div>
         <div class="header-name w156">
-          IP数<img
-            class="icon-question"
-            src="@/assets/images/question.png"
-            alt=""
-          />
+          IP数<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              一天之内您网站的独立访问ip数。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
         </div>
         <div class="header-name w156">
-          平均访问页面<img
-            class="icon-question"
-            src="@/assets/images/question.png"
-            alt=""
-          />
+          平均访问页面<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              访客每次访问的页面打开第一个页面到退出或关闭最后一个页面。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
         </div>
         <div class="header-name w156">
-          平均访问时长<img
-            class="icon-question"
-            src="@/assets/images/question.png"
-            alt=""
-          />
+          平均访问时长<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              访客每次访问的总时长为打开第一个页面到退出或关闭最后一个页面的总时长。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
         </div>
         <div class="header-name w156">
-          跳出率<img
-            class="icon-question"
-            src="@/assets/images/question.png"
-            alt=""
-          />
+          跳出率<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
         </div>
       </div>
       <div class="bid-list-record">
@@ -117,44 +195,160 @@
         <div class="bid-list-item w157">
           <p>{{ huanbi(current.pv, previous.pv) }}</p>
           <p v-if="huanbi(current.pv, previous.pv) != '--'">%</p>
-          <img v-if="huanbi(current.pv, previous.pv) != '--' && huanbi(current.pv, previous.pv) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="huanbi(current.pv, previous.pv) != '--' && huanbi(current.pv, previous.pv) > 0" class="riseImg" src="@/assets/images/rise.png" alt="">
+          <img
+            v-if="
+              huanbi(current.pv, previous.pv) != '--' &&
+              huanbi(current.pv, previous.pv) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              huanbi(current.pv, previous.pv) != '--' &&
+              huanbi(current.pv, previous.pv) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
           <p>{{ huanbi(current.visit, previous.visit) }}</p>
           <p v-if="huanbi(current.visit, previous.visit) != '--'">%</p>
-          <img v-if="huanbi(current.visit, previous.visit) != '--' && huanbi(current.visit, previous.visit) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="huanbi(current.visit, previous.visit) != '--' && huanbi(current.visit, previous.visit) > 0" class="riseImg" src="@/assets/images/rise.png" alt="">
+          <img
+            v-if="
+              huanbi(current.visit, previous.visit) != '--' &&
+              huanbi(current.visit, previous.visit) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              huanbi(current.visit, previous.visit) != '--' &&
+              huanbi(current.visit, previous.visit) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
-          <p>{{ huanbi(current.uv, previous.uv) }} </p>
+          <p>{{ huanbi(current.uv, previous.uv) }}</p>
           <p v-if="huanbi(current.uv, previous.uv) != '--'">%</p>
-          <img v-if="huanbi(current.uv, previous.uv) != '--' && huanbi(current.uv, previous.uv) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="huanbi(current.uv, previous.uv) != '--' && huanbi(current.uv, previous.uv) > 0"  class="riseImg" src="@/assets/images/rise.png" alt="">
+          <img
+            v-if="
+              huanbi(current.uv, previous.uv) != '--' &&
+              huanbi(current.uv, previous.uv) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              huanbi(current.uv, previous.uv) != '--' &&
+              huanbi(current.uv, previous.uv) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
-          <p>{{ huanbi(current.ipCount, previous.ipCount) }} </p>
+          <p>{{ huanbi(current.ipCount, previous.ipCount) }}</p>
           <p v-if="huanbi(current.ipCount, previous.ipCount) != '--'">%</p>
-          <img v-if="huanbi(current.ipCount, previous.ipCount) != '--' && huanbi(current.ipCount, previous.ipCount) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="huanbi(current.ipCount, previous.ipCount) != '--' && huanbi(current.ipCount, previous.ipCount) > 0"  class="riseImg" src="@/assets/images/rise.png" alt="">
+          <img
+            v-if="
+              huanbi(current.ipCount, previous.ipCount) != '--' &&
+              huanbi(current.ipCount, previous.ipCount) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              huanbi(current.ipCount, previous.ipCount) != '--' &&
+              huanbi(current.ipCount, previous.ipCount) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
           <p>{{ huanbi(current.avgPv, previous.avgPv) }}</p>
           <p v-if="huanbi(current.avgPv, previous.avgPv) != '--'">%</p>
-          <img v-if="huanbi(current.avgPv, previous.avgPv) != '--' && huanbi(current.avgPv, previous.avgPv) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="huanbi(current.avgPv, previous.avgPv) != '--' && huanbi(current.avgPv, previous.avgPv) > 0"  class="riseImg" src="@/assets/images/rise.png" alt="">
+          <img
+            v-if="
+              huanbi(current.avgPv, previous.avgPv) != '--' &&
+              huanbi(current.avgPv, previous.avgPv) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              huanbi(current.avgPv, previous.avgPv) != '--' &&
+              huanbi(current.avgPv, previous.avgPv) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
           <p>{{ huanbi(current.avgVisitTime, previous.avgVisitTime) }}</p>
-          <p v-if="huanbi(current.avgVisitTime, previous.avgVisitTime) != '--'">%</p>
-          <img v-if="huanbi(current.avgVisitTime, previous.avgVisitTime) != '--' && huanbi(current.avgVisitTime, previous.avgVisitTime) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="huanbi(current.avgVisitTime, previous.avgVisitTime) != '--' && huanbi(current.avgVisitTime, previous.avgVisitTime) > 0"  class="riseImg" src="@/assets/images/rise.png" alt="">
+          <p v-if="huanbi(current.avgVisitTime, previous.avgVisitTime) != '--'">
+            %
+          </p>
+          <img
+            v-if="
+              huanbi(current.avgVisitTime, previous.avgVisitTime) != '--' &&
+              huanbi(current.avgVisitTime, previous.avgVisitTime) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              huanbi(current.avgVisitTime, previous.avgVisitTime) != '--' &&
+              huanbi(current.avgVisitTime, previous.avgVisitTime) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
           <p>{{ huanbi(current.bounceRate, previous.bounceRate) }}</p>
-          <p v-if="huanbi(current.bounceRate, previous.bounceRate) != '--'">%</p>
-          <img v-if="huanbi(current.bounceRate, previous.bounceRate) != '--' && huanbi(current.bounceRate, previous.bounceRate) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="huanbi(current.bounceRate, previous.bounceRate) != '--' && huanbi(current.bounceRate, previous.bounceRate) > 0"  class="riseImg" src="@/assets/images/rise.png" alt="">
+          <p v-if="huanbi(current.bounceRate, previous.bounceRate) != '--'">
+            %
+          </p>
+          <img
+            v-if="
+              huanbi(current.bounceRate, previous.bounceRate) != '--' &&
+              huanbi(current.bounceRate, previous.bounceRate) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              huanbi(current.bounceRate, previous.bounceRate) != '--' &&
+              huanbi(current.bounceRate, previous.bounceRate) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
       </div>
       <div class="bid-list-record" style="margin-bottom: 0">
@@ -164,45 +358,163 @@
         <div class="bid-list-item w157">
           <p>{{ tongbi(current.pv, samePeriod.pv) }}</p>
           <p v-if="tongbi(current.pv, samePeriod.pv) != '--'">%</p>
-          <img  v-if="tongbi(current.pv, samePeriod.pv) != '--' && tongbi(current.pv, samePeriod.pv) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="tongbi(current.pv, samePeriod.pv) != '--' && tongbi(current.pv, samePeriod.pv) > 0" class="riseImg" src="@/assets/images/rise.png" alt="">
+          <img
+            v-if="
+              tongbi(current.pv, samePeriod.pv) != '--' &&
+              tongbi(current.pv, samePeriod.pv) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              tongbi(current.pv, samePeriod.pv) != '--' &&
+              tongbi(current.pv, samePeriod.pv) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
 
         <div class="bid-list-item w157">
           <p>{{ tongbi(current.visit, samePeriod.visit) }}</p>
           <p v-if="tongbi(current.visit, samePeriod.visit) != '--'">%</p>
-          <img  v-if="tongbi(current.visit, samePeriod.visit) != '--' && tongbi(current.visit, samePeriod.visit) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="tongbi(current.visit, samePeriod.visit) != '--' && tongbi(current.visit, samePeriod.visit) > 0" class="riseImg" src="@/assets/images/rise.png" alt="">
+          <img
+            v-if="
+              tongbi(current.visit, samePeriod.visit) != '--' &&
+              tongbi(current.visit, samePeriod.visit) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              tongbi(current.visit, samePeriod.visit) != '--' &&
+              tongbi(current.visit, samePeriod.visit) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
           <p>{{ tongbi(current.uv, samePeriod.uv) }}</p>
           <p v-if="tongbi(current.uv, samePeriod.uv) != '--'">%</p>
-          <img  v-if="tongbi(current.uv, samePeriod.uv) != '--' && tongbi(current.uv, samePeriod.uv) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="tongbi(current.uv, samePeriod.uv) != '--' && tongbi(current.uv, samePeriod.uv) > 0" class="riseImg" src="@/assets/images/rise.png" alt="">
+          <img
+            v-if="
+              tongbi(current.uv, samePeriod.uv) != '--' &&
+              tongbi(current.uv, samePeriod.uv) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              tongbi(current.uv, samePeriod.uv) != '--' &&
+              tongbi(current.uv, samePeriod.uv) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
           <p>{{ tongbi(current.ipCount, samePeriod.ipCount) }}</p>
           <p v-if="tongbi(current.ipCount, samePeriod.ipCount) != '--'">%</p>
-          <img  v-if="tongbi(current.ipCount, samePeriod.ipCount) != '--' && tongbi(current.ipCount, samePeriod.ipCount) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="tongbi(current.ipCount, samePeriod.ipCount) != '--' && tongbi(current.ipCount, samePeriod.ipCount) > 0" class="riseImg" src="@/assets/images/rise.png" alt="">
+          <img
+            v-if="
+              tongbi(current.ipCount, samePeriod.ipCount) != '--' &&
+              tongbi(current.ipCount, samePeriod.ipCount) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              tongbi(current.ipCount, samePeriod.ipCount) != '--' &&
+              tongbi(current.ipCount, samePeriod.ipCount) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
           <p>{{ tongbi(current.avgPv, samePeriod.avgPv) }}</p>
           <p v-if="tongbi(current.avgPv, samePeriod.avgPv) != '--'">%</p>
-          <img  v-if="tongbi(current.avgPv, samePeriod.avgPv) != '--' && tongbi(current.avgPv, samePeriod.avgPv) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="tongbi(current.avgPv, samePeriod.avgPv) != '--' && tongbi(current.avgPv, samePeriod.avgPv) > 0" class="riseImg" src="@/assets/images/rise.png" alt="">
+          <img
+            v-if="
+              tongbi(current.avgPv, samePeriod.avgPv) != '--' &&
+              tongbi(current.avgPv, samePeriod.avgPv) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              tongbi(current.avgPv, samePeriod.avgPv) != '--' &&
+              tongbi(current.avgPv, samePeriod.avgPv) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
           <p>{{ tongbi(current.avgVisitTime, samePeriod.avgVisitTime) }}</p>
-          <p v-if="tongbi(current.avgVisitTime, samePeriod.avgVisitTime) != '--'">%</p>
-          <img  v-if="tongbi(current.avgVisitTime, samePeriod.avgVisitTime) != '--' && tongbi(current.avgVisitTime, samePeriod.avgVisitTime) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="tongbi(current.avgVisitTime, samePeriod.avgVisitTime) != '--' && tongbi(current.avgVisitTime, samePeriod.avgVisitTime) > 0" class="riseImg" src="@/assets/images/rise.png" alt="">
+          <p
+            v-if="tongbi(current.avgVisitTime, samePeriod.avgVisitTime) != '--'"
+          >
+            %
+          </p>
+          <img
+            v-if="
+              tongbi(current.avgVisitTime, samePeriod.avgVisitTime) != '--' &&
+              tongbi(current.avgVisitTime, samePeriod.avgVisitTime) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              tongbi(current.avgVisitTime, samePeriod.avgVisitTime) != '--' &&
+              tongbi(current.avgVisitTime, samePeriod.avgVisitTime) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
         <div class="bid-list-item w157">
           <p>{{ tongbi(current.bounceRate, samePeriod.bounceRate) }}</p>
-          <p v-if="tongbi(current.bounceRate, samePeriod.bounceRate) != '--'">%</p>
-          <img  v-if="tongbi(current.bounceRate, samePeriod.bounceRate) != '--' && tongbi(current.bounceRate, samePeriod.bounceRate) < 0" class="declineIcon" src="@/assets/images/decline.png" alt="">
-          <img v-if="tongbi(current.bounceRate, samePeriod.bounceRate) != '--' && tongbi(current.bounceRate, samePeriod.bounceRate) > 0" class="riseImg" src="@/assets/images/rise.png" alt="">
+          <p v-if="tongbi(current.bounceRate, samePeriod.bounceRate) != '--'">
+            %
+          </p>
+          <img
+            v-if="
+              tongbi(current.bounceRate, samePeriod.bounceRate) != '--' &&
+              tongbi(current.bounceRate, samePeriod.bounceRate) < 0
+            "
+            class="declineIcon"
+            src="@/assets/images/decline.png"
+            alt=""
+          />
+          <img
+            v-if="
+              tongbi(current.bounceRate, samePeriod.bounceRate) != '--' &&
+              tongbi(current.bounceRate, samePeriod.bounceRate) > 0
+            "
+            class="riseImg"
+            src="@/assets/images/rise.png"
+            alt=""
+          />
         </div>
       </div>
     </div>
@@ -218,7 +530,7 @@ export default {
   },
   data() {
     return {
-      iconShow:true,
+      iconShow: true,
       flowData: null, //流量概览
     };
   },
@@ -251,7 +563,7 @@ export default {
     },
     huanbi(c, p) {
       if (c && p) {
-        return ((c - p) / p).toFixed(2) ;
+        return ((c - p) / p).toFixed(2);
       }
       return "--";
     },
@@ -277,6 +589,11 @@ export default {
     .bid-list-header {
       display: flex;
       margin-bottom: 21px;
+      .popImg {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
       .header-name {
         width: 12.5%;
         justify-content: center;
@@ -316,12 +633,12 @@ export default {
         display: flex;
         align-items: center;
       }
-      .declineIcon{
+      .declineIcon {
         width: 9px;
         height: 11.24px;
         margin-left: 7px;
       }
-      .riseImg{
+      .riseImg {
         width: 9px;
         height: 11.24px;
         margin-left: 7px;
