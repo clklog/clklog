@@ -37,8 +37,8 @@ export default {
       channelValue: "",
       // startTime: "2023-06-07",
       // endTime: "2023-06-08",
-      startTime:"",
-      endTime:"",
+      startTime: "",
+      endTime: "",
     };
   },
   computed: {
@@ -51,20 +51,22 @@ export default {
     },
   },
   mounted() {
-    this.startTime = new Date().getFullYear() +
-        "-" +
-        (new Date().getMonth() + 1 < 10
-          ? "0" + (new Date().getMonth() + 1)
-          : new Date().getMonth() + 1) +
-        "-" +
-        new Date().getDate()
-    this.endTime = new Date().getFullYear() +
-        "-" +
-        (new Date().getMonth() + 1 < 10
-          ? "0" + (new Date().getMonth() + 1)
-          : new Date().getMonth() + 1) +
-        "-" +
-        new Date().getDate()
+    this.startTime =
+      new Date().getFullYear() +
+      "-" +
+      (new Date().getMonth() + 1 < 10
+        ? "0" + (new Date().getMonth() + 1)
+        : new Date().getMonth() + 1) +
+      "-" +
+      new Date().getDate();
+    this.endTime =
+      new Date().getFullYear() +
+      "-" +
+      (new Date().getMonth() + 1 < 10
+        ? "0" + (new Date().getMonth() + 1)
+        : new Date().getMonth() + 1) +
+      "-" +
+      new Date().getDate();
     // this.setTopFilterParams(this.filterParams);
   },
   watch: {
@@ -87,9 +89,13 @@ export default {
         (val.getDate() < 10 ? "0" + val.getDate() : val.getDate())
       );
     },
+    getToYear(vars) {
+      return vars + "-01-01/" + vars + "-12-31";
+    },
     handleChange(val) {
       let date = new Date();
-      let toData = new Date(new Date().toLocaleDateString()).getTime() + 8 * 3600 * 1000;
+      let toData =
+        new Date(new Date().toLocaleDateString()).getTime() + 8 * 3600 * 1000;
       let today =
         new Date().getFullYear() +
         "-" +
@@ -118,7 +124,9 @@ export default {
         this.startTime = timestampToTime(timeDifference);
         this.endTime = today;
       } else {
-        // timestampToTime(timeDifference);
+        let yearData = this.getToYear(today.slice(0, 4)).split("/");
+        this.startTime = yearData[0];
+        this.endTime = yearData[1];
       }
     },
   },
