@@ -2,11 +2,7 @@
   <div class="TopFilter">
     <div class="radio-com">
       <span class="radio-com-label">时间：</span>
-      <el-radio-group
-        v-model="timeType"
-        class="radio-com-el"
-        @change="handleChange"
-      >
+      <el-radio-group v-model="timeType" class="radio-com-el">
         <el-radio label="day">今日</el-radio>
         <el-radio label="week">本周</el-radio>
         <el-radio label="month">本月</el-radio>
@@ -45,9 +41,56 @@ export default {
     startTime() {
       switch (this.timeType) {
         case "day":
+          return formatDate(new Date());
+          break;
+        case "week":
+          let toData =
+            new Date(new Date().toLocaleDateString()).getTime() +
+            8 * 3600 * 1000;
+          let timeDifference = toData - 6 * 3600 * 24 * 1000;
+          return timestampToTime(timeDifference);
+          break;
+        case "month":
+          let monthStart = new Date();
+          monthStart.setDate(1);
+          monthStart = this.formData(monthStart);
+          return monthStart;
+          break;
+        case "year":
+          let today = formatDate(new Date());
+          let yearData = this.getToYear(today.slice(0, 4)).split("/");
+          return yearData[0];
+          break;
+        default:
+          return formatDate(new Date());
+          break;
+      }
+    },
+    endTime() {
+      switch (this.timeType) {
+        case "day":
+          return formatDate(new Date());
+          break;
+        case "week":
+          return formatDate(new Date());
+        case "month":
+          let monthStart = new Date();
+          monthStart.setDate(1);
+          monthStart = this.formData(monthStart);
+          let monthEnd = new Date(monthStart);
+          monthEnd.setMonth(monthEnd.getMonth() + 1);
+          monthEnd.setDate(0);
+          monthEnd = this.formData(monthEnd);
+          return monthEnd;
+          break;
+        case "year":
+          let today = formatDate(new Date());
+          let yearData = this.getToYear(today.slice(0, 4)).split("/");
+          return yearData[1];
           break;
 
         default:
+          return formatDate(new Date());
           break;
       }
     },
@@ -61,26 +104,11 @@ export default {
     },
   },
   mounted() {
-    this.startTime =
-      new Date().getFullYear() +
-      "-" +
-      (new Date().getMonth() + 1 < 10
-        ? "0" + (new Date().getMonth() + 1)
-        : new Date().getMonth() + 1) +
-      "-" +
-      new Date().getDate();
-    this.endTime =
-      new Date().getFullYear() +
-      "-" +
-      (new Date().getMonth() + 1 < 10
-        ? "0" + (new Date().getMonth() + 1)
-        : new Date().getMonth() + 1) +
-      "-" +
-      new Date().getDate();
     this.setTopFilterParams(this.filterParams);
   },
   watch: {
     filterParams(val) {
+      console.log(val);
       return this.setTopFilterParams(val);
     },
   },
@@ -100,32 +128,8 @@ export default {
         (val.getDate() < 10 ? "0" + val.getDate() : val.getDate())
       );
     },
-    handleChange(val) {
-      let toData =
-        new Date(new Date().toLocaleDateString()).getTime() + 8 * 3600 * 1000;
-      let today = formatDate(new Date());
-
-      if (val == "day") {
-        this.startTime = today;
-        this.endTime = today;
-      } else if (val == "month") {
-        let monthStart = new Date();
-        monthStart.setDate(1);
-        monthStart = this.formData(monthStart);
-        let monthEnd = new Date(monthStart);
-        monthEnd.setMonth(monthEnd.getMonth() + 1);
-        monthEnd.setDate(0);
-        monthEnd = this.formData(monthEnd);
-
-        this.startTime = monthStart;
-        this.endTime = monthEnd;
-      } else if (val == "week") {
-        let timeDifference = toData - 6 * 3600 * 24 * 1000;
-        this.startTime = timestampToTime(timeDifference);
-        this.endTime = today;
-      } else {
-        // timestampToTime(timeDifference);
-      }
+    getToYear(vars) {
+      return vars + "-01-01/" + vars + "-12-31";
     },
   },
 };
