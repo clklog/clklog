@@ -1,3 +1,4 @@
+// 暂时不使用
 const state = {
   checkList: {
     channelList: ["网站", "安卓", "苹果"],

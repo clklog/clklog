@@ -129,9 +129,6 @@ export default {
       oldVistorPercent: null,
     };
   },
-  created() {
-    this.getVisitor();
-  },
   computed: {
     params() {
       return Object.assign({}, this.commonParams);

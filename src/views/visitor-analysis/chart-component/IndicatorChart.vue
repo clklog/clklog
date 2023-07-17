@@ -105,6 +105,7 @@ export default {
     },
   },
   mounted() {
+    return
     this.initChart();
     this.flowTrendList = this.flowTrendListed;
     this.headLege = this.pointValue;

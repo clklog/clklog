@@ -5,7 +5,7 @@
         <div class="check_item">
           <span>时间:</span>
           <el-radio-group
-            v-model="timeType"
+            v-model="timeFlag"
             class="checkBoxStyle"
             @change="handleChange"
           >
@@ -20,10 +20,10 @@
         <div style="margin-left: 20px; height: 30px">
           <el-radio-group
             size="mini"
-            v-model="specificTTime"
+            v-model="timeType"
             style="font-size: 12px; height: 30px"
           >
-            <el-radio-button label="time" :disabled="dayFlag ? true : false"
+            <el-radio-button label="hour" :disabled="dayFlag ? true : false"
               >按时</el-radio-button
             >
             <el-radio-button label="day" :disabled="dayFlag ? true : false"
@@ -54,40 +54,16 @@
         >
         </el-date-picker>
 
-        <div v-if="areaFlag == 1" class="areaContent">
+        <div v-if="ByArea" class="areaContent">
           <div class="areaItem">
             <div class="areaHead">地域</div>
-            <!-- <div class="blocks">
-              <el-cascader
-                v-model="areaList"
-                class="cascader2"
-                style="width: 150px"
-                :options="provinceData"
-                :props="{ value: 'provinceName', label: 'provinceName', multiple: true, checkStrictly: true }"
-                placeholder="选择"
-                clearable
-                collapse-tags
-              />
-            </div> -->
             <!-- 气泡弹框 -->
             <div>
               <el-popover placement="bottom" width="510" trigger="click">
                 <div>
-                  <!-- <el-checkbox-group v-model="areaList">
-                    <el-checkbox
-                      @change="handleCheckProvince(item)"
-                      v-for="(item, index) in provinceData"
-                      :key="index"
-                      :label="item.provinceName"
-                      >{{ item.provinceName }}</el-checkbox
-                    >
-                  </el-checkbox-group> -->
-                  <el-radio-group
-                    size="mini"
-                    v-model="areaValue"
-                  >
+                  <el-radio-group size="mini" v-model="areaValue">
                     <el-radio
-                    style="margin-top:11px;"
+                      style="margin-top: 11px"
                       @change="handleCheckProvince(item)"
                       v-for="(item, index) in provinceData"
                       :key="index"
@@ -97,7 +73,7 @@
                   </el-radio-group>
                 </div>
                 <div class="areaBox" slot="reference">
-                  {{ areadefault }}
+                  {{ areaValue }}
                 </div>
               </el-popover>
             </div>
@@ -114,7 +90,8 @@
                 v-for="item in allChaneList"
                 :label="item.id"
                 :key="item.id"
-                >{{ item.label }}</el-radio>
+                >{{ item.label }}</el-radio
+              >
             </el-radio-group>
           </div>
           <div class="check_item">
@@ -152,9 +129,13 @@ import { string } from "clipboard";
 import { province } from "@/utils/province";
 export default {
   props: {
-    areaFlag: {
-      type: string,
-      default: 1,
+    ByData: {
+      type: Boolean,
+      default: false,
+    },
+    ByArea: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -166,9 +147,7 @@ export default {
           return date.getTime() > today.getTime();
         },
       },
-      areadefault: "选择",
       dateRange: null, //日期范围
-      specificTTime: "time",
       isIndeterminate: false,
       checkAll: false,
       channelList: "",
@@ -180,12 +159,8 @@ export default {
         { label: "网站", id: "网站" },
         { label: "微信小程序", id: "微信小程序" },
       ],
-      // allChaneList: ["网站", "安卓", "苹果"],
-      // areaList: this.$store.state.filterBar.checkList.areaList,
-      // areaList: ["上海市", "北京市"],
-      areaList: '上海市',
-      dateList: this.$store.state.filterBar.checkList.dateList,
-      visitorValue: this.$store.state.filterBar.checkList.visitorValue,
+      dateList: "day",
+      visitorValue: "新访客",
       dayFlag: true,
       weekFlag: true,
       monthFlag: true,
@@ -194,48 +169,55 @@ export default {
       timeDifference: "",
 
       // 接口参数数据
-      timeType: "day",
-      startTime: "2023-06-07",
-      endTime: "2023-06-08",
-      areaValue: '北京市',
-      channelValue: '', //渠道
-      visitorType: '',
+      timeType: this.ByData ? "hour" : "day",
+      timeFlag: "day",
+      startTime: "",
+      endTime: "",
+      areaValue: "北京市",
+      channelValue: "", //渠道
+      visitorType: "",
     };
   },
   mounted() {
-    // 多选
-    // if (this.areaList) {
-    //   this.areadefault = this.areaList.join("、");
-    // }
-    if (this.areaList) {
-      this.areadefault = this.areaValue;
-    }
     this.handleAdd();
-    this.setTopFilterParams(this.commonParams);
   },
   computed: {
     channel() {
-      return [this.channelValue ];
+      return [this.channelValue];
     },
-    area(){
-      return [this.areaValue]
-    },
-    project() {
-      return this.$store.getters.project;
+    area() {
+      return [this.areaValue];
     },
     provinceData() {
       return province;
     },
-    // 统一参数的值
+    // 默认参数
+    defaultParams() {
+      const { startTime, endTime, channel, visitorType } = this;
+      return {
+        startTime,
+        endTime,
+        channel,
+        visitorType,
+      };
+    },
     commonParams() {
-      const { timeType, startTime, endTime, area , channel, visitorType, project , } = this;
-      return { timeType, startTime, endTime, area , channel, visitorType, project };
+      let obj = {};
+      obj = Object.assign(obj, this.defaultParams);
+      const { area, timeType } = this;
+      if (this.ByArea) {
+        obj = Object.assign(obj, { area });
+      }
+      if (this.ByData) {
+        obj = Object.assign(obj, { timeType });
+      }
+      return obj;
     },
   },
   watch: {
-    commonParams(val){
+    commonParams(val) {
       return this.setTopFilterParams(val);
-    }
+    },
   },
   methods: {
     setTopFilterParams(val) {
@@ -243,24 +225,11 @@ export default {
     },
     // 切换省份
     handleCheckProvince(e) {
-      this.areadefault = e.provinceName;
-      // 多选操作
-      // let areaList;
-      // if (this.areaList && this.areaList.length > 6) {
-      //   areaList = this.areaList.slice(0, 6).join("、") + "...";
-      //   this.areadefault = areaList;
-      // } else {
-      //   areaList = this.areaList.join("、");
-      //   this.areadefault = areaList;
-      // }
-      // if (this.areaList && this.areaList.length == 0) {
-      //   this.areadefault = "选择";
-      // }
+      this.areaValue = e.provinceName;
     },
     checkDateEvnet(val) {
-      console.log(val,"日期范围");
-      this.startTime = val[0]
-      this.endTime = val[1]
+      this.startTime = val[0];
+      this.endTime = val[1];
       let endTime = new Date(val[1]).getTime();
       let startTime = new Date(val[0]).getTime();
       let toDay =
@@ -272,11 +241,7 @@ export default {
         this.dateList = "month";
       } else if (timeStamp == 86400000) {
         this.dateList = "previous";
-      } else if (
-        !timeStamp &&
-        startTime == toDay &&
-        endTime == toDay
-      ) {
+      } else if (!timeStamp && startTime == toDay && endTime == toDay) {
         this.dateList = "day";
       } else {
         this.dateList = "";
@@ -290,6 +255,14 @@ export default {
         this.weekFlag = false;
         this.dayFlag = false;
         this.monthFlag = true;
+        switch (this.timeType) {
+          case "month":
+            this.timeType = "week";
+            break;
+
+          default:
+            break;
+        }
       }
       if (result >= 29) {
         this.monthFlag = false;
@@ -300,12 +273,23 @@ export default {
         this.dayFlag = false;
         this.monthFlag = true;
         this.weekFlag = true;
+        switch (this.timeType) {
+          case "month":
+          case "week":
+            this.timeType = "day";
+            break;
+
+          default:
+            break;
+        }
       }
     },
     // 日期初始值
     initDate(val) {
-     let startTime = val[0].split("-").join("");
-     let endTime = val[1].split("-").join("");
+      let startTime = val[0].split("-").join("");
+      let endTime = val[1].split("-").join("");
+      this.startTime = val[0];
+      this.endTime = val[1];
       let result = endTime - startTime;
       this.dateTimeCount(result);
     },
@@ -313,7 +297,13 @@ export default {
     handleAdd() {
       var date = new Date();
       let dateTime =
-        date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+        date.getFullYear() +
+        "-" +
+        (date.getMonth() + 1 < 10
+          ? "0" + (date.getMonth() + 1)
+          : date.getMonth() + 1) +
+        "-" +
+        date.getDate();
       this.currentTime = [dateTime, dateTime];
       this.initDate(this.currentTime); //默认日期
     },
@@ -322,7 +312,13 @@ export default {
     handleChange(val) {
       var date = new Date();
       let dateTime =
-        date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+        date.getFullYear() +
+        "-" +
+        (date.getMonth() + 1 < 10
+          ? "0" + (date.getMonth() + 1)
+          : date.getMonth() + 1) +
+        "-" +
+        date.getDate();
       let toData =
         new Date(new Date().toLocaleDateString()).getTime() + 8 * 3600 * 1000;
       if (val == "day") {
@@ -331,7 +327,7 @@ export default {
       } else if (val == "previous") {
         this.timeDifference = toData - 3600 * 24 * 1000;
         this.timestampToTime(this.timeDifference);
-        this.currentTime = [this.checkDateTime, dateTime];
+        this.currentTime = [this.checkDateTime, this.checkDateTime];
         this.dateTimeCount(1);
       } else if (val == "week") {
         this.timeDifference = toData - 6 * 3600 * 24 * 1000;
@@ -344,11 +340,8 @@ export default {
         this.currentTime = [this.checkDateTime, dateTime];
         this.dateTimeCount(29);
       }
-
-      // this.checkDateEvnet(this.currentTime)
-      // if (val == "year") {
-      //   if (this.$refs.tiemPick) this.$refs.tiemPick.focus();
-      // }
+      this.startTime = this.currentTime[0];
+      this.endTime = this.currentTime[1];
     },
     // 时间戳转换器
     timestampToTime(timestamp) {
@@ -359,7 +352,7 @@ export default {
           ? "0" + (date.getMonth() + 1)
           : date.getMonth() + 1) + "-";
       var D =
-        (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " ";
+        (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + "";
       this.checkDateTime = Y + M + D;
     },
 
