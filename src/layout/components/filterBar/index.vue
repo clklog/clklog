@@ -17,7 +17,7 @@
           </el-radio-group>
         </div>
 
-        <div style="margin-left: 20px; height: 30px">
+        <div v-if="ByData" style="margin-left: 20px; height: 30px">
           <el-radio-group
             size="mini"
             v-model="timeType"
