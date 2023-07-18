@@ -58,7 +58,7 @@ export default {
   props: ["flowTrendListed"],
   data() {
     return {
-      disabledSelect:[],
+      disabledSelect: [],
       timeTypeValue: "day",
       chart: null,
       pointValue: ["浏览量", "访问次数"],
@@ -95,9 +95,16 @@ export default {
     };
   },
   watch: {
-    flowTrendListed(val) {
+    // flowTrendListed(val) {
+    //   if (val && val.length > 0) {
+    //     this.flowTrendList = val;
+    //     this.checkSearchValue(this.pointValue);
+    //   } else {
+    //     this.checkSearchValue([]);
+    //   }
+    // },
+    flowTrendList(val) {
       if (val && val.length > 0) {
-        this.flowTrendList = val;
         this.checkSearchValue(this.pointValue);
       } else {
         this.checkSearchValue([]);
@@ -105,7 +112,10 @@ export default {
     },
   },
   mounted() {
-    return
+    // this.checkSearchValue(this.pointValue);
+    this.headLege = this.pointValue;
+    this.initChart();
+    return;
     this.initChart();
     this.flowTrendList = this.flowTrendListed;
     this.headLege = this.pointValue;
@@ -122,6 +132,10 @@ export default {
     this.chart = null;
   },
   methods: {
+    // 传递数据内容
+    apiDetailList(val) {
+      this.flowTrendList = val.detail;
+    },
     changeChartValue(e) {
       let result = [];
       for (let i = 0; i < this.options.length; i++) {
@@ -145,16 +159,9 @@ export default {
     checkSearchValue(val) {
       this.time = [];
       const { time, pv, uv, visit, ipCount, bounceRate } = this;
-      // this.flowTrendList.map((item) => {
-      //   if (item.time) {
-      //     return time.push(item.time.slice(11, 13));
-      //   } else {
-      //     time.push(0);
-      //   }
-      // });
       this.flowTrendList.map((item) => {
-        if (item.statHour) {
-          return time.push(item.statHour);
+        if (item.statTime) {
+          return time.push(item.statTime);
         } else {
           time.push(0);
         }
@@ -361,10 +368,10 @@ export default {
 <style lang="scss" scoped>
 @import "~@/styles/components/custom-select.scss";
 .trafficHead {
-  font-size: 16px;
-  font-weight: 400;
-  // padding: 20px 30px 20px;
-  padding: 15px 13px 18px 0px
+  font-size: 14px;
+  font-weight: 500;
+  color: #4d4d4d;
+  padding: 15px 13px 18px 0px;
 }
 img {
   width: 11.44px;

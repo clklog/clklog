@@ -228,6 +228,8 @@
 
 .documentation-container .comePage .bid-list-page .header-text {
   width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .documentation-container .comePage .bid-list-page .bid-list-header {

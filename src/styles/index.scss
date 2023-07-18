@@ -233,7 +233,13 @@ aside {
     display: flex;
     flex-direction: column;
     .header-text {
+      padding-right: 10px;
       width: 60%;
+      // display: flex;
+      // align-items: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .form-list-header {
       display: flex;
@@ -262,6 +268,8 @@ aside {
         align-items: center;
       }
       .w157 {
+        display: flex;
+        align-items: center;
         color: #555353;
         font-size: 13px;
         line-height: 14px;

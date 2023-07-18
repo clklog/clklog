@@ -699,7 +699,11 @@ aside a:hover {
 }
 
 .block-index-form .form-list-page .header-text {
+  padding-right: 10px;
   width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .block-index-form .form-list-page .form-list-header {
@@ -736,6 +740,8 @@ aside a:hover {
 }
 
 .block-index-form .form-list-page .form-list-record .w157 {
+  display: flex;
+  align-items: center;
   color: #555353;
   font-size: 13px;
   line-height: 14px;

@@ -69,7 +69,7 @@
       </div>
     </div>
     <indicatorChart ref="indicatorChart" />
-    <trendTable />
+    <trendTable ref="trendTable" />
   </div>
 </template>
 
@@ -111,6 +111,8 @@ export default {
       getFlowTrendDetailApi(this.commonParams).then((res) => {
         if (res.code == 200) {
           this.originData = res.data;
+          this.$refs.indicatorChart.apiDetailList(res.data);
+          this.$refs.trendTable.apiDetailList(res.data);
         }
       });
     },
@@ -126,9 +128,9 @@ export default {
   min-height: 118px;
   background-color: #fafafb;
   .trendAnalysis {
-    font-size: 16px;
-    font-weight: 400;
-    // padding: 20px 30px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4d4d4d;
     padding: 14px 13px 18px 13px;
   }
   .bid-list-page {

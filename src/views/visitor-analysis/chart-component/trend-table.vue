@@ -3,60 +3,115 @@
     <div class="flow-indicator">
       <div class="flow-item">
         <div class="flow-title">流量基础指标</div>
-        <el-checkbox-group v-model="channelList" class="checkBoxStyle">
-          <el-checkbox label="1">浏览量(PV)</el-checkbox>
-          <el-checkbox label="2">浏览量占比</el-checkbox>
-          <el-checkbox label="3">访问次数</el-checkbox>
-          <el-checkbox label="4">访客数(UV)</el-checkbox>
-          <el-checkbox label="5">新访客数</el-checkbox>
-          <el-checkbox label="6">新访客比率</el-checkbox>
-          <el-checkbox label="7" style="margin-right: 0">IP数</el-checkbox>
+        <el-checkbox-group
+          v-model="channelList"
+          class="checkBoxStyle"
+          @change="handelChannelList"
+        >
+          <el-checkbox label="pv">浏览量(PV)</el-checkbox>
+          <el-checkbox label="pvRate">浏览量占比</el-checkbox>
+          <el-checkbox label="visitCount">访问次数</el-checkbox>
+          <el-checkbox label="uv">访客数(UV)</el-checkbox>
+          <el-checkbox label="newUv">新访客数</el-checkbox>
+          <el-checkbox label="newUvRate">新访客比率</el-checkbox>
+          <el-checkbox label="ipCount" style="margin-right: 0"
+            >IP数</el-checkbox
+          >
         </el-checkbox-group>
       </div>
       <div class="flow-item setSpace">
         <div class="flow-title">流量质量指标</div>
-        <el-checkbox-group v-model="flowQuality" class="checkBoxStyle">
-          <el-checkbox label="8">跳出率</el-checkbox>
-          <el-checkbox label="9">平均访问时长</el-checkbox>
-          <el-checkbox label="10">平均访问页数</el-checkbox>
+        <el-checkbox-group
+          v-model="flowQuality"
+          class="checkBoxStyle"
+          @change="handelFlowQuality"
+        >
+          <el-checkbox label="bounceRate">跳出率</el-checkbox>
+          <el-checkbox label="avgVisitTime">平均访问时长</el-checkbox>
+          <el-checkbox label="avgPv">平均访问页数</el-checkbox>
         </el-checkbox-group>
       </div>
     </div>
 
+    <!-- :data="tableData.slice((currentPage - 1) * pageSize, currentPage * pageSize)"  -->
     <div class="table-content">
       <el-table
         :header-cell-style="{ textAlign: 'center' }"
         :cell-style="{ textAlign: 'center' }"
-        :data="tableData"
-        :span-method="arraySpanMethod"
+        :data="
+          flowTableList.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )
+        "
         border
         style="width: 100%"
       >
-        <el-table-column prop="dataTime" label="日期" width="150" />
+        <el-table-column prop="statTime" label="日期" width="150" />
         <el-table-column prop="date" label="流量基础指标" width="150">
-          <el-table-column prop="amount1" label="浏览量(PV)" sortable />
-          <el-table-column prop="amount2" label="浏览量占比" sortable />
-          <el-table-column prop="amount3" label="访问次数" sortable />
-          <el-table-column prop="amount4" label="新访客数" sortable />
-          <el-table-column prop="amount5" label="访客数(UV)" sortable />
-          <el-table-column prop="amount6" label="新访客比率" sortable />
-          <el-table-column prop="amount7" label="IP数" sortable />
+          <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
+          <el-table-column
+            v-if="pvRate"
+            prop="pvRate"
+            label="浏览量占比"
+            sortable
+          />
+          <el-table-column
+            v-if="visitCount"
+            prop="visitCount"
+            label="访问次数"
+            sortable
+          />
+          <el-table-column
+            v-if="newUv"
+            prop="newUv"
+            label="新访客数"
+            sortable
+          />
+          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+          <el-table-column
+            v-if="newUvRate"
+            prop="newUvRate"
+            label="新访客比率"
+            sortable
+          />
+          <el-table-column
+            v-if="ipCount"
+            prop="ipCount"
+            label="IP数"
+            sortable
+          />
         </el-table-column>
         <el-table-column prop="date" label="流量质量指标" width="150">
-          <el-table-column prop="amount8" label="跳出率" sortable />
-          <el-table-column prop="amount9" label="平均访问时长" sortable />
-          <el-table-column prop="amount10" label="平均访问页数" sortable />
+          <el-table-column
+            v-if="bounceRate"
+            prop="bounceRate"
+            label="跳出率"
+            sortable
+          />
+          <el-table-column
+            v-if="avgVisitTime"
+            prop="avgVisitTime"
+            label="平均访问时长"
+            sortable
+          />
+          <el-table-column
+            v-if="avgPv"
+            prop="avgPv"
+            label="平均访问页数"
+            sortable
+          />
         </el-table-column>
       </el-table>
     </div>
     <div class="block">
       <el-pagination
         next-text="下一页"
-        :current-page="currentPage4"
+        :current-page="currentPage"
         :page-sizes="[10, 20, 30, 40]"
         :page-size="10"
         layout=" sizes, prev, pager, next, jumper"
-        :total="40"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -69,8 +124,9 @@ import Bus from "@/utils/bus";
 export default {
   data() {
     return {
-      channelList: ["3", "5"],
-      flowQuality: ["9"],
+      flowTableList: [],
+      channelList: ["pv", "visitCount"],
+      flowQuality: ["avgPv"],
       tableData1: [
         {
           date: "2016-05-03",
@@ -183,56 +239,127 @@ export default {
           amount10: 70,
         },
       ],
-      currentPage4: 4,
+      pv: false,
+      visitCount: false,
+      newUv: false,
+      uv: false,
+      ipCount: false,
+      avgPv: false,
+      avgVisitTime: false,
+      bounceRate: false,
+      pvRate: false,
+      newUvRate: false,
+      allPointList: [
+        "pv",
+        "visitCount",
+        "newUv",
+        "uv",
+        "ipCount",
+        "avgPv",
+        "avgVisitTime",
+        "bounceRate",
+        "pvRate",
+        "newUvRate",
+      ],
+      mergedArr: [],
+      currentPage: 1, //当前页
+      total: 0, //总条数
+      tableData: [], //当前页码的表格数据
+      pageSize: 10, //当前页容量
+      pageSizes: [10, 20, 30, 40, 50],
     };
   },
   mounted() {
     Bus.$on("trendAnalysis", (res) => {
       // console.log(res, "兄弟传参2");
     });
+    this.initShowTable();
   },
   methods: {
-    // 分页器
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+    handelChannelList() {
+      this.initShowTable();
     },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+    handelFlowQuality() {
+      this.initShowTable();
     },
-
-    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
-      //   if (rowIndex % 2 === 0) {
-      //     if (columnIndex === 0) {
-      //       return [1, 2];
-      //     } else if (columnIndex === 1) {
-      //       return [0, 0];
-      //     }
-      //   }
+    apiDetailList(val) {
+      this.flowTableList = val.detail;
+      this.total = val.detail.length;
     },
-
-    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      console.log("降序");
-      if (columnIndex === 0) {
-        if (rowIndex % 2 === 0) {
-          return {
-            rowspan: 2,
-            colspan: 1,
-          };
+    initShowTable() {
+      this.mergedArr = [];
+      this.mergedArr = [...this.channelList, ...this.flowQuality];
+      if (this.mergedArr.length > 0) {
+        if (this.mergedArr.includes("pv")) {
+          this.pv = true;
         } else {
-          return {
-            rowspan: 0,
-            colspan: 0,
-          };
+          this.pv = false;
+        }
+        if (this.mergedArr.includes("visitCount")) {
+          this.visitCount = true;
+        } else {
+          this.visitCount = false;
+        }
+        if (this.mergedArr.includes("newUv")) {
+          this.newUv = true;
+        } else {
+          this.newUv = false;
+        }
+        if (this.mergedArr.includes("uv")) {
+          this.uv = true;
+        } else {
+          this.uv = false;
+        }
+        if (this.mergedArr.includes("ipCount")) {
+          this.ipCount = true;
+        } else {
+          this.ipCount = false;
+        }
+        if (this.mergedArr.includes("avgPv")) {
+          this.avgPv = true;
+        } else {
+          this.avgPv = false;
+        }
+        if (this.mergedArr.includes("avgVisitTime")) {
+          this.avgVisitTime = true;
+        } else {
+          this.avgVisitTime = false;
+        }
+        if (this.mergedArr.includes("bounceRate")) {
+          this.bounceRate = true;
+        } else {
+          this.bounceRate = false;
+        }
+        if (this.mergedArr.includes("pvRate")) {
+          this.pvRate = true;
+        } else {
+          this.pvRate = false;
+        }
+        if (this.mergedArr.includes("newUvRate")) {
+          this.newUvRate = true;
+        } else {
+          this.newUvRate = false;
         }
       }
     },
+    // 分页器
+    handleSizeChange(val) {       
+      this.currentPage = 1;
+      this.pageSize = val;
+      // this.apiDetailList();
+    },
+    handleCurrentChange(val) {    
+      this.currentPage = val;
+      // this.apiDetailList();
+    },
+
   },
 };
 </script>
 <style lang="scss" scoped>
 .chartsIcon .flow-indicator .flow-item .el-checkbox {
-    width: 100px !important;
-  }
+  width: 100px !important;
+}
 .chartsIcon {
   box-sizing: border-box;
   margin: 20px;
@@ -268,7 +395,7 @@ export default {
         margin-right: 80px;
         font-size: 12px;
         font-weight: 400;
-        line-height: 15px;
+        line-height: 25px;
         color: #697195;
       }
     }

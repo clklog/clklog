@@ -375,42 +375,18 @@ export default {
 </script>
 <style lang="scss" scoped>
 ::v-deep {
-  .el-range-editor--medium .el-range-separator {
-    line-height: 22px;
-    font-size: 13px;
+  @import "~@/styles/components/custom-radio.scss";
+  // 日历样式start
+  .el-range-editor--medium .el-range-input{
+    font-size: 12px;
   }
-  .el-cascader .el-input input {
-    height: 30px !important;
+  .el-date-editor .el-range__icon{
+    font-size: 12px;
+    line-height: 25px;
   }
-  .el-radio-button--mini .el-radio-button__inner {
-    height: 30px;
-  }
-  .el-cascader--medium {
-    line-height: 29px;
-  }
-  .el-range-editor--medium .el-range__icon,
-  .el-range-editor--medium .el-range__close-icon {
-    display: none;
-  }
-  .el-checkbox {
-    margin-top: 11px;
-  }
-}
-
-::v-deep .el-radio-button {
-  line-height: 30px;
-  height: 30px !important;
-}
-::v-deep.blocks {
-  .el-input__inner {
-    border-radius: 0 5px 5px 0 !important;
-    border-left: #eee;
-  }
-  .el-cascader .el-input.is-focus .el-input__inner {
-    border-color: #eee !important;
-  }
-  .el-cascader .el-input .el-input__inner:focus {
-    border-color: #eee !important;
+  .el-range-editor--medium .el-range-separator{
+    font-size: 12px;
+    line-height: 25px;
   }
 }
 .documentation-container {
@@ -428,7 +404,7 @@ export default {
           height: 30px;
           line-height: 30px;
           text-align: center;
-          font-size: 11px;
+          font-size: 12px;
           font-weight: 400;
           color: #4d4d4d;
           border: 1px solid #eee;
@@ -439,7 +415,7 @@ export default {
           min-width: 78px;
           height: 30px;
           line-height: 30px;
-          font-size: 11px;
+          font-size: 12px;
           font-weight: 400;
           color: #4d4d4d;
           border: 1px solid #eee;
@@ -460,7 +436,7 @@ export default {
       align-items: center;
       // width: 30%;
       span {
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 400;
         line-height: 13px;
         color: #4d4d4d;

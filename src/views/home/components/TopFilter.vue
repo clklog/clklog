@@ -137,4 +137,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/styles/components/TopFilter.scss";
+::v-deep {
+  @import "~@/styles/components/custom-radio.scss";
+}
 </style>
