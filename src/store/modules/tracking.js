@@ -1,5 +1,5 @@
 const state = {
-  project: '在线拍'
+  project: '货清清'
 }
 
 const mutations = {

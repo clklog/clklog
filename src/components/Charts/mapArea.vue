@@ -126,10 +126,9 @@ export default {
         },
         series: [
           {
-            zoom: 1.3,
+            zoom: 1.1,
             map: "china",
             type: "map",
-
             itemStyle: {
               normal: {
                 borderColor: "rgba(0, 0, 0, 0.2)",

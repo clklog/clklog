@@ -24,23 +24,83 @@
 </template>
 
 <script>
+import { timestampToTime } from "@/utils/timestampToTime";
+import { formatDate } from "@/utils/format";
 export default {
   name: "TopFilter",
   data() {
     return {
       timeType: "day",
       channelValue: "",
-      startTime: "2023-06-07",
-      endTime: "2023-06-08",
     };
   },
   computed: {
     channel() {
       return [this.channelValue];
     },
+    startTime() {
+      switch (this.timeType) {
+        case "day":
+          return formatDate(new Date());
+          break;
+        case "week":
+          let toData =
+            new Date(new Date().toLocaleDateString()).getTime() +
+            8 * 3600 * 1000;
+          let timeDifference = toData - 6 * 3600 * 24 * 1000;
+          return timestampToTime(timeDifference);
+          break;
+        case "month":
+          let monthStart = new Date();
+          monthStart.setDate(1);
+          monthStart = this.formData(monthStart);
+          return monthStart;
+          break;
+        case "year":
+          let today = formatDate(new Date());
+          let yearData = this.getToYear(today.slice(0, 4)).split("/");
+          return yearData[0];
+          break;
+        default:
+          return formatDate(new Date());
+          break;
+      }
+    },
+    endTime() {
+      switch (this.timeType) {
+        case "day":
+          return formatDate(new Date());
+          break;
+        case "week":
+          return formatDate(new Date());
+        case "month":
+          let monthStart = new Date();
+          monthStart.setDate(1);
+          monthStart = this.formData(monthStart);
+          let monthEnd = new Date(monthStart);
+          monthEnd.setMonth(monthEnd.getMonth() + 1);
+          monthEnd.setDate(0);
+          monthEnd = this.formData(monthEnd);
+          return monthEnd;
+          break;
+        case "year":
+          let today = formatDate(new Date());
+          let yearData = this.getToYear(today.slice(0, 4)).split("/");
+          return yearData[1];
+          break;
+
+        default:
+          return formatDate(new Date());
+          break;
+      }
+    },
+    implied() {
+      const { startTime, endTime } = this;
+      return { startTime, endTime };
+    },
     filterParams() {
-      const { timeType, channel, startTime, endTime } = this;
-      return { timeType, channel, startTime, endTime };
+      const { timeType, channel } = this;
+      return { timeType, channel };
     },
   },
   mounted() {
@@ -48,12 +108,28 @@ export default {
   },
   watch: {
     filterParams(val) {
+      console.log(val);
       return this.setTopFilterParams(val);
     },
   },
   methods: {
     setTopFilterParams(val) {
-      this.$emit("setTopFilterParams", val);
+      let _val = Object.assign(val, this.implied);
+      this.$emit("setTopFilterParams", _val);
+    },
+    formData(val) {
+      return (
+        val.getFullYear() +
+        "-" +
+        (val.getMonth() + 1 < 10
+          ? "0" + (val.getMonth() + 1)
+          : val.getMonth() + 1) +
+        "-" +
+        (val.getDate() < 10 ? "0" + val.getDate() : val.getDate())
+      );
+    },
+    getToYear(vars) {
+      return vars + "-01-01/" + vars + "-12-31";
     },
   },
 };
@@ -61,4 +137,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/styles/components/TopFilter.scss";
+::v-deep {
+  @import "~@/styles/components/custom-radio.scss";
+}
 </style>

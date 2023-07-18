@@ -52,7 +52,7 @@
       </div>
       <div class="block">
         <el-pagination
-           next-text="下一页"
+          next-text="下一页"
           :current-page="currentPage4"
           :page-sizes="[10, 20, 30, 40]"
           :page-size="10"
@@ -306,8 +306,9 @@ export default {
   }
 }
 .trafficHead {
-  font-size: 16px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4d4d4d;
   padding: 0px 30px 20px;
 }
 img {
@@ -371,7 +372,7 @@ img {
   margin: 20px 12px;
 }
 ::v-deep {
-  .el-pagination{
+  .el-pagination {
     position: relative;
     width: 100%;
     display: flex;
@@ -382,6 +383,5 @@ img {
     position: absolute;
     left: 0;
   }
-  
 }
 </style>

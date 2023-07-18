@@ -91,10 +91,9 @@ export default {
               show: true,
               position: "top",
             },
-            itemStyle:{
-                color:'#051e71',
-            }
-            
+            itemStyle: {
+              color: "#051e71",
+            },
           },
           {
             type: "bar", //形状为柱状图
@@ -105,9 +104,9 @@ export default {
               show: true,
               position: "top",
             },
-            itemStyle:{
-                color:'#3d64e6',
-            }
+            itemStyle: {
+              color: "#3d64e6",
+            },
           },
         ],
       };
@@ -124,8 +123,9 @@ export default {
 
 <style lang="scss" scoped>
 .trafficHead {
-  font-size: 16px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4d4d4d;
   padding: 20px 30px 20px;
 }
 img {

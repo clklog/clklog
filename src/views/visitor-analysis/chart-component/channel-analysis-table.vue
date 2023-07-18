@@ -361,8 +361,9 @@ export default {
   }
 }
 .trafficHead {
-  font-size: 16px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4d4d4d;
   padding: 20px 30px 20px;
 }
 img {
@@ -458,7 +459,7 @@ img {
         margin-right: 80px;
         font-size: 12px;
         font-weight: 400;
-        line-height: 15px;
+        line-height: 25px;
         color: #697195;
       }
     }
