@@ -15,6 +15,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
+              选定时间段内用户访问应用的页面总次数<br>
               用户每打开一个页面被记录一次，同一页面打开多次浏览量值累计计算。
             </div>
             <img
@@ -34,6 +35,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
+              选定时间段内用户访问应用的总次数。<br>
               用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
             </div>
             <img
@@ -52,6 +54,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
+              选定时间段内访问应用的独立访客数。<br>
               访客数以Cookie或设备ID为依据，选定时间段内同一访客多次访问应用只计算为一个访客。
             </div>
             <img
@@ -70,7 +73,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              一天之内您网站的独立访问ip数。
+              选定时间段内访问应用的独立IP数。
             </div>
             <img
               slot="reference"
@@ -88,7 +91,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              访客每次访问的页面打开第一个页面到退出或关闭最后一个页面。
+              平均访问页数 = 浏览量 / 访问次数
             </div>
             <img
               slot="reference"
@@ -106,6 +109,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
+              平均访问时长 = 访问总时长 / 访问次数<br>
               访客每次访问的总时长为打开第一个页面到退出或关闭最后一个页面的总时长。
             </div>
             <img
@@ -124,7 +128,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
+              只浏览一个页面就离开或关闭应用的访问次数占总访问次数的百分比。
             </div>
             <img
               slot="reference"

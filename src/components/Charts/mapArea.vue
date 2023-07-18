@@ -10,8 +10,7 @@
 
 <script>
 import { validLowerCase } from "@/utils/validate";
-// import chinamap from "echarts/map/json/china.json"; 
-import chinamap from "./china.js"; 
+import chinamap from "echarts/map/json/china.json"; 
 export default {
   data() {
     return {
@@ -127,7 +126,7 @@ export default {
         },
         series: [
           {
-            zoom: 1.3,
+            zoom: 1.1,
             map: "china",
             type: "map",
             itemStyle: {
