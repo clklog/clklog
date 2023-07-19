@@ -14,22 +14,10 @@ $menuActiveText:rgb(109, 195, 221);
 $subMenuActiveText:black; // https://github.com/ElemeFE/element/issues/12951
 
 $menuBg:#fff;
-$menuHover:#eee;
+$menuHover:linear-gradient(to right, #E1E7FB, #ffffff);
 
-$subMenuBg:#eee;
-$subMenuHover:#eee;
-
-// $menuText:#bfcbd9;
-// $menuActiveText:#409EFF;
-// $subMenuActiveText:#f4f4f5; // https://github.com/ElemeFE/element/issues/12951
-
-// $menuBg:#304156;
-// $menuHover:#263445;
-
-// $subMenuBg:#1f2d3d;
-// $subMenuHover:#001528;
-
-
+$subMenuBg:#fff;
+$subMenuHover:linear-gradient(to right, #E1E7FB, #ffffff);
 $sideBarWidth: 210px;
 
 // the :export directive is the magic sauce for webpack

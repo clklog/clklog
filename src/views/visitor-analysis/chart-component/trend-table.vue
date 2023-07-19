@@ -2,7 +2,7 @@
   <div class="chartsIcon">
     <div class="flow-indicator">
       <div class="flow-item">
-        <div class="flow-title">流量基础指标</div>
+        <div class="flow-title" style="line-height: 30px">流量基础指标</div>
         <el-checkbox-group
           v-model="channelList"
           class="checkBoxStyle"
@@ -20,7 +20,7 @@
         </el-checkbox-group>
       </div>
       <div class="flow-item setSpace">
-        <div class="flow-title">流量质量指标</div>
+        <div class="flow-title" style="line-height: 30px">流量质量指标</div>
         <el-checkbox-group
           v-model="flowQuality"
           class="checkBoxStyle"
@@ -32,8 +32,6 @@
         </el-checkbox-group>
       </div>
     </div>
-
-    <!-- :data="tableData.slice((currentPage - 1) * pageSize, currentPage * pageSize)"  -->
     <div class="table-content">
       <el-table
         :header-cell-style="{ textAlign: 'center' }"
@@ -47,7 +45,7 @@
         border
         style="width: 100%"
       >
-        <el-table-column prop="statTime" label="日期" width="150" />
+        <el-table-column prop="statTime" label="日期" width="200" />
         <el-table-column prop="date" label="流量基础指标" width="150">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
           <el-table-column
@@ -114,6 +112,7 @@
         :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
+        hide-on-single-page
       />
     </div>
   </div>
@@ -121,124 +120,13 @@
 
 <script>
 import Bus from "@/utils/bus";
+import { percentage } from "@/utils/percent";
 export default {
   data() {
     return {
       flowTableList: [],
       channelList: ["pv", "visitCount"],
       flowQuality: ["avgPv"],
-      tableData1: [
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-08",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 2003233,
-        },
-        {
-          date: "2016-05-06",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-07",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-      ],
-      tableData: [
-        {
-          dataTime: "2023-05-06",
-          amount1: "14",
-          amount2: "3.2",
-          amount3: 10,
-          amount4: "234",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 69,
-        },
-        {
-          dataTime: "2023-05-07",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount4: "24",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 6,
-        },
-        {
-          dataTime: "2013-05-08",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount4: "34",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 9,
-        },
-        {
-          dataTime: "2023-05-09",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount5: "3.2",
-          amount4: "24",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 70,
-        },
-      ],
       pv: false,
       visitCount: false,
       newUv: false,
@@ -262,17 +150,13 @@ export default {
         "newUvRate",
       ],
       mergedArr: [],
-      currentPage: 1, //当前页
-      total: 0, //总条数
-      tableData: [], //当前页码的表格数据
-      pageSize: 10, //当前页容量
+      currentPage: 1,
+      total: 0,
+      pageSize: 10,
       pageSizes: [10, 20, 30, 40, 50],
     };
   },
   mounted() {
-    Bus.$on("trendAnalysis", (res) => {
-      // console.log(res, "兄弟传参2");
-    });
     this.initShowTable();
   },
   methods: {
@@ -282,8 +166,16 @@ export default {
     handelFlowQuality() {
       this.initShowTable();
     },
+    percentageFun(val) {
+      return percentage(val);
+    },
     apiDetailList(val) {
       this.flowTableList = val.detail;
+      this.flowTableList.map((item) => {
+        if (item.bounceRate) {
+          item.bounceRate = this.percentageFun(item.bounceRate);
+        }
+      });
       this.total = val.detail.length;
     },
     initShowTable() {
@@ -342,23 +234,20 @@ export default {
         }
       }
     },
-    // 分页器
-    handleSizeChange(val) {       
+    handleSizeChange(val) {
       this.currentPage = 1;
       this.pageSize = val;
-      // this.apiDetailList();
     },
-    handleCurrentChange(val) {    
+    handleCurrentChange(val) {
       this.currentPage = val;
-      // this.apiDetailList();
     },
-
   },
 };
 </script>
 <style lang="scss" scoped>
-.chartsIcon .flow-indicator .flow-item .el-checkbox {
-  width: 100px !important;
+::v-deep {
+  @import "~@/styles/components/el-checkbox.scss";
+  @import "~@/styles/components/el-pagination.scss";
 }
 .chartsIcon {
   box-sizing: border-box;
@@ -379,7 +268,7 @@ export default {
     }
     .flow-item {
       display: flex;
-      align-items: center;
+      line-height: 30px;
       margin-top: 12px;
       margin-left: 10px;
       .flow-title {
@@ -390,13 +279,6 @@ export default {
         font-weight: 400;
         line-height: 16px;
         color: #4d4d4d;
-      }
-      .el-checkbox {
-        margin-right: 80px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 25px;
-        color: #697195;
       }
     }
     .check_item {
@@ -416,21 +298,6 @@ export default {
         margin-right: 10px;
       }
     }
-  }
-  .block {
-    margin: 20px auto;
-  }
-}
-::v-deep {
-  .el-pagination {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-  }
-  .el-pagination__jump {
-    position: absolute;
-    left: 0;
   }
 }
 </style>

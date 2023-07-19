@@ -95,14 +95,6 @@ export default {
     };
   },
   watch: {
-    // flowTrendListed(val) {
-    //   if (val && val.length > 0) {
-    //     this.flowTrendList = val;
-    //     this.checkSearchValue(this.pointValue);
-    //   } else {
-    //     this.checkSearchValue([]);
-    //   }
-    // },
     flowTrendList(val) {
       if (val && val.length > 0) {
         this.checkSearchValue(this.pointValue);
@@ -112,17 +104,9 @@ export default {
     },
   },
   mounted() {
-    // this.checkSearchValue(this.pointValue);
     this.headLege = this.pointValue;
     this.initChart();
     return;
-    this.initChart();
-    this.flowTrendList = this.flowTrendListed;
-    this.headLege = this.pointValue;
-    this.checkSearchValue(this.pointValue);
-    // Bus.$on("trendAnalysis", (res) => {
-    //   // console.log(res,"兄弟传参");
-    // });
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -151,11 +135,6 @@ export default {
       this.pointValue = this.headLege = e.flat(Infinity);
       this.checkSearchValue(this.headLege);
     },
-    // 指示分析 el-cascader
-    // changeChartValue(val) {
-    //   this.pointValue = this.headLege = val.flat(Infinity);
-    //   this.checkSearchValue(this.headLege);
-    // },
     checkSearchValue(val) {
       this.time = [];
       const { time, pv, uv, visit, ipCount, bounceRate } = this;
@@ -261,8 +240,8 @@ export default {
           {
             type: "category",
             boundaryGap: false,
-            // data: [0, 4, 8, 12, 16, 20],
             data: this.time,
+            axisLabel: { interval: 1 },
             nameTextStyle: {
               fontWeight: 600,
               fontSize: 18,
@@ -282,7 +261,6 @@ export default {
             axisTick: {
               show: false,
             },
-            // data: [50000, 100000, 150000, 200000, 250000],
           },
         ],
         series: [
@@ -297,7 +275,6 @@ export default {
             lineStyle: {
               width: 3,
             },
-            // data: [120152, 132120, 265235, 144225, 178212, 168885],
             data: this.pv,
           },
           {
@@ -305,13 +282,12 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "yellow",
+                color: "#007EE9",
               },
             },
             lineStyle: {
               width: 3,
             },
-            // data: [120152, 132120, 265235, 144225, 178212, 168885],
             data: this.uv,
           },
           {
@@ -334,9 +310,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "red",
-                // borderColor: "#5fb4db",
-                // borderWidth: 12,
+                color: "#00338C",
               },
             },
             lineStyle: {
@@ -349,9 +323,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "pink",
-                // borderColor: "#5fb4db",
-                // borderWidth: 12,
+                color: "#17DDFF",
               },
             },
             lineStyle: {
@@ -367,6 +339,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "~@/styles/components/custom-select.scss";
+::v-deep {
+  @import "~@/styles/components/el-checkbox.scss";
+}
 .trafficHead {
   font-size: 14px;
   font-weight: 500;

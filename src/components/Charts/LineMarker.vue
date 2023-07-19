@@ -9,12 +9,8 @@ import resize from "./mixins/resize";
 export default {
   mixins: [resize],
   props: {
-    defaultLege:{
-
-    },
-    flowTrendListed: {
-      // default: [],
-    },
+    defaultLege: {},
+    flowTrendListed: {},
     className: {
       type: String,
       default: "chart",
@@ -41,27 +37,25 @@ export default {
       ipCount: [],
       bounceRate: [],
       time: [],
-      // headLege: ["浏览量", "访问次数"],
       headLege: [],
-      flowTrendList:[],
+      flowTrendList: [],
     };
   },
-  watch :{
-    flowTrendListed(val){
+  watch: {
+    flowTrendListed(val) {
       if (val && val.length > 0) {
-        this.flowTrendList = val
-        this.checkSearchValue(this.defaultLege)
-      }else {
-        this.checkSearchValue([])
+        this.flowTrendList = val;
+        this.checkSearchValue(this.defaultLege);
+      } else {
+        this.checkSearchValue([]);
       }
-    }
+    },
   },
   mounted() {
     this.initChart();
-    this.flowTrendList = this.flowTrendListed
+    this.flowTrendList = this.flowTrendListed;
     this.headLege = this.defaultLege;
-    this.checkSearchValue(this.defaultLege)
-   
+    this.checkSearchValue(this.defaultLege);
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -73,21 +67,11 @@ export default {
   methods: {
     changeLegend(val) {
       this.headLege = val;
-      // console.log(val, "传递的值");
-      this.checkSearchValue(val)
+      this.checkSearchValue(val);
     },
-    checkSearchValue(val){
-     this.time = []
+    checkSearchValue(val) {
+      this.time = [];
       const { time, pv, uv, visit, ipCount, bounceRate } = this;
-      // 时间
-      
-      // this.flowTrendList.map((item) => {
-      //   if (item.time) {
-      //     return time.push(item.time.slice(11, 13));
-      //   } else {
-      //     time.push(0);
-      //   }
-      // });
       this.flowTrendList.map((item) => {
         if (item.statHour) {
           return time.push(item.statHour);
@@ -118,7 +102,7 @@ export default {
         this.uv = [];
       }
       if (val.includes("IP数")) {
-         this.flowTrendList.map((item) => {
+        this.flowTrendList.map((item) => {
           if (item.ipCount) {
             return ipCount.push(item.ipCount);
           } else {
@@ -158,16 +142,6 @@ export default {
 
       this.chart.setOption({
         backgroundColor: "#FAFAFB",
-        // title: {
-        //   top: 20,
-        //   text: "Requests",
-        //   textStyle: {
-        //     fontWeight: "normal",
-        //     fontSize: 16,
-        //     color: "red",
-        //   },
-        //   left: "1%",
-        // },
         tooltip: {
           trigger: "axis",
           axisPointer: {
@@ -201,8 +175,8 @@ export default {
           {
             type: "category",
             boundaryGap: false,
-            // data: [0, 4, 8, 12, 16, 20],
-            data:this.time,
+            data: this.time,
+            axisLabel: { interval: 1 },
             nameTextStyle: {
               fontWeight: 600,
               fontSize: 18,
@@ -222,7 +196,6 @@ export default {
             axisTick: {
               show: false,
             },
-            // data: [50000, 100000, 150000, 200000, 250000],
           },
         ],
         series: [
@@ -237,7 +210,6 @@ export default {
             lineStyle: {
               width: 3,
             },
-            // data: [120152, 132120, 265235, 144225, 178212, 168885],
             data: this.pv,
           },
           {
@@ -245,13 +217,12 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "yellow",
+                color: '#007EE9',
               },
             },
             lineStyle: {
               width: 3,
             },
-            // data: [120152, 132120, 265235, 144225, 178212, 168885],
             data: this.uv,
           },
           {
@@ -274,9 +245,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "red",
-                // borderColor: "#5fb4db",
-                // borderWidth: 12,
+                color: "#00338C",
               },
             },
             lineStyle: {
@@ -289,9 +258,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "pink",
-                // borderColor: "#5fb4db",
-                // borderWidth: 12,
+                color: "#17DDFF",
               },
             },
             lineStyle: {
@@ -302,8 +269,8 @@ export default {
         ],
       });
     },
-     // 处理接口数据
-     processData() {
+    // 处理接口数据
+    processData() {
       const { time, pv, uv, visit, ipCount, bounceRate } = this;
       // 时间
       this.flowTrendList.map((item) => {
@@ -313,7 +280,6 @@ export default {
           time.push(0);
         }
       });
-      // console.log(time, 234);
       this.flowTrendList.map((item) => {
         if (item.pv) {
           return pv.push(item.pv);
@@ -349,7 +315,6 @@ export default {
           bounceRate.push(0);
         }
       });
-      // console.log(this.bounceRate, "跳出了");
     },
   },
 };

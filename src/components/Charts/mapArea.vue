@@ -10,10 +10,11 @@
 
 <script>
 import { validLowerCase } from "@/utils/validate";
-import chinamap from "echarts/map/json/china.json"; 
+import chinamap from "echarts/map/json/china.json";
 export default {
   data() {
     return {
+      maxValue:200,
       myChart: null,
       provinceList: [
         // { name: "北京", value: this.randomData() },
@@ -70,18 +71,25 @@ export default {
         return resp;
       }, []);
       // 加载接口数据清除
-      this.provinceList.map(item=>{
-        item.value = 0
-      })
+      this.provinceList.map((item) => {
+        item.value = 0;
+      });
+      let maxValue = [];
       // 地图数据匹配
       for (let i = 0; i < this.provinceList.length; i++) {
         for (let j = 0; j < result.length; j++) {
           if (this.provinceList[i].name == result[j].province) {
             this.provinceList[i].value = result[j].pv;
+            maxValue.push(result[j].pv);
           }
         }
       }
-      // this.getAreaList = val;
+      let max = maxValue.sort(function (a, b) {
+        return b - a;
+      })[0];
+      // console.log(maxValue, 32);
+      // console.log(max2, 32);
+      this.maxValue = max
       this.showScatterInGeo();
     },
     randomData() {
@@ -117,7 +125,7 @@ export default {
         // },
         visualMap: {
           min: 0,
-          max: 100,
+          max: this.maxValue,
           left: "10%",
           top: "bottom",
           text: ["高", "低"],

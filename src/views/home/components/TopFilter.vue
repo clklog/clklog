@@ -32,6 +32,8 @@ export default {
     return {
       timeType: "day",
       channelValue: "",
+      weekEnd:'',
+      weekStart:'',
     };
   },
   computed: {
@@ -44,11 +46,13 @@ export default {
           return formatDate(new Date());
           break;
         case "week":
-          let toData =
-            new Date(new Date().toLocaleDateString()).getTime() +
-            8 * 3600 * 1000;
-          let timeDifference = toData - 6 * 3600 * 24 * 1000;
-          return timestampToTime(timeDifference);
+          // let toData =
+          //   new Date(new Date().toLocaleDateString()).getTime() +
+          //   8 * 3600 * 1000;
+          // let timeDifference = toData - 6 * 3600 * 24 * 1000;
+          // return timestampToTime(timeDifference);
+          this.getWeek()
+          return this.weekStart;
           break;
         case "month":
           let monthStart = new Date();
@@ -72,7 +76,10 @@ export default {
           return formatDate(new Date());
           break;
         case "week":
-          return formatDate(new Date());
+          // return formatDate(new Date());
+          this.getWeek()
+          return this.weekEnd
+          break;
         case "month":
           let monthStart = new Date();
           monthStart.setDate(1);
@@ -108,14 +115,25 @@ export default {
   },
   watch: {
     filterParams(val) {
-      console.log(val);
       return this.setTopFilterParams(val);
     },
   },
   methods: {
+    // 获取week 的函数
+    getWeek() {
+      let date = new Date();
+      let day = date.getDate();
+      let week = date.getDay();
+      let month = date.getMonth();
+      let year = date.getFullYear();
+      this.weekStart = this.formData(new Date(year, month, day - week + 1));
+      // this.weekEnd = this.formData(new Date(year, month, day - week + 7));
+      this.weekEnd = this.formData(new Date(year, month, day));
+    },
     setTopFilterParams(val) {
       let _val = Object.assign(val, this.implied);
       this.$emit("setTopFilterParams", _val);
+      this.$emit("timeTypeCheck", this.timeType);
     },
     formData(val) {
       return (

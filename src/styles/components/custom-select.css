@@ -33,3 +33,8 @@
   height: 14px;
   background-color: #ffffff;
 }
+
+.el-select-dropdown.is-multiple .el-select-dropdown__item.selected {
+  color: #697195;
+  font-weight: 400px !important;
+}

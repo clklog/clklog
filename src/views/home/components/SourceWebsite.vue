@@ -6,24 +6,41 @@
         class="block-head-icon"
         @click="$router.push('/visitorAnalysis/sourceWebAnalysis')"
       >
-        >
+        <img src="@/assets/images/icon.png" alt="" width="10px" />
       </div>
     </div>
     <div class="block-index-form">
-      <!-- content -->
       <div class="form-list-page">
         <div class="form-list-header">
           <div class="header-text w156">来源网站</div>
           <div class="header-name w156"><b>浏览量(PV)</b></div>
-          <div class="header-name w156"><b>占比</b></div>
+          <div class="header-name w156">
+            <b>占比</b>
+          </div>
         </div>
-
+        <!-- <div style="height: 280px; overflow: auto;"> -->
         <div
           class="form-list-record"
           v-for="(item, index) in SourceWebsitelist"
           :key="index"
         >
-          <div class="header-text w157">{{ item.website || "--" }}</div>
+          <div class="header-text w157">
+            <el-popover
+              placement="top-start"
+              trigger="hover"
+              v-if="item.website && item.website.length > 70"
+            >
+              <div style="font-size: 12px">
+                {{ item.website }}
+              </div>
+              <div slot="reference" class="overItem" style="cursor: pointer">
+                {{ item.website || "--" }}
+              </div>
+            </el-popover>
+            <div v-else class="overItem">
+              {{ item.website || "--" }}
+            </div>
+          </div>
           <div class="form-list-item w158">
             <p>{{ item.pv }}</p>
           </div>
@@ -31,16 +48,6 @@
             <p>{{ percentageFun(item.percent) }}</p>
           </div>
         </div>
-
-        <!-- <div class="form-list-record">
-              <div class="header-text w157">直接访问</div>
-              <div class="form-list-item w158">
-                <p>187.7%</p>
-              </div>
-              <div class="form-list-item w158">
-                <p>143.3%</p>
-              </div>
-            </div> -->
       </div>
     </div>
   </div>
@@ -71,14 +78,15 @@ export default {
         this.SourceWebsitelist = res.data;
       });
     },
-    percentageFun(val){
-        return percentage(val)
-    }
+    percentageFun(val) {
+      return percentage(val);
+    },
   },
 };
 </script>
-
-<style lang="scss" scoped>
-.SourceWebsite {
+<style>
+.el-popper {
+  margin-bottom: 0px !important;
 }
 </style>
+<style lang="scss" scoped></style>

@@ -6,7 +6,7 @@
         class="block-head-icon"
         @click="$router.push('/visitorAnalysis/newOld-visitor-analysis')"
       >
-        >
+       <img src="@/assets/images/icon.png" alt="" width="10px">
       </div>
     </div>
     <div class="pieShow">
@@ -63,12 +63,12 @@
                 <p>跳出率</p>
               </div>
               <div class="bid-list-item w159 lettSpace">
-                <p style="color: rgb(155, 156, 156)">
-                  {{ oldVisitor.bounceRate || "--" }}
-                </p>
+                <p style="color: rgb(155, 156, 156)" v-if="oldVisitor.bounceRate">{{ percentageFun(oldVisitor.bounceRate) }}</p>
+                  <p v-else>--</p>
               </div>
               <div class="bid-list-item w159 lettSpace">
-                <p>{{ newVisitor.bounceRate || "--" }}</p>
+                <p v-if="newVisitor.bounceRate">{{ percentageFun(newVisitor.bounceRate) }}</p>
+                <p v-else>--</p>
               </div>
             </div>
 
@@ -116,6 +116,7 @@
 <script>
 import pieChart from "@/components/Charts/pieMarker.vue";
 import { getVisitorApi } from "@/api/trackingapi/visitor";
+import { percentage } from "@/utils/percent";
 export default {
   name: "NewOldVisitors",
   components: { pieChart },
@@ -145,9 +146,6 @@ export default {
     },
     vistorPercent() {
       const { newVistorPercent, oldVistorPercent } = this;
-      // return {
-      //   newVistorPercent, oldVistorPercent
-      // }
       return Object.assign(
         { newVistorPercent, oldVistorPercent },
         this.commonParams
@@ -160,6 +158,9 @@ export default {
     },
   },
   methods: {
+    percentageFun(val){
+        return percentage(val)
+    },
     getVisitor() {
       getVisitorApi(this.params).then((res) => {
         if (res.code == 200) {

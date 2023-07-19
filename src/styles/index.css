@@ -131,8 +131,10 @@
 }
 
 .radio-com .radio-com-label {
-  font-size: 14px;
+  font-size: 12px;
   padding: 0 10px;
+  color: #697195;
+  line-height: 30px;
 }
 
 .radio-com .radio-com-el {
@@ -339,8 +341,8 @@
   menuActiveText: #6dc3dd;
   subMenuActiveText: black;
   menuBg: #fff;
-  menuHover: #eee;
-  subMenuBg: #eee;
+  menuHover: linear-gradient(to right, #E1E7FB, #ffffff);
+  subMenuBg: linear-gradient(to right, #E1E7FB, #ffffff);
   subMenuHover: #eee;
   sideBarWidth: 210px;
 }
@@ -666,6 +668,13 @@ aside a:hover {
   z-index: 1000 !important;
 }
 
+.overItem {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 30px;
+  white-space: nowrap;
+}
+
 .block-main {
   padding: 18px 12px;
   background-color: #fafafb;
@@ -679,8 +688,8 @@ aside a:hover {
 }
 
 .block-main .block-head .block-title {
+  font-weight: 400;
   font-size: 14px;
-  font-weight: 500;
   line-height: 33px;
   color: #4d4d4d;
 }
@@ -690,6 +699,10 @@ aside a:hover {
   color: #acaaaa;
   font-size: 16px;
   cursor: pointer;
+}
+
+.block-main .block-head .block-head-icon img:hover {
+  content: url("../assets/images/hover-icon.png");
 }
 
 .block-index-form .form-list-page {
@@ -703,6 +716,7 @@ aside a:hover {
   width: 60%;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 30px;
   white-space: nowrap;
 }
 
@@ -740,11 +754,9 @@ aside a:hover {
 }
 
 .block-index-form .form-list-page .form-list-record .w157 {
-  display: flex;
-  align-items: center;
   color: #555353;
   font-size: 13px;
-  line-height: 14px;
+  line-height: 30px;
 }
 
 .block-index-form .form-list-page .form-list-record .w159 {
@@ -756,6 +768,6 @@ aside a:hover {
 
 .block-index-form .form-list-page .form-list-record .w158 {
   color: #555353;
-  font-size: 17px;
-  line-height: 17px;
+  font-size: 13px;
+  line-height: 30px;
 }

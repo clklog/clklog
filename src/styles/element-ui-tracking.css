@@ -9,8 +9,10 @@
 }
 
 .radio-com .radio-com-label {
-  font-size: 14px;
+  font-size: 12px;
   padding: 0 10px;
+  color: #697195;
+  line-height: 30px;
 }
 
 .radio-com .radio-com-el {
