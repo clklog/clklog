@@ -66,10 +66,10 @@ export default {
 </script>
 <style>
 #app .sidebar-container .el-submenu__title:hover {
-  background:linear-gradient(to right, #e1e7fb, #ffffff) !important;
+  background: linear-gradient(to right, #e1e7fb, #ffffff) !important;
 }
 #app .sidebar-container .submenu-title-noDropdown:hover {
-  background:linear-gradient(to right, #e1e7fb, #ffffff) !important;
+  background: linear-gradient(to right, #e1e7fb, #ffffff) !important;
 }
 </style>
 <style lang="scss" scoped>

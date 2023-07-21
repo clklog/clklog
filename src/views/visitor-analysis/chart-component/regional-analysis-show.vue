@@ -5,23 +5,27 @@
       <div
         id="echart_china"
         ref="echart_china"
-        style="width: 100%; height: 270px"
+        style="width: 100%; height: 350px"
       />
     </div>
+    <!-- style="width: 100%; height: 287px;overflow-y: auto;" -->
     <div class="mapTable">
-      <div style="width: 500px;height:287px;">
+      <div style="width: 500px; height: 100%; margin-top: 62px">
         <el-table
           ref="singleTable"
-          :data="getAreaList"
+          :data="apiProvinceList"
           highlight-current-row
-          style="width: 100%; height: 287px;overflow-y: auto;"
+          style="width: 100%;"
         >
           <el-table-column type="index" width="100"> </el-table-column>
           <el-table-column property="province" label="省份" width="120">
           </el-table-column>
-          <el-table-column property="pv" label="访问次数" width="120">
+          <el-table-column property="visit" label="访问次数" width="120">
           </el-table-column>
-          <el-table-column property="percent" label="占比"></el-table-column>
+          <el-table-column
+            property="visitCountRate"
+            label="占比"
+          ></el-table-column>
         </el-table>
       </div>
     </div>
@@ -38,82 +42,71 @@ export default {
     return {
       getAreaList: null,
       myChart: null,
-      dataList: [
-        { name: "北京", value: this.randomData() },
-        { name: "天津", value: this.randomData() },
-        { name: "上海", value: this.randomData() },
-        { name: "重庆", value: this.randomData() },
-        { name: "河北", value: this.randomData() },
-        { name: "河南", value: this.randomData() },
-        { name: "云南", value: this.randomData() },
-        { name: "辽宁", value: this.randomData() },
-        { name: "黑龙江", value: this.randomData() },
-        { name: "湖南", value: this.randomData() },
-        { name: "安徽", value: this.randomData() },
-        { name: "山东", value: this.randomData() },
+      provinceList: [
+        { name: "上海", value: 0 },
+        { name: "广东", value: 0 },
+        { name: "北京", value: 0 },
+        { name: "天津", value: 0 },
+        { name: "重庆", value: 0 },
+        { name: "河北", value: 0 },
+        { name: "河南", value: 0 },
+        { name: "云南", value: 0 },
+        { name: "辽宁", value: 0 },
+        { name: "黑龙江", value: 0 },
+        { name: "湖南", value: 0 },
+        { name: "安徽", value: 0 },
+        { name: "山东", value: 0 },
         { name: "新疆", value: 0 },
-        { name: "江苏", value: this.randomData() },
-        { name: "浙江", value: this.randomData() },
-        { name: "江西", value: this.randomData() },
-        { name: "湖北", value: this.randomData() },
-        { name: "广西", value: this.randomData() },
-        { name: "甘肃", value: this.randomData() },
-        { name: "山西", value: this.randomData() },
-        { name: "内蒙古", value: this.randomData() },
-        { name: "陕西", value: this.randomData() },
-        { name: "吉林", value: this.randomData() },
-        { name: "福建", value: this.randomData() },
-        { name: "贵州", value: this.randomData() },
-        { name: "广东", value: this.randomData() },
-        { name: "青海", value: this.randomData() },
-        { name: "西藏", value: this.randomData() },
-        { name: "四川", value: this.randomData() },
-        { name: "宁夏", value: this.randomData() },
-        { name: "海南", value: this.randomData() },
-        { name: "台湾", value: this.randomData() },
-        { name: "香港", value: this.randomData() },
-        { name: "澳门", value: this.randomData() },
+        { name: "江苏", value: 0 },
+        { name: "浙江", value: 0 },
+        { name: "江西", value: 0 },
+        { name: "湖北", value: 0 },
+        { name: "广西", value: 0 },
+        { name: "甘肃", value: 0 },
+        { name: "山西", value: 0 },
+        { name: "内蒙古", value: 0 },
+        { name: "陕西", value: 0 },
+        { name: "吉林", value: 0 },
+        { name: "福建", value: 0 },
+        { name: "贵州", value: 0 },
+        { name: "青海", value: 0 },
+        { name: "西藏", value: 0 },
+        { name: "四川", value: 0 },
+        { name: "宁夏", value: 0 },
+        { name: "海南", value: 0 },
+        { name: "台湾", value: 0 },
+        { name: "香港", value: 0 },
+        { name: "澳门", value: 0 },
       ],
-      tableData: [
-        {
-          date: "江苏",
-          name: "5456",
-          address: "78%",
-        },
-        {
-          date: "广东",
-          name: "323",
-          address: "0.9%",
-        },
-        {
-          date: "上海",
-          name: "2334",
-          address: "133%",
-        },
-        {
-          date: "南京",
-          name: "2132",
-          address: "12%",
-        },
-      ],
+      apiProvinceList: [],
+      maxValue: 200,
     };
   },
-  mounted() {
-    this.showScatterInGeo();
-    this.getAreaApi();
-  },
+  mounted() {},
   methods: {
-    getAreaApi() {
-      const params = {
-        timeType: "day",
-        channel: ["安卓", "苹果", "网站", "微信小程序"],
-        startTime: "2023-06-08",
-        endTime: "2023-06-10",
-        projectName: "",
-      };
-      getAreaApi(params).then((res) => {
-        this.getAreaList = res.data;
-      });
+    getAreaProvince(val) {
+      let maxValue = [];
+      // this.apiProvinceList = val.rows;
+      this.apiProvinceList = val;
+      for (let i = 0; i < this.provinceList.length; i++) {
+        for (let j = 0; j < this.apiProvinceList.length; j++) {
+          if (this.provinceList[i].name == this.apiProvinceList[j].province) {
+            this.provinceList[i].value = this.apiProvinceList[j].visit;
+            maxValue.push(this.apiProvinceList[j].visit);
+          }
+        }
+      }
+      if (maxValue.length > 0) {
+        let max = maxValue.sort(function (a, b) {
+          return b - a;
+        })[0];
+        this.maxValue = max;
+      }else{
+        this.provinceList.map(item =>{
+          item.value = 0
+        })
+      }
+      this.showScatterInGeo();
     },
     randomData() {
       return Math.round(Math.random() * 500);
@@ -131,7 +124,6 @@ export default {
       );
       var option = {
         geo: {
-          // 地理坐标系组件,支持在地理坐标系上绘制散点图、线图
           map: "china",
           aspectScale: 0.75,
           zoom: 1.1,
@@ -139,25 +131,19 @@ export default {
         tooltip: {
           formatter: "{b}:{c}",
         },
-        // 省会的位置标注
-        // legend: {
-        //   orient: 'vertical',
-        //   left: 'left',
-        //   data:['']
-        // },
         visualMap: {
           min: 0,
-          max: 1500,
+          max: this.maxValue,
           left: "10%",
           top: "bottom",
           text: ["高", "低"],
           calculable: true,
-          orient: "horizontal",
-          color: ["#0b50b9", "#FFFFFF"],
+          // orient: "horizontal",
+          color: ["#0b50b9", "#fff"],
         },
         series: [
           {
-            zoom: 1.3,
+            zoom: 1.1,
             map: "china",
             type: "map",
 
@@ -181,7 +167,7 @@ export default {
                 show: false,
               },
             },
-            data: this.dataList,
+            data: this.provinceList,
           },
         ],
       };
@@ -197,7 +183,8 @@ export default {
 .area_container {
   margin: 15px;
   background-color: #fafafb;
-  height: 339px;
+  // min-height: 339px;
+  min-height: 470px;
   display: flex;
   .mapCharts {
     width: 50%;

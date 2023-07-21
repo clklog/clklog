@@ -1,37 +1,6 @@
 <template>
   <div class="chartsIcon">
-    <div class="flow-indicator">
-      <div class="flow-item">
-        <div class="flow-title" style="line-height: 30px">流量基础指标</div>
-        <el-checkbox-group
-          v-model="channelList"
-          class="checkBoxStyle"
-          @change="handelChannelList"
-        >
-          <el-checkbox label="pv">浏览量(PV)</el-checkbox>
-          <el-checkbox label="pvRate">浏览量占比</el-checkbox>
-          <el-checkbox label="visitCount">访问次数</el-checkbox>
-          <el-checkbox label="uv">访客数(UV)</el-checkbox>
-          <el-checkbox label="newUv">新访客数</el-checkbox>
-          <el-checkbox label="newUvRate">新访客比率</el-checkbox>
-          <el-checkbox label="ipCount" style="margin-right: 0"
-            >IP数</el-checkbox
-          >
-        </el-checkbox-group>
-      </div>
-      <div class="flow-item setSpace">
-        <div class="flow-title" style="line-height: 30px">流量质量指标</div>
-        <el-checkbox-group
-          v-model="flowQuality"
-          class="checkBoxStyle"
-          @change="handelFlowQuality"
-        >
-          <el-checkbox label="bounceRate">跳出率</el-checkbox>
-          <el-checkbox label="avgVisitTime">平均访问时长</el-checkbox>
-          <el-checkbox label="avgPv">平均访问页数</el-checkbox>
-        </el-checkbox-group>
-      </div>
-    </div>
+    <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
     <div class="table-content">
       <el-table
         :header-cell-style="{ textAlign: 'center' }"
@@ -112,20 +81,22 @@
         :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        hide-on-single-page
       />
     </div>
   </div>
 </template>
 
 <script>
+import flowPoint from "@/components/flowPoint/index";
 import Bus from "@/utils/bus";
+import { filterPoint } from "@/components/flowPoint/filterPoint";
 import { percentage } from "@/utils/percent";
 export default {
+  components: { flowPoint },
   data() {
     return {
       flowTableList: [],
-      channelList: ["pv", "visitCount"],
+      channelList: ["pv", "visitCount", "newUvRate", "pvRate"],
       flowQuality: ["avgPv"],
       pv: false,
       visitCount: false,
@@ -137,29 +108,74 @@ export default {
       bounceRate: false,
       pvRate: false,
       newUvRate: false,
-      allPointList: [
-        "pv",
-        "visitCount",
-        "newUv",
-        "uv",
-        "ipCount",
-        "avgPv",
-        "avgVisitTime",
-        "bounceRate",
-        "pvRate",
-        "newUvRate",
-      ],
       mergedArr: [],
       currentPage: 1,
       total: 0,
       pageSize: 10,
-      pageSizes: [10, 20, 30, 40, 50],
+      name: {
+        uv: false,
+        pv: false,
+      },
     };
   },
   mounted() {
     this.initShowTable();
   },
   methods: {
+    flowPoint(val) {
+      if (val.length > 0) {
+        if (val.includes("pv")) {
+          this.pv = true;
+        } else {
+          this.pv = false;
+        }
+        if (val.includes("visitCount")) {
+          this.visitCount = true;
+        } else {
+          this.visitCount = false;
+        }
+        if (val.includes("newUv")) {
+          this.newUv = true;
+        } else {
+          this.newUv = false;
+        }
+        if (val.includes("uv")) {
+          this.uv = true;
+        } else {
+          this.uv = false;
+        }
+        if (val.includes("ipCount")) {
+          this.ipCount = true;
+        } else {
+          this.ipCount = false;
+        }
+        if (val.includes("avgPv")) {
+          this.avgPv = true;
+        } else {
+          this.avgPv = false;
+        }
+        if (val.includes("avgVisitTime")) {
+          this.avgVisitTime = true;
+        } else {
+          this.avgVisitTime = false;
+        }
+        if (val.includes("bounceRate")) {
+          this.bounceRate = true;
+        } else {
+          this.bounceRate = false;
+        }
+        if (val.includes("pvRate")) {
+          this.pvRate = true;
+        } else {
+          this.pvRate = false;
+        }
+        if (val.includes("newUvRate")) {
+          this.newUvRate = true;
+        } else {
+          this.newUvRate = false;
+        }
+      }
+    },
     handelChannelList() {
       this.initShowTable();
     },
@@ -170,10 +186,17 @@ export default {
       return percentage(val);
     },
     apiDetailList(val) {
+      this.currentPage = 1;
       this.flowTableList = val.detail;
       this.flowTableList.map((item) => {
         if (item.bounceRate) {
           item.bounceRate = this.percentageFun(item.bounceRate);
+        }
+        if (item.newUvRate) {
+          item.newUvRate = this.percentageFun(item.newUvRate);
+        }
+        if (item.pvRate) {
+          item.pvRate = this.percentageFun(item.pvRate);
         }
       });
       this.total = val.detail.length;
@@ -234,6 +257,7 @@ export default {
         }
       }
     },
+
     handleSizeChange(val) {
       this.currentPage = 1;
       this.pageSize = val;
@@ -256,48 +280,5 @@ export default {
   min-height: 461px;
   background: rgba(250, 250, 251);
   border-radius: 6px;
-  .flow-indicator {
-    min-height: 58px;
-    background: rgba(252, 252, 252, 0.39);
-    border: 1px solid #f0f0f5;
-    border-radius: 6px;
-    box-sizing: border-box;
-    margin: 12px;
-    .setSpace {
-      margin-bottom: 12px;
-    }
-    .flow-item {
-      display: flex;
-      line-height: 30px;
-      margin-top: 12px;
-      margin-left: 10px;
-      .flow-title {
-        white-space: nowrap;
-        box-sizing: border-box;
-        margin-right: 21px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 16px;
-        color: #4d4d4d;
-      }
-    }
-    .check_item {
-      background-color: #ffffff;
-      margin-left: 20px;
-      height: 40px;
-      border-radius: 4px;
-      border: 1px solid #eee;
-      display: flex;
-      align-items: center;
-      // width: 30%;
-      span {
-        font-size: 14px;
-        padding: 0 10px;
-      }
-      .checkBoxStyle {
-        margin-right: 10px;
-      }
-    }
-  }
 }
 </style>

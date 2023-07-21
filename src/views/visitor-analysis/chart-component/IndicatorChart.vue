@@ -86,7 +86,7 @@ export default {
       ],
       pv: [],
       uv: [],
-      visit: [],
+      visitCount: [],
       ipCount: [],
       bounceRate: [],
       time: [],
@@ -137,7 +137,7 @@ export default {
     },
     checkSearchValue(val) {
       this.time = [];
-      const { time, pv, uv, visit, ipCount, bounceRate } = this;
+      const { time, pv, uv, visitCount, ipCount, bounceRate } = this;
       this.flowTrendList.map((item) => {
         if (item.statTime) {
           return time.push(item.statTime);
@@ -180,14 +180,14 @@ export default {
       }
       if (val.includes("访问次数")) {
         this.flowTrendList.map((item) => {
-          if (item.visit) {
-            return visit.push(item.visit);
+          if (item.visitCount) {
+            return visitCount.push(item.visitCount);
           } else {
-            visit.push(0);
+            visitCount.push(0);
           }
         });
       } else {
-        this.visit = [];
+        this.visitCount = [];
       }
 
       if (val.includes("跳出率")) {
@@ -303,7 +303,7 @@ export default {
             lineStyle: {
               width: 3,
             },
-            data: this.visit,
+            data: this.visitCount,
           },
           {
             name: "IP数",

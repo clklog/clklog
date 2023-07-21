@@ -18,7 +18,6 @@
             <b>占比</b>
           </div>
         </div>
-        <!-- <div style="height: 280px; overflow: auto;"> -->
         <div
           class="form-list-record"
           v-for="(item, index) in SourceWebsitelist"
@@ -84,9 +83,4 @@ export default {
   },
 };
 </script>
-<style>
-.el-popper {
-  margin-bottom: 0px !important;
-}
-</style>
 <style lang="scss" scoped></style>

@@ -7,21 +7,26 @@
           <el-table
             :header-cell-style="{ textAlign: 'center' }"
             :cell-style="{ textAlign: 'center' }"
-            :data="searchWordDetailList"
-            style="width: 100%; margin-top: 12px; height: 98%"
-            :default-sort="{ prop: 'date', order: 'descending' }"
+            :data="
+              searchTableList.slice(
+                (currentPage - 1) * pageSize,
+                currentPage * pageSize
+              )
+            "
+            border
+            style="width: 100%; margin-top: 12px"
           >
-            <el-table-column prop="statDate" label="日期" sortable width="180">
+            <el-table-column prop="statTime" label="日期" sortable width="180">
             </el-table-column>
             <el-table-column prop="word" label="搜索词" sortable width="180">
             </el-table-column>
             <el-table-column prop="pv" label="浏览量(PV)" sortable>
             </el-table-column>
-            <el-table-column prop="pvRate" label="占比" sortable>
+            <el-table-column prop="percent" label="占比" sortable>
             </el-table-column>
-            <el-table-column prop="avgPv" label="平均访问时长" sortable>
+            <el-table-column prop="avgVisitTime" label="平均访问时长" sortable>
             </el-table-column>
-            <el-table-column prop="avgVisitTime" label="平均访问页数" sortable>
+            <el-table-column prop="avgPv" label="平均访问页数" sortable>
             </el-table-column>
             <el-table-column prop="bounceRate" label="跳出率" sortable>
             </el-table-column>
@@ -31,11 +36,10 @@
     </div>
     <div class="block">
       <el-pagination
-        hide-on-single-page
         :pager-count="5"
         prev-text
         next-text="下一页"
-        :current-page="currentPage4"
+        :current-page="currentPage"
         :page-sizes="[10, 20, 30, 40]"
         :page-size="10"
         layout=" sizes, prev, pager, next, jumper"
@@ -48,175 +52,82 @@
 </template>
 
 <script>
-import { getSearchWordDetailApi } from "@/api/trackingapi/searchword";
+import { percentage } from "@/utils/percent";
 export default {
   data() {
     return {
-      currentPage4: 4,
-      tableData: [
-        {
-          date: "2023/5/30",
-          word: "女士衣服",
-          visitor: "86",
-          user: "15%",
-          timeLegth: "695",
-          pageNum: "56",
-          out: "61",
-        },
-        {
-          date: "2023/5/30",
-          word: "女士衣服",
-          visitor: "86",
-          user: "15%",
-          timeLegth: "695",
-          pageNum: "56",
-          out: "61",
-        },
-        {
-          date: "2023/5/31",
-          word: "NA士衣服",
-          visitor: "86",
-          user: "15%",
-          timeLegth: "69",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/3",
-          word: "衣服",
-          visitor: "86",
-          user: "15%",
-          timeLegth: "695",
-          pageNum: "86",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-      ],
-      searchWordDetailList: null,
+      currentPage: 1,
+      searchTableList: [],
       total: null,
+      total: 0,
+      pageSize: 10,
     };
   },
-  created() {
-    // this.getSearchWordDetail();
-  },
+  created() {},
   methods: {
-    // 关键词详情页
-    getSearchWordDetail() {
-      // 测试数据
-      const params = {
-        pageNum: 1,
-        pageSize: 50,
-        startTime: "",
-        endTime: "",
-      };
-      getSearchWordDetailApi(params).then((res) => {
-        if (res.code == 200) {
-          this.searchWordDetailList = res.data.rows;
-          this.total = res.data.total;
+    percentageFun(val){
+        return percentage(val)
+    },
+    searchTable(val) {
+      this.currentPage = 1;
+      this.searchTableList = val.rows;
+      this.searchTableList.map((item) => {
+        if (item.bounceRate) {
+          item.bounceRate = this.percentageFun(item.bounceRate);
+        }
+        if (item.percent) {
+          item.percent = this.percentageFun(item.percent);
         }
       });
+      this.total = val.total;
     },
     formatter(row, column) {
       return row.address;
     },
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+      this.currentPage = 1;
+      this.pageSize = val;
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+      this.currentPage = val;
     },
   },
 };
 </script>
-<style lang="scss">
-.setTable {
-  .el-table--border {
-    border: none;
-  }
-  .el-table th {
-    background-color: transparent !important;
-  }
-
-  .el-table,
-  .el-table__expanded-cell {
-    background-color: transparent;
-  }
-
-  .setTable .el-table th,
-  .el-table tr {
-    background-color: transparent;
-  }
-}
-</style>
-
 <style lang="scss" scoped>
+@import "~@/styles/components/el-pagination.scss";
+// ::v-deep {
+//   .setTable {
+//     .el-table--border {
+//       border: none;
+//     }
+//     .el-table th {
+//       background-color: transparent !important;
+//     }
+
+//     .el-table,
+//     .el-table__expanded-cell {
+//       background-color: transparent;
+//     }
+
+//     .setTable .el-table th,
+//     .el-table tr {
+//       background-color: transparent;
+//     }
+//     .el-table th.is-leaf, .el-table td{
+//       border: 0 !important;
+//     }
+//     .el-table::before{
+//       height: 0;
+//     }
+//   }
+// }
 .search_wrappy {
   position: relative;
   margin: 15px;
   background-color: #fafafb;
-  min-height: 647px;
+  // min-height: 647px;
+  min-height: 447px;
 }
 .search_table {
   height: 100%;
@@ -226,22 +137,6 @@ export default {
     font-weight: 500;
     line-height: 31px;
     color: #4d4d4d;
-  }
-  .block {
-    margin: 20px 12px;
-  }
-}
-::v-deep {
-  .el-pagination {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 20px;
-  }
-  .el-pagination__jump {
-    position: absolute;
-    left: 0;
   }
 }
 </style>

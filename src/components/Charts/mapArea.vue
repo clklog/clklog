@@ -14,7 +14,7 @@ import chinamap from "echarts/map/json/china.json";
 export default {
   data() {
     return {
-      maxValue:200,
+      maxValue: 200,
       myChart: null,
       provinceList: [
         // { name: "北京", value: this.randomData() },
@@ -84,12 +84,16 @@ export default {
           }
         }
       }
-      let max = maxValue.sort(function (a, b) {
-        return b - a;
-      })[0];
-      // console.log(maxValue, 32);
-      // console.log(max2, 32);
-      this.maxValue = max
+      if (maxValue.length > 0) {
+        let max = maxValue.sort(function (a, b) {
+          return b - a;
+        })[0];
+        this.maxValue = max;
+      } else {
+        this.provinceList.map((item) => {
+          item.value = 0;
+        });
+      }
       this.showScatterInGeo();
     },
     randomData() {

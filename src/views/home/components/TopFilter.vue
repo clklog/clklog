@@ -1,26 +1,26 @@
 <template>
-  <div class="TopFilter">
-    <div class="radio-com">
-      <span class="radio-com-label">时间：</span>
-      <el-radio-group v-model="timeType" class="radio-com-el">
-        <el-radio label="day">今日</el-radio>
-        <el-radio label="week">本周</el-radio>
-        <el-radio label="month">本月</el-radio>
-        <el-radio label="year">本年</el-radio>
-      </el-radio-group>
-    </div>
+    <div class="TopFilter">
+      <div class="radio-com">
+        <span class="radio-com-label">时间：</span>
+        <el-radio-group v-model="timeType" class="radio-com-el">
+          <el-radio label="day">今日</el-radio>
+          <el-radio label="week">本周</el-radio>
+          <el-radio label="month">本月</el-radio>
+          <el-radio label="year">本年</el-radio>
+        </el-radio-group>
+      </div>
 
-    <div class="radio-com">
-      <span class="radio-com-label">渠道：</span>
-      <el-radio-group class="radio-com-el" v-model="channelValue">
-        <el-radio label="">全部</el-radio>
-        <el-radio label="安卓">安卓</el-radio>
-        <el-radio label="苹果">苹果</el-radio>
-        <el-radio label="网站">网站</el-radio>
-        <el-radio label="微信小程序">微信小程序</el-radio>
-      </el-radio-group>
+      <div class="radio-com">
+        <span class="radio-com-label">渠道：</span>
+        <el-radio-group class="radio-com-el" v-model="channelValue">
+          <el-radio label="">全部</el-radio>
+          <el-radio label="安卓">安卓</el-radio>
+          <el-radio label="苹果">苹果</el-radio>
+          <el-radio label="网站">网站</el-radio>
+          <el-radio label="微信小程序">微信小程序</el-radio>
+        </el-radio-group>
+      </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -32,8 +32,8 @@ export default {
     return {
       timeType: "day",
       channelValue: "",
-      weekEnd:'',
-      weekStart:'',
+      weekEnd: "",
+      weekStart: "",
     };
   },
   computed: {
@@ -51,7 +51,7 @@ export default {
           //   8 * 3600 * 1000;
           // let timeDifference = toData - 6 * 3600 * 24 * 1000;
           // return timestampToTime(timeDifference);
-          this.getWeek()
+          this.getWeek();
           return this.weekStart;
           break;
         case "month":
@@ -77,8 +77,8 @@ export default {
           break;
         case "week":
           // return formatDate(new Date());
-          this.getWeek()
-          return this.weekEnd
+          this.getWeek();
+          return this.weekEnd;
           break;
         case "month":
           let monthStart = new Date();

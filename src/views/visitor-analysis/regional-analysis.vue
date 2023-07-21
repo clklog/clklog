@@ -1,140 +1,97 @@
 <template>
   <div>
-    <FilterBar areaFlag = 0  />
+    <FilterBar @setFilterBarParams="setFilterBarParams" />
     <!-- 地域分析 -->
-    <div class="Overview">
-      <div class="trafficHead" style="padding-left: 15px">地域分析</div>
-      <div class="bid-list-page">
-        <div class="bid-list-header">
-          <div class="header-name w156">
-            浏览量(PV)
-            <img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            访问次数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            访问数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            IP数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            平均访问页面<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            平均访问时长<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            跳出率<img src="@/assets/images/question.png" alt="" />
-          </div>
-        </div>
-        <div class="bid-list-record">
-          <div class="bid-list-item w158">
-            <p>18775</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>14330</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>877424</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>800580</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>1.50</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>00:04:05</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>82.56%</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <regionalShow></regionalShow>
-    <regionalTable></regionalTable>
+    <regionalView ref="regionalView"></regionalView>
+    <regionalShow ref="regionalShow"></regionalShow>
+    <regionalTable
+      ref="regionalTable"
+      @currentPage="currentPage"
+    ></regionalTable>
   </div>
 </template>
 
 <script>
-// import JsonEditor from '@/components/JsonEditor'
+import { copyObj } from "@/utils/copy";
 import { FilterBar } from "@/layout/components";
 import regionalShow from "./chart-component/regional-analysis-show";
 import regionalTable from "./chart-component/regional-analysis-table";
+import regionalView from "./chart-component/regional-view";
+import {
+  getAreaDetailApi,
+  getAreaApi,
+  getAreaDetailTop10Api,
+} from "@/api/trackingapi/area.js";
 export default {
   name: "regionalAnalysis",
   components: {
     FilterBar,
+    regionalView,
     regionalShow,
     regionalTable,
+  },
+  data() {
+    return {
+      filterBarParams: {},
+      pageNum: 1,
+      pageSize: 10,
+    };
+  },
+  mounted() {
+    // this.init()
+  },
+  computed: {
+    project() {
+      return this.$store.getters.project;
+    },
+    commonParams() {
+      const { project, pageNum, pageSize } = this;
+      return Object.assign({ project }, this.filterBarParams);
+    },
+  },
+  watch: {
+    commonParams(val) {
+      this.getAreaDetail(val);
+      this.getAreaProvinceList();
+      this.getAreaDetailTop10();
+    },
+  },
+  methods: {
+    getAreaDetail(val) {
+      getAreaDetailApi(val).then((res) => {
+        if (res.code == 200) {
+          this.$refs.regionalView.getDetailView(res.data);
+        }
+      });
+    },
+    getAreaProvinceList(val) {
+      let newvalue = copyObj(this.commonParams);
+      if (val) {
+        newvalue.pageNum = val.page;
+        newvalue.pageSize = val.size;
+      } else {
+        newvalue.pageNum = this.pageNum;
+        newvalue.pageSize = this.pageSize;
+      }
+
+      this.$refs.regionalTable.getDetailList(newvalue);
+    },
+    getAreaDetailTop10() {
+      getAreaDetailTop10Api(this.commonParams).then((res) => {
+        if (res.code == 200) {
+          this.$refs.regionalShow.getAreaProvince(res.data);
+        }
+      });
+    },
+  
+    setFilterBarParams(val) {
+      this.filterBarParams = copyObj(val);
+    },
+    currentPage(val) {
+      this.getAreaProvinceList(val);
+    },
   },
 };
 </script>
 
-<style lang="scss" scoped>
-.Overview {
-  margin: 20px;
-  min-height: 118px;
-  background-color: #fafafb;
-  img {
-    width: 11.44px;
-    height: 11.44px;
-    margin-left: 12px;
-    cursor: pointer;
-  }
-  .trafficHead {
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 14px;
-    color: #4d4d4d;
-    padding: 15px 30px 15px;
-    padding-left: 0;
-  }
-  .bid-list-page {
-    width: clas(100% -20px);
-    display: flex;
-    flex-direction: column;
-    .bid-list-header {
-      display: flex;
-      .header-name {
-        width: 14%;
-        justify-content: center;
-        height: 30px;
-        display: flex;
-        align-items: center;
-      }
-      .w156 {
-        font-size: 13px;
-        font-weight: 400;
-        line-height: 14px;
-        color: #4d4d4d;
-      }
-    }
-    .bid-list-record {
-      display: flex;
-      .bid-list-item {
-        width: 14%;
-        justify-content: center;
-        height: 30px;
-        display: flex;
-        align-items: center;
-      }
-      .w157 {
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 14px;
-        color: #4d4d4d;
-      }
-      .w158 {
-        font-size: 16px;
-        font-weight: bold;
-        color: #3d64e6;
-        line-height: 17px;
-      }
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

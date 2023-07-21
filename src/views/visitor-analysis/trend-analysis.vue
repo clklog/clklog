@@ -48,7 +48,7 @@
             </el-popover>
           </div>
           <div class="header-name w156">
-            访问数<el-popover
+            访客数<el-popover
               placement="bottom-start"
               width="200"
               trigger="hover"

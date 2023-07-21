@@ -377,21 +377,27 @@ export default {
 ::v-deep {
   @import "~@/styles/components/custom-radio.scss";
   // 日历样式start
-  .el-range-editor--medium .el-range-input{
+  .el-range-editor--medium .el-range-input {
     font-size: 12px;
   }
-  .el-date-editor .el-range__icon{
+  .el-date-editor .el-range__icon {
     font-size: 12px;
     line-height: 25px;
   }
-  .el-range-editor--medium .el-range-separator{
+  .el-range-editor--medium .el-range-separator {
     font-size: 12px;
     line-height: 25px;
   }
 }
 .documentation-container {
+  height: 83px;
+  width: 100%;
   .checkContent {
+    position: fixed;
+    z-index: 500;
+    background-color: #fff;
     min-height: 60px;
+    width: 100%;
     border-bottom: 1px #eee solid;
     .areaContent {
       height: 30px;

@@ -1,7 +1,9 @@
 <template>
   <div class="documentation-container">
-    <TopFilter @setTopFilterParams="setTopFilterParams" @timeTypeCheck = "timeTypeCheck"/>
     <!-- 流量概览 -->
+    <div style="height: 51px;">
+      <TopFilter @setTopFilterParams="setTopFilterParams" @timeTypeCheck = "timeTypeCheck"/>
+    </div>
     <FlowView ref="FlowViewRef" :commonParams="commonParams" :timeTypeFlag = "timeTypeFlag"/>
     <div class="block-line">
       <TrendChart ref="TrendChart" :commonParams="commonParams" class="left" />

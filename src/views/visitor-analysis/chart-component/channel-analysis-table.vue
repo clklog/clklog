@@ -15,7 +15,7 @@
               访问次数<img src="@/assets/images/question.png" alt="" />
             </div>
             <div class="header-name w156">
-              访问数<img src="@/assets/images/question.png" alt="" />
+              访客数<img src="@/assets/images/question.png" alt="" />
             </div>
             <div class="header-name w156">
               IP数<img src="@/assets/images/question.png" alt="" />

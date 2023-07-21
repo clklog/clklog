@@ -47,7 +47,7 @@
           </el-popover>
         </div>
         <div class="header-name w156">
-          访问数<el-popover
+          访客数<el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -151,7 +151,7 @@
           <p>{{ current.pv || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
-          <p>{{ current.visit || "--" }}</p>
+          <p>{{ current.visitCount || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
           <p>{{ current.uv || "--" }}</p>
@@ -181,7 +181,7 @@
           <p>{{ previous.pv || "--" }}</p>
         </div>
         <div class="bid-list-item w157">
-          <p>{{ previous.visit || "--" }}</p>
+          <p>{{ previous.visitCount || "--" }}</p>
         </div>
         <div class="bid-list-item w157">
           <p>{{ previous.uv || "--" }}</p>
@@ -205,7 +205,7 @@
           <p v-if="timeType == 'day'">环比（今日与昨日）</p>
           <p v-if="timeType == 'week'">环比（本周与上周）</p>
           <p v-if="timeType == 'month'">环比（本月与上月）</p>
-          <p v-if="timeType == 'year'">环比（本年与上年）</p>
+          <p v-if="timeType == 'year'">环比（本年与上年同期）</p>
         </div>
         <div class="bid-list-item w157">
           <p>{{ huanbi(current.pv, previous.pv) }}</p>
@@ -230,12 +230,12 @@
           />
         </div>
         <div class="bid-list-item w157">
-          <p>{{ huanbi(current.visit, previous.visit) }}</p>
-          <p v-if="huanbi(current.visit, previous.visit) != '--'">%</p>
+          <p>{{ huanbi(current.visitCount, previous.visitCount) }}</p>
+          <p v-if="huanbi(current.visitCount, previous.visitCount) != '--'">%</p>
           <img
             v-if="
-              huanbi(current.visit, previous.visit) != '--' &&
-              huanbi(current.visit, previous.visit) < 0
+              huanbi(current.visitCount, previous.visitCount) != '--' &&
+              huanbi(current.visitCount, previous.visitCount) < 0
             "
             class="declineIcon"
             src="@/assets/images/decline.png"
@@ -243,8 +243,8 @@
           />
           <img
             v-if="
-              huanbi(current.visit, previous.visit) != '--' &&
-              huanbi(current.visit, previous.visit) > 0
+              huanbi(current.visitCount, previous.visitCount) != '--' &&
+              huanbi(current.visitCount, previous.visitCount) > 0
             "
             class="riseImg"
             src="@/assets/images/rise.png"
@@ -371,7 +371,7 @@
           <p v-if="timeType == 'day'">同比（今日与同期）</p>
           <p v-if="timeType == 'week'">环比（本周与同期）</p>
           <p v-if="timeType == 'month'">环比（本月与同期）</p>
-          <p v-if="timeType == 'year'">环比（本年与同期）</p>
+          <p v-if="timeType == 'year'">环比（本年与上年同期）</p>
         </div>
         <div class="bid-list-item w157">
           <p>{{ tongbi(current.pv, samePeriod.pv) }}</p>
@@ -397,12 +397,12 @@
         </div>
 
         <div class="bid-list-item w157">
-          <p>{{ tongbi(current.visit, samePeriod.visit) }}</p>
-          <p v-if="tongbi(current.visit, samePeriod.visit) != '--'">%</p>
+          <p>{{ tongbi(current.visitCount, samePeriod.visitCount) }}</p>
+          <p v-if="tongbi(current.visitCount, samePeriod.visitCount) != '--'">%</p>
           <img
             v-if="
-              tongbi(current.visit, samePeriod.visit) != '--' &&
-              tongbi(current.visit, samePeriod.visit) < 0
+              tongbi(current.visitCount, samePeriod.visitCount) != '--' &&
+              tongbi(current.visitCount, samePeriod.visitCount) < 0
             "
             class="declineIcon"
             src="@/assets/images/decline.png"
@@ -410,8 +410,8 @@
           />
           <img
             v-if="
-              tongbi(current.visit, samePeriod.visit) != '--' &&
-              tongbi(current.visit, samePeriod.visit) > 0
+              tongbi(current.visitCount, samePeriod.visitCount) != '--' &&
+              tongbi(current.visitCount, samePeriod.visitCount) > 0
             "
             class="riseImg"
             src="@/assets/images/rise.png"

@@ -315,6 +315,8 @@ export default {
           bounceRate.push(0);
         }
       });
+
+      console.log( this.flowTrendList,43243);
     },
   },
 };
