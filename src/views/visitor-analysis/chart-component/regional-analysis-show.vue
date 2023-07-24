@@ -20,7 +20,7 @@
           <el-table-column type="index" width="100"> </el-table-column>
           <el-table-column property="province" label="省份" width="120">
           </el-table-column>
-          <el-table-column property="visit" label="访问次数" width="120">
+          <el-table-column property="visitCount" label="访问次数" width="120">
           </el-table-column>
           <el-table-column
             property="visitCountRate"
@@ -36,6 +36,7 @@
 import chinamap from "echarts/map/json/china.json";
 import resize from "@/components/Charts/mixins/resize";
 import { getAreaApi } from "@/api/trackingapi/area";
+import { percentage } from "@/utils/percent";
 export default {
   mixins: [resize],
   data() {
@@ -91,8 +92,8 @@ export default {
       for (let i = 0; i < this.provinceList.length; i++) {
         for (let j = 0; j < this.apiProvinceList.length; j++) {
           if (this.provinceList[i].name == this.apiProvinceList[j].province) {
-            this.provinceList[i].value = this.apiProvinceList[j].visit;
-            maxValue.push(this.apiProvinceList[j].visit);
+            this.provinceList[i].value = this.apiProvinceList[j].visitCount;
+            maxValue.push(this.apiProvinceList[j].visitCount);
           }
         }
       }
@@ -106,6 +107,9 @@ export default {
           item.value = 0
         })
       }
+      this.apiProvinceList.map((item) => {
+        item.visitCountRate = percentage(item.visitCountRate);
+      })
       this.showScatterInGeo();
     },
     randomData() {
@@ -116,8 +120,6 @@ export default {
       this.myChart.width = 100 + "px"; // 页面一半的大小
     },
     showScatterInGeo() {
-      // 2. 注册可用的地图，只在 geo 组件或者map图表类型中使用
-
       this.$echarts.registerMap("china", chinamap);
       this.myChart = this.$echarts.init(
         document.getElementById("echart_china")
@@ -133,7 +135,7 @@ export default {
         },
         visualMap: {
           min: 0,
-          max: this.maxValue,
+          max: this.maxValue || 200,
           left: "10%",
           top: "bottom",
           text: ["高", "低"],

@@ -4,7 +4,7 @@
     <div class="Overview">
       <div class="trafficHead" style="padding-left: 15px">新老访客分析</div>
       <div class="bid-list-page">
-        <div class="bid-list-header">
+        <!-- <div class="bid-list-header">
           <div class="header-name w156">
             访客数
             <img src="@/assets/images/question.png" alt="" />
@@ -24,8 +24,9 @@
           <div class="header-name w156">
             流失用户<img src="@/assets/images/question.png" alt="" />
           </div>
-        </div>
-        <div class="bid-list-record">
+        </div> -->
+        <originView ref="originView" byVisit></originView>
+        <!-- <div class="bid-list-record">
           <div class="bid-list-item w158">
             <p>1877532222</p>
           </div>
@@ -44,48 +45,89 @@
           <div class="bid-list-item w158">
             <p>00:04:05</p>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
-    <newOldAnalysis ref="newOldAnalysis" :commonParams="commonParams"></newOldAnalysis>
+    <newOldAnalysis ref="newOldAnalysis"></newOldAnalysis>
   </div>
 </template>
 
 <script>
 // import Dropzone from '@/components/Dropzone'
+import originView from "@/components/origin-view/index";
 import { FilterBar } from "@/layout/components";
 import newOldAnalysis from "./chart-component/newOld-visitor-analysisTable";
 import { copyObj } from "@/utils/copy";
+import {
+  getVisitorTotalApi,
+  getVisitorListApi,
+  getVisitorDetailApi,
+} from "@/api/trackingapi/visitor";
 export default {
   components: {
     FilterBar,
     newOldAnalysis,
-  },
-  computed: {
-    commonParams() {
-      return Object.assign({}, this.filterBarParams);
-    },
-  },
-  watch: {
-    commonParams(val) {
-      this.getIndexData();
-    },
+    originView
   },
   data() {
     return {
-      filterBarParams:null,
+      filterBarParams: null,
+      pageNum: 1,
+      pageSize: 10,
+      visitorTotal:null,
     };
   },
-  methods:{
-    setFilterBarParams(val){
+  mounted() {},
+  computed: {
+    project() {
+      return this.$store.getters.project;
+    },
+    commonParams() {
+      const { project } = this;
+      return Object.assign({ project }, this.filterBarParams);
+    },
+  },
+  watch: {
+    commonParams() {
+      this.getVisitorTotal();
+      // this.getVisitorList();
+      this.getVisitorDetail()
+    },
+  },
+
+  methods: {
+    setFilterBarParams(val) {
       this.filterBarParams = copyObj(val);
     },
-    getIndexData() {
-      this.$nextTick(() => {
-        this.$refs.newOldAnalysis.getVisitorDetail();
+    getVisitorTotal() {
+      getVisitorTotalApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+          this.visitorTotal = res.data;
+          this.$refs.originView.originEvent(res.data)
+        }
       });
     },
-  }
+    getVisitorDetail() {
+      getVisitorDetailApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+          this.$refs.newOldAnalysis.getVisitorDetail(res.data)
+        }
+      });
+    },
+    // getVisitorList() {
+    //   let newvalue = copyObj(this.commonParams);
+    //   newvalue.pageNum = this.pageNum;
+    //   newvalue.pageSize = this.pageSize;
+
+    //   getVisitorListApi(newvalue).then((res) => {
+    //     if (res.code == 200) {
+    //       console.log(res, 4);
+
+    //     }
+    //   });
+    // },
+   
+  },
 };
 </script>
 

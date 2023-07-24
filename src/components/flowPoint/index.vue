@@ -29,6 +29,7 @@
         <el-checkbox label="avgPv">平均访问页数</el-checkbox>
       </el-checkbox-group>
     </div>
+
   </div>
 </template>
 
@@ -66,27 +67,10 @@ export default {
     percentageFun(val) {
       return percentage(val);
     },
-    // apiDetailLists(val) {
-    //   console.log(val, "触发了");
-    //   this.currentPage = 1;
-    //   this.flowTableList = val.detail;
-    //   this.flowTableList.map((item) => {
-    //     if (item.bounceRate) {
-    //       item.bounceRate = this.percentageFun(item.bounceRate);
-    //     }
-    //     if (item.newUvRate) {
-    //       item.newUvRate = this.percentageFun(item.newUvRate);
-    //     }
-    //     if (item.pvRate) {
-    //       item.pvRate = this.percentageFun(item.pvRate);
-    //     }
-    //   });
-    //   this.total = val.detail.length;
-    // },
     initShowTable() {
       this.mergedArr = [];
       this.mergedArr = [...this.channelList, ...this.flowQuality];
-     this.$emit("flowPoint",this.mergedArr)
+      this.$emit("flowPoint", this.mergedArr);
     },
   },
 };

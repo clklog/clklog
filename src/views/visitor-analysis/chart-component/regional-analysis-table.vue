@@ -1,27 +1,5 @@
 <template>
   <div class="chartsIcon">
-    <!-- <div class="flow-indicator">
-      <div class="flow-item">
-        <div class="flow-title">流量基础指标</div>
-        <el-checkbox-group v-model="channelList" class="checkBoxStyle">
-          <el-checkbox label="1">浏览量(PV)</el-checkbox>
-          <el-checkbox label="2">浏览量占比</el-checkbox>
-          <el-checkbox label="3">访问次数</el-checkbox>
-          <el-checkbox label="4">访客数(UV)</el-checkbox>
-          <el-checkbox label="5">新访客数</el-checkbox>
-          <el-checkbox label="6">新访客比率</el-checkbox>
-          <el-checkbox label="7" style="margin-right: 0">IP数</el-checkbox>
-        </el-checkbox-group>
-      </div>
-      <div class="flow-item setSpace">
-        <div class="flow-title">流量质量指标</div>
-        <el-checkbox-group v-model="flowQuality" class="checkBoxStyle">
-          <el-checkbox label="8">跳出率</el-checkbox>
-          <el-checkbox label="9">平均访问时长</el-checkbox>
-          <el-checkbox label="10">平均访问页数</el-checkbox>
-        </el-checkbox-group>
-      </div>
-    </div> -->
     <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
     <div class="table-content">
       <el-table
@@ -31,20 +9,6 @@
         :cell-style="{ textAlign: 'center' }"
       >
         <el-table-column prop="province" label="地域" width="150" />
-        <!-- <el-table-column prop="date" label="流量基础指标" width="150">
-          <el-table-column prop="pv" label="浏览量(PV)" sortable />
-          <el-table-column prop="pvRate" label="浏览量占比" sortable />
-          <el-table-column prop="visit" label="访问次数" sortable />
-          <el-table-column prop="newUv" label="新访客数" sortable />
-          <el-table-column prop="uv" label="访客数(UV)" sortable />
-          <el-table-column prop="newUvRate" label="新访客比率" sortable />
-          <el-table-column prop="ipCount" label="IP数" sortable />
-        </el-table-column>
-        <el-table-column prop="date" label="流量质量指标" width="150">
-          <el-table-column prop="bounceRate" label="跳出率" sortable />
-          <el-table-column prop="avgVisitTime" label="平均访问时长" sortable />
-          <el-table-column prop="avgPv" label="平均访问页数" sortable />
-        </el-table-column> -->
         <el-table-column prop="date" label="流量基础指标" width="150">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
           <el-table-column
@@ -124,8 +88,6 @@ export default {
   components: { flowPoint },
   data() {
     return {
-      // channelList: ["3", "5"],
-      // flowQuality: ["9"],
       currentPage: 1,
       tableDetailList: [],
       total: 0,

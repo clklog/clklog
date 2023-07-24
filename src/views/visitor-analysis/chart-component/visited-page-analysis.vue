@@ -3,53 +3,101 @@
     <div class="flow-indicator">
       <div class="flow-item">
         <div class="flow-title">流量基础指标</div>
-        <el-checkbox-group v-model="channelList" class="checkBoxStyle">
-          <el-checkbox label="1">浏览量(PV)</el-checkbox>
-          <el-checkbox label="2">访客数(UV)</el-checkbox>
-          <el-checkbox label="3" style="margin-right: 0">IP数</el-checkbox>
+        <el-checkbox-group
+          v-model="channelList"
+          class="checkBoxStyle"
+          @change="handelChannelList"
+        >
+          <el-checkbox label="pv">浏览量(PV)</el-checkbox>
+          <el-checkbox label="uv">访客数(UV)</el-checkbox>
+          <el-checkbox label="ipCount" style="margin-right: 0"
+            >IP数</el-checkbox
+          >
         </el-checkbox-group>
       </div>
       <div class="flow-item setSpace">
         <div class="flow-title">流量质量指标</div>
-        <el-checkbox-group v-model="flowQuality" class="checkBoxStyle">
-          <el-checkbox label="7">入口页次数</el-checkbox>
-          <el-checkbox label="8">贡献下游浏览量</el-checkbox>
-          <el-checkbox label="9">平均访问时长</el-checkbox>
-          <el-checkbox label="10">平均访问页次数</el-checkbox>
-          <el-checkbox label="11">退出率</el-checkbox>
+        <el-checkbox-group
+          v-model="flowQuality"
+          class="checkBoxStyle"
+          @change="handelFlowQuality"
+        >
+          <el-checkbox label="entryRate">入口页次数</el-checkbox>
+          <el-checkbox label="devoteCount">贡献下游浏览量</el-checkbox>
+          <el-checkbox label="exitCount">退出页次数</el-checkbox>
+          <el-checkbox label="avgDuration">平均访问时长</el-checkbox>
+          <el-checkbox label="exitRate">退出率</el-checkbox>
         </el-checkbox-group>
       </div>
     </div>
-
+    <!-- <flowPoint  ref="flowPoint" @flowPoint="flowPoint"></flowPoint> -->
     <div class="table-content">
       <el-table
-        :data="tableData"
-        :span-method="arraySpanMethod"
+        :data="
+          vistedTableData.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )
+        "
         border
         style="width: 100%"
+        :header-cell-style="{ textAlign: 'center' }"
+        :cell-style="{ textAlign: 'center' }"
       >
         <el-table-column type="index" label="序号" width="150" />
-        <el-table-column prop="dataTime" label="页面URL" width="150" />
-        <el-table-column prop="date" label="流量基础指标" width="150">
-          <el-table-column prop="amount5" label="访客数(UV)" sortable />
-          <el-table-column prop="amount7" label="IP数" sortable />
+        <el-table-column prop="uri" label="页面URL" width="150" />
+        <el-table-column label="流量基础指标">
+          <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
+          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+          <el-table-column
+            v-if="ipCount"
+            prop="ipCount"
+            label="IP数"
+            sortable
+          />
         </el-table-column>
-        <el-table-column prop="date" label="流量质量指标" width="150">
-          <el-table-column prop="amount6" label="退出页次数" sortable />
-          <el-table-column prop="amount8" label="退出率" sortable />
-          <el-table-column prop="amount9" label="平均访问时长" sortable />
-          <el-table-column prop="amount10" label="入口页次数" sortable />
+        <el-table-column prop="date" label="流量质量指标">
+          <el-table-column
+            v-if="devoteCount"
+            prop="devoteCount"
+            label="贡献下游浏览量"
+            sortable
+          />
+          <el-table-column
+            v-if="entryRate"
+            prop="entryRate"
+            label="入口页次数"
+            sortable
+          />
+          <el-table-column
+            v-if="exitCount"
+            prop="exitCount"
+            label="退出页次数"
+            sortable
+          />
+          <el-table-column
+            v-if="exitRate"
+            prop="exitRate"
+            label="退出率"
+            sortable
+          />
+          <el-table-column
+            v-if="avgDuration"
+            prop="avgDuration"
+            label="平均访问时长"
+            sortable
+          />
         </el-table-column>
       </el-table>
     </div>
     <div class="block">
       <el-pagination
         next-text="下一页"
-        :current-page="currentPage4"
+        :current-page="currentPage"
         :page-sizes="[10, 20, 30, 40]"
-        :page-size="10"
+        :page-size="pageSize"
         layout=" sizes, prev, pager, next, jumper"
-        :total="40"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -58,179 +106,121 @@
 </template>
 
 <script>
+import flowPoint from "@/components/flowPoint/index";
 export default {
+  components: {
+    flowPoint,
+  },
   data() {
     return {
-      channelList: ["3", "5"],
-      flowQuality: ["9"],
-      tableData1: [
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-08",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 2003233,
-        },
-        {
-          date: "2016-05-06",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-07",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-      ],
-      tableData: [
-        {
-          dataTime: "2023-05-06",
-          amount1: "14",
-          amount2: "3.2",
-          amount3: 10,
-          amount4: "234",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 69,
-        },
-        {
-          dataTime: "2023-05-07",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount4: "24",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 6,
-        },
-        {
-          dataTime: "2013-05-08",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount4: "34",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 9,
-        },
-        {
-          dataTime: "2023-05-09",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount5: "3.2",
-          amount4: "24",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 70,
-        },
-      ],
-      currentPage4: 4,
+      channelList: ["uv","ipCount","pv"],
+      flowQuality: ["entryRate","avgDuration"],
+      mergedArr: [],
+      uri: false,
+      uv: false,
+      pv: false,
+      ipCount: false,
+      exitCount: false,
+      avgDuration: false,
+      exitRate: false,
+      entryRate: false,
+      devoteCount: false,
+      currentPage: 1,
+      vistedTableData: [],
+      total: 0,
+      pageSize: 10,
     };
   },
   methods: {
+    vistedAnalysis(val) {
+      this.vistedTableData = val.detail;
+      this.total = val.detail.length;
+      this.initShowTable()
+    },
     // 分页器
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+      this.currentPage = 1;
+      this.pageSize = val;
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+      this.currentPage = val;
     },
-
-    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
-      //   if (rowIndex % 2 === 0) {
-      //     if (columnIndex === 0) {
-      //       return [1, 2];
-      //     } else if (columnIndex === 1) {
-      //       return [0, 0];
-      //     }
-      //   }
+    handelChannelList() {
+      this.initShowTable();
     },
-
-    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      console.log("降序");
-      if (columnIndex === 0) {
-        if (rowIndex % 2 === 0) {
-          return {
-            rowspan: 2,
-            colspan: 1,
-          };
+    handelFlowQuality() {
+      this.initShowTable();
+    },
+    initShowTable() {
+      this.mergedArr = [];
+      this.mergedArr = [...this.channelList, ...this.flowQuality];
+      this.flowPoint(this.mergedArr);
+    },
+    flowPoint(val) {
+      if (val.length > 0) {
+        if (val.includes("pv")) {
+          this.pv = true;
         } else {
-          return {
-            rowspan: 0,
-            colspan: 0,
-          };
+          this.pv = false;
+        }
+        if (val.includes("uri")) {
+          this.uri = true;
+        } else {
+          this.uri = false;
+        }
+        if (val.includes("uv")) {
+          this.uv = true;
+        } else {
+          this.uv = false;
+        }
+        if (val.includes("ipCount")) {
+          this.ipCount = true;
+        } else {
+          this.ipCount = false;
+        }
+        if (val.includes("exitCount")) {
+          this.exitCount = true;
+        } else {
+          this.exitCount = false;
+        }
+
+        if (val.includes("avgDuration")) {
+          this.avgDuration = true;
+        } else {
+          this.avgDuration = false;
+        }
+        if (val.includes("avgVisitTime")) {
+          this.avgVisitTime = true;
+        } else {
+          this.avgVisitTime = false;
+        }
+        if (val.includes("exitRate")) {
+          this.exitRate = true;
+        } else {
+          this.exitRate = false;
+        }
+        if (val.includes("devoteCount")) {
+          this.devoteCount = true;
+        } else {
+          this.devoteCount = false;
         }
       }
     },
   },
 };
 </script>
-<style>
-.chartsIcon .flow-indicator .flow-item .el-checkbox {
-  width: 100px !important;
-}
-
-</style>
 
 <style lang="scss" scoped>
+::v-deep {
+  @import "~@/styles/components/el-checkbox.scss";
+  @import "~@/styles/components/el-pagination.scss";
+}
 .chartsIcon {
   box-sizing: border-box;
   margin: 20px;
   padding-top: 1px;
   min-height: 461px;
   background: rgba(250, 250, 251);
-  //   background: rgba(158, 158, 161, 0.39);
   border-radius: 6px;
 
   .flow-indicator {
@@ -255,13 +245,6 @@ export default {
         line-height: 16px;
         color: #4d4d4d;
       }
-      .el-checkbox {
-        margin-right: 80px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 15px;
-        color: #697195;
-      }
     }
     .check_item {
       background-color: #ffffff;
@@ -271,7 +254,6 @@ export default {
       border: 1px solid #eee;
       display: flex;
       align-items: center;
-      // width: 30%;
       span {
         font-size: 14px;
         padding: 0 10px;
@@ -281,22 +263,5 @@ export default {
       }
     }
   }
-  .block {
-    margin: 20px 12px;
-  }
-}
-::v-deep {
-  .el-pagination{
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 10px;
-  }
-  .el-pagination__jump {
-    position: absolute;
-    left: 0;
-  }
-  
 }
 </style>

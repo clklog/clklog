@@ -76,7 +76,7 @@
         next-text="下一页"
         :current-page="currentPage"
         :page-sizes="[10, 20, 30, 40]"
-        :page-size="10"
+        :page-size="pageSize"
         layout=" sizes, prev, pager, next, jumper"
         :total="total"
         @size-change="handleSizeChange"
@@ -89,7 +89,6 @@
 <script>
 import flowPoint from "@/components/flowPoint/index";
 import Bus from "@/utils/bus";
-import { filterPoint } from "@/components/flowPoint/filterPoint";
 import { percentage } from "@/utils/percent";
 export default {
   components: { flowPoint },
@@ -112,10 +111,6 @@ export default {
       currentPage: 1,
       total: 0,
       pageSize: 10,
-      name: {
-        uv: false,
-        pv: false,
-      },
     };
   },
   mounted() {

@@ -1,70 +1,61 @@
 <template>
   <div>
-    <FilterBar></FilterBar>
+    <FilterBar ByArea @setFilterBarParams="setFilterBarParams"></FilterBar>
     <div class="Overview">
       <div class="trafficHead" style="padding-left: 15px">受访页面分析</div>
       <div class="bid-list-page">
-        <div class="bid-list-header">
-          <div class="header-name w156">
-            浏览量(PV)
-            <img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            访问次数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            访客数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            IP数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            平均访问页面<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            平均访问时长<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            跳出率<img src="@/assets/images/question.png" alt="" />
-          </div>
-        </div>
-        <div class="bid-list-record">
-          <div class="bid-list-item w158">
-            <p>18775</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>14330</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>877424</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>800580</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>1.50</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>00:04:05</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>82.56%</p>
-          </div>
-        </div>
+        <originView ref="originView" byVisitedPage></originView>
       </div>
     </div>
-    <visitedAnalysis></visitedAnalysis>
+    <visitedAnalysis ref="visitedAnalysis"></visitedAnalysis>
   </div>
 </template>
 
 <script>
-// import splitPane from 'vue-splitpane'
+import { getVisitUriDetailApi } from "@/api/trackingapi/visituri";
 import { FilterBar } from "@/layout/components";
+import originView from "@/components/origin-view";
 import visitedAnalysis from "./chart-component/visited-page-analysis";
+import { copyObj } from "@/utils/copy";
+import { percentage } from "@/utils/percent";
 export default {
   components: {
     FilterBar,
     visitedAnalysis,
+    originView
+  },
+  data() {
+    return {
+      filterBarParams: {},
+      originData: null,
+    };
+  },
+  computed: {
+    project() {
+      return this.$store.getters.project;
+    },
+    commonParams() {
+      const { project } = this;
+      return Object.assign({ project }, this.filterBarParams);
+    },
+  },
+  watch: {
+    commonParams() {
+      this.getVisitUriDetail();
+    },
+  },
+  methods: {
+    getVisitUriDetail() {
+      getVisitUriDetailApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+          this.$refs.originView.originEvent(res.data.total)
+          this.$refs.visitedAnalysis.vistedAnalysis(res.data)
+        }
+      });
+    },
+    setFilterBarParams(val) {
+      this.filterBarParams = copyObj(val);
+    },
   },
 };
 </script>
@@ -92,44 +83,23 @@ export default {
     width: clas(100% -20px);
     display: flex;
     flex-direction: column;
-    .bid-list-header {
-      display: flex;
-      .header-name {
-        width: 14%;
-        justify-content: center;
-        height: 30px;
-        display: flex;
-        align-items: center;
-      }
-      .w156 {
-        font-size: 13px;
-        font-weight: 400;
-        line-height: 14px;
-        color: #4d4d4d;
-      }
-    }
-    .bid-list-record {
-      display: flex;
-      .bid-list-item {
-        width: 14%;
-        justify-content: center;
-        height: 30px;
-        display: flex;
-        align-items: center;
-      }
-      .w157 {
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 14px;
-        color: #4d4d4d;
-      }
-      .w158 {
-        font-size: 16px;
-        font-weight: bold;
-        color: #3d64e6;
-        line-height: 17px;
-      }
-    }
+    // .bid-list-header {
+    //   display: flex;
+    //   .header-name {
+    //     width: 14%;
+    //     justify-content: center;
+    //     height: 30px;
+    //     display: flex;
+    //     align-items: center;
+    //   }
+    //   .w156 {
+    //     font-size: 13px;
+    //     font-weight: 400;
+    //     line-height: 14px;
+    //     color: #4d4d4d;
+    //   }
+    // }
+    
   }
 }
 </style>

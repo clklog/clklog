@@ -33,10 +33,10 @@ export default {
       chart: null,
       pv: [],
       uv: [],
-      visit: [],
+      visitCount: [],
       ipCount: [],
       bounceRate: [],
-      time: [],
+      statTime: [],
       headLege: [],
       flowTrendList: [],
     };
@@ -70,13 +70,13 @@ export default {
       this.checkSearchValue(val);
     },
     checkSearchValue(val) {
-      this.time = [];
-      const { time, pv, uv, visit, ipCount, bounceRate } = this;
+      this.statTime = [];
+      const { statTime, pv, uv, visitCount, ipCount, bounceRate } = this;
       this.flowTrendList.map((item) => {
-        if (item.statHour) {
-          return time.push(item.statHour);
+        if (item.statTime) {
+          return statTime.push(item.statTime);
         } else {
-          time.push(0);
+          statTime.push(0);
         }
       });
       if (val.includes("浏览量")) {
@@ -114,14 +114,14 @@ export default {
       }
       if (val.includes("访问次数")) {
         this.flowTrendList.map((item) => {
-          if (item.visit) {
-            return visit.push(item.visit);
+          if (item.visitCount) {
+            return visitCount.push(item.visitCount);
           } else {
-            visit.push(0);
+            visitCount.push(0);
           }
         });
       } else {
-        this.visit = [];
+        this.visitCount = [];
       }
 
       if (val.includes("跳出率")) {
@@ -175,7 +175,7 @@ export default {
           {
             type: "category",
             boundaryGap: false,
-            data: this.time,
+            data: this.statTime,
             axisLabel: { interval: 1 },
             nameTextStyle: {
               fontWeight: 600,
@@ -238,7 +238,7 @@ export default {
             lineStyle: {
               width: 3,
             },
-            data: this.visit,
+            data: this.visitCount,
           },
           {
             name: "IP数",
@@ -271,13 +271,17 @@ export default {
     },
     // 处理接口数据
     processData() {
-      const { time, pv, uv, visit, ipCount, bounceRate } = this;
+      const { statTime, pv, uv, visitCount, ipCount, bounceRate } = this;
+      console.log(this.flowTrendList,32498098704)
       // 时间
       this.flowTrendList.map((item) => {
-        if (item.time) {
-          return time.push(item.time.slice(11, 13));
+        // if (item.statTime) {
+        //   return statTime.push(item.statTime.slice(11, 13));
+       
+        if (item.statTime) {
+          return statTime.push(item.statTime);
         } else {
-          time.push(0);
+          statTime.push(0);
         }
       });
       this.flowTrendList.map((item) => {
@@ -295,10 +299,10 @@ export default {
         }
       });
       this.flowTrendList.map((item) => {
-        if (item.visit) {
-          return visit.push(item.visit);
+        if (item.visitCount) {
+          return visitCount.push(item.visitCount);
         } else {
-          visit.push(0);
+          visitCount.push(0);
         }
       });
       this.flowTrendList.map((item) => {

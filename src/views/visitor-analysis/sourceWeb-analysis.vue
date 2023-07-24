@@ -59,11 +59,10 @@
 </template>
 
 <script>
-// import ImageCropper from "@/components/ImageCropper";
-// import PanThumb from "@/components/PanThumb";
 import { FilterBar } from "@/layout/components";
 import sourceWebChart from "./chart-component/sourceWeb-analysis-chart";
 import sourceWebTable from "./chart-component/sourceWeb-analysis-table";
+// import { getSourceSiteDetailApi } from "@/api/sourcewebsite/visituri";
 export default {
   components: {
     FilterBar,
