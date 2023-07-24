@@ -1,0 +1,14 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [Node.js CI]
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo to deploy...
