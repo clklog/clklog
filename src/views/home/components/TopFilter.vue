@@ -1,26 +1,26 @@
 <template>
-  <div class="TopFilter">
-    <div class="radio-com">
-      <span class="radio-com-label">时间：</span>
-      <el-radio-group v-model="timeType" class="radio-com-el">
-        <el-radio label="day">今日</el-radio>
-        <el-radio label="week">本周</el-radio>
-        <el-radio label="month">本月</el-radio>
-        <el-radio label="year">本年</el-radio>
-      </el-radio-group>
-    </div>
+    <div class="TopFilter">
+      <div class="radio-com">
+        <span class="radio-com-label">时间：</span>
+        <el-radio-group v-model="timeType" class="radio-com-el">
+          <el-radio label="day">今日</el-radio>
+          <el-radio label="week">本周</el-radio>
+          <el-radio label="month">本月</el-radio>
+          <el-radio label="year">本年</el-radio>
+        </el-radio-group>
+      </div>
 
-    <div class="radio-com">
-      <span class="radio-com-label">渠道：</span>
-      <el-radio-group class="radio-com-el" v-model="channelValue">
-        <el-radio label="">全部</el-radio>
-        <el-radio label="安卓">安卓</el-radio>
-        <el-radio label="苹果">苹果</el-radio>
-        <el-radio label="网站">网站</el-radio>
-        <el-radio label="微信小程序">微信小程序</el-radio>
-      </el-radio-group>
+      <div class="radio-com">
+        <span class="radio-com-label">渠道：</span>
+        <el-radio-group class="radio-com-el" v-model="channelValue">
+          <el-radio label="">全部</el-radio>
+          <el-radio label="安卓">安卓</el-radio>
+          <el-radio label="苹果">苹果</el-radio>
+          <el-radio label="网站">网站</el-radio>
+          <el-radio label="微信小程序">微信小程序</el-radio>
+        </el-radio-group>
+      </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -32,6 +32,8 @@ export default {
     return {
       timeType: "day",
       channelValue: "",
+      weekEnd: "",
+      weekStart: "",
     };
   },
   computed: {
@@ -44,11 +46,13 @@ export default {
           return formatDate(new Date());
           break;
         case "week":
-          let toData =
-            new Date(new Date().toLocaleDateString()).getTime() +
-            8 * 3600 * 1000;
-          let timeDifference = toData - 6 * 3600 * 24 * 1000;
-          return timestampToTime(timeDifference);
+          // let toData =
+          //   new Date(new Date().toLocaleDateString()).getTime() +
+          //   8 * 3600 * 1000;
+          // let timeDifference = toData - 6 * 3600 * 24 * 1000;
+          // return timestampToTime(timeDifference);
+          this.getWeek();
+          return this.weekStart;
           break;
         case "month":
           let monthStart = new Date();
@@ -72,7 +76,10 @@ export default {
           return formatDate(new Date());
           break;
         case "week":
-          return formatDate(new Date());
+          // return formatDate(new Date());
+          this.getWeek();
+          return this.weekEnd;
+          break;
         case "month":
           let monthStart = new Date();
           monthStart.setDate(1);
@@ -108,14 +115,25 @@ export default {
   },
   watch: {
     filterParams(val) {
-      console.log(val);
       return this.setTopFilterParams(val);
     },
   },
   methods: {
+    // 获取week 的函数
+    getWeek() {
+      let date = new Date();
+      let day = date.getDate();
+      let week = date.getDay();
+      let month = date.getMonth();
+      let year = date.getFullYear();
+      this.weekStart = this.formData(new Date(year, month, day - week + 1));
+      // this.weekEnd = this.formData(new Date(year, month, day - week + 7));
+      this.weekEnd = this.formData(new Date(year, month, day));
+    },
     setTopFilterParams(val) {
       let _val = Object.assign(val, this.implied);
       this.$emit("setTopFilterParams", _val);
+      this.$emit("timeTypeCheck", this.timeType);
     },
     formData(val) {
       return (

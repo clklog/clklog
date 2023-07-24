@@ -33,16 +33,6 @@
                 <p>{{ item.percent }}</p>
               </div>
             </div>
-
-            <!-- <div class="bid-list-record">
-              <div class="header-text w157">直接访问</div>
-              <div class="bid-list-item w158">
-                <p>187.7%</p>
-              </div>
-              <div class="bid-list-item w158">
-                <p>143.3%</p>
-              </div>
-            </div> -->
           </div>
         </div>
       </div>

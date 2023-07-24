@@ -3,8 +3,8 @@
   menuActiveText: #6dc3dd;
   subMenuActiveText: black;
   menuBg: #fff;
-  menuHover: #eee;
-  subMenuBg: #eee;
-  subMenuHover: #eee;
+  menuHover: linear-gradient(to right, #E1E7FB, #ffffff);
+  subMenuBg: #fff;
+  subMenuHover: linear-gradient(to right, #E1E7FB, #ffffff);
   sideBarWidth: 210px;
 }

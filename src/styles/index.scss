@@ -5,6 +5,7 @@
 @import "./element-ui-tracking.scss";
 @import "./sidebar.scss";
 @import "./btn.scss";
+@import "./components/element-unifystyle.scss";
 
 body {
   height: 100%;
@@ -198,23 +199,24 @@ aside {
 .multiselect--active {
   z-index: 1000 !important;
 }
-
+.overItem {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 30px;
+  white-space: nowrap;
+}
 // 块通用样式
 .block-main {
-  // padding: 20px;
   padding: 18px 12px;
   background-color: #fafafb;
   .block-head {
     display: flex;
     align-items: center;
     position: relative;
-    // margin-bottom: 20px;
     margin-bottom: 17px;
     .block-title {
-      // font-size: 16px;
-      // font-weight: 400;
+      font-weight: 400;
       font-size: 14px;
-      font-weight: 500;
       line-height: 33px;
       color: #4d4d4d;
     }
@@ -223,6 +225,9 @@ aside {
       color: #acaaaa;
       font-size: 16px;
       cursor: pointer;
+      img:hover {
+        content: url("../assets/images/hover-icon.png");
+      }
     }
   }
 }
@@ -235,10 +240,9 @@ aside {
     .header-text {
       padding-right: 10px;
       width: 60%;
-      // display: flex;
-      // align-items: center;
       overflow: hidden;
       text-overflow: ellipsis;
+      line-height: 30px;
       white-space: nowrap;
     }
     .form-list-header {
@@ -268,11 +272,9 @@ aside {
         align-items: center;
       }
       .w157 {
-        display: flex;
-        align-items: center;
         color: #555353;
         font-size: 13px;
-        line-height: 14px;
+        line-height: 30px;
       }
       .w159 {
         color: #555353;
@@ -282,10 +284,54 @@ aside {
       }
       .w158 {
         color: #555353;
-        font-size: 17px;
-        line-height: 17px;
+        font-size: 13px;
+        line-height: 30px;
         // font-weight: bold;
       }
+    }
+  }
+}
+
+// 流量基础指标多选checkbox统一样式
+.flow-indicator {
+  min-height: 58px;
+  background: rgba(252, 252, 252, 0.39);
+  border: 1px solid #f0f0f5;
+  border-radius: 6px;
+  box-sizing: border-box;
+  margin: 12px;
+  .setSpace {
+    margin-top: 2px !important;
+    margin-bottom: 12px;
+  }
+  .flow-item {
+    display: flex;
+    margin-top: 12px;
+    margin-left: 10px;
+    .flow-title {
+      white-space: nowrap;
+      box-sizing: border-box;
+      margin-right: 21px;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 30px;
+      color: #4d4d4d;
+    }
+  }
+  .check_item {
+    background-color: #ffffff;
+    margin-left: 20px;
+    height: 40px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    span {
+      font-size: 14px;
+      padding: 0 10px;
+    }
+    .checkBoxStyle {
+      margin-right: 10px;
     }
   }
 }

@@ -29,7 +29,6 @@ export default {
   watch: {},
   methods: {
     getArea() {
-      console.log("触发了");
       getAreaApi(this.params).then((res) => {
         this.getAreaList = res.data;
         this.$refs.mapArea.getMapChartsData(res.data)

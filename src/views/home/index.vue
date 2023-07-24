@@ -1,8 +1,10 @@
 <template>
   <div class="documentation-container">
-    <TopFilter @setTopFilterParams="setTopFilterParams" />
     <!-- 流量概览 -->
-    <FlowView ref="FlowViewRef" :commonParams="commonParams" />
+    <div style="height: 51px;">
+      <TopFilter @setTopFilterParams="setTopFilterParams" @timeTypeCheck = "timeTypeCheck"/>
+    </div>
+    <FlowView ref="FlowViewRef" :commonParams="commonParams" :timeTypeFlag = "timeTypeFlag"/>
     <div class="block-line">
       <TrendChart ref="TrendChart" :commonParams="commonParams" class="left" />
       <NewOldVisitors ref="NewOldVisitorsRef" :commonParams="commonParams" class="right" />
@@ -53,6 +55,7 @@ export default {
   data() {
     return {
       topFilterParams: {},
+      timeTypeFlag:"",
     };
   },
   computed: {
@@ -80,6 +83,9 @@ export default {
         this.$refs.LocalDistributionRef.getArea();
         this.$refs.TrendChart.getFlowTrend();
       });
+    },
+    timeTypeCheck(val){
+      this.timeTypeFlag = val;
     },
     setTopFilterParams(val) {
       this.topFilterParams = copyObj(val);

@@ -87,7 +87,9 @@
       background-color: $subMenuBg !important;
 
       &:hover {
-        background-color: $subMenuHover !important;
+        background: $subMenuHover !important;
+        // background: linear-gradient(to right, #00bfff, #ffffff) !important;
+        // background: linear-gradient(269deg, rgba(61,100,230,0) 0%, rgba(61,100,230,0.16) 100%) !important;
       }
     }
   }

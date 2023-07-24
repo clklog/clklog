@@ -3,9 +3,9 @@
   menuActiveText: #6dc3dd;
   subMenuActiveText: black;
   menuBg: #fff;
-  menuHover: #eee;
-  subMenuBg: #eee;
-  subMenuHover: #eee;
+  menuHover: linear-gradient(to right, #E1E7FB, #ffffff);
+  subMenuBg: #fff;
+  subMenuHover: linear-gradient(to right, #E1E7FB, #ffffff);
   sideBarWidth: 210px;
 }
 
@@ -131,8 +131,10 @@
 }
 
 .radio-com .radio-com-label {
-  font-size: 14px;
+  font-size: 12px;
   padding: 0 10px;
+  color: #697195;
+  line-height: 30px;
 }
 
 .radio-com .radio-com-el {
@@ -209,7 +211,7 @@
 
 #app .sidebar-container .submenu-title-noDropdown:hover,
 #app .sidebar-container .el-submenu__title:hover {
-  background-color: #eee !important;
+  background-color: linear-gradient(to right, #E1E7FB, #ffffff) !important;
 }
 
 #app .sidebar-container .is-active > .el-submenu__title {
@@ -218,11 +220,11 @@
 
 #app .sidebar-container .nest-menu .el-submenu > .el-submenu__title, #app .sidebar-container .el-submenu .el-menu-item {
   min-width: 210px !important;
-  background-color: #eee !important;
+  background-color: #fff !important;
 }
 
 #app .sidebar-container .nest-menu .el-submenu > .el-submenu__title:hover, #app .sidebar-container .el-submenu .el-menu-item:hover {
-  background-color: #eee !important;
+  background: linear-gradient(to right, #E1E7FB, #ffffff) !important;
 }
 
 #app .hideSidebar .sidebar-container {
@@ -313,7 +315,7 @@
 
 .el-menu--vertical .nest-menu .el-submenu > .el-submenu__title:hover,
 .el-menu--vertical .el-menu-item:hover {
-  background-color: #eee !important;
+  background-color: linear-gradient(to right, #E1E7FB, #ffffff) !important;
 }
 
 .el-menu--vertical > .el-menu--popup {
@@ -339,9 +341,9 @@
   menuActiveText: #6dc3dd;
   subMenuActiveText: black;
   menuBg: #fff;
-  menuHover: #eee;
-  subMenuBg: #eee;
-  subMenuHover: #eee;
+  menuHover: linear-gradient(to right, #E1E7FB, #ffffff);
+  subMenuBg: #fff;
+  subMenuHover: linear-gradient(to right, #E1E7FB, #ffffff);
   sideBarWidth: 210px;
 }
 
@@ -482,6 +484,31 @@
   padding: 10px 15px;
   font-size: 14px;
   border-radius: 4px;
+}
+
+.el-popper {
+  margin-bottom: 0px !important;
+}
+
+.el-table thead {
+  font-size: 13px !important;
+  font-weight: 400;
+}
+
+.el-table .cell {
+  line-height: 16px;
+}
+
+.el-table .caret-wrapper {
+  height: 15px;
+}
+
+.el-table .sort-caret.descending {
+  bottom: -4px;
+}
+
+.el-table .sort-caret.ascending {
+  top: -3px;
 }
 
 body {
@@ -666,6 +693,13 @@ aside a:hover {
   z-index: 1000 !important;
 }
 
+.overItem {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 30px;
+  white-space: nowrap;
+}
+
 .block-main {
   padding: 18px 12px;
   background-color: #fafafb;
@@ -679,8 +713,8 @@ aside a:hover {
 }
 
 .block-main .block-head .block-title {
+  font-weight: 400;
   font-size: 14px;
-  font-weight: 500;
   line-height: 33px;
   color: #4d4d4d;
 }
@@ -690,6 +724,10 @@ aside a:hover {
   color: #acaaaa;
   font-size: 16px;
   cursor: pointer;
+}
+
+.block-main .block-head .block-head-icon img:hover {
+  content: url("../assets/images/hover-icon.png");
 }
 
 .block-index-form .form-list-page {
@@ -703,6 +741,7 @@ aside a:hover {
   width: 60%;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 30px;
   white-space: nowrap;
 }
 
@@ -740,11 +779,9 @@ aside a:hover {
 }
 
 .block-index-form .form-list-page .form-list-record .w157 {
-  display: flex;
-  align-items: center;
   color: #555353;
   font-size: 13px;
-  line-height: 14px;
+  line-height: 30px;
 }
 
 .block-index-form .form-list-page .form-list-record .w159 {
@@ -756,6 +793,55 @@ aside a:hover {
 
 .block-index-form .form-list-page .form-list-record .w158 {
   color: #555353;
-  font-size: 17px;
-  line-height: 17px;
+  font-size: 13px;
+  line-height: 30px;
+}
+
+.flow-indicator {
+  min-height: 58px;
+  background: rgba(252, 252, 252, 0.39);
+  border: 1px solid #f0f0f5;
+  border-radius: 6px;
+  box-sizing: border-box;
+  margin: 12px;
+}
+
+.flow-indicator .setSpace {
+  margin-top: 2px !important;
+  margin-bottom: 12px;
+}
+
+.flow-indicator .flow-item {
+  display: flex;
+  margin-top: 12px;
+  margin-left: 10px;
+}
+
+.flow-indicator .flow-item .flow-title {
+  white-space: nowrap;
+  box-sizing: border-box;
+  margin-right: 21px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 30px;
+  color: #4d4d4d;
+}
+
+.flow-indicator .check_item {
+  background-color: #ffffff;
+  margin-left: 20px;
+  height: 40px;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  display: flex;
+  align-items: center;
+}
+
+.flow-indicator .check_item span {
+  font-size: 14px;
+  padding: 0 10px;
+}
+
+.flow-indicator .check_item .checkBoxStyle {
+  margin-right: 10px;
 }

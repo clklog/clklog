@@ -40,7 +40,7 @@
         class="block-head-icon"
         @click="$router.push('/visitorAnalysis/trendAnalysis')"
       >
-        >
+       <img src="@/assets/images/icon.png" alt="" width="10px">
       </div>
     </div>
     <!-- echarts -->

@@ -13,7 +13,7 @@
             访问次数<img src="@/assets/images/question.png" alt="" />
           </div>
           <div class="header-name w156">
-            访问数<img src="@/assets/images/question.png" alt="" />
+            访客数<img src="@/assets/images/question.png" alt="" />
           </div>
           <div class="header-name w156">
             IP数<img src="@/assets/images/question.png" alt="" />
@@ -59,11 +59,10 @@
 </template>
 
 <script>
-// import ImageCropper from "@/components/ImageCropper";
-// import PanThumb from "@/components/PanThumb";
 import { FilterBar } from "@/layout/components";
 import sourceWebChart from "./chart-component/sourceWeb-analysis-chart";
 import sourceWebTable from "./chart-component/sourceWeb-analysis-table";
+// import { getSourceSiteDetailApi } from "@/api/sourcewebsite/visituri";
 export default {
   components: {
     FilterBar,

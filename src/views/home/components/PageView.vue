@@ -6,11 +6,10 @@
         class="block-head-icon"
         @click="$router.push('/visitorAnalysis/visitedPage')"
       >
-        >
+        <img src="@/assets/images/icon.png" alt="" width="10px" />
       </div>
     </div>
     <div class="block-index-form">
-      <!-- content -->
       <div class="form-list-page">
         <div class="form-list-header">
           <div class="header-text w156">受访页面</div>
@@ -23,29 +22,29 @@
           :key="index"
         >
           <div class="header-text w157">
-            {{ item.uri || "--" }}
+            <el-popover
+              placement="top-start"
+              trigger="hover"
+              v-if="item.uri && item.uri.length > 70"
+            >
+              <div style="font-size: 12px">
+                {{ item.uri }}
+              </div>
+              <div slot="reference" class="overItem" style="cursor: pointer">
+                {{ item.uri || "--" }}
+              </div>
+            </el-popover>
+            <div v-else class="overItem">
+              {{ item.uri || "--" }}
+            </div>
           </div>
           <div class="form-list-item w158">
             <p>{{ item.pv }}</p>
           </div>
           <div class="form-list-item w158">
-            <!-- <p>{{ item.percent }}</p> -->
-            <!-- <p>{{ percentage(item.percent) }}</p> -->
             <p>{{ percentageFun(item.percent) }}</p>
           </div>
         </div>
-
-        <!-- <div class="form-list-record">
-              <div class="header-text w157">
-                https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&
-              </div>
-              <div class="form-list-item w158">
-                <p>187.7%</p>
-              </div>
-              <div class="form-list-item w158">
-                <p>143.3%</p>
-              </div>
-            </div> -->
       </div>
     </div>
   </div>
@@ -68,30 +67,20 @@ export default {
     params() {
       return Object.assign({}, this.commonParams);
     },
-    // percentageFun(val){
-    //   return function (val) {
-    //      return percentage(val)
-    //    }
-    // }
   },
   watch: {},
-  created(){
-  },
+  created() {},
   methods: {
-    // Top10受访页面
     getVisitUri() {
       getVisitUriApi(this.params).then((res) => {
         this.getVisitList = res.data;
       });
     },
-    percentageFun(val){
-        return percentage(val)
-    }
+    percentageFun(val) {
+      return percentage(val);
+    },
   },
 };
 </script>
 
-<style lang="scss" scoped>
-.PageView {
-}
-</style>
+<style lang="scss" scoped></style>

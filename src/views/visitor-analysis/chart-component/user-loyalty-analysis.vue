@@ -1,14 +1,6 @@
 <template>
   <div class="userLoyalty">
     <span>用户忠诚度分析</span>
-    <!-- <div class="chartsIcon">
-      <div class="chartLeft">
-        <div class="trendHead">
-          <div class="trafficHead">TOP10来源网站指标展示</div>
-        </div>
-        <div class="echart" id="mychart" :style="myChartStyle"></div>
-      </div>
-    </div> -->
     <div class="bar_chart">
       <div style="padding-left: 9px; padding-top: 40px; display: flex">
         <span>访问页数</span>
@@ -33,6 +25,7 @@
 
 <script>
 import echarts from "echarts";
+import { getUserVisitApi,getUserVisitTimeApi,getUserPvApi } from "@/api/trackingapi/uservisit";
 export default {
   data() {
     return {
@@ -77,7 +70,44 @@ export default {
     this.chart.dispose();
     this.chart = null;
   },
+  computed: {
+    project() {
+      return this.$store.getters.project;
+    },
+    commonParams() {
+      const { project } = this;
+      return Object.assign({ project }, this.filterBarParams);
+    },
+  },
+  watch: {
+    commonParams(val) {
+      this.getUserVisit(); //频次
+      this.getUserVisitTime(); //时长
+      this.getUserPv(); //页数
+    },
+  },
   methods: {
+    getUserVisit(){
+      getUserVisitApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+         console.log(res,1);
+        }
+      });
+    },
+    getUserVisitTime(){
+      getUserVisitTimeApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+         console.log(res,2);
+        }
+      });
+    },
+    getUserPv(){
+      getUserPvApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+         console.log(res,3);
+        }
+      });
+    },
     initEcharts() {
       // 多列柱状图
       const mulColumnZZTData = {

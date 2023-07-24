@@ -6,7 +6,7 @@
         class="block-head-icon"
         @click="$router.push('/visitorAnalysis/searchAnalysis')"
       >
-        >
+       <img src="@/assets/images/icon.png" alt="" width="10px"> 
       </div>
     </div>
     <div class="block-index-form">
@@ -82,6 +82,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.SearchWord {
-}
 </style>

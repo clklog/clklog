@@ -1,60 +1,78 @@
 <template>
   <div class="chartsIcon">
-    <div class="flow-indicator">
-      <div class="flow-item">
-        <div class="flow-title">流量基础指标</div>
-        <el-checkbox-group v-model="channelList" class="checkBoxStyle">
-          <el-checkbox label="1">浏览量(PV)</el-checkbox>
-          <el-checkbox label="2">浏览量占比</el-checkbox>
-          <el-checkbox label="3">访问次数</el-checkbox>
-          <el-checkbox label="4">访客数(UV)</el-checkbox>
-          <el-checkbox label="5">新访客数</el-checkbox>
-          <el-checkbox label="6">新访客比率</el-checkbox>
-          <el-checkbox label="7" style="margin-right: 0">IP数</el-checkbox>
-        </el-checkbox-group>
-      </div>
-      <div class="flow-item setSpace">
-        <div class="flow-title">流量质量指标</div>
-        <el-checkbox-group v-model="flowQuality" class="checkBoxStyle">
-          <el-checkbox label="8">跳出率</el-checkbox>
-          <el-checkbox label="9">平均访问时长</el-checkbox>
-          <el-checkbox label="10">平均访问页数</el-checkbox>
-        </el-checkbox-group>
-      </div>
-    </div>
-
+    <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
     <div class="table-content">
       <el-table
-        :data="tableData"
-        :span-method="arraySpanMethod"
+        :data="tableDetailList"
         border
-        style="width: 100%"
+        :header-cell-style="{ textAlign: 'center' }"
+        :cell-style="{ textAlign: 'center' }"
       >
-        <el-table-column prop="dataTime" label="地域" width="150" />
+        <el-table-column prop="province" label="地域" width="150" />
         <el-table-column prop="date" label="流量基础指标" width="150">
-          <el-table-column prop="amount1" label="浏览量(PV)" sortable />
-          <el-table-column prop="amount2" label="浏览量占比" sortable />
-          <el-table-column prop="amount3" label="访问次数" sortable />
-          <el-table-column prop="amount4" label="新访客数" sortable />
-          <el-table-column prop="amount5" label="访客数(UV)" sortable />
-          <el-table-column prop="amount6" label="新访客比率" sortable />
-          <el-table-column prop="amount7" label="IP数" sortable />
+          <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
+          <el-table-column
+            v-if="pvRate"
+            prop="pvRate"
+            label="浏览量占比"
+            sortable
+          />
+          <el-table-column
+            v-if="visit"
+            prop="visit"
+            label="访问次数"
+            sortable
+          />
+          <el-table-column
+            v-if="newUv"
+            prop="newUv"
+            label="新访客数"
+            sortable
+          />
+          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+          <el-table-column
+            v-if="newUvRate"
+            prop="newUvRate"
+            label="新访客比率"
+            sortable
+          />
+          <el-table-column
+            v-if="ipCount"
+            prop="ipCount"
+            label="IP数"
+            sortable
+          />
         </el-table-column>
         <el-table-column prop="date" label="流量质量指标" width="150">
-          <el-table-column prop="amount8" label="跳出率" sortable />
-          <el-table-column prop="amount9" label="平均访问时长" sortable />
-          <el-table-column prop="amount10" label="平均访问页数" sortable />
+          <el-table-column
+            v-if="bounceRate"
+            prop="bounceRate"
+            label="跳出率"
+            sortable
+          />
+          <el-table-column
+            v-if="avgVisitTime"
+            prop="avgVisitTime"
+            label="平均访问时长"
+            sortable
+          />
+          <el-table-column
+            v-if="avgPv"
+            prop="avgPv"
+            label="平均访问页数"
+            sortable
+          />
         </el-table-column>
       </el-table>
     </div>
     <div class="block">
       <el-pagination
         next-text="下一页"
-        :current-page="currentPage4"
+        :current-page="currentPage"
         :page-sizes="[10, 20, 30, 40]"
-        :page-size="10"
+        :page-size="pageSize"
         layout=" sizes, prev, pager, next, jumper"
-        :total="40"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -63,243 +81,137 @@
 </template>
 
 <script>
+import { percentage } from "@/utils/percent";
+import flowPoint from "@/components/flowPoint/index";
+import { getAreaDetailListApi } from "@/api/trackingapi/area.js";
 export default {
+  components: { flowPoint },
   data() {
     return {
-      channelList: ["3", "5"],
-      flowQuality: ["9"],
-      tableData1: [
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-08",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 2003233,
-        },
-        {
-          date: "2016-05-06",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-07",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-      ],
-      tableData: [
-        {
-          dataTime: "2023-05-06",
-          amount1: "14",
-          amount2: "3.2",
-          amount3: 10,
-          amount4: "234",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 69,
-        },
-        {
-          dataTime: "2023-05-07",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount4: "24",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 6,
-        },
-        {
-          dataTime: "2013-05-08",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount4: "34",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 9,
-        },
-        {
-          dataTime: "2023-05-09",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount5: "3.2",
-          amount4: "24",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 70,
-        },
-      ],
-      currentPage4: 4,
+      currentPage: 1,
+      tableDetailList: [],
+      total: 0,
+      pageSize: 10,
+      current: {
+        size: 10,
+        page: 1,
+      },
+
+      // 后面拆分使用
+      flowTableList: [],
+      channelList: ["pv", "visit","newUvRate","pvRate"],
+      flowQuality: ["avgPv"],
+      pv: false,
+      visit: false,
+      newUv: false,
+      uv: false,
+      ipCount: false,
+      avgPv: false,
+      avgVisitTime: false,
+      bounceRate: false,
+      pvRate: false,
+      newUvRate: false,
+      mergedArr: [],
     };
   },
   methods: {
-    // 分页器
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
-
-    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
-      //   if (rowIndex % 2 === 0) {
-      //     if (columnIndex === 0) {
-      //       return [1, 2];
-      //     } else if (columnIndex === 1) {
-      //       return [0, 0];
-      //     }
-      //   }
-    },
-
-    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      console.log("降序");
-      if (columnIndex === 0) {
-        if (rowIndex % 2 === 0) {
-          return {
-            rowspan: 2,
-            colspan: 1,
-          };
+    flowPoint(val) {
+      if (val.length > 0) {
+        if (val.includes("pv")) {
+          this.pv = true;
         } else {
-          return {
-            rowspan: 0,
-            colspan: 0,
-          };
+          this.pv = false;
+        }
+        if (val.includes("visitCount")) {
+          this.visit = true;
+        } else {
+          this.visit = false;
+        }
+        if (val.includes("newUv")) {
+          this.newUv = true;
+        } else {
+          this.newUv = false;
+        }
+        if (val.includes("uv")) {
+          this.uv = true;
+        } else {
+          this.uv = false;
+        }
+        if (val.includes("ipCount")) {
+          this.ipCount = true;
+        } else {
+          this.ipCount = false;
+        }
+        if (val.includes("avgPv")) {
+          this.avgPv = true;
+        } else {
+          this.avgPv = false;
+        }
+        if (val.includes("avgVisitTime")) {
+          this.avgVisitTime = true;
+        } else {
+          this.avgVisitTime = false;
+        }
+        if (val.includes("bounceRate")) {
+          this.bounceRate = true;
+        } else {
+          this.bounceRate = false;
+        }
+        if (val.includes("pvRate")) {
+          this.pvRate = true;
+        } else {
+          this.pvRate = false;
+        }
+        if (val.includes("newUvRate")) {
+          this.newUvRate = true;
+        } else {
+          this.newUvRate = false;
         }
       }
+    },
+    // 分页器
+    handleSizeChange(val) {
+      this.current.size = val;
+      this.$emit("currentPage", this.current);
+    },
+    handleCurrentChange(val) {
+      this.current.page = val;
+      this.$emit("currentPage", this.current);
+    },
+    getDetailList(val) {
+      getAreaDetailListApi(val).then((res) => {
+        if (res.code == 200) {
+          this.tableDetailList = res.data.rows;
+          this.total = res.data.total;
+          this.tableDetailList.map((item) => {
+            if (item.bounceRate) {
+              item.bounceRate = percentage(item.bounceRate);
+            }
+            if (item.newUvRate) {
+              item.newUvRate = percentage(item.newUvRate);
+            }
+            if (item.pvRate) {
+              item.pvRate = percentage(item.pvRate);
+            }
+          });
+        }
+      });
     },
   },
 };
 </script>
 
-
 <style lang="scss" scoped>
-.chartsIcon .flow-indicator .flow-item .el-checkbox {
-    width: 100px !important;
-  }
+::v-deep {
+  @import "~@/styles/components/el-checkbox.scss";
+  @import "~@/styles/components/el-pagination.scss";
+}
 .chartsIcon {
   box-sizing: border-box;
   margin: 20px;
   padding-top: 1px;
   min-height: 461px;
   background: rgba(250, 250, 251);
-  //   background: rgba(158, 158, 161, 0.39);
   border-radius: 6px;
-
-  .flow-indicator {
-    min-height: 58px;
-    background: rgba(252, 252, 252, 0.39);
-    border: 1px solid #f0f0f5;
-    border-radius: 6px;
-    box-sizing: border-box;
-    margin: 12px;
-    .setSpace {
-      margin-bottom: 12px;
-    }
-    .flow-item {
-      display: flex;
-      align-items: center;
-      margin-top: 12px;
-      margin-left: 10px;
-      .flow-title {
-        margin-right: 21px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 16px;
-        color: #4d4d4d;
-      }
-      .el-checkbox {
-        margin-right: 80px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 15px;
-        color: #697195;
-      }
-    }
-    .check_item {
-      background-color: #ffffff;
-      margin-left: 20px;
-      height: 40px;
-      border-radius: 4px;
-      border: 1px solid #eee;
-      display: flex;
-      align-items: center;
-      // width: 30%;
-      span {
-        font-size: 14px;
-        padding: 0 10px;
-      }
-      .checkBoxStyle {
-        padding-right: 10px;
-      }
-    }
-  }
-  .block {
-  margin: 20px 12px;
-}
-}
-::v-deep {
-  .el-pagination{
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 10px;
-  }
-  .el-pagination__jump {
-    position: absolute;
-    left: 0;
-  }
-  
 }
 </style>

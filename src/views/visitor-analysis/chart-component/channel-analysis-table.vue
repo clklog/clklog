@@ -15,7 +15,7 @@
               访问次数<img src="@/assets/images/question.png" alt="" />
             </div>
             <div class="header-name w156">
-              访问数<img src="@/assets/images/question.png" alt="" />
+              访客数<img src="@/assets/images/question.png" alt="" />
             </div>
             <div class="header-name w156">
               IP数<img src="@/assets/images/question.png" alt="" />
@@ -173,7 +173,6 @@
           :data="tableData"
           :header-cell-style="{ textAlign: 'center' }"
           :cell-style="{ textAlign: 'center' }"
-          :span-method="arraySpanMethod"
           border
           style="width: 100%"
         >
@@ -323,32 +322,7 @@ export default {
       console.log(`当前页: ${val}`);
     },
 
-    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
-      //   if (rowIndex % 2 === 0) {
-      //     if (columnIndex === 0) {
-      //       return [1, 2];
-      //     } else if (columnIndex === 1) {
-      //       return [0, 0];
-      //     }
-      //   }
-    },
-
-    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      console.log("降序");
-      if (columnIndex === 0) {
-        if (rowIndex % 2 === 0) {
-          return {
-            rowspan: 2,
-            colspan: 1,
-          };
-        } else {
-          return {
-            rowspan: 0,
-            colspan: 0,
-          };
-        }
-      }
-    },
+   
   },
 };
 </script>
