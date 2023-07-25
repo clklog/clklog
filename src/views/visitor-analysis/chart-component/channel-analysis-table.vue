@@ -5,136 +5,35 @@
       <div class="Overview">
         <div class="trafficHead" style="padding-left: 15px">渠道分析</div>
         <div class="bid-list-page">
-          <div class="bid-list-header">
-            <div class="header-name w156" />
-            <div class="header-name w156">
-              浏览量(PV)
-              <img src="@/assets/images/question.png" alt="" />
-            </div>
-            <div class="header-name w156">
-              访问次数<img src="@/assets/images/question.png" alt="" />
-            </div>
-            <div class="header-name w156">
-              访客数<img src="@/assets/images/question.png" alt="" />
-            </div>
-            <div class="header-name w156">
-              IP数<img src="@/assets/images/question.png" alt="" />
-            </div>
-            <div class="header-name w156">
-              平均访问页面<img src="@/assets/images/question.png" alt="" />
-            </div>
-            <div class="header-name w156">
-              平均访问时长<img src="@/assets/images/question.png" alt="" />
-            </div>
-            <div class="header-name w156">
-              跳出率<img src="@/assets/images/question.png" alt="" />
-            </div>
-          </div>
-          <div class="bid-list-record">
-            <div class="bid-list-item w157">
-              <p>全渠道</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>18775</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>14330</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>877424</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>800580</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>1.50</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>00:04:05</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>82.56%</p>
-            </div>
-          </div>
-          <div class="bid-list-record" style="padding-top: 10px">
-            <div class="bid-list-item w157">
-              <p>Web</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>18775</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>14330</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>877424</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>800580</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>1.50</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>00:04:05</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>82.56%</p>
-            </div>
-          </div>
-          <div class="bid-list-record" style="padding-top: 10px">
-            <div class="bid-list-item w157">
-              <p>安卓</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>18775</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>14330</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>877424</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>800580</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>1.50</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>00:04:05</p>
-            </div>
-            <div class="bid-list-item w111">
-              <p>82.56%</p>
-            </div>
-          </div>
+          <originView ref="originView" byFlowView></originView>
           <div
             class="bid-list-record"
-            style="padding-top: 10px; padding-bottom: 10px"
+            v-for="(item, index) in channelTableData"
+            :key="index"
           >
             <div class="bid-list-item w157">
-              <p>苹果</p>
+              <p>{{ item.channel || "--" }}</p>
             </div>
             <div class="bid-list-item w111">
-              <p>18775</p>
+              <p>{{ item.pv || "--" }}</p>
             </div>
             <div class="bid-list-item w111">
-              <p>14330</p>
+              <p>{{ item.visitCount || "--" }}</p>
             </div>
             <div class="bid-list-item w111">
-              <p>877424</p>
+              <p>{{ item.uv || "--" }}</p>
             </div>
             <div class="bid-list-item w111">
-              <p>800580</p>
+              <p>{{ item.ipCount || "--" }}</p>
             </div>
             <div class="bid-list-item w111">
-              <p>1.50</p>
+              <p>{{ item.avgPv || "--" }}</p>
             </div>
             <div class="bid-list-item w111">
-              <p>00:04:05</p>
+              <p>{{ item.visitTime || "--" }}</p>
             </div>
             <div class="bid-list-item w111">
-              <p>82.56%</p>
+              <p>{{ item.bounceRate || "--" }}</p>
             </div>
           </div>
         </div>
@@ -142,7 +41,7 @@
     </div>
 
     <div class="chartsIcon">
-      <div class="flow-indicator">
+      <!-- <div class="flow-indicator">
         <div class="flow-item">
           <div class="flow-title">流量基础指标</div>
           <el-checkbox-group v-model="channelList" class="checkBoxStyle">
@@ -154,7 +53,7 @@
             <el-checkbox label="6">访客数占比</el-checkbox>
             <el-checkbox label="7">新访客数</el-checkbox>
             <el-checkbox label="8">新访客数占比</el-checkbox>
-            <el-checkbox label="9">新访客比率</el-checkbox>
+            <el-checkbox label="9">新访客数占比</el-checkbox>
             <el-checkbox label="10" style="margin-right: 0">IP数</el-checkbox>
           </el-checkbox-group>
         </div>
@@ -166,7 +65,8 @@
             <el-checkbox label="13">平均访问页数</el-checkbox>
           </el-checkbox-group>
         </div>
-      </div>
+      </div> -->
+      <flowPoint ref="flowPoint" @flowPoint="flowPoint" byChannel></flowPoint>
 
       <div class="table-content">
         <el-table
@@ -192,7 +92,7 @@
       </div>
       <div class="block">
         <el-pagination
-          :current-page="currentPage4"
+          :current-page="currentPage"
           :page-sizes="[10, 20, 30, 40]"
           :page-size="10"
           layout=" sizes, prev, pager, next, jumper"
@@ -206,7 +106,10 @@
 </template>
 
 <script>
+import originView from "@/components/origin-view/index";
+import flowPoint from "@/components/flowPoint/index";
 export default {
+  components: { originView, flowPoint },
   data() {
     return {
       channelList: ["3", "5"],
@@ -310,30 +213,96 @@ export default {
           amount10: 9,
         },
       ],
-      currentPage4: 4,
+      currentPage: 1,
+      channelTableData: [],
+      pv: false,
+      visitCount: false,
+      newUv: false,
+      uv: false,
+      ipCount: false,
+      avgPv: false,
+      avgVisitTime: false,
+      bounceRate: false,
+      pvRate: false,
+      newUvRate: false,
     };
   },
   methods: {
+    getChannelList(val) {
+      this.channelTableData = val.sort((a, b) => {
+        if (a.channel === "全部") {
+          return -1;
+        } else if (b.channel === "全部") {
+          return 1;
+        }
+        return 0;
+      });
+    },
     // 分页器
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
     },
-
-   
+    flowPoint(val) {
+      if (val.length > 0) {
+        if (val.includes("pv")) {
+          this.pv = true;
+        } else {
+          this.pv = false;
+        }
+        if (val.includes("visitCount")) {
+          this.visitCount = true;
+        } else {
+          this.visitCount = false;
+        }
+        if (val.includes("newUv")) {
+          this.newUv = true;
+        } else {
+          this.newUv = false;
+        }
+        if (val.includes("uv")) {
+          this.uv = true;
+        } else {
+          this.uv = false;
+        }
+        if (val.includes("ipCount")) {
+          this.ipCount = true;
+        } else {
+          this.ipCount = false;
+        }
+        if (val.includes("avgPv")) {
+          this.avgPv = true;
+        } else {
+          this.avgPv = false;
+        }
+        if (val.includes("avgVisitTime")) {
+          this.avgVisitTime = true;
+        } else {
+          this.avgVisitTime = false;
+        }
+        if (val.includes("bounceRate")) {
+          this.bounceRate = true;
+        } else {
+          this.bounceRate = false;
+        }
+        if (val.includes("pvRate")) {
+          this.pvRate = true;
+        } else {
+          this.pvRate = false;
+        }
+        if (val.includes("newUvRate")) {
+          this.newUvRate = true;
+        } else {
+          this.newUvRate = false;
+        }
+      }
+    },
   },
 };
 </script>
-<style></style>
-
 <style lang="scss" scoped>
-::v-deep {
-  .chartsIcon .flow-indicator .flow-item .el-checkbox {
-    width: 100px !important;
-  }
-}
+@import "~@/styles/components/el-pagination.scss";
+@import "~@/styles/components/el-checkbox.scss";
 .trafficHead {
   font-size: 14px;
   font-weight: 500;
@@ -445,7 +414,6 @@ img {
       border: 1px solid #eee;
       display: flex;
       align-items: center;
-      // width: 30%;
       span {
         font-size: 14px;
         padding: 0 10px;
@@ -454,22 +422,6 @@ img {
         padding-right: 10px;
       }
     }
-  }
-  .block {
-    margin: 20px 12px;
-  }
-}
-::v-deep {
-  .el-pagination {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 10px;
-  }
-  .el-pagination__jump {
-    position: absolute;
-    left: 0;
   }
 }
 </style>

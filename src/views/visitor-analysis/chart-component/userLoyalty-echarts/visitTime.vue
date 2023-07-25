@@ -70,20 +70,8 @@ export default {
         xAxis: {
           data: this.xData,
         },
-        // 图例
-        // legend: {
-        // //   data: ["浏览量（PV）", "访问次数"],
-        //   top: "0%",
-        //   left:"0%"
-        // },
+
         dataZoom: [
-          //   {
-          //     type: 'slider',
-          //     show: true,
-          //     start: 1,
-          //     end: 3,     // 改变柱子之间的间隔
-          //     handleSize: 5
-          //   },
           {
             type: "inside",
             startValue: 0,
@@ -97,12 +85,11 @@ export default {
         yAxis: {},
         series: [
           {
-            type: "bar", //形状为柱状图
+            type: "bar",
             data: this.yData,
-            barWidth: 30, //改变柱子的宽度
-            name: "浏览量（PV）", // legend属性
+            barWidth: 30,
+            name: "浏览量（PV）",
             label: {
-              // 柱状图上方文本标签，默认展示数值信息
               show: true,
               position: "top",
             },
@@ -112,10 +99,9 @@ export default {
           },
         ],
       };
-    
+
       const timeChart = echarts.init(document.getElementById("timeChart"));
       timeChart.setOption(visitTimeData);
-      
 
       window.addEventListener("resize", () => {
         timeChart.resize();

@@ -137,6 +137,11 @@ export default {
     },
     checkSearchValue(val) {
       this.time = [];
+      this.pv = [];
+      this.uv = [];
+      this.visitCount = [];
+      this.ipCount = [];
+      this.bounceRate = [];
       const { time, pv, uv, visitCount, ipCount, bounceRate } = this;
       this.flowTrendList.map((item) => {
         if (item.statTime) {
@@ -248,6 +253,10 @@ export default {
             },
             axisTick: {
               show: false,
+            },
+            axisLabel: {
+              interval: 0, //强制文字产生间隔
+              rotate: "45", //旋转角度
             },
           },
         ],

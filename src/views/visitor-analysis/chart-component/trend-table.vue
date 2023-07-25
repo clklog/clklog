@@ -39,7 +39,7 @@
           <el-table-column
             v-if="newUvRate"
             prop="newUvRate"
-            label="新访客比率"
+            label="新访客数占比"
             sortable
           />
           <el-table-column

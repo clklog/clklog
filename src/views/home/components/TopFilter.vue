@@ -5,8 +5,8 @@
         <el-radio-group v-model="timeType" class="radio-com-el">
           <el-radio label="day">今日</el-radio>
           <el-radio label="week">本周</el-radio>
-          <el-radio label="month">本月</el-radio>
-          <el-radio label="year">本年</el-radio>
+          <el-radio label="month" >本月</el-radio>
+          <!-- <el-radio label="year">本年</el-radio> -->
         </el-radio-group>
       </div>
 

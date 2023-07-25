@@ -43,9 +43,7 @@
        <img src="@/assets/images/icon.png" alt="" width="10px">
       </div>
     </div>
-    <!-- echarts -->
     <chart
-      v-if="flag"
       id="charts1"
       height="350px"
       width="100%"
@@ -97,7 +95,7 @@ export default {
       flowTrendList: null,
       flag: false,
       specificTTime: "time",
-      headLege: ["浏览量", "访问次数"],
+      headLege: ["IP数","访问次数",],
       disabledSelect: [],
     };
   },
@@ -118,6 +116,7 @@ export default {
         if (res.code == 200) {
           this.flowTrendList = res.data;
           this.flag = true;
+          this.$refs.trendChartRef.getApiTrendList(res.data,this.headLege);
         }
       });
     },

@@ -11,10 +11,20 @@
         <el-checkbox label="pv">浏览量(PV)</el-checkbox>
         <el-checkbox label="pvRate">浏览量占比</el-checkbox>
         <el-checkbox label="visitCount">访问次数</el-checkbox>
-        <el-checkbox label="uv">访客数(UV)</el-checkbox>
+        <el-checkbox v-if="byChannel" label="visitCountRate"
+          >访问次数占比</el-checkbox
+        >
+        <el-checkbox label="uv">访客数</el-checkbox>
+        <el-checkbox v-if="byChannel" label="uvRate">访客数占比</el-checkbox>
         <el-checkbox label="newUv">新访客数</el-checkbox>
-        <el-checkbox label="newUvRate">新访客比率</el-checkbox>
+        <el-checkbox label="newUvRate">新访客数占比</el-checkbox>
         <el-checkbox label="ipCount" style="margin-right: 0">IP数</el-checkbox>
+        <el-checkbox
+          v-if="byChannel"
+          label="ipCountRate"
+          style="margin-right: 0"
+          >IP数占比</el-checkbox
+        >
       </el-checkbox-group>
     </div>
     <div class="flow-item setSpace">
@@ -26,16 +36,27 @@
       >
         <el-checkbox label="bounceRate">跳出率</el-checkbox>
         <el-checkbox label="avgVisitTime">平均访问时长</el-checkbox>
+        <el-checkbox v-if="byChannel" label="avgVisitTimeRate"
+          >平均访问时长占比</el-checkbox
+        >
         <el-checkbox label="avgPv">平均访问页数</el-checkbox>
+        <el-checkbox v-if="byChannel" label="avgPvRate"
+          >平均访问页数占比</el-checkbox
+        >
       </el-checkbox-group>
     </div>
-
   </div>
 </template>
 
 <script>
 import { percentage } from "@/utils/percent";
 export default {
+  props: {
+    byChannel: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       flowTableList: [],
