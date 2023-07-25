@@ -9,7 +9,7 @@
         style="width: 100%"
       >
         <el-table-column type="index" label="序号" width="150" />
-        <el-table-column prop="isFirstDay" label="访客类型" width="150" />
+        <el-table-column prop="visitorType" label="访客类型" width="150" />
         <el-table-column prop="date" label="流量基础指标">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
           <el-table-column
@@ -71,6 +71,7 @@
 
 <script>
 import flowPoint from "@/components/flowPoint/index";
+import { percentage } from "@/utils/percent";
 export default {
   components: { flowPoint },
   props: {
@@ -97,27 +98,15 @@ export default {
   },
   methods: {
     getVisitorDetail(val) {
-      // Object.keys(res.data).forEach((key) => {
-      //   if (key == "newVisitor") {
-      //     res.data[key].visitorType = "新访客";
-      //   } else if (key == "oldVisitor") {
-      //     res.data[key].visitorType = "老访客";
-      //   } else if (key == "total") {
-      //     res.data[key].visitorType = "总计";
-      //   }
-      //   this.visitorDetailData.push(res.data[key]);
-      // });
-      let visitorDetail = val.visitorDetail;
-      visitorDetail.map((item) => {
-        if (item.isFirstDay == "false") {
-          item.isFirstDay = "老访客";
-        } else if (item.isFirstDay == "true") {
-          item.isFirstDay = "新访客";
-        } else {
-          item.isFirstDay = "合计";
-        }
-      });
-      this.visitorDetailData = visitorDetail;
+      val.map((item) => {
+            if (item.bounceRate) {
+              item.bounceRate = percentage(item.bounceRate);
+            }
+            if (item.pvRate) {
+              item.pvRate = percentage(item.pvRate);
+            }
+          });
+      this.visitorDetailData = val.reverse();
     },
     flowPoint(val) {
       if (val.length > 0) {

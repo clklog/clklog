@@ -308,7 +308,7 @@
           <p>{{ (originData && originData.avgVisitTime) || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
-          <p>{{ (originData && originData.bounceRate) || "--" }}</p>
+          <p>{{ percentageFun(originData && originData.bounceRate)|| "--" }}</p>
         </div>
       </div>
     </div>
@@ -440,7 +440,7 @@
               </p>
             </div>
             <div class="bid-list-item w158">
-              <p>{{ (originData && originData.visitRate) || "--" }}</p>
+              <p>{{ percentageFun(originData && originData.visitRate)|| "--" }}</p>
             </div>
             <div class="bid-list-item w158">
               <p>
@@ -455,7 +455,7 @@
            
             <div class="bid-list-item w158">
               <p>
-                <p v-if="originData && originData.churn">{{ percentageFun(originData.churn) }}</p>
+                <p v-if="originData && originData.churn">{{ originData.churn }}</p>
                 <p v-else>--</p>
               </p>
             </div>
@@ -587,7 +587,7 @@
           </el-popover>
         </div>
       </div>
-      <div class="bid-list-record" v-if="">
+      <div class="bid-list-record" >
             <div class="bid-list-item w158">
               <p>{{ (originData && originData.pv) || "--" }}</p>
             </div>
@@ -624,6 +624,7 @@
 </template>
 
 <script>
+import { percentage } from "@/utils/percent";
 export default {
   name: "originName",
   props: {
@@ -654,6 +655,9 @@ export default {
     originEvent(val){
         // console.log(val,4324);
         this.originData = val;
+    },
+    percentageFun(val) {
+      return percentage(val);
     },
   }
 };

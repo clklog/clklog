@@ -4,55 +4,6 @@
      <div class="Overview">
       <div class="trafficHead" style="padding-left: 15px">来源网站分析</div>
       <originView ref="originView" byAreaAnaly></originView>
-      <!-- <div class="bid-list-page">
-        <div class="bid-list-header">
-          <div class="header-name w156">
-            浏览量(PV)
-            <img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            访问次数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            访客数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            IP数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            平均访问页面<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            平均访问时长<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            跳出率<img src="@/assets/images/question.png" alt="" />
-          </div>
-        </div>
-        <div class="bid-list-record">
-          <div class="bid-list-item w158">
-            <p>18775</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>14330</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>877424</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>800580</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>1.50</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>00:04:05</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>82.56%</p>
-          </div>
-        </div>
-      </div> -->
     </div>
     <sourceWebChart ref="sourceWebChart"></sourceWebChart>
     <sourceWebTable ref="sourceWebTable" @currentPage="currentPage"></sourceWebTable>

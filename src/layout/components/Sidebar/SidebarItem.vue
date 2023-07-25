@@ -8,7 +8,7 @@
       </app-link>
     </template>
 
-    <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
+    <el-submenu  v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
       <template slot="title">
         <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.meta.title" />
       </template>
@@ -93,5 +93,12 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped lang="scss">
+#app .sidebar-container .svg-icon{
+  width: 22px;
+  height: 22px;
+  position: relative;
+  top: 0;
+  transform: translate(0,25%);
+}
 </style>

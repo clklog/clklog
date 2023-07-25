@@ -45,7 +45,7 @@
         :cell-style="{ textAlign: 'center' }"
       >
         <el-table-column type="index" label="序号" width="150" />
-        <el-table-column prop="uri" label="页面URL" width="150" />
+        <el-table-column prop="uri" label="页面URL" :show-overflow-tooltip="true" width="300" />
         <el-table-column label="流量基础指标">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
           <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />

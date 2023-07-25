@@ -48,7 +48,7 @@ export default {
       return this.$store.getters.project;
     },
     commonParams() {
-      const { project, pageNum, pageSize } = this;
+      const { project } = this;
       return Object.assign({ project }, this.filterBarParams);
     },
   },

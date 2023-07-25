@@ -1,7 +1,7 @@
 <template>
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams"  />
-    <searchAnalysis ref="searchAnalysis"></searchAnalysis>
+    <searchAnalysis  @currentPage="currentPage" ref="searchAnalysis"></searchAnalysis>
   </div>
 </template>
 
@@ -18,6 +18,8 @@ export default {
   data() {
     return {
       filterBarParams: "",
+      pageNum: 1,
+      pageSize: 10,
     };
   },
   computed: {
@@ -26,12 +28,7 @@ export default {
     },
     commonParams() {
       const { project } = this;
-      let pageNum = 1;
-      let pageSize = 50;
-      return Object.assign(
-        { project, pageNum, pageSize },
-        this.filterBarParams
-      );
+      return Object.assign({ project }, this.filterBarParams);
     },
   },
   watch: {
@@ -40,8 +37,17 @@ export default {
     },
   },
   methods: {
-    getFlowTrendDetail() {
-      getSearchWordDetailApi(this.commonParams).then((res) => {
+    getFlowTrendDetail(val) {
+      let newvalue = copyObj(this.commonParams);
+      if (val) {
+        newvalue.pageNum = val.page;
+        newvalue.pageSize = val.size;
+      } else {
+        newvalue.pageNum = this.pageNum;
+        newvalue.pageSize = this.pageSize;
+      }
+
+      getSearchWordDetailApi(newvalue).then((res) => {
         if (res.code == 200) {
           this.$refs.searchAnalysis.searchTable(res.data);
         }
@@ -49,6 +55,9 @@ export default {
     },
     setFilterBarParams(val) {
       this.filterBarParams = copyObj(val);
+    },
+    currentPage(val) {
+      this.getFlowTrendDetail(val);
     },
   },
 };

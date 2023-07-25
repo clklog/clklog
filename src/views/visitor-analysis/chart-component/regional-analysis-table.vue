@@ -8,7 +8,7 @@
         :header-cell-style="{ textAlign: 'center' }"
         :cell-style="{ textAlign: 'center' }"
       >
-        <el-table-column prop="province" label="地域" width="150" />
+        <el-table-column prop="province" :show-overflow-tooltip="true" label="地域" width="200" />
         <el-table-column prop="date" label="流量基础指标" width="150">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
           <el-table-column
@@ -135,6 +135,9 @@ export default {
             }
             if (item.pvRate) {
               item.pvRate = percentage(item.pvRate);
+            }
+            if (item.province == "未知省份") {
+              item.province = item.country + "-" + item.province
             }
           });
         }

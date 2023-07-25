@@ -41,21 +41,10 @@ export default {
       flowTrendList: [],
     };
   },
-  watch: {
-    // flowTrendListed(val) {
-    //   if (val && val.length > 0) {
-    //     this.flowTrendList = val;
-    //     this.checkSearchValue(this.defaultLege);
-    //   } else {
-    //     this.checkSearchValue([]);
-    //   }
-    // },
-  },
   mounted() {
     this.initChart();
     this.flowTrendList = this.flowTrendListed;
     this.headLege = this.defaultLege;
-    // this.checkSearchValue(this.defaultLege);
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -196,8 +185,8 @@ export default {
               show: false,
             },
             axisLabel: {
-              interval: 0, //强制文字产生间隔
-              rotate: "45", //旋转角度
+              interval: 0, 
+              rotate: "45", 
             },
           },
         ],
@@ -283,59 +272,6 @@ export default {
           },
         ],
       });
-    },
-    // 处理接口数据
-    processData() {
-      const { statTime, pv, uv, visitCount, ipCount, bounceRate } = this;
-      console.log(this.flowTrendList, 32498098704);
-      // 时间
-      this.flowTrendList.map((item) => {
-        // if (item.statTime) {
-        //   return statTime.push(item.statTime.slice(11, 13));
-
-        if (item.statTime) {
-          return statTime.push(item.statTime);
-        } else {
-          statTime.push(0);
-        }
-      });
-      this.flowTrendList.map((item) => {
-        if (item.pv) {
-          return pv.push(item.pv);
-        } else {
-          pv.push(0);
-        }
-      });
-      this.flowTrendList.map((item) => {
-        if (item.uv) {
-          return uv.push(item.uv);
-        } else {
-          uv.push(0);
-        }
-      });
-      this.flowTrendList.map((item) => {
-        if (item.visitCount) {
-          return visitCount.push(item.visitCount);
-        } else {
-          visitCount.push(0);
-        }
-      });
-      this.flowTrendList.map((item) => {
-        if (item.ipCount) {
-          return ipCount.push(item.ipCount);
-        } else {
-          ipCount.push(0);
-        }
-      });
-      this.flowTrendList.map((item) => {
-        if (item.bounceRate) {
-          return uv.push(item.bounceRate);
-        } else {
-          bounceRate.push(0);
-        }
-      });
-
-      console.log(this.flowTrendList, 43243);
     },
   },
 };

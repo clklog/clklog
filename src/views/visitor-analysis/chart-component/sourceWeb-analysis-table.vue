@@ -34,7 +34,12 @@
         style="width: 100%"
       >
         <el-table-column type="index" label="序号" width="150" />
-        <el-table-column prop="sourcesite"  width="250" :show-overflow-tooltip="true" label="来源网站" />
+        <el-table-column
+          prop="sourcesite"
+          width="250"
+          :show-overflow-tooltip="true"
+          label="来源网站"
+        />
         <el-table-column label="流量基础指标">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
           <el-table-column
@@ -108,6 +113,7 @@
 
 <script>
 import flowPoint from "@/components/flowPoint/index";
+import { percentage } from "@/utils/percent";
 export default {
   components: { flowPoint },
   data() {
@@ -136,6 +142,17 @@ export default {
   },
   methods: {
     getSourceSite(val) {
+      val.rows.map((item) => {
+        if (item.bounceRate) {
+          item.bounceRate = percentage(item.bounceRate);
+        }
+        if (item.newUvRate) {
+          item.newUvRate = percentage(item.newUvRate);
+        }
+        if (item.pvRate) {
+          item.pvRate = percentage(item.pvRate);
+        }
+      });
       this.getSourceSiteList = val.rows;
       this.total = val.total;
     },
