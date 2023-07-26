@@ -9,9 +9,9 @@ export function getAreaApi(params) {
   })
 }
 // 获取地域详情
-export function getAreaDetailApi(params) {
+export function getAreaDetailTotalApi(params) {
   return request({
-    url: '/area/getAreaDetail',
+    url: '/area/getAreaDetailTotal',
     method: 'post',
     data: params
   })

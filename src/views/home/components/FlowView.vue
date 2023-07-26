@@ -4,141 +4,7 @@
       <div class="block-title">流量概览</div>
     </div>
     <div class="bid-list-page">
-      <div class="bid-list-header">
-        <div class="header-name w156"></div>
-        <div class="header-name w156">
-          浏览量
-          <el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              选定时间段内用户访问应用的页面总次数<br><br>
-              用户每打开一个页面被记录一次，同一页面打开多次浏览量值累计计算。
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
-        </div>
-        <div class="header-name w156">
-          访问次数
-          <el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              选定时间段内用户访问应用的总次数。<br /><br>
-              用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
-        </div>
-        <div class="header-name w156">
-          访客数<el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              选定时间段内访问应用的独立访客数。<br /><br>
-              访客数以Cookie或设备ID为依据，选定时间段内同一访客多次访问应用只计算为一个访客。
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
-        </div>
-        <div class="header-name w156">
-          IP数<el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              选定时间段内访问应用的独立IP数。
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
-        </div>
-        <div class="header-name w156">
-          平均访问页面<el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              平均访问页数 = 浏览量 / 访问次数
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
-        </div>
-        <div class="header-name w156">
-          平均访问时长<el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              平均访问时长 = 访问总时长 / 访问次数<br /><br>
-              访客每次访问的总时长为打开第一个页面到退出或关闭最后一个页面的总时长。
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
-        </div>
-        <div class="header-name w156">
-          跳出率<el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              只浏览一个页面就离开或关闭应用的访问次数占总访问次数的百分比。
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
-        </div>
-      </div>
+      <originView ref="originView" byFlowView></originView>
       <div class="bid-list-record">
         <div class="bid-list-item1 w157">
           <!-- <p>今日</p> -->
@@ -166,7 +32,9 @@
           <p>{{ current.avgVisitTime || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
-          <p v-if="current.bounceRate">{{ percentageFun(current.bounceRate) }}</p>
+          <p v-if="current.bounceRate">
+            {{ percentageFun(current.bounceRate) }}
+          </p>
           <p v-else>--</p>
         </div>
       </div>
@@ -196,7 +64,9 @@
           <p>{{ previous.avgVisitTime || "--" }}</p>
         </div>
         <div class="bid-list-item w157">
-          <p v-if="previous.bounceRate">{{ percentageFun(previous.bounceRate) }}</p>
+          <p v-if="previous.bounceRate">
+            {{ percentageFun(previous.bounceRate) }}
+          </p>
           <p v-else>--</p>
         </div>
       </div>
@@ -205,7 +75,7 @@
           <p v-if="timeType == 'day'">环比（今日与昨日）</p>
           <p v-if="timeType == 'week'">环比（本周与上周）</p>
           <p v-if="timeType == 'month'">环比（本月与上月）</p>
-          <p v-if="timeType == 'year'">环比（本年与上年同期）</p>
+          <p v-if="timeType == 'year'">环比（本年与上年）</p>
         </div>
         <div class="bid-list-item w157">
           <p>{{ huanbi(current.pv, previous.pv) }}</p>
@@ -231,7 +101,9 @@
         </div>
         <div class="bid-list-item w157">
           <p>{{ huanbi(current.visitCount, previous.visitCount) }}</p>
-          <p v-if="huanbi(current.visitCount, previous.visitCount) != '--'">%</p>
+          <p v-if="huanbi(current.visitCount, previous.visitCount) != '--'">
+            %
+          </p>
           <img
             v-if="
               huanbi(current.visitCount, previous.visitCount) != '--' &&
@@ -368,9 +240,9 @@
       </div>
       <div class="bid-list-record" style="margin-bottom: 0">
         <div class="bid-list-item1 w157">
-          <p v-if="timeType == 'day'">同比（今日与同期）</p>
-          <p v-if="timeType == 'week'">环比（本周与同期）</p>
-          <p v-if="timeType == 'month'">环比（本月与同期）</p>
+          <p v-if="timeType == 'day'">同比（今日与上年同期）</p>
+          <p v-if="timeType == 'week'">环比（本周与上年同期）</p>
+          <p v-if="timeType == 'month'">环比（本月与上年同期）</p>
           <p v-if="timeType == 'year'">环比（本年与上年同期）</p>
         </div>
         <div class="bid-list-item w157">
@@ -398,7 +270,9 @@
 
         <div class="bid-list-item w157">
           <p>{{ tongbi(current.visitCount, samePeriod.visitCount) }}</p>
-          <p v-if="tongbi(current.visitCount, samePeriod.visitCount) != '--'">%</p>
+          <p v-if="tongbi(current.visitCount, samePeriod.visitCount) != '--'">
+            %
+          </p>
           <img
             v-if="
               tongbi(current.visitCount, samePeriod.visitCount) != '--' &&
@@ -540,10 +414,12 @@
 </template>
 
 <script>
+import originView from "@/components/origin-view/index";
 import { getFlowApi } from "@/api/trackingapi/flow";
 import { percentage } from "@/utils/percent";
 export default {
   name: "FlowView",
+  components: { originView },
   props: {
     commonParams: {},
     timeTypeFlag: {},
@@ -577,8 +453,8 @@ export default {
   },
   watch: {},
   methods: {
-    percentageFun(val){
-        return percentage(val)
+    percentageFun(val) {
+      return percentage(val);
     },
     getFlow() {
       this.timeType = this.timeTypeFlag;
@@ -588,13 +464,13 @@ export default {
     },
     huanbi(c, p) {
       if (c && p) {
-        return ((c - p) / p).toFixed(2);
+        return (((c - p) / p) * 100).toFixed(2);
       }
       return "--";
     },
     tongbi(c, s) {
       if (c && s) {
-        return ((c - s) / s).toFixed(2);
+        return (((c - s) / s) * 100).toFixed(2);
       }
       return "--";
     },
@@ -628,7 +504,7 @@ export default {
           margin-left: 12px;
           cursor: pointer;
           position: absolute;
-          transform: translate(0,-50%);
+          transform: translate(0, -50%);
         }
       }
       .w156 {

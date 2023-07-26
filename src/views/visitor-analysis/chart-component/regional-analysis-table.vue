@@ -8,7 +8,7 @@
         :header-cell-style="{ textAlign: 'center' }"
         :cell-style="{ textAlign: 'center' }"
       >
-        <el-table-column prop="province" label="地域" width="150" />
+        <el-table-column prop="province" :show-overflow-tooltip="true" label="地域" width="200" />
         <el-table-column prop="date" label="流量基础指标" width="150">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
           <el-table-column
@@ -19,7 +19,7 @@
           />
           <el-table-column
             v-if="visit"
-            prop="visit"
+            prop="visitCount"
             label="访问次数"
             sortable
           />
@@ -33,7 +33,7 @@
           <el-table-column
             v-if="newUvRate"
             prop="newUvRate"
-            label="新访客比率"
+            label="新访客数占比"
             sortable
           />
           <el-table-column
@@ -96,8 +96,6 @@ export default {
         size: 10,
         page: 1,
       },
-
-      // 后面拆分使用
       flowTableList: [],
       channelList: ["pv", "visit","newUvRate","pvRate"],
       flowQuality: ["avgPv"],
@@ -115,6 +113,36 @@ export default {
     };
   },
   methods: {
+    handleSizeChange(val) {
+      this.current.size = val;
+      this.$emit("currentPage", this.current);
+    },
+    handleCurrentChange(val) {
+      this.current.page = val;
+      this.$emit("currentPage", this.current);
+    },
+    getDetailList(val) {
+      getAreaDetailListApi(val).then((res) => {
+        if (res.code == 200) {
+          this.tableDetailList = res.data.rows;
+          this.total = res.data.total;
+          this.tableDetailList.map((item) => {
+            if (item.bounceRate) {
+              item.bounceRate = percentage(item.bounceRate);
+            }
+            if (item.newUvRate) {
+              item.newUvRate = percentage(item.newUvRate);
+            }
+            if (item.pvRate) {
+              item.pvRate = percentage(item.pvRate);
+            }
+            if (item.province == "未知省份") {
+              item.province = item.country + "-" + item.province
+            }
+          });
+        }
+      });
+    },
     flowPoint(val) {
       if (val.length > 0) {
         if (val.includes("pv")) {
@@ -168,34 +196,6 @@ export default {
           this.newUvRate = false;
         }
       }
-    },
-    // 分页器
-    handleSizeChange(val) {
-      this.current.size = val;
-      this.$emit("currentPage", this.current);
-    },
-    handleCurrentChange(val) {
-      this.current.page = val;
-      this.$emit("currentPage", this.current);
-    },
-    getDetailList(val) {
-      getAreaDetailListApi(val).then((res) => {
-        if (res.code == 200) {
-          this.tableDetailList = res.data.rows;
-          this.total = res.data.total;
-          this.tableDetailList.map((item) => {
-            if (item.bounceRate) {
-              item.bounceRate = percentage(item.bounceRate);
-            }
-            if (item.newUvRate) {
-              item.newUvRate = percentage(item.newUvRate);
-            }
-            if (item.pvRate) {
-              item.pvRate = percentage(item.pvRate);
-            }
-          });
-        }
-      });
     },
   },
 };

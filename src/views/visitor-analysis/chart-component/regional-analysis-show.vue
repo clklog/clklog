@@ -15,12 +15,12 @@
           ref="singleTable"
           :data="apiProvinceList"
           highlight-current-row
-          style="width: 100%;"
+          style="width: 100%"
         >
-          <el-table-column type="index" width="100"> </el-table-column>
-          <el-table-column property="province" label="省份" width="120">
+          <el-table-column type="index" width="80"> </el-table-column>
+          <el-table-column :show-overflow-tooltip="true" property="province" label="省份" width="200">
           </el-table-column>
-          <el-table-column property="visitCount" label="访问次数" width="120">
+          <el-table-column property="visitCount" label="访问次数">
           </el-table-column>
           <el-table-column
             property="visitCountRate"
@@ -102,14 +102,17 @@ export default {
           return b - a;
         })[0];
         this.maxValue = max;
-      }else{
-        this.provinceList.map(item =>{
-          item.value = 0
-        })
+      } else {
+        this.provinceList.map((item) => {
+          item.value = 0;
+        });
       }
       this.apiProvinceList.map((item) => {
         item.visitCountRate = percentage(item.visitCountRate);
-      })
+        if (item.province == "未知省份") {
+          item.province = item.country + "-" + item.province;
+        }
+      });
       this.showScatterInGeo();
     },
     randomData() {

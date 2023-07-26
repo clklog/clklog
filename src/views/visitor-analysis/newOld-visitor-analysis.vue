@@ -4,48 +4,7 @@
     <div class="Overview">
       <div class="trafficHead" style="padding-left: 15px">新老访客分析</div>
       <div class="bid-list-page">
-        <!-- <div class="bid-list-header">
-          <div class="header-name w156">
-            访客数
-            <img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            新访客数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            新访客数占比<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            回流用户<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            沉默用户<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            流失用户<img src="@/assets/images/question.png" alt="" />
-          </div>
-        </div> -->
         <originView ref="originView" byVisit></originView>
-        <!-- <div class="bid-list-record">
-          <div class="bid-list-item w158">
-            <p>1877532222</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>14330</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>877424</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>800580</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>1.50</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>00:04:05</p>
-          </div>
-        </div> -->
       </div>
     </div>
     <newOldAnalysis ref="newOldAnalysis"></newOldAnalysis>
@@ -53,14 +12,12 @@
 </template>
 
 <script>
-// import Dropzone from '@/components/Dropzone'
 import originView from "@/components/origin-view/index";
 import { FilterBar } from "@/layout/components";
 import newOldAnalysis from "./chart-component/newOld-visitor-analysisTable";
 import { copyObj } from "@/utils/copy";
 import {
   getVisitorTotalApi,
-  getVisitorListApi,
   getVisitorDetailApi,
 } from "@/api/trackingapi/visitor";
 export default {

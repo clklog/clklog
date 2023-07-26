@@ -7,17 +7,12 @@
           <el-table
             :header-cell-style="{ textAlign: 'center' }"
             :cell-style="{ textAlign: 'center' }"
-            :data="
-              searchTableList.slice(
-                (currentPage - 1) * pageSize,
-                currentPage * pageSize
-              )
-            "
+            :data="searchTableList"
             border
             style="width: 100%; margin-top: 12px"
           >
-            <el-table-column prop="statTime" label="日期" sortable width="180">
-            </el-table-column>
+            <!-- <el-table-column prop="statTime" label="日期" sortable width="180">
+            </el-table-column> -->
             <el-table-column prop="word" label="搜索词" sortable width="180">
             </el-table-column>
             <el-table-column prop="pv" label="浏览量(PV)" sortable>
@@ -41,9 +36,9 @@
         next-text="下一页"
         :current-page="currentPage"
         :page-sizes="[10, 20, 30, 40]"
-        :page-size="10"
+        :page-size= pageSize
         layout=" sizes, prev, pager, next, jumper"
-        :total="total"
+        :total= total
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -61,12 +56,16 @@ export default {
       total: null,
       total: 0,
       pageSize: 10,
+      current: {
+        size: 10,
+        page: 1,
+      },
     };
   },
   created() {},
   methods: {
-    percentageFun(val){
-        return percentage(val)
+    percentageFun(val) {
+      return percentage(val);
     },
     searchTable(val) {
       this.currentPage = 1;
@@ -85,11 +84,12 @@ export default {
       return row.address;
     },
     handleSizeChange(val) {
-      this.currentPage = 1;
-      this.pageSize = val;
+      this.current.size = val;
+      this.$emit("currentPage", this.current);
     },
     handleCurrentChange(val) {
-      this.currentPage = val;
+      this.current.page = val;
+      this.$emit("currentPage", this.current);
     },
   },
 };

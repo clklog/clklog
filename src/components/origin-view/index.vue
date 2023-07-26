@@ -1,5 +1,318 @@
 <template>
   <div>
+    <div v-if="byFlowView">
+        <div class="bid-list-header">
+        <div class="header-name w156"></div>
+        <div class="header-name w156">
+          浏览量
+          <el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              选定时间段内用户访问应用的页面总次数
+              <div class="setFontTop">
+                用户每打开一个页面被记录一次，同一页面打开多次浏览量值累计计算。
+              </div>
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          访问次数
+          <el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              选定时间段内用户访问应用的总次数。
+              <div class="setFontTop">
+                用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
+              </div>
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          访客数<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              选定时间段内访问应用的独立访客数。
+              <div class="setFontTop">访客数以Cookie或设备ID为依据，选定时间段内同一访客多次访问应用只计算为一个访客。
+            </div>
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          IP数<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              选定时间段内访问应用的独立IP数。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          平均访问页面<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              平均访问页数 = 浏览量 / 访问次数
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          平均访问时长<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              平均访问时长 = 访问总时长 / 访问次数
+              <div class="setFontTop"> 访客每次访问的总时长为打开第一个页面到退出或关闭最后一个页面的总时长。
+                </div>
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          跳出率<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              只浏览一个页面就离开或关闭应用的访问次数占总访问次数的百分比。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+      </div>
+    </div>
+
+    <!-- 地域分析 -->
+    <div class="bid-list-page" v-if="byAreaAnaly">
+        <div class="bid-list-header">
+        <div class="header-name w156">
+          浏览量(PV)
+          <el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              选定时间段内用户访问应用的页面总次数
+              <div style="margin-top: 5px">
+                用户每打开一个页面被记录一次，同一页面打开多次浏览量值累计计算。
+              </div>
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          访问次数
+          <el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              选定时间段内用户访问应用的总次数。
+              <div style="margin-top: 5px">
+                用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
+              </div>
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          访客数<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              选定时间段内访问应用的独立访客数。
+              <div style="margin-top: 5px">
+                访客数以Cookie或设备ID为依据，选定时间段内同一访客多次访问应用只计算为一个访客。
+              </div>
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          IP数<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              选定时间段内访问应用的独立IP数。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          平均访问页面<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              平均访问页数 = 浏览量 / 访问次数
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          平均访问时长<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              平均访问时长 = 访问总时长 / 访问次数
+              <div style="margin-top: 5px">
+                访客每次访问的总时长为打开第一个页面到退出或关闭最后一个页面的总时长。
+              </div>
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+        <div class="header-name w156">
+          跳出率<el-popover
+            placement="bottom-start"
+            width="200"
+            trigger="hover"
+            class="popImg"
+          >
+            <div style="padding: 5px; font-size: 12px">
+              只浏览一个页面就离开或关闭应用的访问次数占总访问次数的百分比。
+            </div>
+            <img
+              slot="reference"
+              class="icon-question"
+              src="@/assets/images/question.png"
+              alt=""
+            />
+          </el-popover>
+        </div>
+      </div>
+      <div class="bid-list-record">
+        <div class="bid-list-item w158">
+          <p>{{ (originData && originData.pv) || "--" }}</p>
+        </div>
+        <div class="bid-list-item w158">
+          <p>{{ (originData && originData.visitCount) || "--" }}</p>
+        </div>
+        <div class="bid-list-item w158">
+          <p>{{ (originData && originData.uv) || "--" }}</p>
+        </div>
+        <div class="bid-list-item w158">
+          <p>{{ (originData && originData.ipCount) || "--" }}</p>
+        </div>
+        <div class="bid-list-item w158">
+          <p>{{ (originData && originData.avgPv) || "--" }}</p>
+        </div>
+        <div class="bid-list-item w158">
+          <p>{{ (originData && originData.avgVisitTime) || "--" }}</p>
+        </div>
+        <div class="bid-list-item w158">
+          <p>{{ percentageFun(originData && originData.bounceRate)|| "--" }}</p>
+        </div>
+      </div>
+    </div>
+
     <div class="bid-list-page" v-if="byVisit">
         <div class="bid-list-header">
         <div class="header-name w156">
@@ -12,7 +325,7 @@
           >
             <div style="padding: 5px; font-size: 12px">
                 选定时间段内访问应用的独立访客数。
-              <div style="margin-top: 5px">
+              <div class="setFontTop">
                 访客数以Cookie或设备ID为依据，选定时间段内同一访客多次访问应用只计算为一个访客。
               </div>
             </div>
@@ -127,7 +440,7 @@
               </p>
             </div>
             <div class="bid-list-item w158">
-              <p>{{ (originData && originData.visitRate) || "--" }}</p>
+              <p>{{ percentageFun(originData && originData.visitRate)|| "--" }}</p>
             </div>
             <div class="bid-list-item w158">
               <p>
@@ -142,12 +455,13 @@
            
             <div class="bid-list-item w158">
               <p>
-                <p v-if="originData && originData.churn">{{ percentageFun(originData.churn) }}</p>
+                <p v-if="originData && originData.churn">{{ originData.churn }}</p>
                 <p v-else>--</p>
               </p>
             </div>
       </div>
     </div>
+
     <div class="bid-list-page" v-if="byVisitedPage">
         <div class="bid-list-header">
         <div class="header-name w156">
@@ -161,7 +475,7 @@
         
             <div style="padding: 5px; font-size: 12px">
               选定时间段内用户访问应用的页面总次数
-              <div style="margin-top: 5px">
+              <div class="setFontTop">
                 用户每打开一个页面被记录一次，同一页面打开多次浏览量值累计计算。
               </div>
             </div>
@@ -174,7 +488,8 @@
           </el-popover>
         </div>
         <div class="header-name w156">
-          访问次数(UV)
+          <!-- 访问次数(UV) -->
+          访问次数
           <el-popover
             placement="bottom-start"
             width="200"
@@ -183,7 +498,7 @@
           >
             <div style="padding: 5px; font-size: 12px">
               选定时间段内用户访问应用的总次数。
-              <div style="margin-top: 5px">
+              <div class="setFontTop">
                 用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
               </div>
             </div>
@@ -241,7 +556,7 @@
           >
             <div style="padding: 5px; font-size: 12px">
               平均访问时长 = 访问总时长 / 访问次数
-              <div style="margin-top: 5px">
+              <div class="setFontTop">
                 访客每次访问的总时长为打开第一个页面到退出或关闭最后一个页面的总时长。
               </div>
             </div>
@@ -272,7 +587,7 @@
           </el-popover>
         </div>
       </div>
-      <div class="bid-list-record" v-if="">
+      <div class="bid-list-record" >
             <div class="bid-list-item w158">
               <p>{{ (originData && originData.pv) || "--" }}</p>
             </div>
@@ -303,13 +618,24 @@
             </div>
       </div>
     </div>
+
+
   </div>
 </template>
 
 <script>
+import { percentage } from "@/utils/percent";
 export default {
   name: "originName",
   props: {
+    byFlowView:{ 
+      type:Boolean,
+       default: false,
+    },
+    byAreaAnaly:{ 
+      type:Boolean,
+       default: false,
+    },
     byVisit: {
       type: Boolean,
       default: false,
@@ -330,11 +656,17 @@ export default {
         // console.log(val,4324);
         this.originData = val;
     },
+    percentageFun(val) {
+      return percentage(val);
+    },
   }
 };
 </script>
 
 <style lang="scss" scoped>
+::v-deep.setFontTop{
+    margin-top:5px;
+  }
 .bid-list-header {
   display: flex;
   .header-name {
@@ -344,6 +676,7 @@ export default {
     display: flex;
     align-items: center;
   }
+ 
   .w156 {
     font-size: 13px;
     font-weight: 400;

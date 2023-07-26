@@ -2,6 +2,7 @@
   <div class="Overview">
     <div class="trafficHead" style="padding-left: 15px">地域分析</div>
     <div class="bid-list-page">
+      <!-- <originView ref="originView" byFlowView></originView> -->
       <div class="bid-list-header">
         <div class="header-name w156">
           浏览量(PV)
@@ -181,8 +182,7 @@ export default {
   created() {},
   methods: {
     getDetailView(val) {
-      console.log(val, "view");
-      this.detailView = val.total;
+      this.detailView = val;
     },
   },
 };

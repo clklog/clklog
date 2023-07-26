@@ -137,9 +137,18 @@ export default {
     },
     checkSearchValue(val) {
       this.time = [];
+      this.pv = [];
+      this.uv = [];
+      this.visitCount = [];
+      this.ipCount = [];
+      this.bounceRate = [];
       const { time, pv, uv, visitCount, ipCount, bounceRate } = this;
       this.flowTrendList.map((item) => {
         if (item.statTime) {
+          item.statTime = item.statTime.replace(/2023-/g, "");
+          if (item.statTime.length <= 2) {
+            item.statTime = item.statTime + "时"
+          }
           return time.push(item.statTime);
         } else {
           time.push(0);
@@ -248,6 +257,10 @@ export default {
             },
             axisTick: {
               show: false,
+            },
+            axisLabel: {
+              interval: 0, //强制文字产生间隔
+              rotate: "45", //旋转角度
             },
           },
         ],

@@ -1,7 +1,7 @@
 <template>
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams"></FilterBar>
-    <channelTable></channelTable>
+    <channelTable ref="channelTable"></channelTable>
   </div>
 </template>
 
@@ -40,7 +40,7 @@ export default {
     getChannelDetail() {
       getChannelDetailApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-        console.log(res.data,234);
+        this.$refs.channelTable.getChannelList(res.data)
         }
       });
     },

@@ -2,7 +2,11 @@
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams" />
     <!-- 地域分析 -->
-    <regionalView ref="regionalView"></regionalView>
+    <div class="Overview">
+      <div class="trafficHead" style="padding-left: 15px">地域分析</div>
+      <!-- <regionalView ref="regionalView"></regionalView> -->
+      <originView ref="originView" byAreaAnaly></originView>
+    </div>
     <regionalShow ref="regionalShow"></regionalShow>
     <regionalTable
       ref="regionalTable"
@@ -17,8 +21,9 @@ import { FilterBar } from "@/layout/components";
 import regionalShow from "./chart-component/regional-analysis-show";
 import regionalTable from "./chart-component/regional-analysis-table";
 import regionalView from "./chart-component/regional-view";
+import originView from "@/components/origin-view/index";
 import {
-  getAreaDetailApi,
+  getAreaDetailTotalApi,
   getAreaApi,
   getAreaDetailTop10Api,
 } from "@/api/trackingapi/area.js";
@@ -29,6 +34,7 @@ export default {
     regionalView,
     regionalShow,
     regionalTable,
+    originView,
   },
   data() {
     return {
@@ -37,30 +43,29 @@ export default {
       pageSize: 10,
     };
   },
-  mounted() {
-    // this.init()
-  },
   computed: {
     project() {
       return this.$store.getters.project;
     },
     commonParams() {
-      const { project, pageNum, pageSize } = this;
+      const { project } = this;
       return Object.assign({ project }, this.filterBarParams);
     },
   },
   watch: {
     commonParams(val) {
-      this.getAreaDetail(val);
+      this.getAreaDetailTotal(val);
       this.getAreaProvinceList();
       this.getAreaDetailTop10();
     },
   },
+  mounted() {},
   methods: {
-    getAreaDetail(val) {
-      getAreaDetailApi(val).then((res) => {
+    getAreaDetailTotal(val) {
+      getAreaDetailTotalApi(val).then((res) => {
         if (res.code == 200) {
-          this.$refs.regionalView.getDetailView(res.data);
+          // this.$refs.regionalView.getDetailView(res.data);
+          this.$refs.originView.originEvent(res.data);
         }
       });
     },
@@ -83,7 +88,7 @@ export default {
         }
       });
     },
-  
+
     setFilterBarParams(val) {
       this.filterBarParams = copyObj(val);
     },
@@ -94,4 +99,23 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.Overview {
+  margin: 20px;
+  min-height: 118px;
+  background-color: #fafafb;
+  img {
+    width: 11.44px;
+    height: 11.44px;
+    margin-left: 12px;
+    cursor: pointer;
+  }
+  .trafficHead {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 14px;
+    color: #4d4d4d;
+    padding: 15px 30px 15px;
+    padding-left: 0;
+  }
+}</style>
