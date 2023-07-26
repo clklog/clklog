@@ -61,6 +61,7 @@
             <router-link to="/behaviorAnalysis/user-behavior-analysis">
               <el-dropdown-item>行为分析</el-dropdown-item>
             </router-link>
+              <el-dropdown-item>v1.2.0</el-dropdown-item>
             <!-- <a
               target="_blank"
               href="https://github.com/PanJiaChen/vue-element-admin/"

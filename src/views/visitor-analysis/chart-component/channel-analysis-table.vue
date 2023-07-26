@@ -176,7 +176,7 @@ export default {
       pv: false,
       visitCount: false,
       newUv: false,
-      newUvRate:false,
+      newUvRate: false,
       uv: false,
       ipCount: false,
       avgPv: false,
