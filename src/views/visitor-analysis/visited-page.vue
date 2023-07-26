@@ -7,12 +7,12 @@
         <originView ref="originView" byVisitedPage></originView>
       </div>
     </div>
-    <visitedAnalysis ref="visitedAnalysis"></visitedAnalysis>
+    <visitedAnalysis @currentPage="currentPage" ref="visitedAnalysis"></visitedAnalysis>
   </div>
 </template>
 
 <script>
-import { getVisitUriDetailApi } from "@/api/trackingapi/visituri";
+import { getVisitUriDetailApi,getVisitUriTotalApi } from "@/api/trackingapi/visituri";
 import { FilterBar } from "@/layout/components";
 import originView from "@/components/origin-view";
 import visitedAnalysis from "./chart-component/visited-page-analysis";
@@ -22,12 +22,14 @@ export default {
   components: {
     FilterBar,
     visitedAnalysis,
-    originView
+    originView,
   },
   data() {
     return {
       filterBarParams: {},
       originData: null,
+      pageNum: 1,
+      pageSize: 10,
     };
   },
   computed: {
@@ -42,19 +44,38 @@ export default {
   watch: {
     commonParams() {
       this.getVisitUriDetail();
+      this.getVisitUriTotal()
     },
   },
   methods: {
-    getVisitUriDetail() {
-      getVisitUriDetailApi(this.commonParams).then((res) => {
+    getVisitUriDetail(val) {
+      let newvalue = copyObj(this.commonParams);
+      if (val) {
+        newvalue.pageNum = val.page;
+        newvalue.pageSize = val.size;
+      } else {
+        newvalue.pageNum = this.pageNum;
+        newvalue.pageSize = this.pageSize;
+      }
+      getVisitUriDetailApi(newvalue).then((res) => {
         if (res.code == 200) {
-          this.$refs.originView.originEvent(res.data.total)
-          this.$refs.visitedAnalysis.vistedAnalysis(res.data)
+          // this.$refs.originView.originEvent(res.data.total);
+          this.$refs.visitedAnalysis.vistedAnalysis(res.data);
+        }
+      });
+    },
+    getVisitUriTotal(){
+      getVisitUriTotalApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+          this.$refs.originView.originEvent(res.data);
         }
       });
     },
     setFilterBarParams(val) {
       this.filterBarParams = copyObj(val);
+    },
+    currentPage(val) {
+      this.getVisitUriDetail(val);
     },
   },
 };
@@ -99,7 +120,6 @@ export default {
     //     color: #4d4d4d;
     //   }
     // }
-    
   }
 }
 </style>

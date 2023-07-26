@@ -30,22 +30,16 @@
         </el-checkbox-group>
       </div>
     </div>
-    <!-- <flowPoint  ref="flowPoint" @flowPoint="flowPoint"></flowPoint> -->
     <div class="table-content">
       <el-table
-        :data="
-          vistedTableData.slice(
-            (currentPage - 1) * pageSize,
-            currentPage * pageSize
-          )
-        "
+        :data="vistedTableData"
         border
         style="width: 100%"
         :header-cell-style="{ textAlign: 'center' }"
         :cell-style="{ textAlign: 'center' }"
       >
         <el-table-column type="index" label="序号" width="150" />
-        <el-table-column prop="uri" label="页面URL" :show-overflow-tooltip="true" width="300" />
+        <el-table-column prop="uri" label="页面URL" :show-overflow-tooltip="true" width="350" />
         <el-table-column label="流量基础指标">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
           <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
@@ -115,6 +109,10 @@ export default {
     return {
       channelList: ["uv","ipCount","pv"],
       flowQuality: ["entryRate","avgDuration"],
+      current: {
+        size: 10,
+        page: 1,
+      },
       mergedArr: [],
       uri: false,
       uv: false,
@@ -133,17 +131,25 @@ export default {
   },
   methods: {
     vistedAnalysis(val) {
-      this.vistedTableData = val.detail;
-      this.total = val.detail.length;
+      // this.vistedTableData = val.detail;
+      // this.total = val.detail.length;
+      
+      this.vistedTableData = val.rows;
+      this.total = val.total;
+
       this.initShowTable()
     },
     // 分页器
     handleSizeChange(val) {
-      this.currentPage = 1;
-      this.pageSize = val;
+      // this.currentPage = 1;
+      // this.pageSize = val;
+      this.current.size = val;
+      this.$emit("currentPage", this.current);
     },
     handleCurrentChange(val) {
-      this.currentPage = val;
+      // this.currentPage = val;
+      this.current.page = val;
+      this.$emit("currentPage", this.current);
     },
     handelChannelList() {
       this.initShowTable();
@@ -206,6 +212,7 @@ export default {
         }
       }
     },
+   
   },
 };
 </script>

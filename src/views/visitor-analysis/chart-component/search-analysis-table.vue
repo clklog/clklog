@@ -13,11 +13,11 @@
           >
             <!-- <el-table-column prop="statTime" label="日期" sortable width="180">
             </el-table-column> -->
-            <el-table-column prop="word" label="搜索词" sortable width="180">
+            <el-table-column prop="searchword" :show-overflow-tooltip="true" label="搜索词" sortable width="250">
             </el-table-column>
             <el-table-column prop="pv" label="浏览量(PV)" sortable>
             </el-table-column>
-            <el-table-column prop="percent" label="占比" sortable>
+            <el-table-column prop="pvRate" label="占比" sortable>
             </el-table-column>
             <el-table-column prop="avgVisitTime" label="平均访问时长" sortable>
             </el-table-column>
@@ -74,8 +74,8 @@ export default {
         if (item.bounceRate) {
           item.bounceRate = this.percentageFun(item.bounceRate);
         }
-        if (item.percent) {
-          item.percent = this.percentageFun(item.percent);
+        if (item.pvRate) {
+          item.pvRate = this.percentageFun(item.pvRate);
         }
       });
       this.total = val.total;

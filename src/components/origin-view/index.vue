@@ -597,7 +597,7 @@
               </p>
             </div>
             <div class="bid-list-item w158">
-              <p>{{ (originData && originData.devoteCount) || "--" }}</p>
+              <p>{{ (originData && originData.downPvCount) || "--" }}</p>
             </div>
             <div class="bid-list-item w158">
               <p>
@@ -607,12 +607,12 @@
               </p>
             </div>
             <div class="bid-list-item w158">
-              <p>{{ (originData && originData.avgDuration) || "--" }}</p>
+              <p>{{ (originData && originData.avgVisitTime) || "--" }}</p>
             </div>
            
             <div class="bid-list-item w158">
               <p>
-                <p v-if="originData && originData.exitRate">{{ percentageFun(originData.exitRate) }}</p>
+                <p v-if="originData && originData.bounceRate">{{ percentageFun(originData.bounceRate) }}</p>
                 <p v-else>--</p>
               </p>
             </div>

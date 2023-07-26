@@ -60,7 +60,7 @@ export default {
   data() {
     return {
       flowTableList: [],
-      channelList: ["pv", "visitCount", "newUvRate", "pvRate"],
+      channelList: ["pv", "uv","ipCount"],
       flowQuality: ["avgPv"],
       pv: false,
       visitCount: false,

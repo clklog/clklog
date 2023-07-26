@@ -33,7 +33,7 @@
               <p>{{ item.visitTime || "--" }}</p>
             </div>
             <div class="bid-list-item w111">
-              <p>{{ percentageFun(item.bounceRate)  || "--" }}</p>
+              <p>{{ percentageFun(item.bounceRate) || "--" }}</p>
             </div>
           </div>
         </div>
@@ -45,22 +45,102 @@
 
       <div class="table-content">
         <el-table
-          :data="tableData"
+          :data="
+            channelTableData.slice(
+              (currentPage - 1) * pageSize,
+              currentPage * pageSize
+            )
+          "
           :header-cell-style="{ textAlign: 'center' }"
           :cell-style="{ textAlign: 'center' }"
           border
           style="width: 100%"
         >
           <el-table-column type="index" label="序号" width="150" />
-          <el-table-column prop="dataTime" label="渠道类型" width="150" />
+          <el-table-column prop="channel" label="渠道类型" width="150" />
           <el-table-column prop="date" label="流量基础指标" width="150">
-            <el-table-column prop="amount1" label="浏览量(PV)" sortable />
-            <el-table-column prop="amount5" label="访客数(UV)" sortable />
-            <el-table-column prop="amount7" label="IP数" sortable />
+            <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
+            <el-table-column
+              v-if="pvRate"
+              prop="pvRate"
+              label="浏览量占比"
+              sortable
+            />
+            <el-table-column
+              v-if="visitCount"
+              prop="visitCount"
+              label="访问次数"
+              sortable
+            />
+            <el-table-column
+              v-if="visitCountRate"
+              prop="visitCountRate"
+              label="访问次数占比"
+              sortable
+            />
+            <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+            <el-table-column
+              v-if="uvRate"
+              prop="uvRate"
+              label="访客数占比"
+              sortable
+            />
+            <el-table-column
+              v-if="newUv"
+              prop="newUv"
+              label="新访客数"
+              sortable
+            />
+            <el-table-column
+              v-if="newUvRate"
+              prop="newUvRate"
+              label="访客数占比"
+              sortable
+            />
+            <el-table-column
+              v-if="ipCount"
+              prop="ipCount"
+              label="IP数"
+              sortable
+            />
+            <el-table-column
+              v-if="ipCountRate"
+              prop="ipCountRate"
+              label="IP数占比"
+              sortable
+            />
           </el-table-column>
           <el-table-column prop="date" label="流量质量指标" width="150">
-            <el-table-column prop="amount8" label="跳出率" sortable />
-            <el-table-column prop="amount9" label="平均访问时长" sortable />
+            <el-table-column
+              v-if="bounceRate"
+              prop="bounceRate"
+              label="跳出率"
+              sortable
+            />
+            <el-table-column
+              prop="avgVisitTime"
+              label="平均访问时长"
+              sortable
+              v-if="avgVisitTime"
+            />
+            <el-table-column
+              v-if="avgVisitTimeRate"
+              prop="avgVisitTimeRate"
+              label="平均访问时长占比"
+              sortable
+            />
+            <el-table-column
+              v-if="avgPv"
+              prop="avgPv"
+              label="平均访问页数"
+              sortable
+            />
+            <el-table-column
+              v-if="avgPvRate"
+              prop="avgPvRate"
+              label="平均访问页数占比"
+              sortable
+            />
             <!-- <el-table-column prop="amount10" label="平均访问页数" sortable /> -->
           </el-table-column>
         </el-table>
@@ -69,9 +149,9 @@
         <el-pagination
           :current-page="currentPage"
           :page-sizes="[10, 20, 30, 40]"
-          :page-size="10"
+          :page-size="pageSize"
           layout=" sizes, prev, pager, next, jumper"
-          :total="40"
+          :total="total"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
@@ -88,112 +168,15 @@ export default {
   components: { originView, flowPoint },
   data() {
     return {
-      channelList: ["3", "5"],
-      flowQuality: ["9"],
-      tableData1: [
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-08",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 2003233,
-        },
-        {
-          date: "2016-05-06",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-07",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-      ],
-      tableData: [
-        {
-          dataTime: "总计",
-          amount1: "14",
-          amount2: "3.2",
-          amount3: 10,
-          amount4: "234",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 69,
-        },
-        {
-          dataTime: "新访客",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount4: "24",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 6,
-        },
-        {
-          dataTime: "老访客",
-          amount1: "165",
-          amount2: "4.43",
-          amount3: 12,
-          amount4: "34",
-          amount5: "3.2",
-          amount6: 10,
-          amount7: "234",
-          amount8: "3.2",
-          amount9: "100%",
-          amount10: 9,
-        },
-      ],
       currentPage: 1,
       channelTableData: [],
+      channelList: ["pv", "visitCount"],
+      flowQuality: ["bounceRate"],
+      equipmentList: [],
       pv: false,
       visitCount: false,
       newUv: false,
+      newUvRate:false,
       uv: false,
       ipCount: false,
       avgPv: false,
@@ -201,6 +184,17 @@ export default {
       bounceRate: false,
       pvRate: false,
       newUvRate: false,
+      avgVisitTimeRate: false,
+      avgPvRate: false,
+      // pvRate visitCount visitCountRate uvRate ipCountRate
+      pvRate: false,
+      visitCount: false,
+      visitCountRate: false,
+      uvRate: false,
+      ipCountRate: false,
+      currentPage: 1,
+      total: 0,
+      pageSize: 10,
     };
   },
   methods: {
@@ -216,8 +210,11 @@ export default {
     },
     // 分页器
     handleSizeChange(val) {
+      this.currentPage = 1;
+      this.pageSize = val;
     },
     handleCurrentChange(val) {
+      this.currentPage = val;
     },
     flowPoint(val) {
       if (val.length > 0) {
@@ -235,6 +232,11 @@ export default {
           this.newUv = true;
         } else {
           this.newUv = false;
+        }
+        if (val.includes("newUvRate")) {
+          this.newUvRate = true;
+        } else {
+          this.newUvRate = false;
         }
         if (val.includes("uv")) {
           this.uv = true;
@@ -270,6 +272,43 @@ export default {
           this.newUvRate = true;
         } else {
           this.newUvRate = false;
+        }
+
+        if (val.includes("pvRate")) {
+          this.pvRate = true;
+        } else {
+          this.pvRate = false;
+        }
+
+        if (val.includes("visitCount")) {
+          this.visitCount = true;
+        } else {
+          this.visitCount = false;
+        }
+        if (val.includes("visitCountRate")) {
+          this.visitCountRate = true;
+        } else {
+          this.visitCountRate = false;
+        }
+        if (val.includes("uvRate")) {
+          this.uvRate = true;
+        } else {
+          this.uvRate = false;
+        }
+        if (val.includes("ipCountRate")) {
+          this.ipCountRate = true;
+        } else {
+          this.ipCountRate = false;
+        }
+        if (val.includes("avgVisitTimeRate")) {
+          this.avgVisitTimeRate = true;
+        } else {
+          this.avgVisitTimeRate = false;
+        }
+        if (val.includes("avgPvRate")) {
+          this.avgPvRate = true;
+        } else {
+          this.avgPvRate = false;
         }
       }
     },
