@@ -145,6 +145,10 @@ export default {
       const { time, pv, uv, visitCount, ipCount, bounceRate } = this;
       this.flowTrendList.map((item) => {
         if (item.statTime) {
+          item.statTime = item.statTime.replace(/2023-/g, "");
+          if (item.statTime.length <= 2) {
+            item.statTime = item.statTime + "时"
+          }
           return time.push(item.statTime);
         } else {
           time.push(0);

@@ -74,6 +74,9 @@ export default {
       this.flowTrendList.map((item) => {
         if (item.statTime) {
           item.statTime = item.statTime.replace(/2023-/g, "");
+          if (item.statTime.length <= 2) {
+            item.statTime = item.statTime + "时"
+          }
           return statTime.push(item.statTime);
         } else {
           statTime.push(0);
