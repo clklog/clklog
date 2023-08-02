@@ -147,6 +147,7 @@
   margin-left: 210px;
   position: relative;
   top: 50px;
+  background: rgba(170, 170, 170, 0.12) !important;
 }
 
 #app .sidebar-container {
@@ -490,6 +491,10 @@
   margin-bottom: 0px !important;
 }
 
+.table-content {
+  margin: 12px;
+}
+
 .el-table thead {
   font-size: 13px !important;
   font-weight: 400;
@@ -509,6 +514,34 @@
 
 .el-table .sort-caret.ascending {
   top: -3px;
+}
+
+.public-block {
+  margin: 20px;
+  box-sizing: border-box;
+}
+
+.public-table-block {
+  box-sizing: border-box;
+  margin: 20px 0;
+  padding-top: 1px;
+  min-height: 461px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.public-echart-block {
+  margin: 20px 0;
+  width: calc(100% -20px);
+  min-height: 300px;
+}
+
+.public-firstHead {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 31px;
+  color: #4d4d4d;
+  padding: 14px 13px 18px 13px;
 }
 
 body {
@@ -701,8 +734,9 @@ aside a:hover {
 }
 
 .block-main {
-  padding: 18px 12px;
-  background-color: #fafafb;
+  box-sizing: border-box;
+  padding: 25px 25px;
+  background-color: #fff;
 }
 
 .block-main .block-head {
@@ -713,8 +747,8 @@ aside a:hover {
 }
 
 .block-main .block-head .block-title {
-  font-weight: 400;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 15px;
   line-height: 33px;
   color: #4d4d4d;
 }
@@ -799,7 +833,7 @@ aside a:hover {
 
 .flow-indicator {
   min-height: 58px;
-  background: rgba(252, 252, 252, 0.39);
+  background: #fff;
   border: 1px solid #f0f0f5;
   border-radius: 6px;
   box-sizing: border-box;

@@ -2,7 +2,7 @@
   <div>
     <FilterBar ByArea @setFilterBarParams="setFilterBarParams"></FilterBar>
     <div class="Overview">
-      <div class="trafficHead" style="padding-left: 15px">受访页面分析</div>
+      <div class="public-firstHead" style="padding-left: 15px">受访页面分析</div>
       <div class="bid-list-page">
         <originView ref="originView" byVisitedPage></originView>
       </div>
@@ -53,6 +53,8 @@ export default {
       if (val) {
         newvalue.pageNum = val.page;
         newvalue.pageSize = val.size;
+        this.pageNum = val.page;
+        this.pageSize = val.size;
       } else {
         newvalue.pageNum = this.pageNum;
         newvalue.pageSize = this.pageSize;
@@ -85,7 +87,7 @@ export default {
 .Overview {
   margin: 20px;
   min-height: 118px;
-  background-color: #fafafb;
+  background-color: #fff;
   img {
     width: 11.44px;
     height: 11.44px;
@@ -93,9 +95,9 @@ export default {
     cursor: pointer;
   }
   .trafficHead {
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 16px;
     color: #4d4d4d;
     padding: 15px 30px 15px;
     padding-left: 0;

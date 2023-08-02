@@ -38,18 +38,13 @@ export default {
       const visitPageData = {
         xAxis: {
           data: this.xData,
+          axisTick: {
+            show: false,
+            alignWithLabel: true,
+          },
         },
 
         dataZoom: [
-          // {
-          //   type: "slider",
-          //   show: true,
-          //   // start: 1,
-          //   // end: 3,     // 改变柱子之间的间隔
-          //   startValue: 0,
-          //   endValue: 5,
-          //   handleSize: 5,
-          // },
           {
             type: "inside",
             startValue: 0,

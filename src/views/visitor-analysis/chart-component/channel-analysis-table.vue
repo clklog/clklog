@@ -3,7 +3,7 @@
     <div class="documentation-container">
       <!-- 流量概览 -->
       <div class="Overview">
-        <div class="trafficHead" style="padding-left: 15px">渠道分析</div>
+        <div class="public-firstHead">渠道分析</div>
         <div class="bid-list-page">
           <originView ref="originView" byFlowView></originView>
           <div
@@ -14,25 +14,46 @@
             <div class="bid-list-item w157">
               <p>{{ item.channel || "--" }}</p>
             </div>
-            <div class="bid-list-item w111">
+            <div
+              class="bid-list-item w111"
+              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+            >
               <p>{{ item.pv || "--" }}</p>
             </div>
-            <div class="bid-list-item w111">
+            <div
+              class="bid-list-item w111"
+              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+            >
               <p>{{ item.visitCount || "--" }}</p>
             </div>
-            <div class="bid-list-item w111">
+            <div
+              class="bid-list-item w111"
+              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+            >
               <p>{{ item.uv || "--" }}</p>
             </div>
-            <div class="bid-list-item w111">
+            <div
+              class="bid-list-item w111"
+              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+            >
               <p>{{ item.ipCount || "--" }}</p>
             </div>
-            <div class="bid-list-item w111">
+            <div
+              class="bid-list-item w111"
+              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+            >
               <p>{{ item.avgPv || "--" }}</p>
             </div>
-            <div class="bid-list-item w111">
+            <div
+              class="bid-list-item w111"
+              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+            >
               <p>{{ item.visitTime || "--" }}</p>
             </div>
-            <div class="bid-list-item w111">
+            <div
+              class="bid-list-item w111"
+              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+            >
               <p>{{ percentageFun(item.bounceRate) || "--" }}</p>
             </div>
           </div>
@@ -94,7 +115,7 @@
             <el-table-column
               v-if="newUvRate"
               prop="newUvRate"
-              label="访客数占比"
+              label="新访客数占比"
               sortable
             />
             <el-table-column
@@ -124,8 +145,8 @@
               v-if="avgVisitTime"
             />
             <el-table-column
-              v-if="avgVisitTimeRate"
-              prop="avgVisitTimeRate"
+              v-if="visitTimeRate"
+              prop="visitTimeRate"
               label="平均访问时长占比"
               sortable
             />
@@ -164,6 +185,7 @@
 import originView from "@/components/origin-view/index";
 import flowPoint from "@/components/flowPoint/index";
 import { percentage } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 export default {
   components: { originView, flowPoint },
   data() {
@@ -184,7 +206,7 @@ export default {
       bounceRate: false,
       pvRate: false,
       newUvRate: false,
-      avgVisitTimeRate: false,
+      visitTimeRate: false,
       avgPvRate: false,
       // pvRate visitCount visitCountRate uvRate ipCountRate
       pvRate: false,
@@ -206,6 +228,36 @@ export default {
           return 1;
         }
         return 0;
+      });
+      this.channelTableData.map((item) => {
+        if (item.bounceRate) {
+          item.bounceRate =percentage(item.bounceRate);
+        }
+        if (item.uvRate) {
+          item.uvRate =percentage(item.uvRate);
+        }
+        if (item.newUvRate) {
+          item.newUvRate =percentage(item.newUvRate);
+        }
+        if (item.visitCountRate) {
+          item.visitCountRate =percentage(item.visitCountRate);
+        }
+        if (item.ipCountRate) {
+          item.ipCountRate =percentage(item.ipCountRate);
+        }
+        
+        if (item.pvRate) {
+          item.pvRate =percentage(item.pvRate);
+        }
+        if (item.avgVisitTime) {
+          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
+        }
+        if (item.visitTimeRate) {
+          item.visitTimeRate = percentage(item.visitTimeRate);
+        }
+        if (item.avgPv) {
+          item.avgPv = Math.floor(item.avgPv);
+        }
       });
     },
     // 分页器
@@ -300,10 +352,10 @@ export default {
         } else {
           this.ipCountRate = false;
         }
-        if (val.includes("avgVisitTimeRate")) {
-          this.avgVisitTimeRate = true;
+        if (val.includes("visitTimeRate")) {
+          this.visitTimeRate = true;
         } else {
-          this.avgVisitTimeRate = false;
+          this.visitTimeRate = false;
         }
         if (val.includes("avgPvRate")) {
           this.avgPvRate = true;
@@ -322,8 +374,8 @@ export default {
 @import "~@/styles/components/el-pagination.scss";
 @import "~@/styles/components/el-checkbox.scss";
 .trafficHead {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: #4d4d4d;
   padding: 20px 30px 20px;
 }
@@ -336,7 +388,7 @@ img {
 .Overview {
   margin: 20px;
   min-height: 200px;
-  background-color: #fafafb;
+  background-color: #fff;
   .bid-list-page {
     width: clas(100% -20px);
     display: flex;
@@ -389,7 +441,7 @@ img {
   margin: 20px;
   padding-top: 1px;
   min-height: 461px;
-  background: rgba(250, 250, 251);
+  background: #fff;
   //   background: rgba(158, 158, 161, 0.39);
   border-radius: 6px;
 

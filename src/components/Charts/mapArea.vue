@@ -11,6 +11,7 @@
 <script>
 import { validLowerCase } from "@/utils/validate";
 import chinamap from "echarts/map/json/china.json";
+import { percentage } from "@/utils/percent";
 export default {
   data() {
     return {
@@ -61,26 +62,38 @@ export default {
   },
   methods: {
     getMapChartsData(val) {
-      let result = val.reduce((resp, obj) => {
-        var originObj = resp.find((item) => item.province === obj.province);
-        if (originObj) {
-          originObj.pv += obj.pv;
-        } else {
-          resp.push(obj);
-        }
-        return resp;
-      }, []);
+      // let result = val.reduce((resp, obj) => {
+      //   var originObj = resp.find((item) => item.province === obj.province);
+      //   if (originObj) {
+      //     originObj.pv += obj.pv;
+      //   } else {
+      //     resp.push(obj);
+      //   }
+      //   return resp;
+      // }, []);
       // 加载接口数据清除
       this.provinceList.map((item) => {
         item.value = 0;
       });
       let maxValue = [];
+      let result = val;
       // 地图数据匹配
       for (let i = 0; i < this.provinceList.length; i++) {
+        this.provinceList[i].visitCountRate = 0;
+        this.provinceList[i].uv = 0;
+        this.provinceList[i].uvRate = 0;
         for (let j = 0; j < result.length; j++) {
+          // if (this.provinceList[i].name == result[j].province) {
+          //   this.provinceList[i].value = result[j].pv;
+          //   // this.provinceList[i]. = result[j].pv;
+          //   maxValue.push(result[j].pv);
+          // }
           if (this.provinceList[i].name == result[j].province) {
-            this.provinceList[i].value = result[j].pv;
-            maxValue.push(result[j].pv);
+            this.provinceList[i].value = result[j].visitCount;
+            this.provinceList[i].visitCountRate = percentage(result[j].visitCountRate) ;
+            this.provinceList[i].uv = result[j].uv;
+            this.provinceList[i].uvRate = percentage(result[j].uvRate) ;
+            maxValue.push(result[j].visitCount);
           }
         }
       }
@@ -117,10 +130,38 @@ export default {
           aspectScale: 0.75,
           zoom: 1.1,
         },
-
+        // tooltip: {
+        //   formatter: "{b}:{c}",
+        // },
         tooltip: {
-          formatter: "{b}:{c}",
+          formatter(params, ticket, callback) {
+            // params.data 就是series配置项中的data数据遍历
+            let visitCountRate, uv, uvRate;
+            if (params.data) {
+              visitCountRate = params.data.visitCountRate;
+              uv = params.data.uv;
+              uvRate = params.data.uvRate;
+            } else {
+              visitCountRate = 0;
+              uv = 0;
+              uvRate = 0;
+            }
+            let htmlStr = `
+              <div style="padding:10px;">
+                <div style='font-size:14px;'> ${params.name}</div>
+                <p style='text-align:left;margin-top:10px;'>
+                  访问次数：${params.value}(占比：${visitCountRate})<br/>
+                  访客数：${uv}(占比：${uvRate})<br/>
+                </p>
+              </div>
+               
+              `;
+            return htmlStr;
+          },
+          // backgroundColor:"#ff7f50",//提示标签背景颜色
+          // textStyle:{color:"#fff"} //提示标签字体颜色
         },
+
         // 省会的位置标注
         // legend: {
         //   orient: 'vertical',
@@ -173,44 +214,6 @@ export default {
       window.addEventListener("resize", () => {
         this.myChart.resize();
       });
-      //   var option = {
-      //     geo: {
-      //       show:true,
-      //       type: "map",
-      //       map: "china",
-      //       label: {
-      //         // label 设置文本标签的显示格式，去掉不影响显示地图
-      //         normal: {
-      //           color: "red",
-      //           show: true, //显示省份名称
-      //         },
-      //       },
-      //     },
-      //     visualMap: {
-      //       min: 0,
-      //       max: 1500,
-      //       left: '10%',
-      //       top: 'bottom',
-      //       text: ['高','低'],
-      //       calculable : true,
-      //       color:['#0b50b9','#FFFFFF']
-      //     },
-      //     series: [
-      //       {
-      //         name: "在地图中显示散点图",
-      //         type: "scatter",
-      //         coordinateSystem: "geo", //设置坐标系为 geo
-      //         data: [
-      //           //这里放标注点的坐标[{name: "北京",value: [116.46, 39.92]}]
-      //           { name: "北京", value: [116.41995, 40.18994] },
-      //           { name: "郑州", value: [113.665412, 34.757975] },
-      //           { name: "天津", value: [117.205126, 39.034933] },
-      //           { name: "昆明", value: [102.81844, 24.906231] },
-      //           { name: "广州", value: [113.26453, 23.155008] },
-      //         ],
-      //       },
-      //     ],
-      //   };
     },
   },
 };

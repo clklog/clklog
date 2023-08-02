@@ -2,7 +2,7 @@
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams" ByArea></FilterBar>
      <div class="Overview">
-      <div class="trafficHead" style="padding-left: 15px">来源网站分析</div>
+      <div class="public-firstHead" >来源网站分析</div>
       <originView ref="originView" byAreaAnaly></originView>
     </div>
     <sourceWebChart ref="sourceWebChart"></sourceWebChart>
@@ -60,6 +60,8 @@ export default {
       if (val) {
         newvalue.pageNum = val.page;
         newvalue.pageSize = val.size;
+        this.pageNum = val.page;
+        this.pageSize = val.size;
       } else {
         newvalue.pageNum = this.pageNum;
         newvalue.pageSize = this.pageSize;
@@ -86,7 +88,7 @@ export default {
 .Overview {
   margin: 20px;
   min-height: 118px;
-  background-color: #fafafb;
+  background-color: #fff;
   img {
     width: 11.44px;
     height: 11.44px;

@@ -1,7 +1,13 @@
 <template>
-  <div class="LocalDistribution block-main">
+  <div class="documentation-container block-main ">
     <div class="block-head">
       <div class="block-title">地域分布</div>
+      <div
+        class="block-head-icon"
+        @click="$router.push('/visitorAnalysis/regionalAnalysis')"
+      >
+        <img src="@/assets/images/icon.png" alt="" width="10px" />
+      </div>
     </div>
     <mapArea ref="mapArea" id="charts3" style="height: 100%" width="100%" />
   </div>
@@ -18,7 +24,7 @@ export default {
   components: { mapArea },
   data() {
     return {
-      getAreaList:null,
+      getAreaList: null,
     };
   },
   computed: {
@@ -31,12 +37,9 @@ export default {
     getArea() {
       getAreaApi(this.params).then((res) => {
         this.getAreaList = res.data;
-        this.$refs.mapArea.getMapChartsData(res.data)
+        this.$refs.mapArea.getMapChartsData(res.data);
       });
     },
   },
 };
 </script>
-
-<style lang="scss" scoped>
-</style>

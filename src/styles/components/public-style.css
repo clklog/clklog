@@ -1,0 +1,27 @@
+.public-block {
+  margin: 20px;
+  box-sizing: border-box;
+}
+
+.public-table-block {
+  box-sizing: border-box;
+  margin: 20px 0;
+  padding-top: 1px;
+  min-height: 461px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.public-echart-block {
+  margin: 20px 0;
+  width: calc(100% -20px);
+  min-height: 300px;
+}
+
+.public-firstHead {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 31px;
+  color: #4d4d4d;
+  padding: 14px 13px 0px 13px;
+}

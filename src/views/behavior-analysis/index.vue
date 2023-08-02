@@ -67,7 +67,7 @@ export default {
 .Overview {
   margin: 20px;
   min-height: 118px;
-  background-color: #fafafb;
+  background-color: #fff;
   img {
     width: 11.44px;
     height: 11.44px;

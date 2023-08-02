@@ -38,6 +38,10 @@ export default {
       const mulColumnZZTData = {
         xAxis: {
           data: this.xData,
+          axisTick: {
+            show: false,
+            alignWithLabel: true,
+          },
         },
        
         dataZoom: [

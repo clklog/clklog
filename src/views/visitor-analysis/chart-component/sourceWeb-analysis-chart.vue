@@ -76,8 +76,6 @@ export default {
         },
       ],
       xData: [], //website
-      yData: [23, 24, 18, 25, 27], //人数数据
-      taskDate: [10, 11, 9, 17, 14],
       myChartStyle: { float: "left", width: "100%", height: "400px" },
       pv: [],
       uv: [],
@@ -86,8 +84,9 @@ export default {
       bounceRate: [],
       time: [],
       headLege: [],
-      pointValue: ["浏览量", "访问次数"],
+      pointValue: ["浏览量", "访客数"],
       disabledSelect: [],
+      seriesdata:[],
     };
   },
   mounted() {},
@@ -203,21 +202,122 @@ export default {
       } else {
         this.bounceRate = [];
       }
-      this.initEcharts();
+
+      let seriesdata = [
+        {
+          type: "bar",
+          data: this.pv,
+          barWidth: 20,
+          barGap: "100%", //柱图间距
+          name: "浏览量",
+          // name: this.pv.length > 0 ? "浏览量（PV）" : "",
+          label: {
+            show: true,
+            position: "top",
+          },
+          itemStyle: {
+            color: "#051e71",
+          },
+        },
+        {
+          type: "bar",
+          data: this.uv,
+          barWidth: 20,
+          name: "访客数",
+          label: {
+            show: true,
+            position: "top",
+          },
+          itemStyle: {
+            color: "#007EE9",
+          },
+        },
+        {
+          type: "bar",
+          data: this.visitCount,
+          barWidth: 20,
+          name: "访问次数",
+          // name: this.visitCount.length > 0 ? "访问次数" : "",
+          label: {
+            show: true,
+            position: "top",
+          },
+          itemStyle: {
+            color: "#3d64e6",
+          },
+        },
+        {
+          type: "bar",
+          data: this.ipCount,
+          barWidth: 20,
+          name: "IP数",
+          label: {
+            show: true,
+            position: "top",
+          },
+          itemStyle: {
+            color: "blue",
+          },
+        },
+        {
+          type: "bar",
+          data: this.bounceRate,
+          barWidth: 20,
+          name: "跳出率",
+          label: {
+            show: true,
+            position: "top",
+          },
+          itemStyle: {
+            color: "#17DDFF",
+          },
+        },
+      ];
+      for (let i = 0; i < seriesdata.length; i++) {
+        if (!this.pointValue.includes(seriesdata[i].name)) {
+          seriesdata.splice(i--, 1);
+        }
+      }
+      this.initEcharts(seriesdata);
     },
-    initEcharts() {
-      // 多列柱状图
-      const sourceChart = {
+    initEcharts(val) {
+       const sourceChart = {
+        tooltip: {
+          trigger: "axis",
+          showContent: true,
+          formatter: function (params) {
+            var res = "<div><p>" + params[0].name + "</p></div>";
+            for (var i = 0; i < params.length; i++) {
+              res +=
+                "<p>" + params[i].seriesName + ":" + params[i].value + "</p>";
+            }
+            return res;
+          },
+        },
         xAxis: {
+          type: "category",
+          boundaryGap: true,
           data: this.xData,
           axisLabel: {
             interval: 0, //强制文字产生间隔
-            rotate: "25", //旋转角度
+            rotate: "30", //旋转角度
+          },
+          axisLine: {
+            onZero: false,
+            // lineStyle: {
+            //   color: "#D9D9D9",
+            // },
+          },
+          axisTick: {
+            show: false,
+            alignWithLabel: true,
           },
         },
-        // 图例
+        grid: {
+          // left: "30%",
+          bottom: "22%",
+        },
         legend: {
-          // data: ["浏览量","访客数", "访问次数","IP数","跳出率"],
           data: this.pointValue,
           top: "0%",
         },
@@ -234,88 +334,20 @@ export default {
           {
             type: "inside",
             startValue: 0,
-            endValue: 5,
-            minValueSpan: 10,
+            endValue: 4,
+            // minValueSpan: 10,
             zoomOnMouseWheel: false, // 关闭滚轮缩放
             moveOnMouseWheel: true, // 开启滚轮平移
             moveOnMouseMove: true, // 鼠标移动能触发数据窗口平移
           },
         ],
-        yAxis: {},
-        series: [
-          {
-            type: "bar",
-            data: this.pv,
-            barWidth: 20,
-            barGap: "100%", //柱图间距
-            name: "浏览量",
-            // name: this.pv.length > 0 ? "浏览量（PV）" : "",
-            label: {
-              show: true,
-              position: "top",
-            },
-            itemStyle: {
-              color: "#051e71",
-            },
-          },
-          {
-            type: "bar",
-            data: this.uv,
-            barWidth: 20,
-            name: "访客数",
-            // name: this.uv.length > 0 ? "访客数" : "",
-            label: {
-              show: true,
-              position: "top",
-            },
-            itemStyle: {
-              color: "#007EE9",
-            },
-          },
-          {
-            type: "bar",
-            data: this.visitCount,
-            barWidth: 20,
-            name: "访问次数",
-            // name: this.visitCount.length > 0 ? "访问次数" : "",
-            label: {
-              show: true,
-              position: "top",
-            },
-            itemStyle: {
-              color: "#3d64e6",
-            },
-          },
-          {
-            type: "bar",
-            data: this.ipCount,
-            barWidth: 20,
-            name: "IP数",
-            label: {
-              show: true,
-              position: "top",
-            },
-            itemStyle: {
-              color: "#00338C",
-            },
-          },
-          {
-            type: "bar",
-            data: this.bounceRate,
-            barWidth: 20,
-            name: "跳出率",
-            label: {
-              show: true,
-              position: "top",
-            },
-            itemStyle: {
-              color: "#17DDFF",
-            },
-          },
-        ],
+        yAxis: {
+          // onZero: false,
+        },
+        series: val,
       };
       const myChart = echarts.init(document.getElementById("mychart"));
-      myChart.setOption(sourceChart);
+      myChart.setOption(sourceChart,true);
       window.addEventListener("resize", () => {
         myChart.resize();
       });
@@ -334,8 +366,8 @@ export default {
 <style lang="scss" scoped>
 @import "~@/styles/components/custom-select.scss";
 .trafficHead {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: #4d4d4d;
   // padding: 20px 30px 20px;
   padding: 15px 13px 18px 0px;
@@ -366,7 +398,7 @@ img {
   display: flex;
   justify-content: space-between;
   .chartLeft {
-    background-color: #fafafb;
+    background-color: #fff;
     padding: 15px;
     width: 100%;
     min-height: 400px;

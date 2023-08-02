@@ -25,8 +25,8 @@
 }
 
 .documentation-container .trafficHead {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   line-height: 33px;
   color: #4d4d4d;
   padding: 20px 30px 20px;
@@ -43,7 +43,7 @@
 .documentation-container .Overview {
   margin: 20px;
   min-height: 200px;
-  background-color: #fafafb;
+  background-color: #fff;
 }
 
 .documentation-container .Overview .bid-list-page {
@@ -65,9 +65,9 @@
 }
 
 .documentation-container .Overview .bid-list-page .bid-list-header .w156 {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 400;
-  line-height: 14px;
+  line-height: 16px;
   color: #4d4d4d;
 }
 
@@ -130,7 +130,7 @@
 }
 
 .documentation-container .chartsIcon .chartLeft {
-  background-color: #fafafb;
+  background-color: #fff;
   padding: 15px;
   width: 49%;
   min-height: 400px;
@@ -176,7 +176,7 @@
 }
 
 .documentation-container .chartsIcon .chartRight .pieShow .visitor .bid-list-page .bid-list-header .w156 {
-  font-size: 16px;
+  font-size: 15px;
   color: #5f5e5e;
 }
 
@@ -245,7 +245,7 @@
 }
 
 .documentation-container .comePage .bid-list-page .bid-list-header .w156 {
-  font-size: 14px;
+  font-size: 15px;
   color: #768fa1;
 }
 

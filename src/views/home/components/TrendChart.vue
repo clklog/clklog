@@ -50,6 +50,7 @@
       :flowTrendListed="flowTrendList"
       :defaultLege="headLege"
       ref="trendChartRef"
+      style="padding:20px"
     />
   </div>
 </template>

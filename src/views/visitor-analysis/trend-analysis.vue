@@ -3,12 +3,15 @@
     <div class="documentation-container">
       <FilterBar ByArea ByData @setFilterBarParams="setFilterBarParams" />
     </div>
-    <div class="Overview">
-      <div class="trendAnalysis">趋势分析</div>
+    <div class="public-block">
+      <div class="Overview">
+      <div class="trendAnalysis public-firstHead">趋势分析</div>
       <originView ref="originView" byAreaAnaly></originView>
     </div>
     <indicatorChart ref="indicatorChart" />
     <trendTable ref="trendTable" />
+    </div>
+    
   </div>
 </template>
 
@@ -72,14 +75,10 @@ export default {
 </script>
 <style lang="scss" scoped>
 .Overview {
-  margin: 20px;
   min-height: 118px;
-  background-color: #fafafb;
+  background-color: #fff;
   .trendAnalysis {
-    font-size: 14px;
-    font-weight: 500;
-    color: #4d4d4d;
-    padding: 14px 13px 18px 13px;
+    // padding: 14px 13px 18px 13px;
   }
   .bid-list-page {
     width: clas(100% -20px);

@@ -54,13 +54,13 @@
             label="访问次数"
             sortable
           />
+          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
           <el-table-column
             v-if="newUv"
             prop="newUv"
             label="新访客数"
             sortable
           />
-          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
           <el-table-column
             v-if="newUvRate"
             prop="newUvRate"
@@ -114,6 +114,7 @@
 <script>
 import flowPoint from "@/components/flowPoint/index";
 import { percentage } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 export default {
   components: { flowPoint },
   data() {
@@ -151,6 +152,12 @@ export default {
         }
         if (item.pvRate) {
           item.pvRate = percentage(item.pvRate);
+        }
+        if (item.avgVisitTime) {
+          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime))
+        }
+        if (item.avgPv) {
+          item.avgPv = Math.floor(item.avgPv)
         }
       });
       this.getSourceSiteList = val.rows;
@@ -228,7 +235,7 @@ export default {
   margin: 20px;
   padding-top: 1px;
   min-height: 461px;
-  background: rgba(250, 250, 251);
+  background: #fff;
   border-radius: 6px;
   .flow-indicator {
     min-height: 58px;

@@ -144,7 +144,7 @@ export default {
       this.chart = echarts.init(document.getElementById(this.id));
 
       this.chart.setOption({
-        backgroundColor: "#FAFAFB",
+        backgroundColor: "#fff",
         tooltip: {
           trigger: "axis",
           axisPointer: {

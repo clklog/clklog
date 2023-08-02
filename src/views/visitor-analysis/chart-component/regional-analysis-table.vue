@@ -8,7 +8,12 @@
         :header-cell-style="{ textAlign: 'center' }"
         :cell-style="{ textAlign: 'center' }"
       >
-        <el-table-column prop="province" :show-overflow-tooltip="true" label="地域" width="200" />
+        <el-table-column
+          prop="province"
+          :show-overflow-tooltip="true"
+          label="地域"
+          width="200"
+        />
         <el-table-column prop="date" label="流量基础指标" width="150">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
           <el-table-column
@@ -23,13 +28,14 @@
             label="访问次数"
             sortable
           />
+          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
           <el-table-column
             v-if="newUv"
             prop="newUv"
             label="新访客数"
             sortable
           />
-          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+         
           <el-table-column
             v-if="newUvRate"
             prop="newUvRate"
@@ -82,6 +88,7 @@
 
 <script>
 import { percentage } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 import flowPoint from "@/components/flowPoint/index";
 import { getAreaDetailListApi } from "@/api/trackingapi/area.js";
 export default {
@@ -97,7 +104,7 @@ export default {
         page: 1,
       },
       flowTableList: [],
-      channelList: ["pv", "visit","newUvRate","pvRate"],
+      channelList: ["pv", "visit", "newUvRate", "pvRate"],
       flowQuality: ["avgPv"],
       pv: false,
       visit: false,
@@ -137,7 +144,13 @@ export default {
               item.pvRate = percentage(item.pvRate);
             }
             if (item.province == "未知省份") {
-              item.province = item.country + "-" + item.province
+              item.province = item.country + "-" + item.province;
+            }
+            if (item.avgVisitTime) {
+              item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
+            }
+            if (item.avgPv) {
+              item.avgPv = Math.floor(item.avgPv);
             }
           });
         }
@@ -211,7 +224,7 @@ export default {
   margin: 20px;
   padding-top: 1px;
   min-height: 461px;
-  background: rgba(250, 250, 251);
+  background: #fff;
   border-radius: 6px;
 }
 </style>

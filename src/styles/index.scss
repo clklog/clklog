@@ -6,6 +6,7 @@
 @import "./sidebar.scss";
 @import "./btn.scss";
 @import "./components/element-unifystyle.scss";
+@import "./components/public-style.scss";
 
 body {
   height: 100%;
@@ -207,16 +208,17 @@ aside {
 }
 // 块通用样式
 .block-main {
-  padding: 18px 12px;
-  background-color: #fafafb;
+  box-sizing: border-box;
+  padding: 25px 25px;
+  background-color: #fff;
   .block-head {
     display: flex;
     align-items: center;
     position: relative;
     margin-bottom: 17px;
     .block-title {
-      font-weight: 400;
-      font-size: 14px;
+      font-weight: 600;
+      font-size: 15px;
       line-height: 33px;
       color: #4d4d4d;
     }
@@ -295,7 +297,8 @@ aside {
 // 流量基础指标多选checkbox统一样式
 .flow-indicator {
   min-height: 58px;
-  background: rgba(252, 252, 252, 0.39);
+  // background: rgba(252, 252, 252, 0.39);
+  background: #fff;
   border: 1px solid #f0f0f5;
   border-radius: 6px;
   box-sizing: border-box;

@@ -39,7 +39,17 @@
         :cell-style="{ textAlign: 'center' }"
       >
         <el-table-column type="index" label="序号" width="150" />
-        <el-table-column prop="uri" label="页面URL" :show-overflow-tooltip="true" width="350" />
+        <!-- :show-overflow-tooltip="true"  prop="uri" -->
+        <el-table-column label="页面URL"  width="350" >
+            <template slot-scope="scope">
+              <el-popover trigger="hover" placement="top">
+                <div>{{ scope.row.uri }}</div>
+                <div slot="reference" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
+                  {{ scope.row.uri }}
+                </div>
+              </el-popover>
+            </template>
+         </el-table-column>
         <el-table-column label="流量基础指标">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
           <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
@@ -101,6 +111,8 @@
 
 <script>
 import flowPoint from "@/components/flowPoint/index";
+import { percentage } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 export default {
   components: {
     flowPoint,
@@ -131,10 +143,18 @@ export default {
   },
   methods: {
     vistedAnalysis(val) {
-      // this.vistedTableData = val.detail;
-      // this.total = val.detail.length;
-      
       this.vistedTableData = val.rows;
+      this.vistedTableData.map((item) => {
+        // if (item.exitRate) {
+        //   item.exitRate = percentage(item.exitRate);
+        // }
+        if (item.avgVisitTime) {
+          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime))
+        }
+        if (item.avgPv) {
+          item.avgPv = Math.floor(item.avgPv)
+        }
+      });
       this.total = val.total;
 
       this.initShowTable()
@@ -227,7 +247,7 @@ export default {
   margin: 20px;
   padding-top: 1px;
   min-height: 461px;
-  background: rgba(250, 250, 251);
+  background: #fff;
   border-radius: 6px;
 
   .flow-indicator {

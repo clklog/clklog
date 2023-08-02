@@ -1,6 +1,6 @@
 <template>
   <div class="userLoyalty">
-    <span>用户忠诚度分析</span>
+    <div class="public-firstHead">用户忠诚度分析</div>
     <div class="bar_chart">
       <div style="padding-left: 9px; padding-top: 40px; display: flex">
         <span>访问页数</span>
@@ -189,12 +189,7 @@ export default {
   padding-top: 18px;
   padding-left: 16px;
   padding-bottom: 30px;
-  span {
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 33px;
-    color: #4d4d4d;
-  }
+ 
   .bar_chart {
     height: 337px;
     background: #fff;

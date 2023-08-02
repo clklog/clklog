@@ -12,7 +12,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              选定时间段内用户访问应用的页面总次数
+              选定时间段内用户访问应用的页面总次数。
               <div class="setFontTop">
                 用户每打开一个页面被记录一次，同一页面打开多次浏览量值累计计算。
               </div>
@@ -86,14 +86,14 @@
           </el-popover>
         </div>
         <div class="header-name w156">
-          平均访问页面<el-popover
+          平均访问页数<el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              平均访问页数 = 浏览量 / 访问次数
+              平均访问页数 = 浏览量 / 访问次数 。
             </div>
             <img
               slot="reference"
@@ -111,7 +111,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              平均访问时长 = 访问总时长 / 访问次数
+              平均访问时长 = 访问总时长 / 访问次数 。
               <div class="setFontTop"> 访客每次访问的总时长为打开第一个页面到退出或关闭最后一个页面的总时长。
                 </div>
             </div>
@@ -156,7 +156,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              选定时间段内用户访问应用的页面总次数
+              选定时间段内用户访问应用的页面总次数。
               <div style="margin-top: 5px">
                 用户每打开一个页面被记录一次，同一页面打开多次浏览量值累计计算。
               </div>
@@ -231,14 +231,14 @@
           </el-popover>
         </div>
         <div class="header-name w156">
-          平均访问页面<el-popover
+          平均访问页数<el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              平均访问页数 = 浏览量 / 访问次数
+              平均访问页数 = 浏览量 / 访问次数。
             </div>
             <img
               slot="reference"
@@ -256,7 +256,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              平均访问时长 = 访问总时长 / 访问次数
+              平均访问时长 = 访问总时长 / 访问次数。
               <div style="margin-top: 5px">
                 访客每次访问的总时长为打开第一个页面到退出或关闭最后一个页面的总时长。
               </div>
@@ -302,10 +302,10 @@
           <p>{{ (originData && originData.ipCount) || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
-          <p>{{ (originData && originData.avgPv) || "--" }}</p>
+          <p>{{ Math.floor(originData && originData.avgPv) || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
-          <p>{{ (originData && originData.avgVisitTime) || "--" }}</p>
+          <p>{{ formatTimeFun(originData && originData.avgVisitTime) || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
           <p>{{ percentageFun(originData && originData.bounceRate)|| "--" }}</p>
@@ -364,7 +364,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-                新访客占比 = 新访客数 / 访客数（UV）
+                新访客占比 = 新访客数 / 访客数（UV）。
             </div>
             <img
               slot="reference"
@@ -474,7 +474,7 @@
           >
         
             <div style="padding: 5px; font-size: 12px">
-              选定时间段内用户访问应用的页面总次数
+              选定时间段内用户访问应用的页面总次数。
               <div class="setFontTop">
                 用户每打开一个页面被记录一次，同一页面打开多次浏览量值累计计算。
               </div>
@@ -555,7 +555,7 @@
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              平均访问时长 = 访问总时长 / 访问次数
+              平均访问时长 = 访问总时长 / 访问次数。
               <div class="setFontTop">
                 访客每次访问的总时长为打开第一个页面到退出或关闭最后一个页面的总时长。
               </div>
@@ -607,7 +607,7 @@
               </p>
             </div>
             <div class="bid-list-item w158">
-              <p>{{ (originData && originData.avgVisitTime) || "--" }}</p>
+              <p>{{ formatTimeFun(originData && originData.avgVisitTime) || "--" }}</p>
             </div>
            
             <div class="bid-list-item w158">
@@ -625,6 +625,7 @@
 
 <script>
 import { percentage } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 export default {
   name: "originName",
   props: {
@@ -652,6 +653,10 @@ export default {
     }
   },
   methods:{
+    formatTimeFun(val){
+      val =  Math.floor(val);
+      return formatTime(val);
+    },
     originEvent(val){
         // console.log(val,4324);
         this.originData = val;
@@ -678,9 +683,9 @@ export default {
   }
  
   .w156 {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 400;
-    line-height: 14px;
+    line-height: 16px;
     color: #4d4d4d;
   }
   img {

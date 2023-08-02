@@ -3,7 +3,7 @@
     <FilterBar @setFilterBarParams="setFilterBarParams"></FilterBar>
     <!-- <userLoyalty></userLoyalty> -->
     <div class="userLoyalty">
-      <span>用户忠诚度分析</span>
+      <span class="public-firstHead">用户忠诚度分析</span>
       <visitNum ref="visitNum"></visitNum>
       <visitPage ref="visitPage"></visitPage>
       <visitTime ref="visitTime"></visitTime>
@@ -88,15 +88,9 @@ export default {
 .userLoyalty {
   height: 1109px;
   margin: 15px;
-  background-color: #fafafb;
+  background-color: #fff;
   padding-top: 18px;
   padding-left: 16px;
   padding-bottom: 30px;
-  span {
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 33px;
-    color: #4d4d4d;
-  }
 }
 </style>

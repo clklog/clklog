@@ -69,6 +69,10 @@ export default {
       const visitTimeData = {
         xAxis: {
           data: this.xData,
+          axisTick: {
+            show: false,
+            alignWithLabel: true,
+          },
         },
 
         dataZoom: [

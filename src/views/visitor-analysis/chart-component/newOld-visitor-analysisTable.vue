@@ -72,6 +72,7 @@
 <script>
 import flowPoint from "@/components/flowPoint/index";
 import { percentage } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 export default {
   components: { flowPoint },
   props: {
@@ -99,13 +100,19 @@ export default {
   methods: {
     getVisitorDetail(val) {
       val.map((item) => {
-            if (item.bounceRate) {
-              item.bounceRate = percentage(item.bounceRate);
-            }
-            if (item.pvRate) {
-              item.pvRate = percentage(item.pvRate);
-            }
-          });
+        if (item.bounceRate) {
+          item.bounceRate = percentage(item.bounceRate);
+        }
+        if (item.pvRate) {
+          item.pvRate = percentage(item.pvRate);
+        }
+        if (item.avgVisitTime) {
+          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
+        }
+        if (item.avgPv) {
+          item.avgPv = Math.floor(item.avgPv);
+        }
+      });
       this.visitorDetailData = val.reverse();
     },
     flowPoint(val) {
@@ -171,7 +178,7 @@ export default {
   margin: 20px;
   padding-top: 1px;
   min-height: 461px;
-  background: rgba(250, 250, 251);
+  background: #fff;
   border-radius: 6px;
 
   .flow-indicator {

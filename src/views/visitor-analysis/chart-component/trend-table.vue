@@ -1,5 +1,5 @@
 <template>
-  <div class="chartsIcon">
+  <div class="chartsIcon public-table-block">
     <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
     <div class="table-content">
       <el-table
@@ -14,34 +14,40 @@
         border
         style="width: 100%"
       >
-        <el-table-column prop="statTime" label="日期" width="200" />
+        <el-table-column sortable prop="statTime" label="日期" width="200" />
         <el-table-column prop="date" label="流量基础指标" width="150">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
-          <el-table-column
-            v-if="pvRate"
-            prop="pvRate"
-            label="浏览量占比"
-            sortable
-          />
+          <el-table-column  label="浏览量占比" sortable :sort-method="(a,b)=>{return a.pvRate - b.pvRate}">
+                <template slot-scope="scope">
+                {{ scope.row.pvRate }}%
+               </template>
+          </el-table-column>
+
           <el-table-column
             v-if="visitCount"
             prop="visitCount"
             label="访问次数"
             sortable
           />
+          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
           <el-table-column
             v-if="newUv"
             prop="newUv"
             label="新访客数"
             sortable
           />
-          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
           <el-table-column
             v-if="newUvRate"
             prop="newUvRate"
             label="新访客数占比"
             sortable
-          />
+            :sort-method="(a,b)=>{return a.newUvRate - b.newUvRate}"
+          >
+          <template slot-scope="scope">
+                {{ scope.row.newUvRate }}%
+               </template>
+          </el-table-column>
+
           <el-table-column
             v-if="ipCount"
             prop="ipCount"
@@ -55,7 +61,12 @@
             prop="bounceRate"
             label="跳出率"
             sortable
-          />
+            :sort-method="(a,b)=>{return a.bounceRate - b.bounceRate}"
+          >
+              <template slot-scope="scope">
+                {{ scope.row.bounceRate }}%
+               </template>
+          </el-table-column>
           <el-table-column
             v-if="avgVisitTime"
             prop="avgVisitTime"
@@ -88,8 +99,9 @@
 
 <script>
 import flowPoint from "@/components/flowPoint/index";
-import Bus from "@/utils/bus";
-import { percentage } from "@/utils/percent";
+// import { percent } from "@/utils/percent";
+import { percent } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 export default {
   components: { flowPoint },
   data() {
@@ -178,7 +190,7 @@ export default {
       this.initShowTable();
     },
     percentageFun(val) {
-      return percentage(val);
+      return percent(val);
     },
     apiDetailList(val) {
       this.currentPage = 1;
@@ -193,7 +205,14 @@ export default {
         if (item.pvRate) {
           item.pvRate = this.percentageFun(item.pvRate);
         }
+        if (item.avgVisitTime) {
+          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime))
+        }
+        if (item.avgPv) {
+          item.avgPv = Math.floor(item.avgPv)
+        }
       });
+
       this.total = val.detail.length;
     },
     initShowTable() {
@@ -268,12 +287,12 @@ export default {
   @import "~@/styles/components/el-checkbox.scss";
   @import "~@/styles/components/el-pagination.scss";
 }
-.chartsIcon {
-  box-sizing: border-box;
-  margin: 20px;
-  padding-top: 1px;
-  min-height: 461px;
-  background: rgba(250, 250, 251);
-  border-radius: 6px;
-}
+// .chartsIcon {
+//   box-sizing: border-box;
+//   margin: 20px 0;
+//   padding-top: 1px;
+//   min-height: 461px;
+//   background: #fff;
+//   border-radius: 6px;
+// }
 </style>

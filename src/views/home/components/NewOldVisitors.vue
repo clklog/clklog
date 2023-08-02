@@ -14,9 +14,9 @@
         <!-- content -->
         <div class="bid-list-page">
           <div class="bid-list-header">
-            <div class="header-name w156"></div>
-            <div class="header-name w156"><b>老访客</b></div>
-            <div class="header-name w156"><b>新访客</b></div>
+            <div class="header-name w157"></div>
+            <div class="header-name w157">老访客</div>
+            <div class="header-name w157">新访客</div>
           </div>
           <div class="bid-list-record">
             <div class="bid-list-item w157"></div>
@@ -78,11 +78,11 @@
               </div>
               <div class="bid-list-item w159 lettSpace">
                 <p style="color: rgb(155, 156, 156)">
-                  {{ oldVisitor.avgVisitTime || "--" }}
+                  {{ formatTimeFun(oldVisitor.avgVisitTime) || "--" }}
                 </p>
               </div>
               <div class="bid-list-item w159 lettSpace">
-                <p>{{ newVisitor.avgVisitTime || "--" }}</p>
+                <p>{{ formatTimeFun(newVisitor.avgVisitTime) || "--" }}</p>
               </div>
             </div>
             <div class="bid-list-record">
@@ -91,11 +91,11 @@
               </div>
               <div class="bid-list-item w159 lettSpace">
                 <p style="color: rgb(155, 156, 156)">
-                  {{ oldVisitor.avgPv || "--" }}
+                  {{ Math.floor(oldVisitor.avgPv) || "--" }}
                 </p>
               </div>
               <div class="bid-list-item w159 lettSpace">
-                <p>{{ newVisitor.avgPv || "--" }}</p>
+                <p>{{ Math.floor(newVisitor.avgPv) || "--" }}</p>
               </div>
             </div>
           </div>
@@ -117,6 +117,7 @@
 import pieChart from "@/components/Charts/pieMarker.vue";
 import { getVisitorApi } from "@/api/trackingapi/visitor";
 import { percentage } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 export default {
   name: "NewOldVisitors",
   components: { pieChart },
@@ -158,6 +159,10 @@ export default {
     },
   },
   methods: {
+    formatTimeFun(val){
+      val =  Math.floor(val);
+      return formatTime(val);
+    },
     percentageFun(val){
         return percentage(val)
     },
@@ -208,7 +213,7 @@ export default {
             align-items: center;
           }
           .w156 {
-            font-size: 16px;
+            font-size: 15px;
             color: #5f5e5e;
           }
         }

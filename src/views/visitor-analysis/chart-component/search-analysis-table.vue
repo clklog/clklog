@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="search_wrappy">
+    <div class="search_wrappy public-table-block">
       <div class="search_table">
-        <span>搜索词分析</span>
+        <span class="public-firstHead" >搜索词分析</span>
         <div class="setTable">
           <el-table
             :header-cell-style="{ textAlign: 'center' }"
@@ -13,17 +13,24 @@
           >
             <!-- <el-table-column prop="statTime" label="日期" sortable width="180">
             </el-table-column> -->
-            <el-table-column prop="searchword" :show-overflow-tooltip="true" label="搜索词" sortable width="250">
+            <el-table-column prop="searchword" :show-overflow-tooltip="true" label="搜索词" width="250">
             </el-table-column>
             <el-table-column prop="pv" label="浏览量(PV)" sortable>
             </el-table-column>
-            <el-table-column prop="pvRate" label="占比" sortable>
+            <!-- prop="pvRate" -->
+            <el-table-column  label="浏览量占比" sortable :sort-method="(a,b)=>{return a.pvRate - b.pvRate}">
+                <template slot-scope="scope">
+                {{ scope.row.pvRate }}%
+               </template>
             </el-table-column>
             <el-table-column prop="avgVisitTime" label="平均访问时长" sortable>
             </el-table-column>
             <el-table-column prop="avgPv" label="平均访问页数" sortable>
             </el-table-column>
-            <el-table-column prop="bounceRate" label="跳出率" sortable>
+            <el-table-column label="跳出率" sortable :sort-method="(a,b)=>{return a.bounceRate - b.bounceRate}">
+              <template slot-scope="scope">
+                {{ scope.row.bounceRate }}%
+               </template>
             </el-table-column>
           </el-table>
         </div>
@@ -47,7 +54,8 @@
 </template>
 
 <script>
-import { percentage } from "@/utils/percent";
+import { percent } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 export default {
   data() {
     return {
@@ -65,7 +73,7 @@ export default {
   created() {},
   methods: {
     percentageFun(val) {
-      return percentage(val);
+      return percent(val);
     },
     searchTable(val) {
       this.currentPage = 1;
@@ -76,6 +84,12 @@ export default {
         }
         if (item.pvRate) {
           item.pvRate = this.percentageFun(item.pvRate);
+        }
+        if (item.avgVisitTime) {
+          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime))
+        }
+        if (item.avgPv) {
+          item.avgPv = Math.floor(item.avgPv)
         }
       });
       this.total = val.total;
@@ -124,19 +138,9 @@ export default {
 // }
 .search_wrappy {
   position: relative;
-  margin: 15px;
-  background-color: #fafafb;
-  // min-height: 647px;
-  min-height: 447px;
 }
 .search_table {
   height: 100%;
   padding: 18px 22px;
-  span {
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 31px;
-    color: #4d4d4d;
-  }
 }
 </style>

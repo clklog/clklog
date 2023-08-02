@@ -36,7 +36,7 @@
       >
         <el-checkbox label="bounceRate">跳出率</el-checkbox>
         <el-checkbox label="avgVisitTime">平均访问时长</el-checkbox>
-        <el-checkbox v-if="byChannel" label="avgVisitTimeRate"
+        <el-checkbox v-if="byChannel" label="visitTimeRate"
           >平均访问时长占比</el-checkbox
         >
         <el-checkbox label="avgPv">平均访问页数</el-checkbox>
@@ -106,7 +106,7 @@ export default {
   margin: 20px;
   padding-top: 1px;
   min-height: 461px;
-  background: rgba(250, 250, 251);
+  background: fff;
   border-radius: 6px;
 }
 </style>

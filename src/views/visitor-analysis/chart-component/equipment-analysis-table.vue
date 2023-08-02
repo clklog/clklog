@@ -93,6 +93,8 @@
 
 <script>
 import flowPoint from "@/components/flowPoint/index";
+import { percentage } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 export default {
   components: { flowPoint },
   data() {
@@ -119,6 +121,23 @@ export default {
   methods: {
     equipmentTableEvent(val) {
       this.equipmentList = val;
+      this.equipmentList.map((item) => {
+        if (item.bounceRate) {
+          item.bounceRate = percentage(item.bounceRate);
+        }
+        if (item.newUvRate) {
+          item.newUvRate = percentage(item.newUvRate);
+        }
+        if (item.pvRate) {
+          item.pvRate = percentage(item.pvRate);
+        }
+        if (item.avgVisitTime) {
+          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime))
+        }
+        if (item.avgPv) {
+          item.avgPv = Math.floor(item.avgPv)
+        }
+      });
     },
     handleSizeChange(val) {
       this.currentPage = 1;
@@ -191,7 +210,7 @@ export default {
   margin: 20px;
   padding-top: 1px;
   min-height: 461px;
-  background: rgba(250, 250, 251);
+  background: #fff;
   border-radius: 6px;
 
   .flow-indicator {

@@ -26,10 +26,10 @@
           <p>{{ current.ipCount || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
-          <p>{{ current.avgPv || "--" }}</p>
+          <p>{{ Math.floor(current.avgPv) || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
-          <p>{{ current.avgVisitTime || "--" }}</p>
+          <p>{{ formatTimeFun(current.avgVisitTime) || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
           <p v-if="current.bounceRate">
@@ -58,10 +58,10 @@
           <p>{{ previous.ipCount || "--" }}</p>
         </div>
         <div class="bid-list-item w157">
-          <p>{{ previous.avgPv || "--" }}</p>
+          <p>{{  Math.floor(previous.avgPv) || "--" }}</p>
         </div>
         <div class="bid-list-item w157">
-          <p>{{ previous.avgVisitTime || "--" }}</p>
+          <p>{{ formatTimeFun(previous.avgVisitTime) || "--" }}</p>
         </div>
         <div class="bid-list-item w157">
           <p v-if="previous.bounceRate">
@@ -241,9 +241,9 @@
       <div class="bid-list-record" style="margin-bottom: 0">
         <div class="bid-list-item1 w157">
           <p v-if="timeType == 'day'">同比（今日与上年同期）</p>
-          <p v-if="timeType == 'week'">环比（本周与上年同期）</p>
-          <p v-if="timeType == 'month'">环比（本月与上年同期）</p>
-          <p v-if="timeType == 'year'">环比（本年与上年同期）</p>
+          <p v-if="timeType == 'week'">同比（本周与上年同期）</p>
+          <p v-if="timeType == 'month'">同比（本月与上年同期）</p>
+          <p v-if="timeType == 'year'">同比（本年与上年同期）</p>
         </div>
         <div class="bid-list-item w157">
           <p>{{ tongbi(current.pv, samePeriod.pv) }}</p>
@@ -417,6 +417,7 @@
 import originView from "@/components/origin-view/index";
 import { getFlowApi } from "@/api/trackingapi/flow";
 import { percentage } from "@/utils/percent";
+import { formatTime } from "@/utils/format";
 export default {
   name: "FlowView",
   components: { originView },
@@ -453,6 +454,10 @@ export default {
   },
   watch: {},
   methods: {
+    formatTimeFun(val){
+      val =  Math.floor(val);
+      return formatTime(val);
+    },
     percentageFun(val) {
       return percentage(val);
     },
@@ -480,9 +485,10 @@ export default {
 
 <style lang="scss" scoped>
 .FlowView {
-  margin: 20px;
+  // margin: 20px;
   min-height: 215px;
-  background-color: #fafafb;
+  background-color: #fff;
+  // z-index: 222;
   .bid-list-page {
     width: clas(100% -20px);
     display: flex;

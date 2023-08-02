@@ -88,7 +88,7 @@
           </el-popover>
         </div>
         <div class="header-name w156">
-          平均访问页面<el-popover
+          平均访问页数<el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -192,7 +192,7 @@ export default {
 .Overview {
   margin: 20px;
   min-height: 118px;
-  background-color: #fafafb;
+  background-color: #fff;
   img {
     width: 11.44px;
     height: 11.44px;
@@ -200,8 +200,8 @@ export default {
     cursor: pointer;
   }
   .trafficHead {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
     line-height: 14px;
     color: #4d4d4d;
     padding: 15px 30px 15px;

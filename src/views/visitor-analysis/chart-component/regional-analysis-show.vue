@@ -1,16 +1,23 @@
 <template>
   <div class="area_container">
     <div class="mapCharts">
-      <span>TOP10访问区域指标展示</span>
+      <span class="public-firstHead" style="padding:0 0;">TOP10访问区域指标展示</span>
       <div
         id="echart_china"
         ref="echart_china"
         style="width: 100%; height: 350px"
       />
     </div>
-    <!-- style="width: 100%; height: 287px;overflow-y: auto;" -->
     <div class="mapTable">
-      <div style="width: 500px; height: 100%; margin-top: 62px">
+      <div
+        style="
+          width: 500px;
+          height: 405px;
+          margin-top: 62px;
+          overflow: hidden;
+          margin-bottom: 20px;
+        "
+      >
         <el-table
           ref="singleTable"
           :data="apiProvinceList"
@@ -18,7 +25,12 @@
           style="width: 100%"
         >
           <el-table-column type="index" width="80"> </el-table-column>
-          <el-table-column :show-overflow-tooltip="true" property="province" label="省份" width="200">
+          <el-table-column
+            :show-overflow-tooltip="true"
+            property="province"
+            label="省份"
+            width="200"
+          >
           </el-table-column>
           <el-table-column property="visitCount" label="访问次数">
           </el-table-column>
@@ -107,20 +119,45 @@ export default {
           item.value = 0;
         });
       }
-      this.apiProvinceList.map((item) => {
-        item.visitCountRate = percentage(item.visitCountRate);
-        if (item.province == "未知省份") {
-          item.province = item.country + "-" + item.province;
+      // this.apiProvinceList.map((item) => {
+      //   item.visitCountRate = percentage(item.visitCountRate);
+      //   if (item.province == "未知省份") {
+      //     // item.province = item.country + "-" + item.province;
+      //   }
+      // });
+      for (let i = 0; i < this.apiProvinceList.length; i++) {
+        this.apiProvinceList[i].visitCountRate = percentage(
+          this.apiProvinceList[i].visitCountRate
+        );
+        if (this.apiProvinceList[i].province == "未知省份") {
+          this.apiProvinceList.splice(i--, 1);
         }
-      });
+      }
+     
+      let result = this.apiProvinceList;
+      for (let i = 0; i < this.provinceList.length; i++) {
+        this.provinceList[i].visitCountRate = 0;
+        this.provinceList[i].uv = 0;
+        this.provinceList[i].uvRate = 0;
+        for (let j = 0; j < result.length; j++) {
+          if (this.provinceList[i].name == result[j].province) {
+            this.provinceList[i].value = result[j].visitCount;
+            this.provinceList[i].visitCountRate = result[j].visitCountRate
+            this.provinceList[i].uv = result[j].uv;
+            this.provinceList[i].uvRate = percentage(result[j].uvRate);
+            maxValue.push(result[j].visitCount);
+          }
+        }
+      }
+      this.apiProvinceList = this.apiProvinceList.splice(0, 10);
       this.showScatterInGeo();
     },
     randomData() {
       return Math.round(Math.random() * 500);
     },
     resizeMyChartContainer() {
-      this.myChart.height = 100 + "px"; // 页面一半的大小
-      this.myChart.width = 100 + "px"; // 页面一半的大小
+      this.myChart.height = 100 + "px";
+      this.myChart.width = 100 + "px";
     },
     showScatterInGeo() {
       this.$echarts.registerMap("china", chinamap);
@@ -133,9 +170,39 @@ export default {
           aspectScale: 0.75,
           zoom: 1.1,
         },
+        // tooltip: {
+        //   formatter: "{b}:{c}",
+        // },
         tooltip: {
-          formatter: "{b}:{c}",
+          formatter(params, ticket, callback) {
+
+            console.log(params,234);
+            let visitCountRate, uv, uvRate;
+            if (params.data) {
+              visitCountRate = params.data.visitCountRate;
+              uv = params.data.uv;
+              uvRate = params.data.uvRate;
+            } else {
+              visitCountRate = 0;
+              uv = 0;
+              uvRate = 0;
+            }
+            let htmlStr = `
+              <div style="padding:10px;">
+                <div style='font-size:14px;'> ${params.name}</div>
+                <p style='text-align:left;margin-top:10px;'>
+                  访问次数：${params.value}(占比：${visitCountRate})<br/>
+                  访客数：${uv}(占比：${uvRate})<br/>
+                </p>
+              </div>
+               
+              `;
+            return htmlStr;
+          },
+          // backgroundColor:"#ff7f50",//提示标签背景颜色
+          // textStyle:{color:"#fff"} //提示标签字体颜色
         },
+
         visualMap: {
           min: 0,
           max: this.maxValue || 200,
@@ -187,7 +254,7 @@ export default {
 <style lang="scss" scoped>
 .area_container {
   margin: 15px;
-  background-color: #fafafb;
+  background-color: #fff;
   // min-height: 339px;
   min-height: 470px;
   display: flex;
@@ -195,12 +262,6 @@ export default {
     width: 50%;
     padding-top: 17px;
     padding-left: 18px;
-    span {
-      font-size: 13px;
-      font-weight: 500;
-      line-height: 31px;
-      color: #4d4d4d;
-    }
   }
   .mapTable {
     width: 50%;

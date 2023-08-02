@@ -13,9 +13,9 @@
       <div class="form-list-page">
         <div class="form-list-header">
           <div class="header-text w156">来源网站</div>
-          <div class="header-name w156"><b>浏览量(PV)</b></div>
+          <div class="header-name w156">浏览量(PV)</div>
           <div class="header-name w156">
-            <b>占比</b>
+            占比
           </div>
         </div>
         <div

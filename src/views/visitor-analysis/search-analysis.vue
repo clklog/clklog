@@ -1,7 +1,9 @@
 <template>
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams"  />
-    <searchAnalysis  @currentPage="currentPage" ref="searchAnalysis"></searchAnalysis>
+    <div class="public-block">
+      <searchAnalysis  @currentPage="currentPage" ref="searchAnalysis"></searchAnalysis>
+    </div>
   </div>
 </template>
 
@@ -42,6 +44,8 @@ export default {
       if (val) {
         newvalue.pageNum = val.page;
         newvalue.pageSize = val.size;
+        this.pageNum = val.page;
+        this.pageSize = val.size;
       } else {
         newvalue.pageNum = this.pageNum;
         newvalue.pageSize = this.pageSize;
@@ -64,9 +68,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.search_wrappy {
-  margin: 15px;
-  background-color: #fafafb;
-  min-height: 647px;
-}
 </style>

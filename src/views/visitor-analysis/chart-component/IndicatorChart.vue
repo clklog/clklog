@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="chartsIcon">
+    <div class="chartsIcon public-echart-block">
       <div class="chartLeft">
         <div class="trendHead">
           <div class="trafficHead">指示分析图</div>
@@ -215,7 +215,7 @@ export default {
     initChart() {
       this.chart = echarts.init(document.getElementById("indicator"));
       this.chart.setOption({
-        backgroundColor: "#FAFAFB",
+        backgroundColor: "#fff",
         tooltip: {
           trigger: "axis",
           axisPointer: {
@@ -356,8 +356,8 @@ export default {
   @import "~@/styles/components/el-checkbox.scss";
 }
 .trafficHead {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: #4d4d4d;
   padding: 15px 13px 18px 0px;
 }
@@ -381,13 +381,13 @@ img {
   }
 }
 .chartsIcon {
-  margin: 20px;
-  width: calc(100% -20px);
-  min-height: 300px;
+  // margin:20px 0;
+  // width: calc(100% -20px);
+  // min-height: 300px;
   display: flex;
   justify-content: space-between;
   .chartLeft {
-    background-color: #fafafb;
+    background-color: #fff;
     padding: 15px;
     width: 100%;
     min-height: 400px;

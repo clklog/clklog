@@ -17,6 +17,21 @@
           </el-radio-group>
         </div>
 
+        <el-date-picker
+          class="timnePickCSS"
+          style="margin-left: 20px; width: 250px; height: 30px"
+          v-model="currentTime"
+          ref="tiemPick"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd"
+          :picker-options="pickerBeginOption"
+          @change="checkDateEvnet"
+        >
+        </el-date-picker>
+
         <div v-if="ByData" style="margin-left: 20px; height: 30px">
           <el-radio-group
             size="mini"
@@ -38,28 +53,19 @@
           </el-radio-group>
         </div>
 
-        <!-- 日期 -->
-        <el-date-picker
-          class="timnePickCSS"
-          style="margin-left: 20px; width: 250px; height: 30px"
-          v-model="currentTime"
-          ref="tiemPick"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          value-format="yyyy-MM-dd"
-          :picker-options="pickerBeginOption"
-          @change="checkDateEvnet"
-        >
-        </el-date-picker>
-
         <div v-if="ByArea" class="areaContent">
           <div class="areaItem">
             <div class="areaHead">地域</div>
             <!-- 气泡弹框 -->
-            <div>
-              <el-popover placement="bottom" width="510" trigger="click">
+            <div class="area_select">
+              <i v-if="popflag" class="el-icon-arrow-up iconArrow"></i>
+              <i v-else class="el-icon-arrow-down iconArrow"></i>
+              <el-popover
+                placement="bottom"
+                width="510"
+                trigger="click"
+                v-model="popflag"
+              >
                 <div>
                   <el-radio-group size="mini" v-model="areaValue">
                     <el-radio
@@ -176,6 +182,7 @@ export default {
       areaValue: "北京市",
       channelValue: "", //渠道
       visitorType: "",
+      popflag: false,
     };
   },
   mounted() {
@@ -228,6 +235,7 @@ export default {
       this.areaValue = e.provinceName;
     },
     checkDateEvnet(val) {
+      this.timeFlag = "";
       this.startTime = val[0];
       this.endTime = val[1];
       let endTime = new Date(val[1]).getTime();
@@ -390,18 +398,31 @@ export default {
   }
 }
 .documentation-container {
-  height: 83px;
+  box-sizing: border-box;
+  min-height: 94px;
+  padding-bottom: 20px;
   width: 100%;
   .checkContent {
     position: fixed;
+    min-height: 94px;
     z-index: 500;
     background-color: #fff;
-    min-height: 60px;
     width: 100%;
     border-bottom: 1px #eee solid;
     .areaContent {
       height: 30px;
       margin-left: 15px;
+      .area_select {
+        position: relative;
+        .iconArrow {
+          position: absolute;
+          font-size: 13px;
+          //  line-height: 30px;
+          top: 3px;
+          right: 5px;
+          transform: translate(0, 50%);
+        }
+      }
       .areaItem {
         display: flex;
         align-items: center;
@@ -417,6 +438,7 @@ export default {
           border-top-left-radius: 5px;
           border-bottom-left-radius: 5px;
         }
+
         .areaBox {
           min-width: 78px;
           height: 30px;
