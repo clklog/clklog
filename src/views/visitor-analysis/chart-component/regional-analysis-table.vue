@@ -1,87 +1,89 @@
 <template>
   <div class="chartsIcon">
     <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
-    <div class="table-content">
-      <el-table
-        :data="tableDetailList"
-        border
-        :header-cell-style="{ textAlign: 'center' }"
-        :cell-style="{ textAlign: 'center' }"
-      >
-        <el-table-column
-          prop="province"
-          :show-overflow-tooltip="true"
-          label="地域"
-          width="200"
+    <div class="public-table-block">
+      <div class="public-Table-minHeight public-hoverItem">
+        <el-table
+          :data="tableDetailList"
+          border
+          :header-cell-style="{ textAlign: 'center' }"
+          :cell-style="{ textAlign: 'center' }"
+        >
+          <el-table-column
+            prop="province"
+            :show-overflow-tooltip="true"
+            label="地域"
+            width="200"
+          />
+          <el-table-column prop="date" label="流量基础指标" width="150">
+            <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
+            <el-table-column
+              v-if="pvRate"
+              prop="pvRate"
+              label="浏览量占比"
+              sortable
+            />
+            <el-table-column
+              v-if="visit"
+              prop="visitCount"
+              label="访问次数"
+              sortable
+            />
+            <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+            <el-table-column
+              v-if="newUv"
+              prop="newUv"
+              label="新访客数"
+              sortable
+            />
+
+            <el-table-column
+              v-if="newUvRate"
+              prop="newUvRate"
+              label="新访客数占比"
+              sortable
+            />
+            <el-table-column
+              v-if="ipCount"
+              prop="ipCount"
+              label="IP数"
+              sortable
+            />
+          </el-table-column>
+          <el-table-column prop="date" label="流量质量指标" width="150">
+            <el-table-column
+              v-if="bounceRate"
+              prop="bounceRate"
+              label="跳出率"
+              sortable
+            />
+            <el-table-column
+              v-if="avgVisitTime"
+              prop="avgVisitTime"
+              label="平均访问时长"
+              sortable
+            />
+            <el-table-column
+              v-if="avgPv"
+              prop="avgPv"
+              label="平均访问页数"
+              sortable
+            />
+          </el-table-column>
+        </el-table>
+      </div>
+      <div class="block">
+        <el-pagination
+          next-text="下一页"
+          :current-page="currentPage"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="pageSize"
+          layout=" sizes, prev, pager, next, jumper"
+          :total="total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
         />
-        <el-table-column prop="date" label="流量基础指标" width="150">
-          <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
-          <el-table-column
-            v-if="pvRate"
-            prop="pvRate"
-            label="浏览量占比"
-            sortable
-          />
-          <el-table-column
-            v-if="visit"
-            prop="visitCount"
-            label="访问次数"
-            sortable
-          />
-          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
-          <el-table-column
-            v-if="newUv"
-            prop="newUv"
-            label="新访客数"
-            sortable
-          />
-         
-          <el-table-column
-            v-if="newUvRate"
-            prop="newUvRate"
-            label="新访客数占比"
-            sortable
-          />
-          <el-table-column
-            v-if="ipCount"
-            prop="ipCount"
-            label="IP数"
-            sortable
-          />
-        </el-table-column>
-        <el-table-column prop="date" label="流量质量指标" width="150">
-          <el-table-column
-            v-if="bounceRate"
-            prop="bounceRate"
-            label="跳出率"
-            sortable
-          />
-          <el-table-column
-            v-if="avgVisitTime"
-            prop="avgVisitTime"
-            label="平均访问时长"
-            sortable
-          />
-          <el-table-column
-            v-if="avgPv"
-            prop="avgPv"
-            label="平均访问页数"
-            sortable
-          />
-        </el-table-column>
-      </el-table>
-    </div>
-    <div class="block">
-      <el-pagination
-        next-text="下一页"
-        :current-page="currentPage"
-        :page-sizes="[10, 20, 30, 40]"
-        :page-size="pageSize"
-        layout=" sizes, prev, pager, next, jumper"
-        :total="total"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+      </div>
     </div>
   </div>
 </template>
@@ -221,7 +223,6 @@ export default {
 }
 .chartsIcon {
   box-sizing: border-box;
-  margin: 20px;
   padding-top: 1px;
   min-height: 461px;
   background: #fff;

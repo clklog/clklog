@@ -4,10 +4,10 @@
       <FilterBar ByArea ByData @setFilterBarParams="setFilterBarParams" />
     </div>
     <div class="public-block">
-      <div class="Overview">
-      <div class="trendAnalysis public-firstHead">趋势分析</div>
-      <originView ref="originView" byAreaAnaly></originView>
-    </div>
+      <div class="Overview public-hoverItem">
+        <div class="trendAnalysis public-firstHead">趋势分析</div>
+        <originView ref="originView" byAreaAnaly></originView>
+       </div>
     <indicatorChart ref="indicatorChart" />
     <trendTable ref="trendTable" />
     </div>
@@ -74,14 +74,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.Overview {
-  min-height: 118px;
-  background-color: #fff;
-  .trendAnalysis {
-    // padding: 14px 13px 18px 13px;
-  }
   .bid-list-page {
-    width: clas(100% -20px);
     display: flex;
     flex-direction: column;
     .bid-list-header {
@@ -134,5 +127,4 @@ export default {
       }
     }
   }
-}
 </style>

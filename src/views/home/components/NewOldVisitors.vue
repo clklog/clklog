@@ -1,7 +1,7 @@
 <template>
-  <div class="NewOldVisitors block-main">
+  <div class="NewOldVisitors block-main public-hoverItem">
     <div class="block-head">
-      <div class="block-title">新老访客</div>
+      <div class="block-title ">新老访客</div>
       <div
         class="block-head-icon"
         @click="$router.push('/visitorAnalysis/newOld-visitor-analysis')"

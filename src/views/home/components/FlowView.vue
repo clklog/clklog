@@ -1,5 +1,5 @@
 <template>
-  <div class="FlowView block-main">
+  <div class="FlowView block-main public-hoverItem">
     <div class="block-head">
       <div class="block-title">流量概览</div>
     </div>
@@ -485,10 +485,8 @@ export default {
 
 <style lang="scss" scoped>
 .FlowView {
-  // margin: 20px;
   min-height: 215px;
   background-color: #fff;
-  // z-index: 222;
   .bid-list-page {
     width: clas(100% -20px);
     display: flex;

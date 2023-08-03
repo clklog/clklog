@@ -1,86 +1,102 @@
 <template>
-  <div class="chartsIcon public-table-block">
+  <div class="chartsIcon public-table-block public-hoverItem">
     <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
-    <div class="table-content">
-      <el-table
-        :header-cell-style="{ textAlign: 'center' }"
-        :cell-style="{ textAlign: 'center' }"
-        :data="
-          flowTableList.slice(
-            (currentPage - 1) * pageSize,
-            currentPage * pageSize
-          )
-        "
-        border
-        style="width: 100%"
-      >
-        <el-table-column sortable prop="statTime" label="日期" width="200" />
-        <el-table-column prop="date" label="流量基础指标" width="150">
-          <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
-          <el-table-column  label="浏览量占比" sortable :sort-method="(a,b)=>{return a.pvRate - b.pvRate}">
-                <template slot-scope="scope">
-                {{ scope.row.pvRate }}%
-               </template>
-          </el-table-column>
+    <div class="public-table-block">
+      <div class="public-Table-minHeight">
+        <el-table
+          :header-cell-style="{ textAlign: 'center' }"
+          :cell-style="{ textAlign: 'center' }"
+          :data="
+            flowTableList.slice(
+              (currentPage - 1) * pageSize,
+              currentPage * pageSize
+            )
+          "
+          border
+          style="width: 100%"
+        >
+          <el-table-column sortable prop="statTime" label="日期" width="200" />
+          <el-table-column prop="date" label="流量基础指标" width="150">
+            <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
+            <el-table-column
+              label="浏览量占比"
+              sortable
+              :sort-method="
+                (a, b) => {
+                  return a.pvRate - b.pvRate;
+                }
+              "
+            >
+              <template slot-scope="scope"> {{ scope.row.pvRate }}% </template>
+            </el-table-column>
 
-          <el-table-column
-            v-if="visitCount"
-            prop="visitCount"
-            label="访问次数"
-            sortable
-          />
-          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
-          <el-table-column
-            v-if="newUv"
-            prop="newUv"
-            label="新访客数"
-            sortable
-          />
-          <el-table-column
-            v-if="newUvRate"
-            prop="newUvRate"
-            label="新访客数占比"
-            sortable
-            :sort-method="(a,b)=>{return a.newUvRate - b.newUvRate}"
-          >
-          <template slot-scope="scope">
+            <el-table-column
+              v-if="visitCount"
+              prop="visitCount"
+              label="访问次数"
+              sortable
+            />
+            <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+            <el-table-column
+              v-if="newUv"
+              prop="newUv"
+              label="新访客数"
+              sortable
+            />
+            <el-table-column
+              v-if="newUvRate"
+              prop="newUvRate"
+              label="新访客数占比"
+              sortable
+              :sort-method="
+                (a, b) => {
+                  return a.newUvRate - b.newUvRate;
+                }
+              "
+            >
+              <template slot-scope="scope">
                 {{ scope.row.newUvRate }}%
-               </template>
-          </el-table-column>
+              </template>
+            </el-table-column>
 
-          <el-table-column
-            v-if="ipCount"
-            prop="ipCount"
-            label="IP数"
-            sortable
-          />
-        </el-table-column>
-        <el-table-column prop="date" label="流量质量指标" width="150">
-          <el-table-column
-            v-if="bounceRate"
-            prop="bounceRate"
-            label="跳出率"
-            sortable
-            :sort-method="(a,b)=>{return a.bounceRate - b.bounceRate}"
-          >
+            <el-table-column
+              v-if="ipCount"
+              prop="ipCount"
+              label="IP数"
+              sortable
+            />
+          </el-table-column>
+          <el-table-column prop="date" label="流量质量指标" width="150">
+            <el-table-column
+              v-if="bounceRate"
+              prop="bounceRate"
+              label="跳出率"
+              sortable
+              :sort-method="
+                (a, b) => {
+                  return a.bounceRate - b.bounceRate;
+                }
+              "
+            >
               <template slot-scope="scope">
                 {{ scope.row.bounceRate }}%
-               </template>
+              </template>
+            </el-table-column>
+            <el-table-column
+              v-if="avgVisitTime"
+              prop="avgVisitTime"
+              label="平均访问时长"
+              sortable
+            />
+            <el-table-column
+              v-if="avgPv"
+              prop="avgPv"
+              label="平均访问页数"
+              sortable
+            />
           </el-table-column>
-          <el-table-column
-            v-if="avgVisitTime"
-            prop="avgVisitTime"
-            label="平均访问时长"
-            sortable
-          />
-          <el-table-column
-            v-if="avgPv"
-            prop="avgPv"
-            label="平均访问页数"
-            sortable
-          />
-        </el-table-column>
-      </el-table>
+        </el-table>
+      </div>
     </div>
     <div class="block">
       <el-pagination
@@ -99,7 +115,6 @@
 
 <script>
 import flowPoint from "@/components/flowPoint/index";
-// import { percent } from "@/utils/percent";
 import { percent } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
@@ -206,10 +221,10 @@ export default {
           item.pvRate = this.percentageFun(item.pvRate);
         }
         if (item.avgVisitTime) {
-          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime))
+          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
         }
         if (item.avgPv) {
-          item.avgPv = Math.floor(item.avgPv)
+          item.avgPv = Math.floor(item.avgPv);
         }
       });
 

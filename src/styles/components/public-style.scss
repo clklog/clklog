@@ -6,14 +6,17 @@
 .public-table-block {
   box-sizing: border-box;
   margin: 20px 0;
-  padding-top: 1px;
-  min-height: 461px;
+  padding: 22px;
+//   min-height: 461px;
   background: #fff;
-  border-radius: 6px;
+  .public-Table-minHeight {
+    // min-height: 410px;
+  }
 }
+
 .public-echart-block {
   margin: 20px 0;
-  width: calc(100% -20px);
+  width: 100%;
   min-height: 300px;
 }
 
@@ -22,5 +25,20 @@
   font-weight: 600;
   line-height: 31px;
   color: #4d4d4d;
-  padding: 14px 13px 0px 13px;
+  padding-bottom: 7px;
+  //padding: 14px 13px 0px 13px;
+}
+// page every block
+.public-hoverItem {
+  border-radius: 6px;
+}
+// page 概览间距整体调整
+.Overview {
+  min-height: 118px ;
+  background-color: #fff;
+  padding: 15px;
+}
+.public-visited-echarts {
+  font-size: 15px;
+  padding: 40px 20px 0;
 }

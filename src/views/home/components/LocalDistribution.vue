@@ -1,5 +1,5 @@
 <template>
-  <div class="documentation-container block-main ">
+  <div class="documentation-container block-main public-hoverItem">
     <div class="block-head">
       <div class="block-title">地域分布</div>
       <div

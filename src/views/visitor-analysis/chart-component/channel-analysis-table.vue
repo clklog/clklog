@@ -2,7 +2,7 @@
   <div>
     <div class="documentation-container">
       <!-- 流量概览 -->
-      <div class="Overview">
+      <div class="Overview public-hoverItem">
         <div class="public-firstHead">渠道分析</div>
         <div class="bid-list-page">
           <originView ref="originView" byFlowView></originView>
@@ -54,7 +54,7 @@
               class="bid-list-item w111"
               :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
             >
-              <p>{{ percentageFun(item.bounceRate) || "--" }}</p>
+              <p>{{ item.bounceRate || "--" }}</p>
             </div>
           </div>
         </div>
@@ -63,119 +63,130 @@
 
     <div class="chartsIcon">
       <flowPoint ref="flowPoint" @flowPoint="flowPoint" byChannel></flowPoint>
-
-      <div class="table-content">
-        <el-table
-          :data="
-            channelTableData.slice(
-              (currentPage - 1) * pageSize,
-              currentPage * pageSize
-            )
-          "
-          :header-cell-style="{ textAlign: 'center' }"
-          :cell-style="{ textAlign: 'center' }"
-          border
-          style="width: 100%"
-        >
-          <el-table-column type="index" label="序号" width="150" />
-          <el-table-column prop="channel" label="渠道类型" width="150" />
-          <el-table-column prop="date" label="流量基础指标" width="150">
-            <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
-            <el-table-column
-              v-if="pvRate"
-              prop="pvRate"
-              label="浏览量占比"
-              sortable
-            />
-            <el-table-column
-              v-if="visitCount"
-              prop="visitCount"
-              label="访问次数"
-              sortable
-            />
-            <el-table-column
-              v-if="visitCountRate"
-              prop="visitCountRate"
-              label="访问次数占比"
-              sortable
-            />
-            <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
-            <el-table-column
-              v-if="uvRate"
-              prop="uvRate"
-              label="访客数占比"
-              sortable
-            />
-            <el-table-column
-              v-if="newUv"
-              prop="newUv"
-              label="新访客数"
-              sortable
-            />
-            <el-table-column
-              v-if="newUvRate"
-              prop="newUvRate"
-              label="新访客数占比"
-              sortable
-            />
-            <el-table-column
-              v-if="ipCount"
-              prop="ipCount"
-              label="IP数"
-              sortable
-            />
-            <el-table-column
-              v-if="ipCountRate"
-              prop="ipCountRate"
-              label="IP数占比"
-              sortable
-            />
-          </el-table-column>
-          <el-table-column prop="date" label="流量质量指标" width="150">
-            <el-table-column
-              v-if="bounceRate"
-              prop="bounceRate"
-              label="跳出率"
-              sortable
-            />
-            <el-table-column
-              prop="avgVisitTime"
-              label="平均访问时长"
-              sortable
-              v-if="avgVisitTime"
-            />
-            <el-table-column
-              v-if="visitTimeRate"
-              prop="visitTimeRate"
-              label="平均访问时长占比"
-              sortable
-            />
-            <el-table-column
-              v-if="avgPv"
-              prop="avgPv"
-              label="平均访问页数"
-              sortable
-            />
-            <el-table-column
-              v-if="avgPvRate"
-              prop="avgPvRate"
-              label="平均访问页数占比"
-              sortable
-            />
-            <!-- <el-table-column prop="amount10" label="平均访问页数" sortable /> -->
-          </el-table-column>
-        </el-table>
-      </div>
-      <div class="block">
-        <el-pagination
-          :current-page="currentPage"
-          :page-sizes="[10, 20, 30, 40]"
-          :page-size="pageSize"
-          layout=" sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
+      <div class="public-table-block">
+        <div class="public-Table-minHeight">
+          <el-table
+            :data="
+              channelTableData.slice(
+                (currentPage - 1) * pageSize,
+                currentPage * pageSize
+              )
+            "
+            :header-cell-style="{ textAlign: 'center' }"
+            :cell-style="{ textAlign: 'center' }"
+            border
+            style="width: 100%"
+          >
+            <el-table-column type="index" label="序号" width="150" />
+            <el-table-column prop="channel" label="渠道类型" width="150" />
+            <el-table-column prop="date" label="流量基础指标" width="150">
+              <el-table-column
+                v-if="pv"
+                prop="pv"
+                label="浏览量(PV)"
+                sortable
+              />
+              <el-table-column
+                v-if="pvRate"
+                prop="pvRate"
+                label="浏览量占比"
+                sortable
+              />
+              <el-table-column
+                v-if="visitCount"
+                prop="visitCount"
+                label="访问次数"
+                sortable
+              />
+              <el-table-column
+                v-if="visitCountRate"
+                prop="visitCountRate"
+                label="访问次数占比"
+                sortable
+              />
+              <el-table-column
+                v-if="uv"
+                prop="uv"
+                label="访客数(UV)"
+                sortable
+              />
+              <el-table-column
+                v-if="uvRate"
+                prop="uvRate"
+                label="访客数占比"
+                sortable
+              />
+              <el-table-column
+                v-if="newUv"
+                prop="newUv"
+                label="新访客数"
+                sortable
+              />
+              <el-table-column
+                v-if="newUvRate"
+                prop="newUvRate"
+                label="新访客数占比"
+                sortable
+              />
+              <el-table-column
+                v-if="ipCount"
+                prop="ipCount"
+                label="IP数"
+                sortable
+              />
+              <el-table-column
+                v-if="ipCountRate"
+                prop="ipCountRate"
+                label="IP数占比"
+                sortable
+              />
+            </el-table-column>
+            <el-table-column prop="date" label="流量质量指标" width="150">
+              <el-table-column
+                v-if="bounceRate"
+                prop="bounceRate"
+                label="跳出率"
+                sortable
+              />
+              <el-table-column
+                prop="avgVisitTime"
+                label="平均访问时长"
+                sortable
+                v-if="avgVisitTime"
+              />
+              <el-table-column
+                v-if="visitTimeRate"
+                prop="visitTimeRate"
+                label="平均访问时长占比"
+                sortable
+              />
+              <el-table-column
+                v-if="avgPv"
+                prop="avgPv"
+                label="平均访问页数"
+                sortable
+              />
+              <el-table-column
+                v-if="avgPvRate"
+                prop="avgPvRate"
+                label="平均访问页数占比"
+                sortable
+              />
+              <!-- <el-table-column prop="amount10" label="平均访问页数" sortable /> -->
+            </el-table-column>
+          </el-table>
+        </div>
+        <div class="block">
+          <el-pagination
+            :current-page="currentPage"
+            :page-sizes="[10, 20, 30, 40]"
+            :page-size="pageSize"
+            layout=" sizes, prev, pager, next, jumper"
+            :total="total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -231,23 +242,23 @@ export default {
       });
       this.channelTableData.map((item) => {
         if (item.bounceRate) {
-          item.bounceRate =percentage(item.bounceRate);
+          item.bounceRate = percentage(item.bounceRate);
         }
         if (item.uvRate) {
-          item.uvRate =percentage(item.uvRate);
+          item.uvRate = percentage(item.uvRate);
         }
         if (item.newUvRate) {
-          item.newUvRate =percentage(item.newUvRate);
+          item.newUvRate = percentage(item.newUvRate);
         }
         if (item.visitCountRate) {
-          item.visitCountRate =percentage(item.visitCountRate);
+          item.visitCountRate = percentage(item.visitCountRate);
         }
         if (item.ipCountRate) {
-          item.ipCountRate =percentage(item.ipCountRate);
+          item.ipCountRate = percentage(item.ipCountRate);
         }
-        
+
         if (item.pvRate) {
-          item.pvRate =percentage(item.pvRate);
+          item.pvRate = percentage(item.pvRate);
         }
         if (item.avgVisitTime) {
           item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
@@ -387,7 +398,7 @@ img {
 }
 .Overview {
   margin: 20px;
-  min-height: 200px;
+  min-height: 180px;
   background-color: #fff;
   .bid-list-page {
     width: clas(100% -20px);

@@ -1,5 +1,5 @@
 <template>
-  <div class="SearchWord block-main">
+  <div class="SearchWord block-main public-hoverItem" >
     <div class="block-head">
       <div class="block-title">Top10搜索词</div>
       <div

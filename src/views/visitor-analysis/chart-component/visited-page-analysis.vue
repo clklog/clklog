@@ -23,88 +23,97 @@
           @change="handelFlowQuality"
         >
           <el-checkbox label="entryRate">入口页次数</el-checkbox>
-          <el-checkbox label="devoteCount">贡献下游浏览量</el-checkbox>
+          <el-checkbox label="downPvCount">贡献下游浏览量</el-checkbox>
           <el-checkbox label="exitCount">退出页次数</el-checkbox>
-          <el-checkbox label="avgDuration">平均访问时长</el-checkbox>
+          <el-checkbox label="avgVisitTime">平均访问时长</el-checkbox>
           <el-checkbox label="exitRate">退出率</el-checkbox>
         </el-checkbox-group>
       </div>
     </div>
-    <div class="table-content">
-      <el-table
-        :data="vistedTableData"
-        border
-        style="width: 100%"
-        :header-cell-style="{ textAlign: 'center' }"
-        :cell-style="{ textAlign: 'center' }"
-      >
-        <el-table-column type="index" label="序号" width="150" />
-        <!-- :show-overflow-tooltip="true"  prop="uri" -->
-        <el-table-column label="页面URL"  width="350" >
+    <div class="public-table-block">
+      <div class="public-Table-minHeight public-hoverItem">
+        <el-table
+          :data="vistedTableData"
+          border
+          style="width: 100%"
+          :header-cell-style="{ textAlign: 'center' }"
+          :cell-style="{ textAlign: 'center' }"
+        >
+          <el-table-column type="index" label="序号" width="150" />
+          <!-- :show-overflow-tooltip="true"  prop="uri" -->
+          <el-table-column label="页面URL" width="350">
             <template slot-scope="scope">
               <el-popover trigger="hover" placement="top">
                 <div>{{ scope.row.uri }}</div>
-                <div slot="reference" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
+                <div
+                  slot="reference"
+                  style="
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
                   {{ scope.row.uri }}
                 </div>
               </el-popover>
             </template>
-         </el-table-column>
-        <el-table-column label="流量基础指标">
-          <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
-          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
-          <el-table-column
-            v-if="ipCount"
-            prop="ipCount"
-            label="IP数"
-            sortable
-          />
-        </el-table-column>
-        <el-table-column prop="date" label="流量质量指标">
-          <el-table-column
-            v-if="devoteCount"
-            prop="devoteCount"
-            label="贡献下游浏览量"
-            sortable
-          />
-          <el-table-column
-            v-if="entryRate"
-            prop="entryRate"
-            label="入口页次数"
-            sortable
-          />
-          <el-table-column
-            v-if="exitCount"
-            prop="exitCount"
-            label="退出页次数"
-            sortable
-          />
-          <el-table-column
-            v-if="exitRate"
-            prop="exitRate"
-            label="退出率"
-            sortable
-          />
-          <el-table-column
-            v-if="avgDuration"
-            prop="avgDuration"
-            label="平均访问时长"
-            sortable
-          />
-        </el-table-column>
-      </el-table>
-    </div>
-    <div class="block">
-      <el-pagination
-        next-text="下一页"
-        :current-page="currentPage"
-        :page-sizes="[10, 20, 30, 40]"
-        :page-size="pageSize"
-        layout=" sizes, prev, pager, next, jumper"
-        :total="total"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+          </el-table-column>
+          <el-table-column label="流量基础指标">
+            <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
+            <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+            <el-table-column
+              v-if="ipCount"
+              prop="ipCount"
+              label="IP数"
+              sortable
+            />
+          </el-table-column>
+          <el-table-column prop="date" label="流量质量指标">
+            <el-table-column
+              v-if="downPvCount"
+              prop="downPvCount"
+              label="贡献下游浏览量"
+              sortable
+            />
+            <el-table-column
+              v-if="entryRate"
+              prop="entryRate"
+              label="入口页次数"
+              sortable
+            />
+            <el-table-column
+              v-if="exitCount"
+              prop="exitCount"
+              label="退出页次数"
+              sortable
+            />
+            <el-table-column
+              v-if="exitRate"
+              prop="exitRate"
+              label="退出率"
+              sortable
+            />
+            <el-table-column
+              v-if="avgVisitTime"
+              prop="avgVisitTime"
+              label="平均访问时长"
+              sortable
+            />
+          </el-table-column>
+        </el-table>
+      </div>
+      <div class="block">
+        <el-pagination
+          next-text="下一页"
+          :current-page="currentPage"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="pageSize"
+          layout=" sizes, prev, pager, next, jumper"
+          :total="total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -119,8 +128,8 @@ export default {
   },
   data() {
     return {
-      channelList: ["uv","ipCount","pv"],
-      flowQuality: ["entryRate","avgDuration"],
+      channelList: ["uv", "ipCount", "pv"],
+      flowQuality: ["entryRate", "avgVisitTime"],
       current: {
         size: 10,
         page: 1,
@@ -131,10 +140,10 @@ export default {
       pv: false,
       ipCount: false,
       exitCount: false,
-      avgDuration: false,
+      avgVisitTime: false,
       exitRate: false,
       entryRate: false,
-      devoteCount: false,
+      downPvCount: false,
       currentPage: 1,
       vistedTableData: [],
       total: 0,
@@ -145,19 +154,22 @@ export default {
     vistedAnalysis(val) {
       this.vistedTableData = val.rows;
       this.vistedTableData.map((item) => {
-        // if (item.exitRate) {
-        //   item.exitRate = percentage(item.exitRate);
-        // }
+        if (item.exitRate) {
+          item.exitRate = percentage(item.exitRate);
+        }
         if (item.avgVisitTime) {
-          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime))
+          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
         }
         if (item.avgPv) {
-          item.avgPv = Math.floor(item.avgPv)
+          item.avgPv = Math.floor(item.avgPv);
         }
+        // if (item.avgPv) {
+        //   item.avgPv = Math.floor(item.avgPv);
+        // }
       });
       this.total = val.total;
 
-      this.initShowTable()
+      this.initShowTable();
     },
     // 分页器
     handleSizeChange(val) {
@@ -210,10 +222,10 @@ export default {
           this.exitCount = false;
         }
 
-        if (val.includes("avgDuration")) {
-          this.avgDuration = true;
+        if (val.includes("avgVisitTime")) {
+          this.avgVisitTime = true;
         } else {
-          this.avgDuration = false;
+          this.avgVisitTime = false;
         }
         if (val.includes("avgVisitTime")) {
           this.avgVisitTime = true;
@@ -225,14 +237,13 @@ export default {
         } else {
           this.exitRate = false;
         }
-        if (val.includes("devoteCount")) {
-          this.devoteCount = true;
+        if (val.includes("downPvCount")) {
+          this.downPvCount = true;
         } else {
-          this.devoteCount = false;
+          this.downPvCount = false;
         }
       }
     },
-   
   },
 };
 </script>

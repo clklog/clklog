@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="chartsIcon">
-      <div class="chartLeft">
+      <div class="chartLeft public-hoverItem">
         <div class="trendHead">
           <div class="trafficHead">Top10来源网站</div>
           <div
@@ -36,7 +36,7 @@
           </div>
         </div>
       </div>
-      <div class="chartRight">
+      <div class="chartRight public-hoverItem">
         <div class="trendHead">
           <div class="trafficHead">地域分布</div>
         </div>

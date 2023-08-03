@@ -206,7 +206,6 @@ aside {
   line-height: 30px;
   white-space: nowrap;
 }
-// 块通用样式
 .block-main {
   box-sizing: border-box;
   padding: 25px 25px;
@@ -216,6 +215,7 @@ aside {
     align-items: center;
     position: relative;
     margin-bottom: 17px;
+    // 首页一级标题字体设置
     .block-title {
       font-weight: 600;
       font-size: 15px;

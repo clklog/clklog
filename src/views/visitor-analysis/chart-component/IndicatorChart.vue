@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="chartsIcon public-echart-block">
-      <div class="chartLeft">
+    <div class="chartsIcon public-echart-block  ">
+      <div class="chartLeft public-hoverItem">
         <div class="trendHead">
-          <div class="trafficHead">指示分析图</div>
+          <div class="public-firstHead" style="padding:0 13px 0 0;">指示分析图</div>
           <div class="block">
             <!-- <el-cascader
               v-model="pointValue"

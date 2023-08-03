@@ -2,11 +2,10 @@
 
   .main-container {
     min-height: calc(100% - 50px);
-    transition: margin-left .28s;
     margin-left: $sideBarWidth;
     position: relative;
     top: 50px;
-    background: rgba(170, 170, 170, 0.12) !important;;
+    background: rgba(170, 170, 170, 0.12)!important;
   }
 
   .sidebar-container {
@@ -88,8 +87,8 @@
       background-color: $subMenuBg !important;
 
       &:hover {
-        background: $subMenuHover !important;
-        // background: linear-gradient(to right, #00bfff, #ffffff) !important;
+        // background: $subMenuHover !important;
+        background: linear-gradient(to right, #d5e5fa,#fff ) !important;
         // background: linear-gradient(269deg, rgba(61,100,230,0) 0%, rgba(61,100,230,0.16) 100%) !important;
       }
     }

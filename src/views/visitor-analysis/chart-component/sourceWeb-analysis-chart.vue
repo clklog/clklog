@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="chartsIcon">
-      <div class="chartLeft">
+      <div class="chartLeft public-hoverItem">
         <div class="trendHead">
           <div class="trafficHead">TOP10来源网站指标展示</div>
           <div class="block">

@@ -143,7 +143,6 @@
 
 #app .main-container {
   min-height: calc(100% - 50px);
-  transition: margin-left .28s;
   margin-left: 210px;
   position: relative;
   top: 50px;
@@ -225,7 +224,7 @@
 }
 
 #app .sidebar-container .nest-menu .el-submenu > .el-submenu__title:hover, #app .sidebar-container .el-submenu .el-menu-item:hover {
-  background: linear-gradient(to right, #E1E7FB, #ffffff) !important;
+  background: linear-gradient(to right, #d5e5fa, #fff) !important;
 }
 
 #app .hideSidebar .sidebar-container {
@@ -532,7 +531,7 @@
 
 .public-echart-block {
   margin: 20px 0;
-  width: calc(100% -20px);
+  width: 100%;
   min-height: 300px;
 }
 
@@ -541,7 +540,11 @@
   font-weight: 600;
   line-height: 31px;
   color: #4d4d4d;
-  padding: 14px 13px 18px 13px;
+  padding: 14px 13px 0px 13px;
+}
+
+.public-hoverItem {
+  border-radius: 6px;
 }
 
 body {

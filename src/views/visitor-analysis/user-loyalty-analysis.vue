@@ -1,9 +1,8 @@
 <template>
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams"></FilterBar>
-    <!-- <userLoyalty></userLoyalty> -->
-    <div class="userLoyalty">
-      <span class="public-firstHead">用户忠诚度分析</span>
+    <div class="userLoyalty public-hoverItem">
+      <div class="public-firstHead loyaltyTitle">用户忠诚度分析</div>
       <visitNum ref="visitNum"></visitNum>
       <visitPage ref="visitPage"></visitPage>
       <visitTime ref="visitTime"></visitTime>
@@ -19,7 +18,6 @@ import {
   getUserPvApi,
 } from "@/api/trackingapi/uservisit";
 
-// import userLoyalty from "./chart-component/user-loyalty-analysis";
 import visitNum from "./chart-component/userLoyalty-echarts/visitNum";
 import visitPage from "./chart-component/userLoyalty-echarts/visitPage";
 import visitTime from "./chart-component/userLoyalty-echarts/visitTime";
@@ -28,7 +26,6 @@ import { percentage } from "@/utils/percent";
 export default {
   components: {
     FilterBar,
-    // userLoyalty,
     visitNum,
     visitPage,
     visitTime,
@@ -62,21 +59,21 @@ export default {
     getUserVisit() {
       getUserVisitApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.visitNum.getVisitNum(res.data)
+          this.$refs.visitNum.getVisitNum(res.data);
         }
       });
     },
     getUserVisitTime() {
       getUserVisitTimeApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.visitTime.getVisitTime(res.data)
+          this.$refs.visitTime.getVisitTime(res.data);
         }
       });
     },
     getUserPv() {
       getUserPvApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.visitPage.getVisitPage(res.data)
+          this.$refs.visitPage.getVisitPage(res.data);
         }
       });
     },
@@ -88,9 +85,13 @@ export default {
 .userLoyalty {
   height: 1109px;
   margin: 15px;
-  background-color: #fff;
+  // background: rgba(170, 170, 170, 0.12);
   padding-top: 18px;
   padding-left: 16px;
   padding-bottom: 30px;
+  // .loyaltyTitle {
+  //   background-color: #fff;
+  //   padding:20px;
+  // }
 }
 </style>

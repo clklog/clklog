@@ -673,6 +673,7 @@ export default {
     margin-top:5px;
   }
 .bid-list-header {
+  padding-bottom: 10px;
   display: flex;
   .header-name {
     width: 14%;

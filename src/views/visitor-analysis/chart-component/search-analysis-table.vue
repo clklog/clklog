@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="search_wrappy public-table-block">
-      <div class="search_table">
-        <span class="public-firstHead" >搜索词分析</span>
-        <div class="setTable">
+    <div class="search_wrappy public-table-block public-hoverItem">
+      <!-- <div class="search_table"> -->
+        <span class="public-firstHead">搜索词分析</span>
+        <div class="public-Table-minHeight">
           <el-table
             :header-cell-style="{ textAlign: 'center' }"
             :cell-style="{ textAlign: 'center' }"
@@ -13,43 +13,66 @@
           >
             <!-- <el-table-column prop="statTime" label="日期" sortable width="180">
             </el-table-column> -->
-            <el-table-column prop="searchword" :show-overflow-tooltip="true" label="搜索词" width="250">
+            <el-table-column
+              prop="searchword"
+              :show-overflow-tooltip="true"
+              label="搜索词"
+              width="250"
+            >
             </el-table-column>
-            <el-table-column prop="pv" label="浏览量(PV)" sortable>
+            <el-table-column
+              prop="pv"
+              label="浏览量(PV)"
+              :sort-orders="['descending', 'ascending']"
+              :sortable="true"
+            >
             </el-table-column>
-            <!-- prop="pvRate" -->
-            <el-table-column  label="浏览量占比" sortable :sort-method="(a,b)=>{return a.pvRate - b.pvRate}">
-                <template slot-scope="scope">
-                {{ scope.row.pvRate }}%
-               </template>
+            <el-table-column
+              label="浏览量占比"
+              sortable
+              :sort-method="
+                (a, b) => {
+                  return a.pvRate - b.pvRate;
+                }
+              "
+            >
+              <template slot-scope="scope"> {{ scope.row.pvRate }}% </template>
             </el-table-column>
             <el-table-column prop="avgVisitTime" label="平均访问时长" sortable>
             </el-table-column>
             <el-table-column prop="avgPv" label="平均访问页数" sortable>
             </el-table-column>
-            <el-table-column label="跳出率" sortable :sort-method="(a,b)=>{return a.bounceRate - b.bounceRate}">
+            <el-table-column
+              label="跳出率"
+              sortable
+              :sort-method="
+                (a, b) => {
+                  return a.bounceRate - b.bounceRate;
+                }
+              "
+            >
               <template slot-scope="scope">
                 {{ scope.row.bounceRate }}%
-               </template>
+              </template>
             </el-table-column>
           </el-table>
         </div>
+        <div class="block">
+          <el-pagination
+            :pager-count="5"
+            prev-text
+            next-text="下一页"
+            :current-page="currentPage"
+            :page-sizes="[10, 20, 30, 40]"
+            :page-size="pageSize"
+            layout=" sizes, prev, pager, next, jumper"
+            :total="total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
       </div>
-    </div>
-    <div class="block">
-      <el-pagination
-        :pager-count="5"
-        prev-text
-        next-text="下一页"
-        :current-page="currentPage"
-        :page-sizes="[10, 20, 30, 40]"
-        :page-size= pageSize
-        layout=" sizes, prev, pager, next, jumper"
-        :total= total
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
-    </div>
+    <!-- </div> -->
   </div>
 </template>
 
@@ -86,10 +109,10 @@ export default {
           item.pvRate = this.percentageFun(item.pvRate);
         }
         if (item.avgVisitTime) {
-          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime))
+          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
         }
         if (item.avgPv) {
-          item.avgPv = Math.floor(item.avgPv)
+          item.avgPv = Math.floor(item.avgPv);
         }
       });
       this.total = val.total;
@@ -110,6 +133,16 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "~@/styles/components/el-pagination.scss";
+.search_wrappy {
+  position: relative;
+}
+.setTable {
+  min-height: 410px;
+}
+// .search_table {
+//   // min-height: 410px;
+//   padding: 18px 22px;
+// }
 // ::v-deep {
 //   .setTable {
 //     .el-table--border {
@@ -136,11 +169,4 @@ export default {
 //     }
 //   }
 // }
-.search_wrappy {
-  position: relative;
-}
-.search_table {
-  height: 100%;
-  padding: 18px 22px;
-}
 </style>

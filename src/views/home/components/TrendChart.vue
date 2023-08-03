@@ -1,5 +1,5 @@
 <template>
-  <div class="TrendChart block-main">
+  <div class="TrendChart block-main public-hoverItem">
     <div class="block-head">
       <div class="block-title">趋势图</div>
       <!-- collapse-tags -->

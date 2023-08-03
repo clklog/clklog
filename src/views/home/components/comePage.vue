@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="chartsIcon">
-      <div class="chartLeft">
+      <div class="chartLeft public-hoverItem">
         <div class="trendHead">
           <div class="trafficHead">Top10受访页面</div>
           <div
@@ -49,7 +49,7 @@
           </div>
         </div>
       </div>
-      <div class="chartRight">
+      <div class="chartRight public-hoverItem">
         <div class="trendHead">
           <div class="trafficHead">Top10搜索词</div>
           <div
@@ -59,7 +59,7 @@
             >
           </div>
         </div>
-        <div class="comePage">
+        <div class="comePage public-hoverItem">
           <!-- content -->
           <div class="bid-list-page">
             <div class="bid-list-header">

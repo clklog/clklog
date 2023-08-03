@@ -97,10 +97,8 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-// .public-block{
-//   margin: 20px;
-// }
 .block-line {
+  box-sizing: border-box;
   margin: 20px 0 20px 0;
   width: calc(100% -20px);
   min-height: 300px;

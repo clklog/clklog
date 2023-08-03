@@ -1,7 +1,7 @@
 <template>
-  <div class="bar_chart setSpace">
-    <div style="padding-left: 9px; padding-top: 40px; display: flex">
-      <span>访问页数</span>
+  <div class="bar_chart setSpace public-hoverItem">
+    <div class="public-visited-echarts">
+      访问页数
     </div>
     <div id="pageChart" :style="myChartStyle"></div>
   </div>
@@ -41,6 +41,11 @@ export default {
           axisTick: {
             show: false,
             alignWithLabel: true,
+          },
+          axisLabel: {
+            show: true,
+            interval: 0,
+            // rotate:45,
           },
         },
 

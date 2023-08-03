@@ -1,7 +1,7 @@
 <template>
-  <div class="bar_chart">
-    <div style="padding-left: 9px; padding-top: 40px; display: flex">
-      <span>访问次数</span>
+  <div class="bar_chart public-hoverItem">
+    <div class="public-visited-echarts">
+       访问次数
     </div>
     <div id="numChart" :style="myChartStyle"></div>
   </div>
@@ -14,7 +14,7 @@ export default {
     return {
       chart: null,
       emptyList: "",
-     
+
       xData: [],
       yData: [],
       myChartStyle: { width: "100%", height: "300px" }, //图表样式
@@ -22,9 +22,9 @@ export default {
   },
   methods: {
     getVisitNum(val) {
-      console.log(val,"次数");
-      this.xData = []
-      this.yData = []
+      console.log(val, "次数");
+      this.xData = [];
+      this.yData = [];
       val.map((item) => {
         if (item) {
           this.xData.push(item.key);
@@ -42,8 +42,13 @@ export default {
             show: false,
             alignWithLabel: true,
           },
+          axisLabel: {
+            show: true,
+            interval: 0,
+            rotate:35,
+          },
         },
-       
+
         dataZoom: [
           // {
           //   type: "slider",
@@ -112,7 +117,7 @@ export default {
     color: #4d4d4d;
   }
   .bar_chart {
-    height: 337px;
+    min-height: 337px;
     background: #fff;
     span {
       font-size: 12px;

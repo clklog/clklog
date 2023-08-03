@@ -1,7 +1,7 @@
 <template>
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams"></FilterBar>
-    <div class="Overview">
+    <div class="Overview public-hoverItem">
       <div class="public-firstHead">新老访客分析</div>
       <div class="bid-list-page">
         <originView ref="originView" byVisit></originView>

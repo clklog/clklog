@@ -1,5 +1,5 @@
 <template>
-  <div class="chartsIcon">
+  <div class="chartsIcon public-hoverItem">
     <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
     <div class="table-content">
       <el-table

@@ -1,5 +1,5 @@
 <template>
-  <div class="area_container">
+  <div class="area_container public-hoverItem">
     <div class="mapCharts">
       <span class="public-firstHead" style="padding:0 0;">TOP10访问区域指标展示</span>
       <div
@@ -253,10 +253,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .area_container {
-  margin: 15px;
   background-color: #fff;
-  // min-height: 339px;
   min-height: 470px;
+  margin-bottom: 20px;
   display: flex;
   .mapCharts {
     width: 50%;

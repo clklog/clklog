@@ -1,7 +1,7 @@
 <template>
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams" ByArea></FilterBar>
-     <div class="Overview">
+     <div class="Overview public-hoverItem">
       <div class="public-firstHead" >来源网站分析</div>
       <originView ref="originView" byAreaAnaly></originView>
     </div>

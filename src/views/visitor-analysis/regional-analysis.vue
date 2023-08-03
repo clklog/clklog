@@ -1,15 +1,17 @@
 <template>
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams" />
-    <div class="Overview">
-      <div class="public-firstHead" style="padding-left: 15px">地域分析</div>
-      <originView ref="originView" byAreaAnaly></originView>
+    <div class="public-block">
+      <div class="Overview public-hoverItem">
+        <div class="public-firstHead" style="padding-left: 15px">地域分析</div>
+        <originView ref="originView" byAreaAnaly></originView>
+      </div>
+      <regionalShow ref="regionalShow"></regionalShow>
+      <regionalTable
+        ref="regionalTable"
+        @currentPage="currentPage"
+      ></regionalTable>
     </div>
-    <regionalShow ref="regionalShow"></regionalShow>
-    <regionalTable
-      ref="regionalTable"
-      @currentPage="currentPage"
-    ></regionalTable>
   </div>
 </template>
 
@@ -55,7 +57,7 @@ export default {
       this.getAreaDetailTotal(val);
       this.getAreaProvinceList();
       this.getAreaDetailTop10();
-      this.getArea()
+      this.getArea();
     },
   },
   mounted() {},
@@ -109,7 +111,9 @@ export default {
 
 <style lang="scss" scoped>
 .Overview {
-  margin: 20px;
+  // margin: 20px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
   min-height: 118px;
   background-color: #fff;
   img {
@@ -126,4 +130,5 @@ export default {
     padding: 15px 30px 15px;
     padding-left: 0;
   }
-}</style>
+}
+</style>

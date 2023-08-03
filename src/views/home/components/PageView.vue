@@ -1,7 +1,7 @@
 <template>
-  <div class="PageView block-main">
-    <div class="block-head">
-      <div class="block-title">Top10受访页面</div>
+  <div class="PageView block-main public-hoverItem">
+    <div class="block-head ">
+      <div class="block-title ">Top10受访页面</div>
       <div
         class="block-head-icon"
         @click="$router.push('/visitorAnalysis/visitedPage')"

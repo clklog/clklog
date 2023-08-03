@@ -66,19 +66,19 @@ export default {
 </script>
 <style>
 #app .sidebar-container .el-submenu__title:hover {
-  background: linear-gradient(to right, #e1e7fb, #ffffff) !important;
+ background: linear-gradient(to right, #d5e5fa,#fff ) !important;
 }
 #app .sidebar-container .submenu-title-noDropdown:hover {
-  background: linear-gradient(to right, #e1e7fb, #ffffff) !important;
+ background: linear-gradient(to right, #d5e5fa,#fff ) !important;
 }
 </style>
 <style lang="scss" scoped>
 ::v-deep {
   #app .sidebar-container .el-submenu .el-menu-item.is-active {
-    background: linear-gradient(to right, #e1e7fb, #ffffff) !important;
+   background: linear-gradient(to right, #d5e5fa,#fff ) !important;
   }
   .el-menu-item.is-active {
-    background: linear-gradient(to right, #e1e7fb, #ffffff) !important;
+   background: linear-gradient(to right, #d5e5fa,#fff ) !important;
   }
 }
 </style>
