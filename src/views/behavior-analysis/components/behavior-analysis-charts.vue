@@ -3,9 +3,9 @@
     <div class="chartsIcon">
       <div class="chartLeft">
         <div class="trendHead">
-          <div class="trafficHead">指标分析图</div>
+          <div class="public-firstHead">指标分析图</div>
           <div class="block">
-            <el-cascader
+            <!-- <el-cascader
               v-model="emptyList"
               style="width: 170px"
               placeholder="指标 | 选项"
@@ -13,7 +13,30 @@
               :props="{ multiple: true, checkStrictly: true }"
               clearable
               collapse-tags
-            />
+            /> -->
+            <el-select
+              class="custom_select"
+              v-model="pointValue"
+              multiple
+              placeholder="请选择"
+              style="min-width: 280px"
+              @change="changeChartValue"
+            >
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+                :disabled="disabledSelect.includes(item.value)"
+              >
+                <div style="display: flex; align-items: center">
+                  <span class="checkbox__inner"
+                    ><div class="inner-box"></div
+                  ></span>
+                  <span style="">{{ item.label }}</span>
+                </div>
+              </el-option>
+            </el-select>
           </div>
         </div>
         <div class="echart" id="mychart" :style="myChartStyle"></div>
@@ -22,30 +45,46 @@
 
     <div class="search_wrappy">
       <div class="search_table">
-        <span>用户列表</span>
+        <span class="public-firstHead">用户列表</span>
         <div class="setTable">
           <el-table
-            :data="tableData"
+            border
+            :data="userListData"
             :header-cell-style="{ textAlign: 'center' }"
             :cell-style="{ textAlign: 'center' }"
             style="width: 100%; margin-top: 12px; height: 98%"
-            :default-sort="{ prop: 'date', order: 'descending' }"
           >
-            <el-table-column prop="date" label="日期" sortable width="180">
+            <el-table-column
+              :show-overflow-tooltip="true"
+              style="cursor: pointer !important"
+              prop="distinctId"
+              label="访客ID"
+              width="200"
+            >
+              <template slot-scope="scope">
+                <div
+                  @click="handleCellClick(scope.row.distinctId)"
+                  style="
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  {{ scope.row.distinctId }}
+                </div>
+              </template>
             </el-table-column>
-            <el-table-column prop="word" label="访客ID" sortable width="180">
+            <el-table-column prop="visitorType" label="访客类型" sortable>
             </el-table-column>
-            <el-table-column prop="visitor" label="访客类型" sortable>
+            <el-table-column prop="visitCount" label="访客次数" sortable>
             </el-table-column>
-            <el-table-column prop="user" label="访客次数" sortable>
+            <el-table-column prop="pv" label="浏览量" sortable>
             </el-table-column>
-            <el-table-column prop="timeLegth" label="浏览量" sortable>
+            <el-table-column prop="visitTime" label="停留时长" sortable>
             </el-table-column>
-            <el-table-column prop="pageNum" label="停留时长" sortable>
+            <el-table-column prop="avgPv" label="平均访问页数" sortable>
             </el-table-column>
-            <el-table-column prop="out" label="访客页数" sortable>
-            </el-table-column>
-            <el-table-column prop="out" label="上次访问时间" sortable>
+            <el-table-column prop="latestTime" label="上次访问时间" sortable>
             </el-table-column>
           </el-table>
         </div>
@@ -53,160 +92,82 @@
       <div class="block">
         <el-pagination
           next-text="下一页"
-          :current-page="currentPage4"
+          :current-page="currentPage"
           :page-sizes="[10, 20, 30, 40]"
-          :page-size="10"
+          :page-size="pageSize"
           layout=" sizes, prev, pager, next, jumper"
-          :total="40"
+          :total="total"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
       </div>
     </div>
+
+    <dialogs ref="child" />
   </div>
 </template>
 
 <script>
 import echarts from "echarts";
+import dialogs from "@/layout/components/dialog/index";
+
 export default {
+  components: {
+    dialogs,
+  },
   data() {
     return {
+      pointValue: ["浏览量", "访客数"],
       chart: null,
       emptyList: "",
       options: [
         {
-          value: 1,
+          value: "浏览量",
           label: "浏览量",
         },
         {
-          value: 2,
+          value: "访客数",
           label: "访客数",
         },
         {
-          value: 3,
+          value: "访问次数",
           label: "访问次数",
         },
         {
-          value: 4,
+          value: "IP数",
           label: "IP数",
         },
         {
-          value: 5,
+          value: "跳出率",
           label: "跳出率",
         },
       ],
-      xData: ["网站", "安卓"], //横坐标
-      yData: [23, 24], //人数数据
-      taskDate: [10, 11],
-      averageData: [23, 12],
+      xData: [],
+      yData: [],
       myChartStyle: { float: "left", width: "100%", height: "400px" }, //图表样式
-      currentPage4: 4,
-      tableData: [
-        {
-          date: "2023/5/30",
-          word: "女士衣服",
-          visitor: "86",
-          user: "15%",
-          timeLegth: "695",
-          pageNum: "56",
-          out: "61",
-        },
-        {
-          date: "2023/5/30",
-          word: "女士衣服",
-          visitor: "86",
-          user: "15%",
-          timeLegth: "695",
-          pageNum: "56",
-          out: "61",
-        },
-        {
-          date: "2023/5/31",
-          word: "NA士衣服",
-          visitor: "86",
-          user: "15%",
-          timeLegth: "69",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/3",
-          word: "衣服",
-          visitor: "86",
-          user: "15%",
-          timeLegth: "695",
-          pageNum: "86",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-        {
-          date: "2023/5/13",
-          word: "士衣服",
-          visitor: "186",
-          user: "151%",
-          timeLegth: "695",
-          pageNum: "856",
-          out: "61",
-        },
-      ],
+      pv: [],
+      uv: [],
+      visitCount: [],
+      ipCount: [],
+      bounceRate: [],
+      time: [],
+      headLege: [],
+      pointValue: ["浏览量", "访客数", "IP数"],
+      disabledSelect: [],
+      seriesdata: [],
+      userListData: [],
+      current: {
+        size: 10,
+        page: 1,
+      },
+      total: 0,
+      pageSize: 10,
+      currentPage: 1,
     };
   },
   mounted() {
-    // this.initChart();
     this.initEcharts();
+    this.initChartValue(); //是否初始开启三个禁用
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -216,95 +177,293 @@ export default {
     this.chart = null;
   },
   methods: {
-    initEcharts() {
-      // 多列柱状图
-      const mulColumnZZTData = {
-        xAxis: {
-          data: this.xData,
+    getChannelList(val) {
+      this.pv = [];
+      this.uv = [];
+      this.visitCount = [];
+      this.ipCount = [];
+      this.bounceRate = [];
+      this.xData = [];
+      this.sourceChartList = val;
+      this.sourceChartList.map((item) => {
+        if (item.channel) {
+          this.xData.push(item.channel);
+        } else {
+          this.xData.push(0);
+        }
+      });
+      this.filterData(this.pointValue);
+    },
+    getUserListEvent(val) {
+      this.userListData = val.rows;
+      val.rows.map(item=>{
+        if (item.avgPv) {
+          item.avgPv = Math.floor(item.avgPv)
+        }
+      })
+      this.total = val.total;
+      // console.log(this.userListData, "用户列表数据");
+    },
+    handleCellClick(val) {
+      this.$refs.child.callMethod(val);
+    },
+    
+    // 切换事件
+    changeChartValue(e) {
+      this.pv = [];
+      this.uv = [];
+      this.visitCount = [];
+      this.ipCount = [];
+      this.bounceRate = [];
+      let result = [];
+      for (let i = 0; i < this.options.length; i++) {
+        result.push(this.options[i].label);
+
+        if (e.length > 2) {
+          this.disabledSelect = result.filter((item) => {
+            return e.indexOf(item) == -1;
+          });
+        } else {
+          this.disabledSelect = [];
+        }
+      }
+      this.filterData(this.pointValue);
+    },
+    initChartValue() {
+      let result = [];
+      for (let i = 0; i < this.options.length; i++) {
+        result.push(this.options[i].label);
+        if (this.pointValue.length > 2) {
+          this.disabledSelect = result.filter((item) => {
+            return this.pointValue.indexOf(item) == -1;
+          });
+        } else {
+          this.disabledSelect = [];
+        }
+      }
+    },
+    filterData(val) {
+      const { pv, uv, visitCount, ipCount, bounceRate } = this;
+      if (val.includes("浏览量")) {
+        this.sourceChartList.map((item) => {
+          if (item.visitorChannel.pv) {
+            return pv.push(item.visitorChannel.pv);
+          } else {
+            pv.push(0);
+          }
+        });
+      } else {
+        this.pv = [];
+      }
+      if (val.includes("访客数")) {
+        this.sourceChartList.map((item) => {
+          if (item.visitorChannel.uv) {
+            return uv.push(item.visitorChannel.uv);
+          } else {
+            uv.push(0);
+          }
+        });
+      } else {
+        this.uv = [];
+      }
+      if (val.includes("IP数")) {
+        this.sourceChartList.map((item) => {
+          if (item.visitorChannel.ipCount) {
+            return ipCount.push(item.visitorChannel.ipCount);
+          } else {
+            ipCount.push(0);
+          }
+        });
+      } else {
+        this.ipCount = [];
+      }
+      if (val.includes("访问次数")) {
+        this.sourceChartList.map((item) => {
+          if (item.visitorChannel.visitCount) {
+            return visitCount.push(item.visitorChannel.visitCount);
+          } else {
+            visitCount.push(0);
+          }
+        });
+      } else {
+        this.visitCount = [];
+      }
+
+      if (val.includes("跳出率")) {
+        this.sourceChartList.map((item) => {
+          if (item.visitorChannel.bounceRate) {
+            return bounceRate.push(item.visitorChannel.bounceRate);
+          } else {
+            bounceRate.push(0);
+          }
+        });
+      } else {
+        this.bounceRate = [];
+      }
+      let seriesdata = [
+        {
+          type: "bar",
+          data: this.pv,
+          barWidth: 20,
+          barGap: "100%", //柱图间距
+          name: "浏览量",
+          label: {
+            show: true,
+            position: "top",
+          },
+          itemStyle: {
+            color: "#d5e5fa",
+          },
         },
-        // 图例
+        {
+          type: "bar",
+          data: this.uv,
+          barWidth: 20,
+          name: "访客数",
+          label: {
+            show: true,
+            position: "top",
+          },
+          itemStyle: {
+            color: "#80b0ef",
+          },
+        },
+        {
+          type: "bar",
+          data: this.visitCount,
+          barWidth: 20,
+          name: "访问次数",
+          label: {
+            show: true,
+            position: "top",
+          },
+          itemStyle: {
+            color: "#5695ea",
+          },
+        },
+        {
+          type: "bar",
+          data: this.ipCount,
+          barWidth: 20,
+          name: "IP数",
+          label: {
+            show: true,
+            position: "top",
+          },
+          itemStyle: {
+            color: "#2c7be5",
+          },
+        },
+        {
+          type: "bar",
+          data: this.bounceRate,
+          barWidth: 20,
+          name: "跳出率",
+          label: {
+            show: true,
+            position: "top",
+          },
+          itemStyle: {
+            color: "#1a4a89",
+          },
+        },
+      ];
+      for (let i = 0; i < seriesdata.length; i++) {
+        if (!this.pointValue.includes(seriesdata[i].name)) {
+          seriesdata.splice(i--, 1);
+        }
+      }
+      this.initEcharts(seriesdata);
+    },
+    initEcharts(val) {
+      const sourceChart = {
+        tooltip: {
+          trigger: "axis",
+          showContent: true,
+          formatter: function (params) {
+            var res = "<div><p>" + params[0].name + "</p></div>";
+            for (var i = 0; i < params.length; i++) {
+              res +=
+                "<p>" + params[i].seriesName + ":" + params[i].value + "</p>";
+            }
+            return res;
+          },
+        },
+        xAxis: {
+          type: "category",
+          boundaryGap: true,
+          data: this.xData,
+          axisLabel: {
+            interval: 0,
+            // rotate: "30",
+          },
+          axisLine: {
+            onZero: false,
+          },
+          axisTick: {
+            show: false,
+            alignWithLabel: true,
+          },
+        },
+        grid: {
+          bottom: "22%",
+        },
         legend: {
-          data: ["浏览量", "访问次数", "平均访问页数"],
+          data: this.pointValue,
           top: "0%",
         },
-        yAxis: {},
-        series: [
+        dataZoom: [
           {
-            type: "bar", //形状为柱状图
-            data: this.yData,
-            barWidth: 40,
-            name: "浏览量", // legend属性
-            label: {
-              // 柱状图上方文本标签，默认展示数值信息
-              show: true,
-              position: "top",
-            },
-            itemStyle: {
-              color: "#051e71",
-            },
-          },
-          {
-            type: "bar", //形状为柱状图
-            data: this.taskDate,
-            barWidth: 40,
-            name: "访问次数", // legend属性
-            label: {
-              // 柱状图上方文本标签，默认展示数值信息
-              show: true,
-              position: "top",
-            },
-            itemStyle: {
-              color: "#3d64e6",
-            },
-          },
-          {
-            type: "bar", //形状为柱状图
-            data: this.averageData,
-            barWidth: 40,
-            name: "平均访问页数", // legend属性
-            label: {
-              show: true,
-              position: "top",
-            },
-            itemStyle: {
-              color: "#A4C4FE",
-            },
+            type: "inside",
+            startValue: 0,
+            endValue: 4,
+            zoomOnMouseWheel: false, // 关闭滚轮缩放
+            moveOnMouseWheel: true, // 开启滚轮平移
+            moveOnMouseMove: true, // 鼠标移动能触发数据窗口平移
           },
         ],
+        yAxis: {
+          // onZero: false,
+        },
+        series: val,
       };
       const myChart = echarts.init(document.getElementById("mychart"));
-      myChart.setOption(mulColumnZZTData);
-      //随着屏幕大小调节图表
+      myChart.setOption(sourceChart, true);
       window.addEventListener("resize", () => {
         myChart.resize();
       });
     },
-    handleCurrentChange() {},
-    handleSizeChange() {},
+    handleSizeChange(val) {
+      this.current.size = val;
+      this.$emit("currentPage", this.current);
+    },
+    handleCurrentChange(val) {
+      this.current.page = val;
+      this.$emit("currentPage", this.current);
+    },
   },
 };
 </script>
-<style lang="scss"></style>
-
 <style lang="scss" scoped>
-::v-deep .setTable {
-  .el-table--border {
-    border: none;
-  }
-  .el-table th {
-    background-color: transparent !important;
-  }
+@import "~@/styles/components/custom-select.scss";
+// ::v-deep .setTable {
+//   .el-table--border {
+//     border: none;
+//   }
+//   .el-table th {
+//     background-color: transparent !important;
+//   }
 
-  .el-table,
-  .el-table__expanded-cell {
-    background-color: transparent;
-  }
+//   .el-table,
+//   .el-table__expanded-cell {
+//     background-color: transparent;
+//   }
 
-  .setTable .el-table th,
-  .el-table tr {
-    background-color: transparent;
-  }
-}
+//   .setTable .el-table th,
+//   .el-table tr {
+//     background-color: transparent;
+//   }
+// }
 .trafficHead {
   font-size: 16px;
   font-weight: 600;
@@ -361,12 +520,12 @@ img {
 .search_table {
   height: 100%;
   padding: 18px 22px;
-  span {
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 31px;
-    color: #4d4d4d;
-  }
+  // span {
+  //   font-size: 13px;
+  //   font-weight: 500;
+  //   line-height: 31px;
+  //   color: #4d4d4d;
+  // }
 }
 .block {
   margin: 20px 12px;

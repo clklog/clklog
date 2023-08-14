@@ -5,15 +5,6 @@
         <div class="trendHead">
           <div class="trafficHead">TOP10来源网站指标展示</div>
           <div class="block">
-            <!-- <el-cascader
-              v-model="emptyList"
-              style="width: 170px"
-              placeholder="指标 | 选项"
-              :options="options"
-              :props="{ multiple: true, checkStrictly: true }"
-              clearable
-              collapse-tags
-            /> -->
             <el-select
               class="custom_select"
               v-model="pointValue"
@@ -369,7 +360,6 @@ export default {
   font-size: 16px;
   font-weight: 600;
   color: #4d4d4d;
-  // padding: 20px 30px 20px;
   padding: 15px 13px 18px 0px;
 }
 img {

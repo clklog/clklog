@@ -71,18 +71,6 @@ export default {
         }
       });
     },
-    // getVisitorList() {
-    //   let newvalue = copyObj(this.commonParams);
-    //   newvalue.pageNum = this.pageNum;
-    //   newvalue.pageSize = this.pageSize;
-
-    //   getVisitorListApi(newvalue).then((res) => {
-    //     if (res.code == 200) {
-    //       console.log(res, 4);
-
-    //     }
-    //   });
-    // },
    
   },
 };

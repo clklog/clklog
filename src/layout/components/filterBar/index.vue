@@ -159,7 +159,7 @@ export default {
       channelList: "",
       currentTime: "",
       allChaneList: [
-        { label: "全部", id: "" },
+        { label: "全部", id: '' },
         { label: "安卓", id: "安卓" },
         { label: "苹果", id: "苹果" },
         { label: "网站", id: "网站" },
@@ -190,7 +190,12 @@ export default {
   },
   computed: {
     channel() {
-      return [this.channelValue];
+      if (this.channelValue) {
+        return [this.channelValue];
+      }else{
+        return [];
+      }
+      // return [this.channelValue];
     },
     area() {
       return [this.areaValue];

@@ -70,7 +70,7 @@ export const constantRoutes = [
 export const asyncRoutes = [
   visitorAnalysis,
   behaviorAnalysis,
-  userBehavior,
+  // userBehavior, //用户分析页面
   { path: '*', redirect: '/index', hidden: true }
 ]
 

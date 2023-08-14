@@ -1,64 +1,105 @@
 <template>
   <div>
-    <FilterBar></FilterBar>
+    <FilterBar @setFilterBarParams="setFilterBarParams" ByArea></FilterBar>
     <div class="Overview">
-      <div class="trafficHead" style="padding-left: 15px">用户概览</div>
+      <div class="public-firstHead">用户概览</div>
       <div class="bid-list-page">
-        <div class="bid-list-header">
-          <div class="header-name w156">
-            访客数
-            <img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            新访客数<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            新访客数占比<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            回流用户<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            沉默用户<img src="@/assets/images/question.png" alt="" />
-          </div>
-          <div class="header-name w156">
-            流失用户<img src="@/assets/images/question.png" alt="" />
-          </div>
-        </div>
-        <div class="bid-list-record">
-          <div class="bid-list-item w158">
-            <p>1877532222</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>14330</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>877424</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>800580</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>1.50</p>
-          </div>
-          <div class="bid-list-item w158">
-            <p>00:04:05</p>
-          </div>
-        </div>
+        <originView ref="originView" byVisit></originView>
       </div>
     </div>
-    <behaviorChart></behaviorChart>
+    <behaviorChart ref="behaviorChart" @currentPage="currentPage"></behaviorChart>
   </div>
 </template>
 
 <script>
 import { FilterBar } from "@/layout/components";
-import behaviorChart  from "./components/behavior-analysis-charts";
-
+import behaviorChart from "./components/behavior-analysis-charts";
+import { copyObj } from "@/utils/copy";
+import {
+  getVisitorTotalApi,
+  getVisitorChannelApi,
+  getVisitorListApi,
+} from "@/api/trackingapi/visitor.js";
+import originView from "@/components/origin-view/index";
 export default {
   components: {
     FilterBar,
-    behaviorChart
+    behaviorChart,
+    originView,
+  },
+  data() {
+    return {
+      filterBarParams: null,
+      pageNum: 1,
+      pageSize: 10,
+      visitorTotal: null,
+    };
+  },
+  computed: {
+    project() {
+      return this.$store.getters.project;
+    },
+    commonParams() {
+      const { project } = this;
+      return Object.assign({ project }, this.filterBarParams);
+    },
+  },
+  watch: {
+    commonParams() {
+      this.getVisitorTotal();
+      this.getVisitorChannel();
+      this.getVisitorList();
+    },
+  },
+  mounted() {},
+  methods: {
+    currentPage(val) {
+      this.getVisitorList(val);
+    },
+    setFilterBarParams(val) {
+      this.filterBarParams = copyObj(val);
+    },
+    getVisitorTotal() {
+      getVisitorTotalApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+          // this.visitorTotal = res.data;
+          this.$refs.originView.originEvent(res.data);
+        }
+      });
+    },
+    getVisitorChannel() {
+      getVisitorChannelApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+          this.$refs.behaviorChart.getChannelList(res.data);
+        }
+      });
+    },
+    getVisitorList(val) {
+      let newvalue = copyObj(this.commonParams);
+      newvalue.pageNum = this.pageNum;
+      newvalue.pageSize = this.pageSize;
+      if (val) {
+        newvalue.pageNum = val.page;
+        newvalue.pageSize = val.size;
+        this.pageNum = val.page;
+        this.pageSize = val.size;
+      } else {
+        newvalue.pageNum = this.pageNum;
+        newvalue.pageSize = this.pageSize;
+        // newvalue.sortName = "pv";
+        // newvalue.country=["全球"]
+        newvalue.sortOrder = "desc";
+        // newvalue.timeType = "day";
+        // newvalue["province"] = newvalue["area"];
+        // delete newvalue["area"];
+      }
+
+      getVisitorListApi(newvalue).then((res) => {
+        if (res.code == 200) {
+          this.$refs.behaviorChart.getUserListEvent(res.data);
+        }
+      });
+    },
   },
 };
 </script>

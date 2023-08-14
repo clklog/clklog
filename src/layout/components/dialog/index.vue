@@ -5,6 +5,7 @@
       center
       :modal-append-to-body="false"
       width="1100px"
+      @close="resetForm()"
     >
       <div class="el-dialog-div">
         <div class="left-item">
@@ -13,37 +14,46 @@
             <div style="padding-left: 49px">
               <div class="title">访客信息</div>
               <div style="display: flex">
-                <div class="gap" style="padding-right: 53px">
-                  <div class="lable">
+                <div class="gap" style="padding-right: 30px">
+                  <div
+                    class="lable"
+                    v-if="userBaseInfo && userBaseInfo.distinctId"
+                  >
                     ID：
-                    <span>4e2077d9166e5596</span>
+                    <span>{{ userBaseInfo.distinctId }}</span>
                   </div>
-                  <div class="lable">
+                  <div
+                    class="lable"
+                    v-if="userBaseInfo.country || userBaseInfo.city"
+                  >
                     地域：
-                    <span>中国 北京</span>
+                    <span
+                      >{{ userBaseInfo.country }} {{ userBaseInfo.city }}</span
+                    >
                   </div>
-                  <div class="lable">
+                  <div class="lable" v-if="userBaseInfo.channel">
                     渠道：
-                    <span>安卓</span>
+                    <span>{{ userBaseInfo.channel }}</span>
                   </div>
-                  <div class="lable">
+                  <div class="lable" v-if="userBaseInfo.client_ip">
                     IP：
-                    <span>117.21.119.21</span>
+                    <span>{{ userBaseInfo.client_ip }}</span>
                   </div>
                 </div>
                 <div>
-                  <div class="lable">
+                  <div class="lable" v-if="userBaseInfo.visitorType">
+                    类型：
+                    <span>{{ userBaseInfo.visitorType }}</span>
+                  </div>
+                  <!-- <div class="lable">
                     性别：
                     <span>男</span>
                   </div>
-                  <div class="lable">
-                    类型：
-                    <span>老访客</span>
-                  </div>
+
                   <div class="lable">
                     年龄：
                     <span>21</span>
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -51,15 +61,28 @@
           <div class="total">
             <div class="total_lable">总计</div>
             <div class="total-head">
-              此用户在x次的访问中，共访问了x个界面，在货清清APP上总耗时为x分钟
-              <br />用户每个界面的平均访问时长为x分钟<br />用户每次访平均点击的次数为x
+              <!-- 此用户在{{ userBaseInfo.visitCount }}次的访问中，平均访问了{{
+                userBaseInfo.avgPv
+              }}个界面，在货清清APP上总耗时为{{ userBaseInfo.visitTime }}分钟
+              <br />用户每个界面的平均访问时长为{{
+                userBaseInfo.avgVisitTime
+              }}分钟<br />用户每次访平均点击的次数为{{ userBaseInfo.pv }}
+            </div> -->
+              此用户在{{ userBaseInfo.visitCount }}次的访问中，共访问了{{
+                userBaseInfo.pv
+              }}个页面，访问总耗时为{{ userBaseInfo.visitTime }}分钟。
+              <br />每次访问的平均访问页数为{{
+                userBaseInfo.avgPv
+              }}
+              页，平均访问时长为{{ userBaseInfo.avgVisitTime }}分钟
             </div>
             <div class="total-body">
               首次访问时间
-              <span style="padding-right: 20px"></span> 2023年5月20日 09:21:46
-              星期日 <br />
+              <span style="padding-right: 20px"></span
+              >{{ userBaseInfo.firstTime }} 星期日 <br />
               最后访问时间
-              <span style="padding-right: 20px"></span> 2023年5月25日 18:21:54
+              <span style="padding-right: 20px"></span>
+              {{ userBaseInfo.latestTime }}
               星期四
             </div>
           </div>
@@ -68,8 +91,8 @@
             <span class="device-label">设备</span>
             <div class="describe">
               来自智能手机设备的
-              <div class="number">3</div>
-              次访问：Huawei DVC-AN20(4X)
+              <div class="number">{{ userBaseInfo.visitCount }}</div>
+              次访问：{{ userBaseInfo.manufacturer }}
             </div>
           </div>
 
@@ -79,18 +102,14 @@
               class="describe"
               style="display: flex; flex-direction: column; margin-top: 16px"
             >
-              <div style="display: flex">
-                <div class="number">3</div>
-                次访问来自中国
-                <div class="number">北京</div>
-                ;
-              </div>
-
-              <div style="display: flex">
-                <div class="number">2</div>
-                次访问来自中国
-                <div class="number">上海</div>
-                ;
+              <div
+                style="display: flex"
+                v-for="(item, index) in userBaseInfo.visitorAreaList"
+                :key="index"
+              >
+                <div class="number">{{ item.visitCount }}</div>
+                次访问来自{{ item.country }}
+                <div class="number">{{ item.city }}</div>
               </div>
             </div>
           </div>
@@ -98,71 +117,53 @@
         <div class="right-item">
           <div class="right-head">
             <div class="name">页面访问明细分析</div>
-            <div class="btnEvent">
+            <!-- <div class="btnEvent">
               <i
                 class="el-icon-download"
                 style="padding-right: 3px; font-size: 14px"
               ></i
               >下载
-            </div>
+            </div> -->
           </div>
-          <div class="right-body">
+          <div
+            class="right-body"
+            v-for="(item, index) in visitorSessionList"
+            :key="index"
+          >
             <div class="right-body-head">
-              <span class="body-left">访问#3</span>
+              <div class="body-left">访问#3</div>
               <div class="body-right">
-                <span>访问时间：2023年5月25日 18:21:54</span>
+                <span>访问时间：{{ item.firstTime }}</span>
                 <span style="padding-top: 3px; padding-bottom: 13px"
-                  >访问时长：00:21:54</span
+                  >访问时长：{{ item.visitTime }}</span
                 >
               </div>
             </div>
 
             <div class="lined"></div>
             <div class="webAddress">
-              h5.huoqingqing.com/天天货清清
-              <br />h5.huoqingqing.com/?wechatShare=/detail/?id=2c94825586e5d3e40186e83d3a1
-              <br />35ce3$PARc$EQU$PAR
-            </div>
-            <div class="ipAdress">IP:<span>无</span></div>
-          </div>
-
-          <div class="right-body">
-            <div class="right-body-head">
-              <span class="body-left">访问#3</span>
-              <div class="body-right">
-                <span>访问时间：2023年5月25日 18:21:54</span>
-                <span style="padding-top: 3px; padding-bottom: 13px"
-                  >访问时长：00:21:54</span
-                >
+              <div v-for="(value,index) in item.rows" :key="index">
+                <div> {{ value.uri }}</div>
               </div>
-            </div>
-
-            <div class="lined"></div>
-            <div class="webAddress">
-              h5.huoqingqing.com/天天货清清
+              <!-- h5.huoqingqing.com/天天货清清
               <br />h5.huoqingqing.com/?wechatShare=/detail/?id=2c94825586e5d3e40186e83d3a1
-              <br />35ce3$PARc$EQU$PAR
+              <br />35ce3$PARc$EQU$PAR -->
             </div>
-            <div class="ipAdress">IP:<span>无</span></div>
+            <div class="ipAdress">IP:<span>{{ item.clientIp }}</span></div>
           </div>
-          <div class="right-body">
-            <div class="right-body-head">
-              <span class="body-left">访问#3</span>
-              <div class="body-right">
-                <span>访问时间：2023年5月25日 18:21:54</span>
-                <span style="padding-top: 3px; padding-bottom: 13px"
-                  >访问时长：00:21:54</span
-                >
-              </div>
-            </div>
-
-            <div class="lined"></div>
-            <div class="webAddress">
-              h5.huoqingqing.com/天天货清清
-              <br />h5.huoqingqing.com/?wechatShare=/detail/?id=2c94825586e5d3e40186e83d3a1
-              <br />35ce3$PARc$EQU$PAR
-            </div>
-            <div class="ipAdress">IP:<span>无</span></div>
+          <div class="block">
+            <el-pagination
+            v-if="visitorSessionList.length >0"
+              next-text="下一页"
+              :pager-count="3"
+              :current-page="currentPage"
+              :page-sizes="[1, 2, 3]"
+              :page-size="pageSize"
+              layout=" sizes, prev, pager, next, jumper"
+              :total="total"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
           </div>
         </div>
       </div>
@@ -171,24 +172,116 @@
 </template>
 
 <script>
+import {
+  getVisitorDetailinfoApi,
+  getVisitorSessionUriListApi,
+  getVisitorSessionListApi,
+} from "@/api/trackingapi/visitor";
 export default {
   data() {
     return {
+      total: 0,
+      pageSize: 3,
+      currentPage: 1,
       centerDialogVisible: false,
+      userBaseInfo: {},
+      visitorSessionList: {},
+      distinctId: null,
     };
   },
+  mounted() {
+    // this.getVisitorSessionUriList();
+  },
   methods: {
-    callMethod() {
+    handleSizeChange(val) {
+      this.currentPage = 1;
+      this.pageSize = val;
+      this.getVisitorSessionList();
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.getVisitorSessionList();
+    },
+    resetForm(val) {
+      this.userBaseInfo = {};
+    },
+    callMethod(val) {
+      this.distinctId = val;
+      this.getVisitorDetailinfo();
+      this.getVisitorSessionList();
       this.centerDialogVisible = true;
+    },
+    // user baseInfo
+    getVisitorDetailinfo() {
+      let params = { distinctId: this.distinctId };
+      getVisitorDetailinfoApi(params).then((res) => {
+        if (res.code == 200) {
+          this.userBaseInfo = res.data;
+        }
+      });
+    },
+    // 右边 visit data
+    getVisitorSessionList() {
+      let params = {
+        distinctId: this.distinctId,
+        pageNum: this.currentPage,
+        pageSize: this.pageSize,
+      };
+      getVisitorSessionListApi(params).then((res) => {
+        if (res.code == 200) {
+          this.total = res.data.total;
+          let params = {
+            pageNum: 1,
+            pageSize: 10,
+            distinctId: "",
+            eventSessionId: "",
+          };
+          res.data.rows.map((item) => {
+            item.rows = [];
+            params.distinctId = item.distinctId;
+            params.eventSessionId = item.eventSessionId;
+            getVisitorSessionUriListApi(params).then((res) => {
+              if (res.code == 200) {
+                // console.log(res.data, "执行三次调用");
+                item.rows =item.rows.concat(res.data.rows);
+              }
+            });
+          });
+          this.visitorSessionList = res.data.rows;
+        }
+      });
+    },
+    // 右边里面url
+    getVisitorSessionUriList() {
+      this.visitorSessionList.map((item) => {
+        let params = {
+          pageNum: 1,
+          pageSize: 50,
+          distinctId: this.distinctId,
+          eventSessionId: "98816BD0-9E22-43DF-88CA-C29EFD910474",
+        };
+      });
+      // let params = {
+      //   pageNum: 1,
+      //   pageSize: 50,
+      //   distinctId: this.distinctId,
+      //   eventSessionId: "98816BD0-9E22-43DF-88CA-C29EFD910474",
+      // };
+      getVisitorSessionUriListApi(params).then((res) => {
+        if (res.code == 200) {
+          // this.$refs.behaviorChart.getChannelList(res.data);
+          this.visitorSessionList = res.data.rows;
+        }
+      });
     },
   },
 };
 </script>
-<style>
-</style>
+<style></style>
 <style lang="scss" scoped>
+@import "~@/styles/components/el-pagination.scss";
 ::v-deep {
-    .el-dialog__body {
+  .el-dialog__body {
     padding: 15px 15px;
   }
 }
@@ -196,7 +289,8 @@ export default {
   display: flex;
   .left-item {
     min-width: 516px;
-    height: 584px;
+    min-height: 584px;
+    max-height: 960px;
     padding: 15px 15px;
     padding-top: 0;
     .visitorInfo {
@@ -230,6 +324,11 @@ export default {
         color: #5a607f;
         white-space: nowrap;
         span {
+          width: 140px;
+          box-sizing: border-box;
+          // width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
           font-size: 12px;
           line-height: 26px;
           color: #5a607f;
@@ -240,6 +339,7 @@ export default {
       margin-top: 15px;
       width: 516px;
       height: 172px;
+
       background: #fafafb;
       border-radius: 6px;
       padding: 12px;
@@ -280,6 +380,8 @@ export default {
       color: #4d4d4d;
     }
     .describe {
+      box-sizing: border-box;
+
       display: flex;
       font-size: 12px;
       line-height: 27px;
@@ -291,9 +393,11 @@ export default {
       }
     }
     .whereFrom {
+      padding: 11px;
+      box-sizing: border-box;
       margin-top: 16px;
       width: 516px;
-      height: 116px;
+      min-height: 116px;
       background: #fafafb;
       border-radius: 6px;
       display: flex;
@@ -303,7 +407,10 @@ export default {
   .right-item {
     margin-left: 15px;
     width: 525px;
-    height: 570px;
+    min-height: 570px;
+    // max-height: 960px;
+    // overflow-y: scroll;
+    // overflow-x: hidden;
     background: #fafafb;
     border-radius: 6px;
     padding: 12px;
@@ -331,7 +438,7 @@ export default {
     }
     .right-body {
       width: 501px;
-      height: 168px;
+      min-height: 168px;
       background: #fafafb;
       border: 1px solid #f0f0f5;
       border-radius: 5px;
@@ -342,7 +449,22 @@ export default {
       .right-body-head {
         display: flex;
         justify-content: space-between;
+        .body-left {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          max-height: 30px;
+          line-clamp: 2;
+          font-size: 12px;
+          font-weight: 400;
+          line-height: 15px;
+          color: #4d4d4d;
+          width: 250px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
+
       .body-right {
         display: flex;
         flex-direction: column;

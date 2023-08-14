@@ -61,7 +61,7 @@ export default {
       disabledSelect: [],
       timeTypeValue: "day",
       chart: null,
-      pointValue: ["浏览量", "访问次数"],
+      pointValue: ["浏览量", "访问次数",],
       options: [
         {
           value: "浏览量",

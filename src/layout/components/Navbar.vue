@@ -61,8 +61,8 @@
             <router-link to="/behaviorAnalysis/user-behavior-analysis">
               <el-dropdown-item>行为分析</el-dropdown-item>
             </router-link>
-              <el-dropdown-item>v1.2.1</el-dropdown-item>
-            <!-- <a
+              <el-dropdown-item>v1.2.2</el-dropdown-item>
+            <!-- <agit config user.email
               target="_blank"
               href="https://github.com/PanJiaChen/vue-element-admin/"
             >
@@ -81,7 +81,7 @@
         </el-dropdown>
       </div>
     </div>
-    <dialogs ref="child" />
+    <!-- <dialogs ref="child" /> -->
   </div>
 </template>
 
@@ -93,7 +93,7 @@ import ErrorLog from "@/components/ErrorLog";
 import Screenfull from "@/components/Screenfull";
 import SizeSelect from "@/components/SizeSelect";
 import Search from "@/components/HeaderSearch";
-import dialogs from "./dialog/index";
+// import dialogs from "./dialog/index";
 
 export default {
   components: {
@@ -103,7 +103,7 @@ export default {
     Screenfull,
     SizeSelect,
     Search,
-    dialogs,
+    // dialogs,
   },
   data() {
     return {
@@ -146,7 +146,7 @@ export default {
     },
     clickImg() {
       // console.log(this.$refs.child.callMethod,234)
-      this.$refs.child.callMethod();
+      // this.$refs.child.callMethod();
     },
     handleChangeProject(val) {
       this.$store.dispatch("tracking/setProject", val);
