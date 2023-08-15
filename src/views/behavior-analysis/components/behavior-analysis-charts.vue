@@ -110,7 +110,7 @@
 <script>
 import echarts from "echarts";
 import dialogs from "@/layout/components/dialog/index";
-
+import { formatTime } from "@/utils/format";
 export default {
   components: {
     dialogs,
@@ -200,6 +200,10 @@ export default {
         if (item.avgPv) {
           item.avgPv = Math.floor(item.avgPv)
         }
+        if (item.visitTime) {
+          item.visitTime =  formatTime(Math.floor(item.visitTime))
+        }
+         //   // item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
       })
       this.total = val.total;
       // console.log(this.userListData, "用户列表数据");

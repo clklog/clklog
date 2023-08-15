@@ -79,11 +79,10 @@
             <div class="total-body">
               首次访问时间
               <span style="padding-right: 20px"></span
-              >{{ userBaseInfo.firstTime }} 星期日 <br />
+              >{{ userBaseInfo.firstTime }} <br />
               最后访问时间
               <span style="padding-right: 20px"></span>
               {{ userBaseInfo.latestTime }}
-              星期四
             </div>
           </div>
 
@@ -131,7 +130,8 @@
             :key="index"
           >
             <div class="right-body-head">
-              <div class="body-left">访问#3</div>
+              <div class="body-left">访问#{{ index + 1 }}</div>
+              <!-- <div class="body-left">访问#{{ total -( currentPage * (index + 1)) > 0 ? total -( currentPage * (index + 1)) :1  }}</div> -->
               <div class="body-right">
                 <span>访问时间：{{ item.firstTime }}</span>
                 <span style="padding-top: 3px; padding-bottom: 13px"
@@ -142,18 +142,20 @@
 
             <div class="lined"></div>
             <div class="webAddress">
-              <div v-for="(value,index) in item.rows" :key="index">
-                <div> {{ value.uri }}</div>
+              <div v-for="(value, index) in item.rows" :key="index">
+                <div>{{ value.uri }}</div>
               </div>
               <!-- h5.huoqingqing.com/天天货清清
               <br />h5.huoqingqing.com/?wechatShare=/detail/?id=2c94825586e5d3e40186e83d3a1
               <br />35ce3$PARc$EQU$PAR -->
             </div>
-            <div class="ipAdress">IP:<span>{{ item.clientIp }}</span></div>
+            <div class="ipAdress">
+              IP:<span>{{ item.clientIp }}</span>
+            </div>
           </div>
           <div class="block">
             <el-pagination
-            v-if="visitorSessionList.length >0"
+              v-if="visitorSessionList.length > 0"
               next-text="下一页"
               :pager-count="3"
               :current-page="currentPage"
@@ -177,6 +179,7 @@ import {
   getVisitorSessionUriListApi,
   getVisitorSessionListApi,
 } from "@/api/trackingapi/visitor";
+import { formatTime } from "@/utils/format";
 export default {
   data() {
     return {
@@ -217,6 +220,10 @@ export default {
       getVisitorDetailinfoApi(params).then((res) => {
         if (res.code == 200) {
           this.userBaseInfo = res.data;
+          // this.userBaseInfo.avgVisitTime = formatTime(Math.floor(this.userBaseInfo.avgVisitTime)) 
+          this.userBaseInfo.avgVisitTime = Math.floor(Math.floor(this.userBaseInfo.avgVisitTime) / 60 )
+          this.userBaseInfo.visitTime = Math.floor(Math.floor(this.userBaseInfo.visitTime) / 60 )
+          this.userBaseInfo.avgPv = Math.floor(this.userBaseInfo.avgPv)
         }
       });
     },
@@ -230,24 +237,26 @@ export default {
       getVisitorSessionListApi(params).then((res) => {
         if (res.code == 200) {
           this.total = res.data.total;
-          let params = {
-            pageNum: 1,
-            pageSize: 10,
-            distinctId: "",
-            eventSessionId: "",
-          };
-          res.data.rows.map((item) => {
-            item.rows = [];
-            params.distinctId = item.distinctId;
-            params.eventSessionId = item.eventSessionId;
-            getVisitorSessionUriListApi(params).then((res) => {
-              if (res.code == 200) {
-                // console.log(res.data, "执行三次调用");
-                item.rows =item.rows.concat(res.data.rows);
+          for (let i = 0; i < res.data.rows.length; i++) {
+            res.data.rows[i].rows = [];
+            let params = {
+              pageNum: 1,
+              pageSize: 10,
+              distinctId: res.data.rows[i].distinctId,
+              eventSessionId: res.data.rows[i].eventSessionId,
+            };
+            getVisitorSessionUriListApi(params).then((val) => {
+              if (val.code == 200) {
+                res.data.rows[i].rows = res.data.rows[i].rows.concat(
+                  val.data.rows
+                );
               }
             });
-          });
+          }
           this.visitorSessionList = res.data.rows;
+          this.visitorSessionList.map((item) => {
+            item.visitTime = formatTime(Math.floor(item.visitTime));
+          });
         }
       });
     },
