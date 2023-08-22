@@ -1,5 +1,6 @@
 const state = {
-  project: '货清清'
+  // project: '货清清'
+  project: 'hqq'
 }
 
 const mutations = {

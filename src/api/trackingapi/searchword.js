@@ -1,9 +1,16 @@
 import request from '@/utils/request'
 
 // 获取Top10搜索词
+// export function getSearchWordApi(params) {
+//   return request({
+//     url: '/searchword/getSearchWord',
+//     method: 'post',
+//     data: params
+//   })
+// }
 export function getSearchWordApi(params) {
   return request({
-    url: '/searchword/getSearchWord',
+    url: '/searchword/getSearchWordTop10',
     method: 'post',
     data: params
   })

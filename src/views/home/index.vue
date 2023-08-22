@@ -68,6 +68,8 @@ export default {
     commonParams() {
       const { project } = this;
       return Object.assign({ project }, this.topFilterParams);
+       // const  projectName = this.project;
+      // return Object.assign({ projectName }, this.topFilterParams);
     },
   },
   watch: {

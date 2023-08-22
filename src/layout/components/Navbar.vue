@@ -36,7 +36,7 @@
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
       </template> -->
-        <div class="dataTime">2023年05月18日 星期四</div>
+        <div class="dataTime">{{ dateTime }}&nbsp;&nbsp;{{ dateWeek }}</div>
         <!-- <img
           :src="avatar + '?imageView2/1/w/80/h/80'"
           class="user-avatar"
@@ -61,7 +61,7 @@
             <router-link to="/behaviorAnalysis/user-behavior-analysis">
               <el-dropdown-item>行为分析</el-dropdown-item>
             </router-link>
-              <el-dropdown-item>v1.2.2</el-dropdown-item>
+            <el-dropdown-item>v1.2.2</el-dropdown-item>
             <!-- <agit config user.email
               target="_blank"
               href="https://github.com/PanJiaChen/vue-element-admin/"
@@ -109,7 +109,7 @@ export default {
     return {
       options: [
         {
-          value: "货清清",
+          value: "hqq",
           label: "货清清",
         },
         {
@@ -126,17 +126,43 @@ export default {
         },
       ],
       value: "",
+      dateTime: "",
+      dateWeek: "",
     };
   },
   created() {
     this.value = this.options[0].value;
     this.handleChangeProject(this.options[0].value);
+    this.initDate();
+    const _this = this;
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) {
+        _this.initDate();
+      }
+    });
   },
   computed: {
     // ...mapGetters(["sidebar", "avatar", "device"]),
     ...mapGetters(["sidebar", "avatar", "device", "project"]),
   },
   methods: {
+    initDate() {
+      const date = new Date();
+      const year = date.getFullYear(); 
+      const month = date.getMonth() + 1; 
+      const day = date.getDate(); 
+      const weekMap = [
+        "星期日",
+        "星期一",
+        "星期二",
+        "星期三",
+        "星期四",
+        "星期五",
+        "星期六",
+      ];
+      this.dateWeek = weekMap[date.getDay()];
+      this.dateTime = year + "年" + month + "月" + day + "日";
+    },
     toggleSideBar() {
       // this.$store.dispatch("app/toggleSideBar");
     },
