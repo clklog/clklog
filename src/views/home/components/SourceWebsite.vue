@@ -30,21 +30,25 @@
               v-if="item.website && item.website.length > 70"
             >
               <div style="font-size: 12px">
-                {{ item.website }}
+                <!-- {{ item.website }} -->
+                {{ item.sourcesite }}
               </div>
               <div slot="reference" class="overItem" style="cursor: pointer">
-                {{ item.website || "--" }}
+                <!-- {{ item.website || "--" }} -->
+                {{ item.sourcesite || "--" }}
               </div>
             </el-popover>
             <div v-else class="overItem">
-              {{ item.website || "--" }}
+              <!-- {{ item.website || "--" }} -->
+              {{ item.sourcesite || "--" }}
             </div>
           </div>
           <div class="form-list-item w158">
             <p>{{ item.pv }}</p>
           </div>
           <div class="form-list-item w158">
-            <p>{{ percentageFun(item.percent) }}</p>
+            <!-- <p>{{ percentageFun(item.percent) }}</p> -->
+            <p>{{ percentageFun(item.pvRate) }}</p>
           </div>
         </div>
       </div>

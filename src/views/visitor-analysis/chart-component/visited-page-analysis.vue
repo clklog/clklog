@@ -38,6 +38,7 @@
           style="width: 100%"
           :header-cell-style="{ textAlign: 'center' }"
           :cell-style="{ textAlign: 'center' }"
+          @sort-change="sortChange($event)"
         >
           <el-table-column type="index" label="序号" width="150" />
           <!-- :show-overflow-tooltip="true"  prop="uri" -->
@@ -105,10 +106,10 @@
       <div class="block">
         <el-pagination
           next-text="下一页"
-          :current-page="currentPage"
+          :current-page.sync="currentPage"
           :page-sizes="[10, 20, 30, 40]"
           :page-size="pageSize"
-          layout=" sizes, prev, pager, next, jumper"
+          layout="total, sizes, prev, pager, next, jumper"
           :total="total"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -119,6 +120,8 @@
 </template>
 
 <script>
+import { blobDownloads } from "@/utils/localDownloadUtil.js";
+import { exportSourceWebsiteDetailApi } from "@/api/trackingapi/download";
 import flowPoint from "@/components/flowPoint/index";
 import { percentage } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
@@ -133,6 +136,8 @@ export default {
       current: {
         size: 10,
         page: 1,
+        sortName:null,
+        sortOrder:null,
       },
       mergedArr: [],
       uri: false,
@@ -150,7 +155,45 @@ export default {
       pageSize: 10,
     };
   },
+  mounted() {
+    this.$bus.$on("publicEventDown", (val) => {
+      this.publicEventDown(val);
+    });
+  },
   methods: {
+    sortChange(e) {
+      if (e.order && e.order == "ascending") {
+        // 降序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = 'asc';
+        this.$emit("currentPage", this.current);
+      } else if (e.order && e.order == "descending") {
+        // 升序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = 'desc';
+        this.$emit("currentPage", this.current);
+      }else{
+        this.current.sortName = null;
+        this.current.sortOrder = null;
+        this.$emit("currentPage", this.current);
+      }
+    },
+    publicEventDown(val) {
+      let params = val;
+      params.project = this.$store.getters.project;
+      params.cols = [...this.channelList, ...this.flowQuality];
+      exportSourceWebsiteDetailApi(params).then((res) => {
+        let name = this.sliceTypeFile(res);
+        blobDownloads(res.data, name);
+      });
+    },
+    sliceTypeFile(res) {
+      let fileName = res.headers["content-disposition"] || "";
+      let index1 = fileName.indexOf("filename=");
+      let result = fileName.substring(index1);
+      result = decodeURIComponent(decodeURI(result.slice(9)));
+      return result;
+    },
     vistedAnalysis(val) {
       this.vistedTableData = val.rows;
       this.vistedTableData.map((item) => {
@@ -173,13 +216,10 @@ export default {
     },
     // 分页器
     handleSizeChange(val) {
-      // this.currentPage = 1;
-      // this.pageSize = val;
       this.current.size = val;
       this.$emit("currentPage", this.current);
     },
     handleCurrentChange(val) {
-      // this.currentPage = val;
       this.current.page = val;
       this.$emit("currentPage", this.current);
     },
@@ -188,6 +228,9 @@ export default {
     },
     handelFlowQuality() {
       this.initShowTable();
+    },
+    initCurrentPage() {
+      this.currentPage = 1;
     },
     initShowTable() {
       this.mergedArr = [];
@@ -244,6 +287,11 @@ export default {
         }
       }
     },
+  },
+  beforeDestroy() {
+    console.log("执行了");
+    // 绑在$bus上的 都要主动销毁，因为App.vue销毁之后，$bus还在，在上面注册的事件都还在占空间，所以销毁时得一起$off掉
+    this.$bus.$off(["publicEventDown"]); // 同时关闭多个用数组形式放进去
   },
 };
 </script>

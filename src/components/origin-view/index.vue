@@ -488,19 +488,16 @@
           </el-popover>
         </div>
         <div class="header-name w156">
-          <!-- 访问次数(UV) -->
-          访问次数
-          <el-popover
+          访客数<el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
             class="popImg"
           >
             <div style="padding: 5px; font-size: 12px">
-              选定时间段内用户访问应用的总次数。
-              <div class="setFontTop">
-                用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
-              </div>
+              选定时间段内访问应用的独立访客数。
+              <div class="setFontTop">访客数以Cookie或设备ID为依据，选定时间段内同一访客多次访问应用只计算为一个访客。
+            </div>
             </div>
             <img
               slot="reference"

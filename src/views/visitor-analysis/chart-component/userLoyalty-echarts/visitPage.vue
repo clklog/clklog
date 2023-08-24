@@ -22,7 +22,6 @@ export default {
 
   methods: {
     getVisitPage(val) {
-      console.log(val, "页数");
       this.xData = [];
       this.yData = [];
       val.map((item) => {
@@ -31,7 +30,6 @@ export default {
           this.yData.push(item.value);
         }
       });
-      console.log(this.yData, "y轴");
       this.initEcharts();
     },
     initEcharts() {

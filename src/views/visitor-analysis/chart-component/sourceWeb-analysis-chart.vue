@@ -89,14 +89,10 @@ export default {
       this.ipCount = [];
       this.bounceRate = [];
       this.xData = [];
-      this.sourceChartList = val.detail;
+      // this.sourceChartList = val.detail;
+      this.sourceChartList = val;
       this.sourceChartList.map((item) => {
         if (item.sourcesite) {
-          // if (item.sourcesite.length > 8) {
-          //   name = item.sourcesite.substring(0, 8) + "...";
-          // } else {
-          //   name = item.sourcesite;
-          // }
           let hostName = this.getHost(item.sourcesite);
           this.xData.push(hostName);
         } else {

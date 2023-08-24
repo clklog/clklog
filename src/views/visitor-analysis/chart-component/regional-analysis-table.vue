@@ -8,6 +8,7 @@
           border
           :header-cell-style="{ textAlign: 'center' }"
           :cell-style="{ textAlign: 'center' }"
+          @sort-change="sortChange($event)"
         >
           <el-table-column
             prop="province"
@@ -75,10 +76,10 @@
       <div class="block">
         <el-pagination
           next-text="下一页"
-          :current-page="currentPage"
+          :current-page.sync="currentPage"
           :page-sizes="[10, 20, 30, 40]"
           :page-size="pageSize"
-          layout=" sizes, prev, pager, next, jumper"
+          layout="total, sizes, prev, pager, next, jumper"
           :total="total"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -101,10 +102,6 @@ export default {
       tableDetailList: [],
       total: 0,
       pageSize: 10,
-      current: {
-        size: 10,
-        page: 1,
-      },
       flowTableList: [],
       channelList: ["pv", "visit", "newUvRate", "pvRate"],
       flowQuality: ["avgPv"],
@@ -119,9 +116,35 @@ export default {
       pvRate: false,
       newUvRate: false,
       mergedArr: [],
+      current: {
+        size: 10,
+        page: 1,
+        sortName:null,
+        sortOrder:null,
+      },
     };
   },
   methods: {
+    sortChange(e) {
+      if (e.order && e.order == "ascending") {
+        // 降序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = 'asc';
+        this.$emit("currentPage", this.current);
+      } else if (e.order && e.order == "descending") {
+        // 升序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = 'desc';
+        this.$emit("currentPage", this.current);
+      }else{
+        this.current.sortName = null;
+        this.current.sortOrder = null;
+        this.$emit("currentPage", this.current);
+      }
+    },
+    initCurrentPage() {
+      this.currentPage = 1;
+    },
     handleSizeChange(val) {
       this.current.size = val;
       this.$emit("currentPage", this.current);

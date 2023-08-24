@@ -175,8 +175,6 @@ export default {
         // },
         tooltip: {
           formatter(params, ticket, callback) {
-
-            console.log(params,234);
             let visitCountRate, uv, uvRate;
             if (params.data) {
               visitCountRate = params.data.visitCountRate;

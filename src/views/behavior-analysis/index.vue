@@ -33,6 +33,8 @@ export default {
       pageNum: 1,
       pageSize: 10,
       visitorTotal: null,
+      sortName: null,
+      sortOrder: null,
     };
   },
   computed: {
@@ -76,6 +78,7 @@ export default {
     },
     getVisitorList(val) {
       let newvalue = copyObj(this.commonParams);
+      this.pageNum= 1;
       newvalue.pageNum = this.pageNum;
       newvalue.pageSize = this.pageSize;
       if (val) {
@@ -83,12 +86,19 @@ export default {
         newvalue.pageSize = val.size;
         this.pageNum = val.page;
         this.pageSize = val.size;
+        newvalue.sortName = val.sortName;
+        newvalue.sortOrder = val.sortOrder;
+        this.sortName = val.sortName;
+        this.sortOrder = val.sortOrder;
       } else {
+        newvalue.sortName = this.sortName;
+        newvalue.sortOrder = this.sortOrder;
         newvalue.pageNum = this.pageNum;
         newvalue.pageSize = this.pageSize;
         // newvalue.sortName = "pv";
         // newvalue.country=["全球"]
         newvalue.sortOrder = "desc";
+        this.$refs.behaviorChart.initCurrentPage()
         // newvalue.timeType = "day";
         // newvalue["province"] = newvalue["area"];
         // delete newvalue["area"];

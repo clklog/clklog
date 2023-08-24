@@ -5,15 +5,11 @@
       <div class="public-table-block">
         <div class="public-Table-minHeight public-hoverItem">
           <el-table
-            :data="
-              equipmentList.slice(
-                (currentPage - 1) * pageSize,
-                currentPage * pageSize
-              )
-            "
+            :data="equipmentList"
             :header-cell-style="{ textAlign: 'center' }"
             :cell-style="{ textAlign: 'center' }"
             border
+            @sort-change="sortChange($event)"
             style="width: 100%"
           >
             <el-table-column type="index" label="序号" width="150" />
@@ -88,10 +84,10 @@
         <div class="block">
           <el-pagination
             next-text="下一页"
-            :current-page="currentPage"
+            :current-page.sync="currentPage"
             :page-sizes="[10, 20, 30, 40]"
             :page-size="pageSize"
-            layout=" sizes, prev, pager, next, jumper"
+            layout=" total,sizes, prev, pager, next, jumper"
             :total="total"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
@@ -124,6 +120,12 @@ export default {
       pvRate: false,
       newUvRate: false,
       mergedArr: [],
+      current: {
+        size: 10,
+        page: 1,
+        sortName:null,
+        sortOrder:null,
+      },
       currentPage: 1,
       total: 0,
       pageSize: 10,
@@ -131,7 +133,7 @@ export default {
   },
   methods: {
     equipmentTableEvent(val) {
-      this.equipmentList = val;
+      this.equipmentList = val.rows;
       this.equipmentList.map((item) => {
         if (item.bounceRate) {
           item.bounceRate = percentage(item.bounceRate);
@@ -149,13 +151,35 @@ export default {
           item.avgPv = Math.floor(item.avgPv);
         }
       });
+      this.total = val.total;
     },
+    sortChange(e) {
+      if (e.order && e.order == "ascending") {
+        // 降序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = 'asc';
+        this.$emit("currentPage", this.current);
+      } else if (e.order && e.order == "descending") {
+        // 升序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = 'desc';
+        this.$emit("currentPage", this.current);
+      }else{
+        this.current.sortName = null;
+        this.current.sortOrder = null;
+        this.$emit("currentPage", this.current);
+      }
+    },  
     handleSizeChange(val) {
-      this.currentPage = 1;
-      this.pageSize = val;
+      this.current.size = val;
+      this.$emit("currentPage", this.current);
     },
     handleCurrentChange(val) {
-      this.currentPage = val;
+      this.current.page = val;
+      this.$emit("currentPage", this.current);
+    },
+    initCurrentPage(){
+      this.currentPage = 1;
     },
     flowPoint(val) {
       if (val.length > 0) {
@@ -215,7 +239,10 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "~@/styles/components/el-pagination.scss";
+::v-deep{
+  @import "~@/styles/components/el-pagination.scss";
+
+}
 .chartsIcon {
   box-sizing: border-box;
   margin: 20px;

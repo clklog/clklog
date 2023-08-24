@@ -7,8 +7,9 @@
     <!-- 埋点系统 -->
     <div class="burying_point">
       <div style="display: flex; align-items: center">
-        <img src="@/assets/images/burying-logo.png" alt="" />
-        <span>埋点系统</span>
+        <!-- <img src="@/assets/images/burying-logo.png" alt="" />
+        <span>埋点系统</span> -->
+        <span>ClkLog日志分析</span>
         <el-select
           v-model="value"
           placeholder="请选择"
@@ -224,9 +225,9 @@ export default {
       height: 27px;
     }
     span {
-      margin-left: 10px;
-      margin-right: 53px;
-      font-size: 13px;
+      margin-left: 5px;
+      margin-right: 70px;
+      font-size: 15px;
       font-weight: bold;
       line-height: 17px;
       color: #4d4d4d;

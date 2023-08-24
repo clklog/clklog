@@ -22,7 +22,6 @@ export default {
   },
   methods: {
     getVisitNum(val) {
-      console.log(val, "次数");
       this.xData = [];
       this.yData = [];
       val.map((item) => {

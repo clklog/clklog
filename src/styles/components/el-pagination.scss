@@ -1,6 +1,12 @@
   .el-pagination {
+    position: relative;
+    width: 100%;
     display: flex;
     justify-content: flex-end;
+  }
+  .el-pagination__total{
+    position: absolute;
+    left: 30px;
   }
   .block {
     margin: 20px 0 0;
@@ -15,4 +21,5 @@
   //   position: absolute;
   //   left: 0;
   // }
+  
  

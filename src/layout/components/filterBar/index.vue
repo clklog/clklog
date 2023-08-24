@@ -1,4 +1,5 @@
 <template>
+  <!-- class="documentation-container" -->
   <div class="documentation-container">
     <div class="checkContent">
       <div style="display: flex; margin-top: 11px">
@@ -88,6 +89,16 @@
       </div>
 
       <div class="channel">
+        <!-- <div style="display: flex; margin-right: 16px;position: absolute;right: 220px;z-index: 10;">
+          <div class="btnEvent">
+            <i
+              class="el-icon-download"
+              style="padding-right: 3px; font-size: 14px"
+            ></i
+            >下载
+          </div>
+        </div> -->
+
         <div style="display: flex">
           <div class="check_item">
             <span>渠道:</span>
@@ -109,15 +120,16 @@
             </el-radio-group>
           </div>
         </div>
-        <div style="display: flex; margin-right: 16px">
-          <div class="btnEvent SetSpace">
+
+        <div style="display: flex; position: fixed; right: 30px">
+          <!-- <div class="btnEvent SetSpace">
             <i
               class="el-icon-message"
               style="padding-right: 3px; font-size: 14px"
             ></i
             >订阅
-          </div>
-          <div class="btnEvent">
+          </div> -->
+          <div class="btnEvent" @click="download">
             <i
               class="el-icon-download"
               style="padding-right: 3px; font-size: 14px"
@@ -131,10 +143,16 @@
 </template>
 
 <script>
+import { blobDownloads } from "@/utils/localDownloadUtil.js";
 import { string } from "clipboard";
 import { province } from "@/utils/province";
+import { exportSearchWordDetailApi,exportVisitorApi,exportVisitorListApi } from "@/api/trackingapi/download";
 export default {
   props: {
+    bySub: {
+      type: Boolean,
+      default: false,
+    },
     ByData: {
       type: Boolean,
       default: false,
@@ -153,13 +171,14 @@ export default {
           return date.getTime() > today.getTime();
         },
       },
+      showBtn: true,
       dateRange: null, //日期范围
       isIndeterminate: false,
       checkAll: false,
       channelList: "",
       currentTime: "",
       allChaneList: [
-        { label: "全部", id: '' },
+        { label: "全部", id: "" },
         { label: "安卓", id: "安卓" },
         { label: "苹果", id: "苹果" },
         { label: "网站", id: "网站" },
@@ -176,6 +195,7 @@ export default {
 
       // 接口参数数据
       timeType: this.ByData ? "hour" : "day",
+      // timeType: this.ByData ? "day" : "day",
       timeFlag: "day",
       startTime: "",
       endTime: "",
@@ -183,6 +203,7 @@ export default {
       channelValue: "", //渠道
       visitorType: "",
       popflag: false,
+      commonData: "",
     };
   },
   mounted() {
@@ -192,7 +213,7 @@ export default {
     channel() {
       if (this.channelValue) {
         return [this.channelValue];
-      }else{
+      } else {
         return [];
       }
       // return [this.channelValue];
@@ -228,10 +249,51 @@ export default {
   },
   watch: {
     commonParams(val) {
-      return this.setTopFilterParams(val);
+      // return this.setTopFilterParams(val);
+      this.setTopFilterParams(val);
+      this.commonData = val;
     },
   },
   methods: {
+    download() {
+      this.$bus.$emit("publicEventDown", this.commonData);
+      let path = this.$route.path;
+      this.commonData.project = this.$store.getters.project;
+      switch (path) {
+        case "/visitorAnalysis/searchAnalysis": {
+          let cols = ["searchword","pv","pvRate","visitCount","visitCountRate","uv","newUv","ipCount","ipCountRate","avgVisitTime","avgPv","bounceRate"]
+          this.commonData.cols = cols;
+          exportSearchWordDetailApi(this.commonData).then((res) => {
+            let name = this.sliceTypeFile(res);
+            blobDownloads(res.data, name);
+          });
+          break;
+        }
+        case "/visitorAnalysis/userLoyaltyAnalysis": {
+          exportVisitorApi(this.commonData).then((res) => {
+            let name = this.sliceTypeFile(res);
+            blobDownloads(res.data, name);
+          });
+          break;
+        }
+        case "/behaviorAnalysis/user-behavior-analysis": {
+          let cols =[ "distinctId","visitorType","visitCount","pv","visitTime","avgPv","latestTime"]
+          this.commonData.cols = cols;
+          exportVisitorListApi(this.commonData).then((res) => {
+            let name = this.sliceTypeFile(res);
+            blobDownloads(res.data, name);
+          });
+          break;
+        }
+      }
+    },
+    sliceTypeFile(res) {
+      let fileName = res.headers["content-disposition"] || "";
+      let index1 = fileName.indexOf("filename=");
+      let result = fileName.substring(index1);
+      result = decodeURIComponent(decodeURI(result.slice(9)));
+      return result;
+    },
     setTopFilterParams(val) {
       this.$emit("setFilterBarParams", val);
     },
@@ -409,10 +471,11 @@ export default {
   width: 100%;
   .checkContent {
     position: fixed;
+    width: 100%;
     min-height: 94px;
     z-index: 500;
     background-color: #fff;
-    width: 100%;
+    // width: calc(100% - 209px);
     border-bottom: 1px #eee solid;
     .areaContent {
       height: 30px;
@@ -479,26 +542,28 @@ export default {
         padding-right: 10px;
       }
     }
+    .btnEvent {
+      cursor: pointer;
+      width: 54px;
+      height: 21px;
+      border: 1px solid #3d64e6;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 21px;
+      text-align: center;
+      color: #656d92;
+    }
+    .SetSpace {
+      margin-right: 9px;
+    }
     .channel {
+      width: 100%;
       display: flex;
       margin: 11px 0;
-      justify-content: space-between;
+      // justify-content: space-between;
       align-items: center;
-      .btnEvent {
-        cursor: pointer;
-        width: 54px;
-        height: 21px;
-        border: 1px solid #3d64e6;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 21px;
-        text-align: center;
-        color: #656d92;
-      }
-      .SetSpace {
-        margin-right: 9px;
-      }
+      position: relative;
     }
   }
 }

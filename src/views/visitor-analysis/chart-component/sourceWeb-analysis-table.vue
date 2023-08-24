@@ -10,6 +10,7 @@
           :cell-style="{ textAlign: 'center' }"
           :data="getSourceSiteList"
           border
+          @sort-change="sortChange($event)"
           style="width: 100%"
         >
           <el-table-column type="index" label="序号" width="150" />
@@ -78,10 +79,10 @@
       <div class="block">
         <el-pagination
           next-text="下一页"
-          :current-page="currentPage"
+          :current-page.sync="currentPage"
           :page-sizes="[10, 20, 30, 40]"
-          :page-size="pageSize"
-          layout=" sizes, prev, pager, next, jumper"
+          :page-size.sync="pageSize"
+          layout=" total,sizes, prev, pager, next, jumper"
           :total="total"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -102,6 +103,8 @@ export default {
       current: {
         size: 10,
         page: 1,
+        sortName:null,
+        sortOrder:null,
       },
       channelList: ["pv", "visitCount", "newUvRate", "pvRate"],
       flowQuality: ["avgPv"],
@@ -122,6 +125,23 @@ export default {
     };
   },
   methods: {
+    sortChange(e) {
+      if (e.order && e.order == "ascending") {
+        // 降序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = 'asc';
+        this.$emit("currentPage", this.current);
+      } else if (e.order && e.order == "descending") {
+        // 升序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = 'desc';
+        this.$emit("currentPage", this.current);
+      }else{
+        this.current.sortName = null;
+        this.current.sortOrder = null;
+        this.$emit("currentPage", this.current);
+      }
+    },  
     getSourceSite(val) {
       val.rows.map((item) => {
         if (item.bounceRate) {
@@ -142,6 +162,9 @@ export default {
       });
       this.getSourceSiteList = val.rows;
       this.total = val.total;
+    },
+    initCurrentPage(){
+      this.currentPage = 1;
     },
     handleSizeChange(val) {
       this.current.size = val;
@@ -209,61 +232,63 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "~@/styles/components/el-pagination.scss";
+::v-deep{
+  @import "~@/styles/components/el-pagination.scss";
+}
 .chartsIcon {
-  box-sizing: border-box;
-  margin: 20px;
-  padding-top: 1px;
-  min-height: 461px;
-  background: #fff;
-  border-radius: 6px;
-  .flow-indicator {
-    min-height: 58px;
-    background: rgba(252, 252, 252, 0.39);
-    border: 1px solid #f0f0f5;
-    border-radius: 6px;
-    box-sizing: border-box;
-    margin: 12px;
-    .setSpace {
-      margin-bottom: 12px;
-    }
-    .flow-item {
-      display: flex;
-      align-items: center;
-      margin-top: 12px;
-      margin-left: 10px;
-      .flow-title {
-        margin-right: 21px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 16px;
-        color: #4d4d4d;
-      }
-      .el-checkbox {
-        margin-right: 80px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 15px;
-        color: #697195;
-      }
-    }
-    .check_item {
-      background-color: #ffffff;
-      margin-left: 20px;
-      height: 40px;
-      border-radius: 4px;
-      border: 1px solid #eee;
-      display: flex;
-      align-items: center;
-      // width: 30%;
-      span {
-        font-size: 14px;
-        padding: 0 10px;
-      }
-      .checkBoxStyle {
-        padding-right: 10px;
-      }
-    }
-  }
+  // box-sizing: border-box;
+  // margin: 20px;
+  // padding-top: 1px;
+  // min-height: 461px;
+  // background: #fff;
+  // border-radius: 6px;
+  // .flow-indicator {
+  //   min-height: 58px;
+  //   background: rgba(252, 252, 252, 0.39);
+  //   border: 1px solid #f0f0f5;
+  //   border-radius: 6px;
+  //   box-sizing: border-box;
+  //   margin: 12px;
+  //   .setSpace {
+  //     margin-bottom: 12px;
+  //   }
+  //   .flow-item {
+  //     display: flex;
+  //     align-items: center;
+  //     margin-top: 12px;
+  //     margin-left: 10px;
+  //     .flow-title {
+  //       margin-right: 21px;
+  //       font-size: 12px;
+  //       font-weight: 400;
+  //       line-height: 16px;
+  //       color: #4d4d4d;
+  //     }
+  //     .el-checkbox {
+  //       margin-right: 80px;
+  //       font-size: 12px;
+  //       font-weight: 400;
+  //       line-height: 15px;
+  //       color: #697195;
+  //     }
+  //   }
+  //   .check_item {
+  //     background-color: #ffffff;
+  //     margin-left: 20px;
+  //     height: 40px;
+  //     border-radius: 4px;
+  //     border: 1px solid #eee;
+  //     display: flex;
+  //     align-items: center;
+  //     // width: 30%;
+  //     span {
+  //       font-size: 14px;
+  //       padding: 0 10px;
+  //     }
+  //     .checkBoxStyle {
+  //       padding-right: 10px;
+  //     }
+  //   }
+  // }
 }
 </style>

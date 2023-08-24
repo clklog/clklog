@@ -8,7 +8,7 @@
           <originView ref="originView" byFlowView></originView>
           <div
             class="bid-list-record"
-            v-for="(item, index) in channelTableData"
+            v-for="(item, index) in filterChannelList"
             :key="index"
           >
             <div class="bid-list-item w157">
@@ -176,7 +176,7 @@
             </el-table-column>
           </el-table>
         </div>
-        <div class="block">
+        <!-- <div class="block">
           <el-pagination
             :current-page="currentPage"
             :page-sizes="[10, 20, 30, 40]"
@@ -186,7 +186,7 @@
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
           />
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -201,6 +201,7 @@ export default {
   components: { originView, flowPoint },
   data() {
     return {
+      filterChannelList: [],
       currentPage: 1,
       channelTableData: [],
       channelList: ["pv", "visitCount"],
@@ -270,6 +271,10 @@ export default {
           item.avgPv = Math.floor(item.avgPv);
         }
       });
+      const filteredArr = this.channelTableData.filter(
+        (item) => item.channel !== "网站"
+      );
+      this.filterChannelList = filteredArr;
     },
     // 分页器
     handleSizeChange(val) {
@@ -382,8 +387,11 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "~@/styles/components/el-pagination.scss";
-@import "~@/styles/components/el-checkbox.scss";
+::v-deep {
+  @import "~@/styles/components/el-pagination.scss";
+  @import "~@/styles/components/el-checkbox.scss";
+}
+
 .trafficHead {
   font-size: 16px;
   font-weight: 600;
@@ -428,8 +436,8 @@ img {
         align-items: center;
       }
       .w157 {
-        color: #252424;
-        font-size: 14px;
+        color: #4d4d4d;
+        font-size: 12px;
         line-height: 14px;
       }
       .w158 {
@@ -441,10 +449,10 @@ img {
   }
 }
 .w111 {
-  font-size: 10px;
-  font-weight: 400;
-  line-height: 8px;
-  color: #4d4d4d;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 16px;
+  color: #3d64e6;
 }
 .chartsIcon {
   position: relative;
@@ -472,6 +480,7 @@ img {
       margin-top: 12px;
       margin-left: 10px;
       .flow-title {
+        // white-space: nowrap;
         white-space: nowrap;
         margin-right: 21px;
         font-size: 12px;

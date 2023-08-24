@@ -104,7 +104,7 @@
         :current-page="currentPage"
         :page-sizes="[10, 20, 30, 40]"
         :page-size="pageSize"
-        layout=" sizes, prev, pager, next, jumper"
+        layout="total, sizes, prev, pager, next, jumper"
         :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -197,6 +197,7 @@ export default {
           this.newUvRate = false;
         }
       }
+      // console.log(this.channelList,"channnelisyt");
     },
     handelChannelList() {
       this.initShowTable();
@@ -209,7 +210,8 @@ export default {
     },
     apiDetailList(val) {
       this.currentPage = 1;
-      this.flowTableList = val.detail;
+      // this.flowTableList = val.detail;
+      this.flowTableList = val;
       this.flowTableList.map((item) => {
         if (item.bounceRate) {
           item.bounceRate = this.percentageFun(item.bounceRate);
@@ -227,8 +229,8 @@ export default {
           item.avgPv = Math.floor(item.avgPv);
         }
       });
-
-      this.total = val.detail.length;
+      // this.total = val.detail.length;
+      this.total = val.length;
     },
     initShowTable() {
       this.mergedArr = [];

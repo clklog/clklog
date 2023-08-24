@@ -41,6 +41,8 @@ export default {
       filterBarParams: {},
       pageNum: 1,
       pageSize: 10,
+      sortName: null,
+      sortOrder: null,
     };
   },
   computed: {
@@ -72,16 +74,23 @@ export default {
     },
     getAreaProvinceList(val) {
       let newvalue = copyObj(this.commonParams);
+      this.pageNum = 1;
       if (val) {
         newvalue.pageNum = val.page;
         newvalue.pageSize = val.size;
+        newvalue.sortName = val.sortName;
+        newvalue.sortOrder = val.sortOrder;
         this.pageNum = val.page;
         this.pageSize = val.size;
+        this.sortName = val.sortName;
+        this.sortOrder = val.sortOrder;
       } else {
         newvalue.pageNum = this.pageNum;
         newvalue.pageSize = this.pageSize;
+        newvalue.sortName = this.sortName;
+        newvalue.sortOrder = this.sortOrder;
+        this.$refs.regionalTable.initCurrentPage();
       }
-
       this.$refs.regionalTable.getDetailList(newvalue);
     },
     getAreaDetailTop10() {

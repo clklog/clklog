@@ -1,6 +1,6 @@
 <template>
   <!-- 公用流量指标 -->
-  <div class="flow-indicator">
+  <div class="flow-indicators">
     <div class="flow-item">
       <div class="flow-title">流量基础指标</div>
       <el-checkbox-group
@@ -50,6 +50,15 @@
 
 <script>
 import { percentage } from "@/utils/percent";
+import { blobDownloads } from "@/utils/localDownloadUtil.js";
+import {
+  exportFlowTrendDetailApi,
+  exportAreaDetailApi,
+  exportSourceWebsiteDetailApi,
+  exportVisitorDetailApi,
+  exportChannelDetailApi,
+  exportDeviceDetailApi,
+} from "@/api/trackingapi/download";
 export default {
   props: {
     byChannel: {
@@ -60,7 +69,7 @@ export default {
   data() {
     return {
       flowTableList: [],
-      channelList: ["pv", "uv","ipCount"],
+      channelList: ["pv", "uv", "ipCount"],
       flowQuality: ["avgPv"],
       pv: false,
       visitCount: false,
@@ -73,12 +82,92 @@ export default {
       pvRate: false,
       newUvRate: false,
       mergedArr: [],
+      dateTime: null,
     };
   },
   mounted() {
     this.initShowTable();
+    this.$bus.$on("publicEventDown", (val) => {
+      this.publicEventDown(val);
+    });
   },
   methods: {
+    publicEventDown(val) {
+      let params = val;
+      params.project = this.$store.getters.project;
+      params.cols = [...this.channelList, ...this.flowQuality];
+      let path = this.$route.path;
+      // if (path.includes("trendAnalysis")) {
+      //   exportFlowTrendDetailApi(params).then((res) => {
+      //     let fileName = res.headers["content-disposition"] || "";
+      //     let index1 = fileName.indexOf("filename=");
+      //     let result = fileName.substring(index1);
+      //     result = decodeURIComponent(decodeURI(result.slice(9)));
+      //     // blobDownloads(res.data,result);
+      //   });
+      // }
+      switch (path) {
+        case "/visitorAnalysis/trendAnalysis": {
+          exportFlowTrendDetailApi(params).then((res) => {
+            let name = this.sliceTypeFile(res);
+            blobDownloads(res.data, name);
+          });
+          break;
+        }
+        case "/visitorAnalysis/regionalAnalysis": {
+          exportAreaDetailApi(params).then((res) => {
+            let name = this.sliceTypeFile(res);
+            blobDownloads(res.data, name);
+          });
+          break;
+        }
+        case "/visitorAnalysis/sourceWebAnalysis": {
+          exportSourceWebsiteDetailApi(params).then((res) => {
+            let name = this.sliceTypeFile(res);
+            blobDownloads(res.data, name);
+          });
+          break;
+        }
+        case "/visitorAnalysis/newOld-visitor-analysis": {
+          exportVisitorDetailApi(params).then((res) => {
+            let name = this.sliceTypeFile(res);
+            blobDownloads(res.data, name);
+          });
+          break;
+        }
+        case "/visitorAnalysis/channel-analysis": {
+          exportChannelDetailApi(params).then((res) => {
+            let name = this.sliceTypeFile(res);
+            blobDownloads(res.data, name);
+          });
+          break;
+        }
+        case "/visitorAnalysis/equipment-analysis": {
+          exportDeviceDetailApi(params).then((res) => {
+            let name = this.sliceTypeFile(res);
+            blobDownloads(res.data, name);
+          });
+          break;
+        }
+      }
+    },
+    sliceTypeFile(res) {
+      let fileName = res.headers["content-disposition"] || "";
+      let index1 = fileName.indexOf("filename=");
+      let result = fileName.substring(index1);
+      result = decodeURIComponent(decodeURI(result.slice(9)));
+      return result;
+    },
+    initDate() {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getSeconds();
+      this.dateTime = month + "月" + day + "日" + hours + "时" + minutes + "分";
+    },
     handelChannelList() {
       this.initShowTable();
     },
@@ -94,6 +183,9 @@ export default {
       this.$emit("flowPoint", this.mergedArr);
     },
   },
+  beforeDestroy() {
+    this.$bus.$off(["publicEventDown"]); // 同时关闭多个用数组形式放进去
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -106,7 +198,56 @@ export default {
   margin: 20px;
   padding-top: 1px;
   min-height: 461px;
-  background: fff;
+  background: #fff;
   border-radius: 6px;
+}
+.flow-indicators {
+  min-height: 58px;
+  background: rgba(252, 252, 252, 0.39);
+  border: 1px solid #f0f0f5;
+  border-radius: 6px;
+  box-sizing: border-box;
+  margin: 12px;
+  .setSpace {
+    margin-bottom: 12px;
+  }
+  .flow-item {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    margin-left: 10px;
+    .flow-title {
+      margin-right: 21px;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 16px;
+      color: #4d4d4d;
+      white-space: nowrap;
+    }
+    .el-checkbox {
+      margin-right: 80px;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 15px;
+      color: #697195;
+    }
+  }
+  .check_item {
+    background-color: #ffffff;
+    margin-left: 20px;
+    height: 40px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    // width: 30%;
+    span {
+      font-size: 14px;
+      padding: 0 10px;
+    }
+    .checkBoxStyle {
+      padding-right: 10px;
+    }
+  }
 }
 </style>

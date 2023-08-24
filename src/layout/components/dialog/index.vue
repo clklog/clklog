@@ -134,14 +134,16 @@
               class="describe"
               style="display: flex; flex-direction: column; margin-top: 16px"
             >
-              <div
-                style="display: flex"
-                v-for="(item, index) in userBaseInfo.visitorAreaList"
-                :key="index"
-              >
-                <div class="number">{{ item.visitCount }}</div>
-                次访问来自{{ item.country }}
-                <div class="number">{{ item.city }}</div>
+              <div style="display: flex">
+                <div
+                  style="display: flex;margin-right: 10px;box-sizing: border-box;"
+                  v-for="(item, index) in userBaseInfo.visitorAreaList"
+                  :key="index"
+                >
+                  {{ item.country }}
+                  <div class="number" style="white-space: nowrap;">{{ item.city }}</div>
+                </div>
+               
               </div>
             </div>
           </div>
@@ -157,108 +159,132 @@
               >下载
             </div> -->
           </div>
-          <div
-            class="right-body"
-            v-for="(item, index) in visitorSessionList"
-            :key="index"
-          >
-            <div class="right_body-con">
-              <div class="right_body_title">
-                <div class="body-left common-title">
-                  访问#{{ getIndex(index) }}
+          <div class="warry-body">
+            <div
+              class="right-body"
+              v-for="(item, index) in visitorSessionList"
+              :key="index"
+            >
+              <div class="right_body-con">
+                <div class="right_body_title">
+                  <div class="body-left common-title">
+                    访问#{{ getIndex(index) }}
+                  </div>
+                  <div class="body-right">
+                    {{ item.firstTime }} &nbsp;&nbsp; 访问时长:{{
+                      item.visitTime
+                    }}
+                  </div>
                 </div>
-                <div class="body-right">
-                  {{ item.firstTime }} &nbsp;&nbsp; 访问时长:{{
-                    item.visitTime
-                  }}
-                </div>
-                <!-- <div class="body-right">
-                  {{ item.firstTime }} &nbsp;&nbsp;&nbsp;&nbsp;
-                </div> -->
-              </div>
-              <div class="line"></div>
-              <div class="right_body_http" @click="toVisitHttp(item, index)">
-                <div
-                  v-loading="clickIndex == index && loading"
-                  style="line-height: 50px"
-                >
-                  {{ item.visitTime }}中的{{ item.pv }}的动作
-                </div>
-
-                <div
-                  style="text-align: left"
-                  v-if="clickIndex == index && visitListUrl"
-                >
-                  <div v-for="val in visitListUrl">
-                    <div style="display: flex">
-                      <div
-                        style="
-                          width: 50px;
-                          box-sizing: border-box;
-                          height: 100%;
-                          text-align: start;
-                        "
+                <div class="line"></div>
+                <div class="right_body_http">
+                  <div class="right_ip">IP：</div>
+                  <div v-for="ipItem in item.rows">
+                    <div
+                      style="display: flex; align-items: center; height: 28px;padding-left: 23px;"
+                    >
+                      <span class="right_single_font"
+                        >{{ ipItem.clientIp }}</span
                       >
-                        <i class="el-icon-link"></i>
-                        <div style="width: 1px;min-height:40px;border-left:1px solid #b8b8b8;margin:5px 0 5px 3px; "></div>
-                      </div>
-                      <div>
+                      <span class="right_single_font"
+                        >{{ ipItem.province }}
+                      </span>
+                      <!-- <span class="right_single_font">{{ ipItem.pv }}次</span> -->
+                    </div>
+                  </div>
+                  <div
+                    v-loading="clickIndex == index && loading"
+                    style="
+                      line-height: 20px;
+                      box-sizing: border-box;
+                      padding-bottom: 20px;
+                      cursor: pointer;
+                    "
+                    @click="toVisitHttp(item, index)"
+                  >
+                    {{ item.visitTime }}中的{{ item.pv }}个动作
+                  </div>
+
+                  <div
+                    style="
+                      text-align: left;
+                      max-height: 500px;
+                      overflow-y: auto;
+                      overflow-x: hidden;
+                    "
+                    v-if="item.httpList.length > 0"
+                  >
+                    <div v-for="val in item.httpList[0]">
+                      <div style="display: flex">
                         <div
                           style="
-                            width: 435px;
-                            min-height: 15px;
-                            line-height: 18px;
-                            margin-bottom: 5px;
-                            color: #4d4d4d;
+                            width: 50px;
+                            box-sizing: border-box;
+                            height: 100%;
+                            text-align: start;
                           "
                         >
-                          {{ val.logTime }}
+                          <i class="el-icon-link" style="font-size: 16px"></i>
+                          <div
+                            style="
+                              width: 1px;
+                              min-height: 40px;
+                              border-left: 1px solid #b8b8b8;
+                              margin: 5px 0 5px 6px;
+                            "
+                          ></div>
                         </div>
-                        <div
-                          style="
-                            width: 435px;
-                            min-height: 15px;
-                            line-height: 18px;
-                            margin-bottom: 10px;
-                          "
-                        >
-                          {{ val.uri }}
+                        <div>
+                          <div
+                            style="
+                              width: 435px;
+                              min-height: 15px;
+                              line-height: 18px;
+                              margin-bottom: 5px;
+                              color: #4d4d4d;
+                            "
+                          >
+                            {{ val.logTime }}
+                          </div>
+                          <div
+                            style="
+                              width: 435px;
+                              min-height: 15px;
+                              line-height: 18px;
+                              margin-bottom: 10px;
+                            "
+                          >
+                            <!-- {{ val.uri }} -->
+                            <a :href="val.uri" target="_blank">{{ val.uri }}</a>
+
+                          </div>
                         </div>
                       </div>
+                    </div>
+                    <div
+                      @click="tomoreEvent(item, index)"
+                      v-if="
+                        item.httpList.length > 0 &&
+                        item.pv > item.httpList[0].length
+                      "
+                      class="loadMore"
+                    >
+                      加载更多
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <!-- <div class="right-body-head">
-              <div class="body-left">访问#{{ index + 1 }}</div>
-              <div class="body-right">
-                <span>访问时间：{{ item.firstTime }}</span>
-                <span style="padding-top: 3px; padding-bottom: 13px"
-                  >访问时长：{{ item.visitTime }}</span
-                >
-              </div>
-            </div>
-
-            <div class="lined"></div>
-            <div class="webAddress">
-              <div v-for="(value, index) in item.rows" :key="index">
-                <div>{{ value.uri }}</div>
-              </div>
-            </div>
-            <div class="ipAdress">
-              IP:<span>{{ item.clientIp }}</span>
-            </div> -->
           </div>
           <div class="block">
+            <!-- :page-sizes="[10, 15, 20]" -->
+            <!-- layout=" sizes, prev, pager, next, jumper" -->
             <el-pagination
               v-if="visitorSessionList && visitorSessionList.length > 0"
               next-text="下一页"
               :pager-count="5"
               :current-page="currentPage"
-              :page-sizes="[10, 15, 20]"
               :page-size="pageSize"
-              layout=" sizes, prev, pager, next, jumper"
               :total="total"
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
@@ -304,42 +330,87 @@ export default {
     },
     toVisitHttp(val, index) {
       this.visitListUrl = null; //重新赋值
-      console.log(val, index, "val----------");
+      // console.log(val, index, "val----------");
+
       this.getVisitorSessionUriList(val);
       this.clickIndex = index;
       this.loading = true;
     },
+    // 一级接口
+    getVisitorSessionList() {
+      let params = {
+        distinctId: this.distinctId,
+        pageNum: this.currentPage,
+        pageSize: this.pageSize,
+      };
+      getVisitorSessionListApi(params).then((res) => {
+        if (res.code == 200) {
+          this.total = res.data.total;
+          this.visitorSessionList = res.data.rows;
+
+          this.visitorSessionList.map((item) => {
+            item.httpList = [];
+            item.allHttpList = [];
+            item.visitTime = formatTime(Math.floor(item.visitTime));
+          });
+        }
+      });
+    },
+    // 二级接口 url链接的接口
     getVisitorSessionUriList(val) {
-      console.log("调用了");
       let params = {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: val.pv,
         distinctId: val.distinctId,
         eventSessionId: val.eventSessionId,
       };
       getVisitorSessionUriListApi(params).then((res) => {
-        console.log(res, "相应的数据");
         if (res.code == 200) {
-          // this.clickIndex=-1
           this.loading = false;
           this.visitListUrl = res.data.rows;
-          let clickIndex = this.clickIndex;
-          this.visitListUrl.index = clickIndex;
-          let allList = JSON.parse(JSON.stringify(this.visitListUrl));
-          this.allVisitListUrl.push(allList);
-
-          console.log(this.visitListUrl, "visitListUrl---------------");
-          console.log(
-            this.allVisitListUrl,
-            " this.allVisitListUrl---------------"
-          );
-
-          // res.data.rows[i].rows = res.data.rows[i].rows.concat(val.data.rows);
+          this.visitorSessionList.map((i) => {
+            if (i.eventSessionId == this.visitListUrl[0].eventSessionId) {
+              if (i.httpList.length > 0) {
+                i.httpList = [];
+                i.allHttpList = [];
+                i.httpList.push(
+                  JSON.parse(JSON.stringify(this.visitListUrl.slice(0, 10)))
+                );
+                i.allHttpList.push(
+                  JSON.parse(JSON.stringify(this.visitListUrl))
+                );
+              } else {
+                i.httpList.push(
+                  JSON.parse(JSON.stringify(this.visitListUrl.slice(0, 10)))
+                );
+                i.allHttpList.push(
+                  JSON.parse(JSON.stringify(this.visitListUrl))
+                );
+              }
+            }
+          });
+          // console.log(this.visitorSessionList, "处理后一级会话");
         } else {
-          // this.clickIndex= -1
           this.loading = false;
         }
       });
+    },
+    tomoreEvent(item, index) {
+      if (item.clickMore) {
+        if (item.clickMore + 10 > item.pv) {
+          item.clickMore = item.pv;
+        } else {
+          item.clickMore = item.clickMore + 10;
+        }
+      } else {
+        item.clickMore = 20;
+      }
+      const copyArray = JSON.parse(JSON.stringify(this.visitorSessionList));
+      const abc = JSON.parse(
+        JSON.stringify(item.allHttpList[0].slice(0, item.clickMore))
+      );
+      copyArray[index].httpList = [abc];
+      this.visitorSessionList = copyArray;
     },
     handleSizeChange(val) {
       this.currentPage = 1;
@@ -359,6 +430,7 @@ export default {
       this.getVisitorSessionList();
       this.centerDialogVisible = true;
       this.currentPage = 1;
+      this.visitListUrl = null;
     },
     // user baseInfo
     getVisitorDetailinfo() {
@@ -377,42 +449,7 @@ export default {
         }
       });
     },
-    // 右边 visit data
-    getVisitorSessionList() {
-      let params = {
-        distinctId: this.distinctId,
-        pageNum: this.currentPage,
-        pageSize: this.pageSize,
-      };
-      getVisitorSessionListApi(params).then((res) => {
-        if (res.code == 200) {
-          this.total = res.data.total;
-          // for (let i = 0; i < res.data.rows.length; i++) {
-          //   res.data.rows[i].rows = [];
-          //   let params = {
-          //     pageNum: 1,
-          //     pageSize: 10,
-          //     distinctId: res.data.rows[i].distinctId,
-          //     eventSessionId: res.data.rows[i].eventSessionId,
-          //   };
-          //   getVisitorSessionUriListApi(params).then((val) => {
-          //     if (val.code == 200) {
-          //       res.data.rows[i].rows = res.data.rows[i].rows.concat(
-          //         val.data.rows
-          //       );
-          //     }
-          //   });
-          // }
-          this.visitorSessionList = res.data.rows;
 
-          // allVisitListUrl:[]
-          // this.vis
-          this.visitorSessionList.map((item) => {
-            item.visitTime = formatTime(Math.floor(item.visitTime));
-          });
-        }
-      });
-    },
     // 右边里面url
     // getVisitorSessionUriList() {
     //   this.visitorSessionList.map((item) => {
@@ -546,18 +583,10 @@ export default {
       height: 76px;
       border-radius: 6px;
       padding: 12px;
-      // background: #fafafb;
       margin-top: 15px;
-    }
-    .device-label {
-      // font-size: 13px;
-      // font-weight: 500;
-      // line-height: 31px;
-      // color: #4d4d4d;
     }
     .describe {
       box-sizing: border-box;
-
       display: flex;
       font-size: 12px;
       line-height: 27px;
@@ -566,6 +595,7 @@ export default {
         font-size: 18px;
         color: #3d64e6;
         font-weight: 500;
+
       }
     }
     .whereFrom {
@@ -584,9 +614,10 @@ export default {
     margin-left: 15px;
     // width: 525px;
     min-height: 584px;
-    max-height: 750px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    // max-height: 750px;
+    // height: 750px;
+    // overflow-y: auto;
+    // overflow-x: hidden;
     background-color: #efefef;
     // background: #fafafb;
     // border-radius: 6px;
@@ -613,9 +644,20 @@ export default {
         color: #656d92;
       }
     }
+    .warry-body {
+      // height: calc(100%-52px);
+      min-height: 600px;
+      max-height: 725px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
     .right-body {
       width: 501px;
-      min-height: 40px;
+      // min-height: 40px;
+      // min-height: 40px;
+      // max-height: 650px;
+      height: 40x;
+
       .right_body-con {
         padding: 5px 15px;
         box-sizing: border-box;
@@ -646,12 +688,33 @@ export default {
         }
         .right_body_http {
           min-height: 50px;
-          // line-height: 50px;
           line-height: 13px;
           color: #3d64e6;
           font-size: 13px;
-          cursor: pointer;
           text-align: right;
+          position: relative;
+          .right_ip{
+            position: absolute;
+            top: 10px;
+            color: #4d4d4d;
+            font-size: 13px;
+          }
+          .right_single_font {
+            box-sizing: border-box;
+            font-size: 13px;
+            line-height: 28px;
+            color: #4d4d4d;
+            margin-top: 5px;
+            margin-right: 5px;
+          }
+          .loadMore {
+            box-sizing: border-box;
+            padding-bottom: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #4d4d4d;
+            text-align: center;
+          }
         }
       }
       // background: #fafafb;
