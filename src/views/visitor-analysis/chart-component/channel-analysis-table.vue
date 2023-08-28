@@ -1,19 +1,19 @@
 <template>
   <div>
     <div class="documentation-container">
-      <!-- 流量概览 -->
       <div class="Overview public-hoverItem">
-        <div class="public-firstHead">渠道分析</div>
+        <div class="public-firstHead">流量概览</div>
         <div class="bid-list-page">
-          <originView ref="originView" byFlowView></originView>
+          <originView ref="originView" byChannel></originView>
+          <!-- <originView ref="originView" byAreaAnaly></originView> -->
           <div
             class="bid-list-record"
             v-for="(item, index) in filterChannelList"
             :key="index"
           >
-            <div class="bid-list-item w157">
+            <!-- <div class="bid-list-item w157">
               <p>{{ item.channel || "--" }}</p>
-            </div>
+            </div> -->
             <div
               class="bid-list-item w111"
               :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
@@ -62,10 +62,12 @@
     </div>
 
     <div class="chartsIcon">
+      <div class="public-firstHead">渠道分析</div>
       <flowPoint ref="flowPoint" @flowPoint="flowPoint" byChannel></flowPoint>
-      <div class="public-table-block">
+      <div>
         <div class="public-Table-minHeight">
           <el-table
+           class="public-radius"
             :data="
               channelTableData.slice(
                 (currentPage - 1) * pageSize,
@@ -166,12 +168,12 @@
                 label="平均访问页数"
                 sortable
               />
-              <el-table-column
+              <!-- <el-table-column
                 v-if="avgPvRate"
                 prop="avgPvRate"
                 label="平均访问页数占比"
                 sortable
-              />
+              /> -->
               <!-- <el-table-column prop="amount10" label="平均访问页数" sortable /> -->
             </el-table-column>
           </el-table>
@@ -406,7 +408,7 @@ img {
 }
 .Overview {
   margin: 20px;
-  min-height: 180px;
+  min-height: 118px;
   background-color: #fff;
   .bid-list-page {
     width: clas(100% -20px);
@@ -458,60 +460,9 @@ img {
   position: relative;
   box-sizing: border-box;
   margin: 20px;
-  padding-top: 1px;
   min-height: 461px;
   background: #fff;
-  //   background: rgba(158, 158, 161, 0.39);
+  padding: 22px;
   border-radius: 6px;
-
-  .flow-indicator {
-    min-height: 58px;
-    background: rgba(252, 252, 252, 0.39);
-    border: 1px solid #f0f0f5;
-    border-radius: 6px;
-    box-sizing: border-box;
-    margin: 12px;
-    .setSpace {
-      margin-bottom: 12px;
-    }
-    .flow-item {
-      display: flex;
-      align-items: center;
-      margin-top: 12px;
-      margin-left: 10px;
-      .flow-title {
-        // white-space: nowrap;
-        white-space: nowrap;
-        margin-right: 21px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 16px;
-        color: #4d4d4d;
-      }
-      .el-checkbox {
-        margin-right: 80px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 25px;
-        color: #697195;
-      }
-    }
-    .check_item {
-      background-color: #ffffff;
-      margin-left: 20px;
-      height: 40px;
-      border-radius: 4px;
-      border: 1px solid #eee;
-      display: flex;
-      align-items: center;
-      span {
-        font-size: 14px;
-        padding: 0 10px;
-      }
-      .checkBoxStyle {
-        padding-right: 10px;
-      }
-    }
-  }
 }
 </style>

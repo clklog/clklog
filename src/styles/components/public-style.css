@@ -3,11 +3,20 @@
   box-sizing: border-box;
 }
 
+.public-radius {
+  border-radius: 6px;
+}
+
 .public-table-block {
   box-sizing: border-box;
   margin: 20px 0;
   padding: 22px;
   background: #fff;
+}
+
+.public-Table-minHeight {
+  margin-top: 20px;
+  box-sizing: border-box;
 }
 
 .public-echart-block {

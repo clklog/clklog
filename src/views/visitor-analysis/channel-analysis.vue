@@ -1,6 +1,6 @@
 <template>
   <div>
-    <FilterBar @setFilterBarParams="setFilterBarParams"></FilterBar>
+    <FilterBar byChnnel  @setFilterBarParams="setFilterBarParams"></FilterBar>
     <channelTable ref="channelTable"></channelTable>
   </div>
 </template>

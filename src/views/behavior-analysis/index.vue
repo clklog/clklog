@@ -119,6 +119,7 @@ export default {
   margin: 20px;
   min-height: 118px;
   background-color: #fff;
+  border-radius: 6px;
   img {
     width: 11.44px;
     height: 11.44px;

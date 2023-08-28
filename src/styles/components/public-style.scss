@@ -2,16 +2,20 @@
   margin: 20px;
   box-sizing: border-box;
 }
+.public-radius {
+  border-radius: 6px;
+}
 
 .public-table-block {
   box-sizing: border-box;
   margin: 20px 0;
   padding: 22px;
-//   min-height: 461px;
   background: #fff;
-  .public-Table-minHeight {
-    // min-height: 410px;
-  }
+  
+}
+.public-Table-minHeight {
+  margin-top: 20px;
+  box-sizing: border-box;
 }
 
 .public-echart-block {
@@ -34,7 +38,7 @@
 }
 // page 概览间距整体调整
 .Overview {
-  min-height: 118px ;
+  min-height: 118px;
   background-color: #fff;
   padding: 15px;
 }

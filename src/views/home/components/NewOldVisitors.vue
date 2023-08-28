@@ -1,10 +1,10 @@
 <template>
   <div class="NewOldVisitors block-main public-hoverItem">
-    <div class="block-head">
+    <div class="block-head"  @click="$router.push('/visitorAnalysis/newOld-visitor-analysis')">
       <div class="block-title ">新老访客</div>
       <div
         class="block-head-icon"
-        @click="$router.push('/visitorAnalysis/newOld-visitor-analysis')"
+       
       >
        <img src="@/assets/images/icon.png" alt="" width="10px">
       </div>

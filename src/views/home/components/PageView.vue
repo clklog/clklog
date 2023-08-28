@@ -1,51 +1,42 @@
 <template>
   <div class="PageView block-main public-hoverItem">
-    <div class="block-head ">
-      <div class="block-title ">Top10受访页面</div>
+    <div class="block-head"  @click="$router.push('/visitorAnalysis/visitedPage')">
+      <div class="block-title">Top10受访页面</div>
       <div
         class="block-head-icon"
-        @click="$router.push('/visitorAnalysis/visitedPage')"
+       
       >
         <img src="@/assets/images/icon.png" alt="" width="10px" />
       </div>
     </div>
     <div class="block-index-form">
-      <div class="form-list-page">
-        <div class="form-list-header">
-          <div class="header-text w156">受访页面</div>
-          <div class="header-name w156">浏览量(PV)</div>
-          <div class="header-name w156">占比</div>
-        </div>
-        <div
-          class="form-list-record"
-          v-for="(item, index) in getVisitList"
-          :key="index"
+      <el-table
+       class="public-radius"
+        :data="getVisitList"
+        :cell-style="tableHeaderColor"
+        style="width: 100%"
+      >
+        <el-table-column
+          align="left"
+          prop="uri"
+          label="受访页面"
+          :show-overflow-tooltip="true"
         >
-          <div class="header-text w157">
-            <el-popover
-              placement="top-start"
-              trigger="hover"
-              v-if="item.uri && item.uri.length > 70"
-            >
-              <div style="font-size: 12px">
-                {{ item.uri }}
-              </div>
-              <div slot="reference" class="overItem" style="cursor: pointer">
-                {{ item.uri || "--" }}
-              </div>
-            </el-popover>
-            <div v-else class="overItem">
-              {{ item.uri || "--" }}
-            </div>
-          </div>
-          <div class="form-list-item w158">
-            <p>{{ item.pv }}</p>
-          </div>
-          <div class="form-list-item w158">
-            <p>{{ percentageFun(item.percent) }}</p>
-          </div>
-        </div>
-      </div>
+          <template
+            slot-scope="scope"
+          >
+            {{ scope.row.uri }}
+          </template>
+        </el-table-column>
+        <el-table-column  align="center" prop="pv" label="浏览量" width="150" />
+        <el-table-column  align="center" label="占比" width="150">
+          <template
+            slot-scope="scope"
+          >
+            {{ percentageFun(scope.row.percent) }}
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -71,6 +62,13 @@ export default {
   watch: {},
   created() {},
   methods: {
+    tableHeaderColor({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 0) {
+        return "text-align:left";
+      } else {
+        return "text-align:center";
+      }
+    },
     getVisitUri() {
       getVisitUriApi(this.params).then((res) => {
         this.getVisitList = res.data;

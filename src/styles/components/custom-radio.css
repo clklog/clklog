@@ -1,0 +1,17 @@
+.el-radio__label {
+  font-size: 13px !important;
+}
+
+.el-radio__inner {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+.el-radio__input.is-checked + .el-radio__label {
+  color: #697195;
+}
+
+.el-radio__input.is-checked .el-radio__inner {
+  background-color: #3d64e6;
+  background: #3d64e6;
+}

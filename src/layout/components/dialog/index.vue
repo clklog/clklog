@@ -10,21 +10,22 @@
       <div class="el-dialog-div">
         <div class="left-item">
           <div class="visitorInfo commonBackgrond">
-            <img src="@/assets/images/avator.jpg" alt="" />
-            <div style="padding-left: 49px">
+            <div class="setImg">
+              <img src="@/assets/images/avator.jpg" alt="" />
+            </div>
+            <div class="visitDetail">
               <div class="title common-title">访客信息</div>
               <div style="display: flex">
-                <div class="gap" style="padding-right: 30px">
+                <div class="gap" style="padding-right: 10px; width: 373px">
                   <div
                     class="lable"
                     v-if="userBaseInfo && userBaseInfo.distinctId"
                   >
-                    ID：
-                    <!-- <span>{{ userBaseInfo.distinctId }}</span> -->
+                    ID:
                     <el-popover
                       placement="top-start"
                       trigger="hover"
-                      v-if="userBaseInfo.distinctId.length > 19"
+                      v-if="userBaseInfo.distinctId.length > 52"
                     >
                       <div style="font-size: 12px">
                         {{ userBaseInfo.distinctId }}
@@ -42,6 +43,33 @@
                     </div>
                   </div>
                   <div
+                    style="
+                      display: flex;
+                      width: 373px;
+                      justify-content: space-between;
+                    "
+                  >
+                    <div
+                      class="lable"
+                      style="width: 50%; text-align: left"
+                      v-if="userBaseInfo.country || userBaseInfo.city"
+                    >
+                      地域：
+                      <span
+                        >{{ userBaseInfo.country }}
+                        {{ userBaseInfo.city }}</span
+                      >
+                    </div>
+                    <div
+                      class="lable"
+                      v-if="userBaseInfo.visitorType"
+                      style="width: 50%; text-align: right"
+                    >
+                      类型：
+                      <span>{{ userBaseInfo.visitorType }}</span>
+                    </div>
+                  </div>
+                  <!-- <div
                     class="lable"
                     v-if="userBaseInfo.country || userBaseInfo.city"
                   >
@@ -49,36 +77,17 @@
                     <span
                       >{{ userBaseInfo.country }} {{ userBaseInfo.city }}</span
                     >
-                  </div>
+                  </div> -->
                   <div class="lable" v-if="userBaseInfo.channel">
                     渠道：
                     <span>{{ userBaseInfo.channel }}</span>
                   </div>
-                  <!-- <div class="lable" v-if="userBaseInfo.client_ip">
-                    IP：
-                    <span>{{ userBaseInfo.client_ip }}</span>
-                  </div> -->
-                </div>
-                <div>
-                  <div class="lable" v-if="userBaseInfo.visitorType">
-                    类型：
-                    <span>{{ userBaseInfo.visitorType }}</span>
-                  </div>
-                  <!-- <div class="lable">
-                    性别：
-                    <span>男</span>
-                  </div>
-
-                  <div class="lable">
-                    年龄：
-                    <span>21</span>
-                  </div> -->
                 </div>
               </div>
               <div
                 style="
                   font-size: 12px;
-                  width: 300px;
+                  width: 373px;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -91,31 +100,31 @@
               </div>
             </div>
           </div>
+
           <div class="total commonBackgrond">
             <div class="total_lable common-title">总计</div>
             <div class="total-head">
-              <!-- 此用户在{{ userBaseInfo.visitCount }}次的访问中，平均访问了{{
-                userBaseInfo.avgPv
-              }}个界面，在货清清APP上总耗时为{{ userBaseInfo.visitTime }}分钟
-              <br />用户每个界面的平均访问时长为{{
-                userBaseInfo.avgVisitTime
-              }}分钟<br />用户每次访平均点击的次数为{{ userBaseInfo.pv }}
-            </div> -->
+              <!-- find1 -->
               此用户在{{ userBaseInfo.visitCount }}次的访问中，共访问了{{
                 userBaseInfo.pv
-              }}个页面，访问总耗时为{{ userBaseInfo.visitTime }}分钟。
-              <br />每次访问的平均访问页数为{{
+              }}个页面， 访问总耗时为{{
+                formatTimeData(userBaseInfo.visitTime)
+              }}。 <br />每次访问的平均访问页数为{{
                 userBaseInfo.avgPv
               }}
-              页，平均访问时长为{{ userBaseInfo.avgVisitTime }}分钟
+              页，平均访问时长为{{
+                formatTimeData(userBaseInfo.avgVisitTime)
+              }}。
             </div>
-            <div class="total-body">
-              首次访问时间
-              <span style="padding-right: 20px"></span
-              >{{ userBaseInfo.firstTime }} <br />
-              最后访问时间
-              <span style="padding-right: 20px"></span>
-              {{ userBaseInfo.latestTime }}
+            <div class="visit_Time">
+              <div class="firstTime">
+                <span>首次访问时间</span>
+                <div class="detailTime">{{ userBaseInfo.firstTime }}</div>
+              </div>
+              <div class="lastTime">
+                <span>最后访问时间</span>
+                <div class="detailTime">{{ userBaseInfo.latestTime }}</div>
+              </div>
             </div>
           </div>
 
@@ -132,18 +141,28 @@
             <span class="device-label common-title"> 位置 </span>
             <div
               class="describe"
-              style="display: flex; flex-direction: column; margin-top: 16px"
+              style="
+                display: flex;
+                flex-direction: column;
+                line-height: 20px;
+                margin-top: 5px;
+              "
             >
               <div style="display: flex">
                 <div
-                  style="display: flex;margin-right: 10px;box-sizing: border-box;"
+                  style="
+                    display: flex;
+                    margin-right: 10px;
+                    box-sizing: border-box;
+                  "
                   v-for="(item, index) in userBaseInfo.visitorAreaList"
                   :key="index"
                 >
                   {{ item.country }}
-                  <div class="number" style="white-space: nowrap;">{{ item.city }}</div>
+                  <div class="number" style="white-space: nowrap">
+                    {{ item.city }}
+                  </div>
                 </div>
-               
               </div>
             </div>
           </div>
@@ -171,9 +190,10 @@
                     访问#{{ getIndex(index) }}
                   </div>
                   <div class="body-right">
-                    {{ item.firstTime }} &nbsp;&nbsp; 访问时长:{{
+                    {{ item.firstTime }} &nbsp;&nbsp;
+                    <!-- 访问时长:{{
                       item.visitTime
-                    }}
+                    }} -->
                   </div>
                 </div>
                 <div class="line"></div>
@@ -181,11 +201,16 @@
                   <div class="right_ip">IP：</div>
                   <div v-for="ipItem in item.rows">
                     <div
-                      style="display: flex; align-items: center; height: 28px;padding-left: 23px;"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        height: 28px;
+                        padding-left: 23px;
+                      "
                     >
-                      <span class="right_single_font"
-                        >{{ ipItem.clientIp }}</span
-                      >
+                      <span class="right_single_font">{{
+                        ipItem.clientIp
+                      }}</span>
                       <span class="right_single_font"
                         >{{ ipItem.province }}
                       </span>
@@ -240,7 +265,6 @@
                               width: 435px;
                               min-height: 15px;
                               line-height: 18px;
-                              margin-bottom: 5px;
                               color: #4d4d4d;
                             "
                           >
@@ -256,7 +280,6 @@
                           >
                             <!-- {{ val.uri }} -->
                             <a :href="val.uri" target="_blank">{{ val.uri }}</a>
-
                           </div>
                         </div>
                       </div>
@@ -321,9 +344,14 @@ export default {
     };
   },
   mounted() {
+    let a = "18590c236842d6-007c5010db20a89-247a1d38-329160-18590";
+    console.log(a.length, "244332");
     // this.getVisitorSessionUriList();
   },
   methods: {
+    formatTimeData(val) {
+      return formatTime(Math.floor(val));
+    },
     getIndex(index) {
       // return (this.currentPage - 1) * this.pageSize + index + 1
       return this.total - ((this.currentPage - 1) * this.pageSize + index);
@@ -439,40 +467,16 @@ export default {
         if (res.code == 200) {
           this.userBaseInfo = res.data;
           // this.userBaseInfo.avgVisitTime = formatTime(Math.floor(this.userBaseInfo.avgVisitTime))
-          this.userBaseInfo.avgVisitTime = Math.floor(
-            Math.floor(this.userBaseInfo.avgVisitTime) / 60
-          );
-          this.userBaseInfo.visitTime = Math.floor(
-            Math.floor(this.userBaseInfo.visitTime) / 60
-          );
+          // this.userBaseInfo.avgVisitTime = Math.floor(
+          //   Math.floor(this.userBaseInfo.avgVisitTime) / 60
+          // );
+          // this.userBaseInfo.visitTime = Math.floor(
+          //   Math.floor(this.userBaseInfo.visitTime) / 60
+          // );
           this.userBaseInfo.avgPv = Math.floor(this.userBaseInfo.avgPv);
         }
       });
     },
-
-    // 右边里面url
-    // getVisitorSessionUriList() {
-    //   this.visitorSessionList.map((item) => {
-    //     let params = {
-    //       pageNum: 1,
-    //       pageSize: 50,
-    //       distinctId: this.distinctId,
-    //       eventSessionId: "98816BD0-9E22-43DF-88CA-C29EFD910474",
-    //     };
-    //   });
-    //   // let params = {
-    //   //   pageNum: 1,
-    //   //   pageSize: 50,
-    //   //   distinctId: this.distinctId,
-    //   //   eventSessionId: "98816BD0-9E22-43DF-88CA-C29EFD910474",
-    //   // };
-    //   getVisitorSessionUriListApi(params).then((res) => {
-    //     if (res.code == 200) {
-    //       // this.$refs.behaviorChart.getChannelList(res.data);
-    //       this.visitorSessionList = res.data.rows;
-    //     }
-    //   });
-    // },
   },
 };
 </script>
@@ -501,45 +505,55 @@ export default {
   display: flex;
   .left-item {
     min-width: 516px;
-    min-height: 584px;
+    min-height: 450px;
     max-height: 960px;
     padding: 15px 15px;
     padding-top: 0;
     .visitorInfo {
-      width: 516px;
-      height: 174px;
-      // background: #fafafb;
+      max-width: 516px;
+      overflow: hidden;
+      min-height: 100px;
       border-radius: 6px;
       display: flex;
-      //   align-items: center;
-      padding: 24px 21px;
+      padding: 15px;
       box-sizing: border-box;
-      img {
-        width: 125px;
-        height: 125px;
-        background: rgba(0, 0, 0, 0);
-        border-radius: 50%;
+      .setImg {
+        // width: 125px;
+        width: 90px;
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        // align-items: center;
+        box-sizing: border-box;
+        img {
+          width: 90px;
+          height: 90px;
+          object-fit: cover;
+          background: rgba(0, 0, 0, 0);
+          border-radius: 50%;
+        }
       }
-      .title {
-        margin-top: 6px;
-        // font-size: 13px;
-        // font-weight: 500;
-        // line-height: 13px;
-        // color: #4d4d4d;
-        // padding-bottom: 16px;
+      .visitDetail {
+        box-sizing: border-box;
+        width: 373px;
+        // width: 337px;
+        min-height: 100px;
+        margin-left: 15px;
       }
       .lable {
         display: flex;
         font-size: 12px;
-        font-weight: 500;
         line-height: 26px;
+        font-weight: 500;
         color: #5a607f;
         white-space: nowrap;
         align-items: center;
+        text-overflow: ellipsis;
+        box-sizing: border-box;
+        overflow: hidden;
+        white-space: nowrap;
         span {
-          width: 140px;
           box-sizing: border-box;
-          // width: 100%;
           overflow: hidden;
           text-overflow: ellipsis;
           font-size: 12px;
@@ -551,31 +565,34 @@ export default {
     .total {
       margin-top: 15px;
       width: 516px;
-      height: 172px;
-
-      // background: #fafafb;
+      min-height: 140px;
       border-radius: 6px;
       padding: 12px;
-      .total_lable {
-        // font-size: 13px;
-        // font-weight: 500;
-        // line-height: 13px;
-        // color: #4d4d4d;
-        padding-bottom: 24px;
+      .visit_Time {
+        display: flex;
+        padding-top: 15px;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 13px;
+        line-height: 20px;
+        color: #3d64e6;
+        .firstTime {
+          width: 100%;
+          text-align: left;
+        }
+        .lastTime {
+          width: 100%;
+          text-align: left;
+        }
+        .detailTime {
+          padding-top: 5px;
+        }
       }
       .total-head {
         font-size: 12px;
         line-height: 12px;
         line-height: 20px;
         color: #5a607f;
-      }
-      .total-body {
-        padding-top: 18px;
-        font-size: 13px;
-        font-weight: 500;
-        line-height: 13px;
-        line-height: 20px;
-        color: #3d64e6;
       }
     }
     .device {
@@ -595,7 +612,6 @@ export default {
         font-size: 18px;
         color: #3d64e6;
         font-weight: 500;
-
       }
     }
     .whereFrom {
@@ -603,7 +619,7 @@ export default {
       box-sizing: border-box;
       margin-top: 16px;
       width: 516px;
-      min-height: 116px;
+      min-height: 50px;
       // background: #fafafb;
       border-radius: 6px;
       display: flex;
@@ -693,7 +709,7 @@ export default {
           font-size: 13px;
           text-align: right;
           position: relative;
-          .right_ip{
+          .right_ip {
             position: absolute;
             top: 10px;
             color: #4d4d4d;

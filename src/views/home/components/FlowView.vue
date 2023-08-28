@@ -240,7 +240,8 @@
       </div>
       <div class="bid-list-record" style="margin-bottom: 0">
         <div class="bid-list-item1 w157">
-          <p v-if="timeType == 'day'">同比（今日与上年同期）</p>
+          <!-- <p v-if="timeType == 'day'">同比（今日与上年同期）</p> -->
+          <p v-if="timeType == 'day'">同比（今日与上周同期）</p>
           <p v-if="timeType == 'week'">同比（本周与上年同期）</p>
           <p v-if="timeType == 'month'">同比（本月与上年同期）</p>
           <p v-if="timeType == 'year'">同比（本年与上年同期）</p>

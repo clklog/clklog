@@ -3,7 +3,7 @@
     <div class="chartsIcon">
       <div class="chartLeft">
         <div class="trendHead">
-          <div class="public-firstHead">指标分析图</div>
+          <div class="public-firstHead" style="margin-top: 20px; margin-right: 13px;">指标分析图</div>
           <div class="block">
             <!-- <el-cascader
               v-model="emptyList"
@@ -54,6 +54,7 @@
               textAlign: 'center',
               background: '#F5F7FA',
             }"
+             class="public-radius"
             :cell-style="{ textAlign: 'center' }"
             style="width: 100%; margin-top: 12px; height: 98%"
             @sort-change="sortChange($event)"
@@ -479,25 +480,6 @@ export default {
   @import "~@/styles/components/el-pagination.scss";
   @import "~@/styles/components/custom-select.scss";
 }
-
-// ::v-deep .setTable {
-//   .el-table--border {
-//     border: none;
-//   }
-//   .el-table th {
-//     background-color: transparent !important;
-//   }
-
-//   .el-table,
-//   .el-table__expanded-cell {
-//     background-color: transparent;
-//   }
-
-//   .setTable .el-table th,
-//   .el-table tr {
-//     background-color: transparent;
-//   }
-// }
 .trafficHead {
   font-size: 16px;
   font-weight: 600;
@@ -513,7 +495,6 @@ img {
 .trendHead {
   display: flex;
   align-items: center;
-  //   position: relative;
   font-size: 14px;
   font-weight: 500;
   line-height: 33px;
@@ -534,7 +515,8 @@ img {
   display: flex;
   justify-content: space-between;
   .chartLeft {
-    background-color: #fafafb;
+    border-radius: 6px;
+    background-color: #fff;
     padding: 15px;
     width: 100%;
     min-height: 400px;
@@ -546,23 +528,15 @@ img {
 
 // table表格
 .search_wrappy {
+  border-radius: 6px;
   position: relative;
   margin: 15px;
   background-color: #fff;
   min-height: 647px;
+  padding: 22px;
 }
 .search_table {
   height: 100%;
-  padding: 18px 22px;
-  // span {
-  //   font-size: 13px;
-  //   font-weight: 500;
-  //   line-height: 31px;
-  //   color: #4d4d4d;
-  // }
+  // padding: 18px 22px;
 }
-// .block {
-//   // margin: 20px 12px;
-//   width: 100%;
-// }
 </style>

@@ -1,47 +1,42 @@
 <template>
-  <div class="SearchWord block-main public-hoverItem" >
-    <div class="block-head">
+  <div class="SearchWord block-main public-hoverItem">
+    <div
+      class="block-head"
+      @click="$router.push('/visitorAnalysis/searchAnalysis')"
+    >
       <div class="block-title">Top10搜索词</div>
-      <div
-        class="block-head-icon"
-        @click="$router.push('/visitorAnalysis/searchAnalysis')"
-      >
-       <img src="@/assets/images/icon.png" alt="" width="10px"> 
+      <div class="block-head-icon">
+        <img src="@/assets/images/icon.png" alt="" width="10px" />
       </div>
     </div>
-    <div class="block-index-form">
-      <!-- content -->
-      <div class="form-list-page">
-        <div class="form-list-header">
-          <div class="header-text w156">搜索词</div>
-          <div class="header-name w156">浏览量(PV)</div>
-          <div class="header-name w156">占比</div>
-        </div>
+    <!-- :header-cell-style="{ textAlign: 'center' }" -->
+    <!-- :header-cell-style="headerStyle" -->
 
-        <div
-          class="form-list-record"
-          v-for="(item, index) in searchWordList"
-          :key="index"
+    <div class="block-index-form">
+      <el-table
+        class="public-radius"
+        :data="searchWordList"
+        :cell-style="tableHeaderColor"
+        style="width: 100%"
+      >
+        <el-table-column
+          prop="word"
+          label="搜索词"
+          style="text-align: center;"
+          align="left"
+          :show-overflow-tooltip="true"
         >
-          <div class="header-text w157">{{ item.word || "--" }}</div>
-          <div class="form-list-item w158">
-            <p>{{ item.pv }}</p>
-          </div>
-          <div class="form-list-item w158">
-            <p>{{ percentageFun(item.percent) }}</p>
-          </div>
-        </div>
-        <!--
-            <div class="form-list-record">
-              <div class="header-text w157">百度统计</div>
-              <div class="form-list-item w158">
-                <p>187.7%</p>
-              </div>
-              <div class="form-list-item w158">
-                <p>143.3%</p>
-              </div>
-            </div> -->
-      </div>
+          <template slot-scope="scope">
+            {{ scope.row.word }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="pv" label="浏览量" width="150"  align="center" />
+        <el-table-column label="占比" width="150" align="center">
+          <template slot-scope="scope">
+            {{ percentageFun(scope.row.percent) }}
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -66,6 +61,20 @@ export default {
   },
   watch: {},
   methods: {
+    tableHeaderColor({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 0) {
+        return "text-align:left";
+      } else {
+        return "text-align:center";
+      }
+    },
+    headerStyle(row, column, rowIndex, columnIndex) {
+      if (columnIndex === 0) {
+        return "text-align:left";
+      } else {
+        return "text-align:center";
+      }
+    },
     // 关键词搜索
     getSearchWord() {
       getSearchWordApi(this.params).then((res) => {
@@ -74,12 +83,11 @@ export default {
         }
       });
     },
-    percentageFun(val){
-        return percentage(val)
-    }
+    percentageFun(val) {
+      return percentage(val);
+    },
   },
 };
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

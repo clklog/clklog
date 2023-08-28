@@ -195,15 +195,14 @@ export default {
           type: "bar",
           data: this.pv,
           barWidth: 20,
-          barGap: "100%", //柱图间距
+          barGap: "100%", 
           name: "浏览量",
-          // name: this.pv.length > 0 ? "浏览量（PV）" : "",
           label: {
             show: true,
             position: "top",
           },
           itemStyle: {
-            color: "#051e71",
+            color: "#d5e5fa",
           },
         },
         {
@@ -216,7 +215,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#007EE9",
+            color: "#80b0ef",
           },
         },
         {
@@ -224,13 +223,12 @@ export default {
           data: this.visitCount,
           barWidth: 20,
           name: "访问次数",
-          // name: this.visitCount.length > 0 ? "访问次数" : "",
           label: {
             show: true,
             position: "top",
           },
           itemStyle: {
-            color: "#3d64e6",
+            color: "#5695ea",
           },
         },
         {
@@ -243,7 +241,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "blue",
+            color: "2c7be5",
           },
         },
         {
@@ -256,7 +254,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#17DDFF",
+            color: "#1a4a89",
           },
         },
       ];

@@ -1,5 +1,6 @@
 <template>
   <div class="chartsIcon">
+    <div class="public-firstHead">受访页面分析</div>
     <div class="flow-indicator">
       <div class="flow-item">
         <div class="flow-title">流量基础指标</div>
@@ -22,7 +23,7 @@
           class="checkBoxStyle"
           @change="handelFlowQuality"
         >
-          <el-checkbox label="entryRate">入口页次数</el-checkbox>
+          <el-checkbox label="entryCount">入口页次数</el-checkbox>
           <el-checkbox label="downPvCount">贡献下游浏览量</el-checkbox>
           <el-checkbox label="exitCount">退出页次数</el-checkbox>
           <el-checkbox label="avgVisitTime">平均访问时长</el-checkbox>
@@ -30,20 +31,25 @@
         </el-checkbox-group>
       </div>
     </div>
-    <div class="public-table-block">
+    <!-- class="public-table-block" -->
+    <div>
       <div class="public-Table-minHeight public-hoverItem">
         <el-table
           :data="vistedTableData"
           border
+          class="public-radius"
           style="width: 100%"
           :header-cell-style="{ textAlign: 'center' }"
-          :cell-style="{ textAlign: 'center' }"
+          :cell-style="tableHeaderColor"
           @sort-change="sortChange($event)"
         >
-          <el-table-column type="index" label="序号" width="150" />
-          <!-- :show-overflow-tooltip="true"  prop="uri" -->
-          <el-table-column label="页面URL" width="350">
+          <el-table-column label="序号" type="index" width="150" align="center">
             <template slot-scope="scope">
+              <span v-text="getIndex(scope.$index)"> </span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="uri" label="页面URL" width="400" :show-overflow-tooltip="true">
+            <!-- <template slot-scope="scope">
               <el-popover trigger="hover" placement="top">
                 <div>{{ scope.row.uri }}</div>
                 <div
@@ -57,7 +63,7 @@
                   {{ scope.row.uri }}
                 </div>
               </el-popover>
-            </template>
+            </template> -->
           </el-table-column>
           <el-table-column label="流量基础指标">
             <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
@@ -70,16 +76,17 @@
             />
           </el-table-column>
           <el-table-column prop="date" label="流量质量指标">
+           
+            <el-table-column
+              v-if="entryCount"
+              prop="entryCount"
+              label="入口页次数"
+              sortable
+            />
             <el-table-column
               v-if="downPvCount"
               prop="downPvCount"
               label="贡献下游浏览量"
-              sortable
-            />
-            <el-table-column
-              v-if="entryRate"
-              prop="entryRate"
-              label="入口页次数"
               sortable
             />
             <el-table-column
@@ -89,17 +96,18 @@
               sortable
             />
             <el-table-column
-              v-if="exitRate"
-              prop="exitRate"
-              label="退出率"
-              sortable
-            />
-            <el-table-column
               v-if="avgVisitTime"
               prop="avgVisitTime"
               label="平均访问时长"
               sortable
             />
+            <el-table-column
+              v-if="exitRate"
+              prop="exitRate"
+              label="退出率"
+              sortable
+            />
+            
           </el-table-column>
         </el-table>
       </div>
@@ -121,7 +129,7 @@
 
 <script>
 import { blobDownloads } from "@/utils/localDownloadUtil.js";
-import { exportSourceWebsiteDetailApi } from "@/api/trackingapi/download";
+import { exportVisitUriDetailApi } from "@/api/trackingapi/download";
 import flowPoint from "@/components/flowPoint/index";
 import { percentage } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
@@ -132,12 +140,12 @@ export default {
   data() {
     return {
       channelList: ["uv", "ipCount", "pv"],
-      flowQuality: ["entryRate", "avgVisitTime"],
+      flowQuality: ["entryCount", "avgVisitTime"],
       current: {
         size: 10,
         page: 1,
-        sortName:null,
-        sortOrder:null,
+        sortName: null,
+        sortOrder: null,
       },
       mergedArr: [],
       uri: false,
@@ -147,7 +155,7 @@ export default {
       exitCount: false,
       avgVisitTime: false,
       exitRate: false,
-      entryRate: false,
+      entryCount: false,
       downPvCount: false,
       currentPage: 1,
       vistedTableData: [],
@@ -161,18 +169,29 @@ export default {
     });
   },
   methods: {
+    tableHeaderColor({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 1) {
+        return "text-align:left";
+      } else {
+        return "text-align:center";
+      }
+    },
+    // 分页
+    getIndex($index) {
+      return (this.currentPage - 1) * this.pageSize + $index + 1;
+    },
     sortChange(e) {
       if (e.order && e.order == "ascending") {
         // 降序
         this.current.sortName = e.prop;
-        this.current.sortOrder = 'asc';
+        this.current.sortOrder = "asc";
         this.$emit("currentPage", this.current);
       } else if (e.order && e.order == "descending") {
         // 升序
         this.current.sortName = e.prop;
-        this.current.sortOrder = 'desc';
+        this.current.sortOrder = "desc";
         this.$emit("currentPage", this.current);
-      }else{
+      } else {
         this.current.sortName = null;
         this.current.sortOrder = null;
         this.$emit("currentPage", this.current);
@@ -182,7 +201,7 @@ export default {
       let params = val;
       params.project = this.$store.getters.project;
       params.cols = [...this.channelList, ...this.flowQuality];
-      exportSourceWebsiteDetailApi(params).then((res) => {
+      exportVisitUriDetailApi(params).then((res) => {
         let name = this.sliceTypeFile(res);
         blobDownloads(res.data, name);
       });
@@ -285,6 +304,11 @@ export default {
         } else {
           this.downPvCount = false;
         }
+        if (val.includes("entryCount")) {
+          this.entryCount = true;
+        } else {
+          this.entryCount = false;
+        }
       }
     },
   },
@@ -308,27 +332,27 @@ export default {
   min-height: 461px;
   background: #fff;
   border-radius: 6px;
-
+  padding: 22px;
   .flow-indicator {
     min-height: 58px;
     background: rgba(252, 252, 252, 0.39);
     border: 1px solid #f0f0f5;
     border-radius: 6px;
     box-sizing: border-box;
-    margin: 12px;
+    margin-top: 10px;
     .setSpace {
       margin-bottom: 12px;
     }
     .flow-item {
       display: flex;
-      align-items: center;
+      // align-items: center;
       margin-top: 12px;
       margin-left: 10px;
       .flow-title {
         margin-right: 21px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 400;
-        line-height: 16px;
+        line-height: 32px;
         color: #4d4d4d;
       }
     }

@@ -1,7 +1,7 @@
 <template>
   <div class="area_container public-hoverItem">
     <div class="mapCharts">
-      <span class="public-firstHead" style="padding:0 0;">TOP10访问区域指标展示</span>
+      <span class="public-firstHead" style="padding: 0 0">地域分布图</span>
       <div
         id="echart_china"
         ref="echart_china"
@@ -12,13 +12,14 @@
       <div
         style="
           width: 500px;
-          height: 405px;
+          height: 410px;
           margin-top: 62px;
           overflow: hidden;
           margin-bottom: 20px;
         "
       >
         <el-table
+          class="public-radius"
           ref="singleTable"
           :data="apiProvinceList"
           highlight-current-row
@@ -133,7 +134,7 @@ export default {
           this.apiProvinceList.splice(i--, 1);
         }
       }
-     
+
       let result = this.apiProvinceList;
       for (let i = 0; i < this.provinceList.length; i++) {
         this.provinceList[i].visitCountRate = 0;
@@ -142,7 +143,7 @@ export default {
         for (let j = 0; j < result.length; j++) {
           if (this.provinceList[i].name == result[j].province) {
             this.provinceList[i].value = result[j].visitCount;
-            this.provinceList[i].visitCountRate = result[j].visitCountRate
+            this.provinceList[i].visitCountRate = result[j].visitCountRate;
             this.provinceList[i].uv = result[j].uv;
             this.provinceList[i].uvRate = percentage(result[j].uvRate);
             maxValue.push(result[j].visitCount);

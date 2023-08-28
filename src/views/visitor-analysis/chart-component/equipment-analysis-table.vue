@@ -1,18 +1,30 @@
 <template>
   <div>
     <div class="chartsIcon">
+      <div class="public-firstHead">设备分析</div>
       <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
-      <div class="public-table-block">
+      <div>
         <div class="public-Table-minHeight public-hoverItem">
           <el-table
             :data="equipmentList"
             :header-cell-style="{ textAlign: 'center' }"
             :cell-style="{ textAlign: 'center' }"
             border
+            class="public-radius"
             @sort-change="sortChange($event)"
             style="width: 100%"
           >
-            <el-table-column type="index" label="序号" width="150" />
+            <!-- <el-table-column type="index" label="序号" width="150" /> -->
+            <el-table-column
+              label="序号"
+              type="index"
+              width="150"
+              align="center"
+            >
+              <template slot-scope="scope">
+                <span v-text="getIndex(scope.$index)"> </span>
+              </template>
+            </el-table-column>
             <el-table-column prop="device" label="设备类型" width="150" />
 
             <el-table-column prop="date" label="流量基础指标">
@@ -123,8 +135,8 @@ export default {
       current: {
         size: 10,
         page: 1,
-        sortName:null,
-        sortOrder:null,
+        sortName: null,
+        sortOrder: null,
       },
       currentPage: 1,
       total: 0,
@@ -132,6 +144,11 @@ export default {
     };
   },
   methods: {
+    getIndex($index) {
+      return (
+        (this.currentPage - 1) * this.pageSize + $index + 1
+      );
+    },
     equipmentTableEvent(val) {
       this.equipmentList = val.rows;
       this.equipmentList.map((item) => {
@@ -157,19 +174,19 @@ export default {
       if (e.order && e.order == "ascending") {
         // 降序
         this.current.sortName = e.prop;
-        this.current.sortOrder = 'asc';
+        this.current.sortOrder = "asc";
         this.$emit("currentPage", this.current);
       } else if (e.order && e.order == "descending") {
         // 升序
         this.current.sortName = e.prop;
-        this.current.sortOrder = 'desc';
+        this.current.sortOrder = "desc";
         this.$emit("currentPage", this.current);
-      }else{
+      } else {
         this.current.sortName = null;
         this.current.sortOrder = null;
         this.$emit("currentPage", this.current);
       }
-    },  
+    },
     handleSizeChange(val) {
       this.current.size = val;
       this.$emit("currentPage", this.current);
@@ -178,7 +195,7 @@ export default {
       this.current.page = val;
       this.$emit("currentPage", this.current);
     },
-    initCurrentPage(){
+    initCurrentPage() {
       this.currentPage = 1;
     },
     flowPoint(val) {
@@ -239,9 +256,8 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-::v-deep{
+::v-deep {
   @import "~@/styles/components/el-pagination.scss";
-
 }
 .chartsIcon {
   box-sizing: border-box;
@@ -250,54 +266,6 @@ export default {
   min-height: 461px;
   background: #fff;
   border-radius: 6px;
-
-  .flow-indicator {
-    min-height: 58px;
-    background: rgba(252, 252, 252, 0.39);
-    border: 1px solid #f0f0f5;
-    border-radius: 6px;
-    box-sizing: border-box;
-    margin: 12px;
-    .setSpace {
-      margin-bottom: 12px;
-    }
-    .flow-item {
-      display: flex;
-      align-items: center;
-      margin-top: 12px;
-      margin-left: 10px;
-      .flow-title {
-        margin-right: 21px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 16px;
-        color: #4d4d4d;
-      }
-      .el-checkbox {
-        margin-right: 80px;
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 15px;
-        color: #697195;
-      }
-    }
-    .check_item {
-      background-color: #ffffff;
-      margin-left: 20px;
-      height: 40px;
-      border-radius: 4px;
-      border: 1px solid #eee;
-      display: flex;
-      align-items: center;
-      // width: 30%;
-      span {
-        font-size: 14px;
-        padding: 0 10px;
-      }
-      .checkBoxStyle {
-        padding-right: 10px;
-      }
-    }
-  }
+  padding: 22px;
 }
 </style>

@@ -3,7 +3,7 @@
     <FilterBar @setFilterBarParams="setFilterBarParams" />
     <div class="public-block">
       <div class="Overview public-hoverItem">
-        <div class="public-firstHead" style="padding-left: 15px">地域分析</div>
+        <div class="public-firstHead" >流量概览</div>
         <originView ref="originView" byAreaAnaly></originView>
       </div>
       <regionalShow ref="regionalShow"></regionalShow>
@@ -80,15 +80,15 @@ export default {
         newvalue.pageSize = val.size;
         newvalue.sortName = val.sortName;
         newvalue.sortOrder = val.sortOrder;
-        this.pageNum = val.page;
-        this.pageSize = val.size;
         this.sortName = val.sortName;
         this.sortOrder = val.sortOrder;
+        this.pageNum = val.page;
+        this.pageSize = val.size;
       } else {
-        newvalue.pageNum = this.pageNum;
-        newvalue.pageSize = this.pageSize;
         newvalue.sortName = this.sortName;
         newvalue.sortOrder = this.sortOrder;
+        newvalue.pageNum = this.pageNum;
+        newvalue.pageSize = this.pageSize;
         this.$refs.regionalTable.initCurrentPage();
       }
       this.$refs.regionalTable.getDetailList(newvalue);

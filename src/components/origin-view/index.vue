@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div v-if="byFlowView">
+    <div v-if="byFlowView || byChannel">
         <div class="bid-list-header">
-        <div class="header-name w156"></div>
+        <div class="header-name w156" v-if="!byChannel"></div>
         <div class="header-name w156">
           浏览量
           <el-popover
@@ -626,6 +626,10 @@ import { formatTime } from "@/utils/format";
 export default {
   name: "originName",
   props: {
+    byChannel:{
+      type:Boolean,
+       default: false,
+    },
     byFlowView:{ 
       type:Boolean,
        default: false,

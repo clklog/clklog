@@ -520,13 +520,20 @@
   box-sizing: border-box;
 }
 
+.public-radius {
+  border-radius: 6px;
+}
+
 .public-table-block {
   box-sizing: border-box;
   margin: 20px 0;
-  padding-top: 1px;
-  min-height: 461px;
+  padding: 22px;
   background: #fff;
-  border-radius: 6px;
+}
+
+.public-Table-minHeight {
+  margin-top: 20px;
+  box-sizing: border-box;
 }
 
 .public-echart-block {
@@ -540,11 +547,22 @@
   font-weight: 600;
   line-height: 31px;
   color: #4d4d4d;
-  padding: 14px 13px 0px 13px;
+  padding-bottom: 7px;
 }
 
 .public-hoverItem {
   border-radius: 6px;
+}
+
+.Overview {
+  min-height: 118px;
+  background-color: #fff;
+  padding: 15px;
+}
+
+.public-visited-echarts {
+  font-size: 15px;
+  padding: 40px 20px 0;
 }
 
 body {
@@ -743,6 +761,7 @@ aside a:hover {
 }
 
 .block-main .block-head {
+  cursor: pointer;
   display: flex;
   align-items: center;
   position: relative;
@@ -757,7 +776,9 @@ aside a:hover {
 }
 
 .block-main .block-head .block-head-icon {
+  box-sizing: content-box;
   margin-left: auto;
+  text-align: right;
   color: #acaaaa;
   font-size: 16px;
   cursor: pointer;
@@ -840,7 +861,6 @@ aside a:hover {
   border: 1px solid #f0f0f5;
   border-radius: 6px;
   box-sizing: border-box;
-  margin: 12px;
 }
 
 .flow-indicator .setSpace {

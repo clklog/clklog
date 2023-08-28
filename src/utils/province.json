@@ -1,8 +1,13 @@
 {
   "province": [
     {
+      "provinceCode": "000000",
+      "provinceName": "全部",
+      "provinceType": 0
+    },
+    {
       "provinceCode": "110000",
-      "provinceName": "北京市",
+      "provinceName": "北京",
       "provinceType": 1,
       "cities": [
         {
@@ -115,7 +120,7 @@
     },
     {
       "provinceCode": "120000",
-      "provinceName": "天津市",
+      "provinceName": "天津",
       "provinceType": 1,
       "cities": [
         {
@@ -228,7 +233,7 @@
     },
     {
       "provinceCode": "130000",
-      "provinceName": "河北省",
+      "provinceName": "河北",
       "provinceType": 2,
       "cities": [
         {
@@ -1238,7 +1243,7 @@
     },
     {
       "provinceCode": "140000",
-      "provinceName": "山西省",
+      "provinceName": "山西",
       "provinceType": 2,
       "cities": [
         {
@@ -1984,7 +1989,7 @@
 
     {
       "provinceCode": "210000",
-      "provinceName": "辽宁省",
+      "provinceName": "辽宁",
       "provinceType": 2,
       "cities": [
         {
@@ -2673,7 +2678,7 @@
     },
     {
       "provinceCode": "220000",
-      "provinceName": "吉林省",
+      "provinceName": "吉林",
       "provinceType": 2,
       "cities": [
         {
@@ -3092,7 +3097,7 @@
     },
     {
       "provinceCode": "310000",
-      "provinceName": "上海市",
+      "provinceName": "上海",
       "provinceType": 1,
       "cities": [
         {
@@ -3210,7 +3215,7 @@
     },
     {
       "provinceCode": "320000",
-      "provinceName": "江苏省",
+      "provinceName": "江苏",
       "provinceType": 2,
       "cities": [
         {
@@ -3916,7 +3921,7 @@
     },
     {
       "provinceCode": "330000",
-      "provinceName": "浙江省",
+      "provinceName": "浙江",
       "provinceType": 2,
       "cities": [
         {
@@ -4516,7 +4521,7 @@
     },
     {
       "provinceCode": "340000",
-      "provinceName": "安徽省",
+      "provinceName": "安徽",
       "provinceType": 2,
       "cities": [
         {
@@ -5269,7 +5274,7 @@
     },
     {
       "provinceCode": "350000",
-      "provinceName": "福建省",
+      "provinceName": "福建",
       "provinceType": 2,
       "cities": [
         {
@@ -5818,7 +5823,7 @@
     },
     {
       "provinceCode": "360000",
-      "provinceName": "江西省",
+      "provinceName": "江西",
       "provinceType": 2,
       "cities": [
         {
@@ -6463,7 +6468,7 @@
     },
     {
       "provinceCode": "370000",
-      "provinceName": "山东省",
+      "provinceName": "山东",
       "provinceType": 2,
       "cities": [
         {
@@ -7391,7 +7396,7 @@
     },
     {
       "provinceCode": "410000",
-      "provinceName": "河南省",
+      "provinceName": "河南",
       "provinceType": 2,
       "cities": [
         {
@@ -8414,7 +8419,7 @@
     },
     {
       "provinceCode": "420000",
-      "provinceName": "湖北省",
+      "provinceName": "湖北",
       "provinceType": 2,
       "cities": [
         {
@@ -8856,7 +8861,7 @@
     },
     {
       "provinceCode": "430000",
-      "provinceName": "湖南省",
+      "provinceName": "湖南",
       "provinceType": 2,
       "cities": [
         {
@@ -9650,7 +9655,7 @@
     },
     {
       "provinceCode": "440000",
-      "provinceName": "广东省",
+      "provinceName": "广东",
       "provinceType": 2,
       "cities": [
         {
@@ -10536,7 +10541,7 @@
 
     {
       "provinceCode": "460000",
-      "provinceName": "海南省",
+      "provinceName": "海南",
       "provinceType": 2,
       "cities": [
         {
@@ -10692,7 +10697,7 @@
     },
     {
       "provinceCode": "500000",
-      "provinceName": "重庆市",
+      "provinceName": "重庆",
       "provinceType": 1,
       "cities": [
         {
@@ -10915,7 +10920,7 @@
     },
     {
       "provinceCode": "510000",
-      "provinceName": "四川省",
+      "provinceName": "四川",
       "provinceType": 2,
       "cities": [
         {
@@ -12085,7 +12090,7 @@
     },
     {
       "provinceCode": "520000",
-      "provinceName": "贵州省",
+      "provinceName": "贵州",
       "provinceType": 2,
       "cities": [
         {
@@ -12619,7 +12624,7 @@
     },
     {
       "provinceCode": "530000",
-      "provinceName": "云南省",
+      "provinceName": "云南",
       "provinceType": 2,
       "cities": [
         {
@@ -13439,7 +13444,7 @@
     },
     {
       "provinceCode": "610000",
-      "provinceName": "陕西省",
+      "provinceName": "陕西",
       "provinceType": 2,
       "cities": [
         {
@@ -14111,7 +14116,7 @@
     },
     {
       "provinceCode": "620000",
-      "provinceName": "甘肃省",
+      "provinceName": "甘肃",
       "provinceType": 2,
       "cities": [
         {
@@ -14720,7 +14725,7 @@
     },
     {
       "provinceCode": "630000",
-      "provinceName": "青海省",
+      "provinceName": "青海",
       "provinceType": 2,
       "cities": [
         {
@@ -16901,7 +16906,7 @@
     },
     {
       "provinceCode": "230000",
-      "provinceName": "黑龙江省",
+      "provinceName": "黑龙江",
       "provinceType": 2,
       "cities": [
         {

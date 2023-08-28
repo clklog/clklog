@@ -122,8 +122,8 @@ export default {
           label: "上海机动车",
         },
         {
-          value: "国拍",
-          label: "国拍",
+          value: "国拍租房",
+          label: "国拍租房",
         },
       ],
       value: "",

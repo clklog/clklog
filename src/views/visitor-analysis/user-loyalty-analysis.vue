@@ -85,7 +85,7 @@ export default {
 .userLoyalty {
   height: 1109px;
   margin: 15px;
-  // background: rgba(170, 170, 170, 0.12);
+  background: #fff;
   padding-top: 18px;
   padding-left: 16px;
   padding-bottom: 30px;

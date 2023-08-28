@@ -2,7 +2,7 @@
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams" ByArea></FilterBar>
     <div class="Overview public-hoverItem">
-      <div class="public-firstHead">来源网站分析</div>
+      <div class="public-firstHead">流量概览</div>
       <originView ref="originView" byAreaAnaly></originView>
     </div>
     <sourceWebChart ref="sourceWebChart"></sourceWebChart>

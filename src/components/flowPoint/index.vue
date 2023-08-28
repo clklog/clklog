@@ -1,6 +1,6 @@
 <template>
   <!-- 公用流量指标 -->
-  <div class="flow-indicators">
+  <div class="flow-indicator">
     <div class="flow-item">
       <div class="flow-title">流量基础指标</div>
       <el-checkbox-group
@@ -14,11 +14,12 @@
         <el-checkbox v-if="byChannel" label="visitCountRate"
           >访问次数占比</el-checkbox
         >
-        <el-checkbox label="uv">访客数</el-checkbox>
+        <el-checkbox label="uv">访客数(UV)</el-checkbox>
         <el-checkbox v-if="byChannel" label="uvRate">访客数占比</el-checkbox>
-        <el-checkbox label="newUv">新访客数</el-checkbox>
-        <el-checkbox label="newUvRate">新访客数占比</el-checkbox>
-        <el-checkbox label="ipCount" style="margin-right: 0">IP数</el-checkbox>
+        <el-checkbox v-if="!byNewOldVisit" label="newUv">新访客数</el-checkbox>
+        <el-checkbox v-if="!byNewOldVisit" label="newUvRate">新访客数占比</el-checkbox>
+        <el-checkbox label="newUvRate" v-if="byNewOldVisit">访客数占比</el-checkbox>
+        <el-checkbox label="ipCount" >IP数</el-checkbox>
         <el-checkbox
           v-if="byChannel"
           label="ipCountRate"
@@ -40,9 +41,9 @@
           >平均访问时长占比</el-checkbox
         >
         <el-checkbox label="avgPv">平均访问页数</el-checkbox>
-        <el-checkbox v-if="byChannel" label="avgPvRate"
+        <!-- <el-checkbox v-if="byChannel" label="avgPvRate"
           >平均访问页数占比</el-checkbox
-        >
+        > -->
       </el-checkbox-group>
     </div>
   </div>
@@ -65,6 +66,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    byNewOldVisit:{
+      type: Boolean,
+      default: false,
+    }
   },
   data() {
     return {
@@ -106,6 +111,7 @@ export default {
       //     // blobDownloads(res.data,result);
       //   });
       // }
+      console.log(path,"路径");
       switch (path) {
         case "/visitorAnalysis/trendAnalysis": {
           exportFlowTrendDetailApi(params).then((res) => {
@@ -122,6 +128,7 @@ export default {
           break;
         }
         case "/visitorAnalysis/sourceWebAnalysis": {
+          console.log("受访页面分析");
           exportSourceWebsiteDetailApi(params).then((res) => {
             let name = this.sliceTypeFile(res);
             blobDownloads(res.data, name);
@@ -193,6 +200,14 @@ export default {
   @import "~@/styles/components/el-checkbox.scss";
   @import "~@/styles/components/el-pagination.scss";
 }
+// .chartsIcon {
+//   box-sizing: border-box;
+//   margin: 20px;
+//   padding-top: 1px;
+//   min-height: 461px;
+//   background: #fff;
+//   border-radius: 6px;
+// }
 .chartsIcon {
   box-sizing: border-box;
   margin: 20px;
@@ -200,53 +215,46 @@ export default {
   min-height: 461px;
   background: #fff;
   border-radius: 6px;
-}
-.flow-indicators {
-  min-height: 58px;
-  background: rgba(252, 252, 252, 0.39);
-  border: 1px solid #f0f0f5;
-  border-radius: 6px;
-  box-sizing: border-box;
-  margin: 12px;
-  .setSpace {
-    margin-bottom: 12px;
-  }
-  .flow-item {
-    display: flex;
-    align-items: center;
-    margin-top: 12px;
-    margin-left: 10px;
-    .flow-title {
-      margin-right: 21px;
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 16px;
-      color: #4d4d4d;
-      white-space: nowrap;
+  padding: 22px;
+  .flow-indicator {
+    margin-top: 10px;
+    min-height: 58px;
+    background: rgba(252, 252, 252, 0.39);
+    border: 1px solid #f0f0f5;
+    border-radius: 6px;
+    box-sizing: border-box;
+    // margin: 12px;
+    .setSpace {
+      margin-bottom: 12px;
     }
-    .el-checkbox {
-      margin-right: 80px;
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 15px;
-      color: #697195;
+    .flow-item {
+      display: flex;
+      // align-items: center;
+      margin-top: 12px;
+      margin-left: 10px;
+      .flow-title {
+        margin-right: 21px;
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 32px;
+        color: #4d4d4d;
+      }
     }
-  }
-  .check_item {
-    background-color: #ffffff;
-    margin-left: 20px;
-    height: 40px;
-    border-radius: 4px;
-    border: 1px solid #eee;
-    display: flex;
-    align-items: center;
-    // width: 30%;
-    span {
-      font-size: 14px;
-      padding: 0 10px;
-    }
-    .checkBoxStyle {
-      padding-right: 10px;
+    .check_item {
+      background-color: #ffffff;
+      margin-left: 20px;
+      height: 40px;
+      border-radius: 4px;
+      border: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      span {
+        font-size: 14px;
+        padding: 0 10px;
+      }
+      .checkBoxStyle {
+        padding-right: 10px;
+      }
     }
   }
 }

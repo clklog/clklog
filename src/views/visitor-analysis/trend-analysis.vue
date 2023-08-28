@@ -6,12 +6,11 @@
         ByData
         bySub
         @setFilterBarParams="setFilterBarParams"
-        @publicEventDown="publicEventDown"
       />
     </div>
     <div class="public-block">
       <div class="Overview public-hoverItem">
-        <div class="trendAnalysis public-firstHead">趋势分析</div>
+        <div class="trendAnalysis public-firstHead">流量概览</div>
         <originView ref="originView" byAreaAnaly></originView>
       </div>
       <indicatorChart ref="indicatorChart" />
@@ -73,32 +72,25 @@ export default {
           this.$refs.originView.originEvent(res.data);
         }
       });
-      getFlowTrendApi(this.commonParams).then((res) => {
-        if (res.code == 200) {
-          this.$refs.indicatorChart.apiDetailList(res.data);
-        }
-      });
+      // getFlowTrendApi(this.commonParams).then((res) => {
+      //   if (res.code == 200) {
+      //     // console.log(this.commonParams,"commonParams---");
+      //     this.$refs.indicatorChart.apiDetailList(res.data,);
+      //   }
+      // });
     },
     getFlowTrendDetail() {
       // getFlowTrendDetailApi(this.commonParams).then((res) => {
       getFlowDetailApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.trendTable.apiDetailList(res.data);
+          this.$refs.trendTable.apiDetailList(res.data,this.commonParams.timeType);
+          this.$refs.indicatorChart.apiDetailList(res.data,)
         }
       });
     },
     setFilterBarParams(val) {
       this.filterBarParams = copyObj(val);
     },
-    publicEventDown(val){
-      // 下载文档事件
-      console.log(this.filterBarParams,"----------");
-      // exportFlowTrendDetailApi(this.commonParams).then((res) => {
-      //   if (res.code == 200) {
-          
-      //   }
-      // });
-    }
   },
 };
 </script>
