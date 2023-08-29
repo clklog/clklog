@@ -74,7 +74,7 @@
                 currentPage * pageSize
               )
             "
-            :header-cell-style="{ textAlign: 'center' }"
+            :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
             :cell-style="{ textAlign: 'center' }"
             border
             style="width: 100%"

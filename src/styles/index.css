@@ -131,7 +131,7 @@
 }
 
 .radio-com .radio-com-label {
-  font-size: 12px;
+  font-size: 13px;
   padding: 0 10px;
   color: #697195;
   line-height: 30px;
@@ -547,7 +547,7 @@
   font-weight: 600;
   line-height: 31px;
   color: #4d4d4d;
-  padding-bottom: 7px;
+  /* padding-bottom: 7px; */
 }
 
 .public-hoverItem {
@@ -563,6 +563,10 @@
 .public-visited-echarts {
   font-size: 15px;
   padding: 40px 20px 0;
+}
+
+.el-table--enable-row-hover .el-table__body tr:hover > td {
+  background-color: #f7fafe !important;
 }
 
 body {

@@ -114,6 +114,9 @@ export default {
       console.log(path,"路径");
       switch (path) {
         case "/visitorAnalysis/trendAnalysis": {
+          let regular = ["statTime"]
+          params.cols = [...params.cols, ...regular]; //增加固定列
+          // console.log(params,"下载参数");
           exportFlowTrendDetailApi(params).then((res) => {
             let name = this.sliceTypeFile(res);
             blobDownloads(res.data, name);
@@ -121,6 +124,8 @@ export default {
           break;
         }
         case "/visitorAnalysis/regionalAnalysis": {
+          let regular = ["index","province"]
+          params.cols = [...params.cols, ...regular];
           exportAreaDetailApi(params).then((res) => {
             let name = this.sliceTypeFile(res);
             blobDownloads(res.data, name);
@@ -128,7 +133,8 @@ export default {
           break;
         }
         case "/visitorAnalysis/sourceWebAnalysis": {
-          console.log("受访页面分析");
+          let regular = ["index","sourcesite"]
+          params.cols = [...params.cols, ...regular];
           exportSourceWebsiteDetailApi(params).then((res) => {
             let name = this.sliceTypeFile(res);
             blobDownloads(res.data, name);
@@ -136,6 +142,8 @@ export default {
           break;
         }
         case "/visitorAnalysis/newOld-visitor-analysis": {
+          let regular = ["index","visitorType"]
+          params.cols = [...params.cols, ...regular];
           exportVisitorDetailApi(params).then((res) => {
             let name = this.sliceTypeFile(res);
             blobDownloads(res.data, name);
@@ -143,6 +151,8 @@ export default {
           break;
         }
         case "/visitorAnalysis/channel-analysis": {
+          let regular = ["index","channel"]
+          params.cols = [...params.cols, ...regular];
           exportChannelDetailApi(params).then((res) => {
             let name = this.sliceTypeFile(res);
             blobDownloads(res.data, name);
@@ -150,6 +160,8 @@ export default {
           break;
         }
         case "/visitorAnalysis/equipment-analysis": {
+          let regular = ["index","device"]
+          params.cols = [...params.cols, ...regular];
           exportDeviceDetailApi(params).then((res) => {
             let name = this.sliceTypeFile(res);
             blobDownloads(res.data, name);

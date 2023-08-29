@@ -7,7 +7,7 @@
         <div class="public-Table-minHeight public-hoverItem">
           <el-table
             :data="equipmentList"
-            :header-cell-style="{ textAlign: 'center' }"
+            :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
             :cell-style="{ textAlign: 'center' }"
             border
             class="public-radius"

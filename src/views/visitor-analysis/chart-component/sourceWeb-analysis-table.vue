@@ -6,7 +6,7 @@
       <div class="public-Table-minHeight">
         <el-table
         class="public-radius"
-          :header-cell-style="{ textAlign: 'center' }"
+          :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
           :cell-style="tableHeaderColor"
           :data="getSourceSiteList"
           border

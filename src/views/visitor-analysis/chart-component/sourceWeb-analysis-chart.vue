@@ -377,7 +377,8 @@ img {
 }
 .chartsIcon {
   margin: 20px;
-  width: calc(100% -20px);
+  // width: calc(100% -20px);
+  box-sizing: border-box;
   min-height: 300px;
   display: flex;
   justify-content: space-between;

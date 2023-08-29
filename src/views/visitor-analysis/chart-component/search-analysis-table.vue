@@ -7,13 +7,19 @@
         <!-- textAlign: 'center', -->
         <el-table
           class="public-radius"
-          :header-cell-style="{ background: '#F5F7FA' }"
+          :header-cell-style="{ background: '#f4f8fe' }"
           :cell-style="tableHeaderColor"
           :data="searchTableList"
           border
           @sort-change="sortChange($event)"
           style="width: 100%; margin-top: 12px"
         >
+          <el-table-column label="序号" type="index" width="150" align="center">
+            <template slot-scope="scope">
+              <span v-text="getIndex(scope.$index)"> </span>
+            </template>
+          </el-table-column>
+
           <el-table-column
             prop="searchword"
             align="left"
@@ -31,7 +37,7 @@
           >
           </el-table-column>
           <el-table-column
-          align="center"
+            align="center"
             label="搜索次数占比"
             sortable
             :sort-method="
@@ -43,24 +49,55 @@
             <template slot-scope="scope"> {{ scope.row.pvRate }}% </template>
           </el-table-column>
           <!-- “访问次数”，“访问次数占比”，“访客数”，“新访客数”， “IP数”，“IP数占比” -->
-          <el-table-column  align="center" prop="visitCount" label="访问次数" sortable>
-          </el-table-column>
-          <el-table-column  align="center" prop="visitCountRate" label="访问次数占比" sortable>
-          </el-table-column>
-          <el-table-column  align="center" prop="uv" label="访客数" sortable> </el-table-column>
-          <el-table-column  align="center" prop="newUv" label="新访客数" sortable>
-          </el-table-column>
-          <el-table-column  align="center" prop="ipCount" label="IP数" sortable>
-          </el-table-column>
-          <el-table-column  align="center" prop="ipCountRate" label="IP数占比" sortable>
-          </el-table-column>
-
-          <el-table-column  align="center" prop="avgVisitTime" label="平均访问时长" sortable>
-          </el-table-column>
-          <el-table-column  align="center" prop="avgPv" label="平均访问页数" sortable>
+          <el-table-column
+            align="center"
+            prop="visitCount"
+            label="访问次数"
+            sortable
+          >
           </el-table-column>
           <el-table-column
-          align="center"
+            align="center"
+            prop="visitCountRate"
+            label="访问次数占比"
+            sortable
+          >
+          </el-table-column>
+          <el-table-column align="center" prop="uv" label="访客数" sortable>
+          </el-table-column>
+          <el-table-column
+            align="center"
+            prop="newUv"
+            label="新访客数"
+            sortable
+          >
+          </el-table-column>
+          <el-table-column align="center" prop="ipCount" label="IP数" sortable>
+          </el-table-column>
+          <el-table-column
+            align="center"
+            prop="ipCountRate"
+            label="IP数占比"
+            sortable
+          >
+          </el-table-column>
+
+          <el-table-column
+            align="center"
+            prop="avgVisitTime"
+            label="平均访问时长"
+            sortable
+          >
+          </el-table-column>
+          <el-table-column
+            align="center"
+            prop="avgPv"
+            label="平均访问页数"
+            sortable
+          >
+          </el-table-column>
+          <el-table-column
+            align="center"
             label="跳出率"
             sortable
             :sort-method="
@@ -115,8 +152,13 @@ export default {
   },
   created() {},
   methods: {
+    getIndex($index) {
+      return (
+        (this.currentPage - 1) * this.pageSize + $index + 1
+      );
+    },
     tableHeaderColor({ row, column, rowIndex, columnIndex }) {
-      if (columnIndex === 0) {
+      if (columnIndex === 1) {
         return "text-align:left";
       } else {
         return "text-align:center";

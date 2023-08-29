@@ -30,7 +30,7 @@
             {{ scope.row.word }}
           </template>
         </el-table-column>
-        <el-table-column prop="pv" label="浏览量" width="150"  align="center" />
+        <el-table-column prop="pv" label="搜索次数" width="150"  align="center" />
         <el-table-column label="占比" width="150" align="center">
           <template slot-scope="scope">
             {{ percentageFun(scope.row.percent) }}

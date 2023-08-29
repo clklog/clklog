@@ -4,10 +4,10 @@
     <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
     <!-- class="public-table-block" -->
     <div>
-      <div class="public-Table-minHeight" >
+      <div class="public-Table-minHeight">
         <el-table
-        class="public-radius"
-          :header-cell-style="{ textAlign: 'center' }"
+          class="public-radius"
+          :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
           :cell-style="{ textAlign: 'center' }"
           :data="
             flowTableList.slice(
@@ -153,8 +153,7 @@ export default {
       timeType: null,
     };
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     avgTimeEvent(val) {
       return formatTime(Math.floor(val));

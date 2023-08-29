@@ -5,13 +5,18 @@
     <div>
       <div class="public-Table-minHeight public-hoverItem">
         <el-table
-        class="public-radius"
+          class="public-radius"
           :data="tableDetailList"
           border
-          :header-cell-style="{ textAlign: 'center' }"
+          :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
           :cell-style="{ textAlign: 'center' }"
           @sort-change="sortChange($event)"
         >
+          <el-table-column label="序号" type="index" width="150" align="center">
+            <template slot-scope="scope">
+              <span v-text="getIndex(scope.$index)"> </span>
+            </template>
+          </el-table-column>
           <el-table-column
             prop="province"
             :show-overflow-tooltip="true"
@@ -121,29 +126,34 @@ export default {
       current: {
         size: 10,
         page: 1,
-        sortName:null,
-        sortOrder:null,
+        sortName: null,
+        sortOrder: null,
       },
     };
   },
   methods: {
+    getIndex($index) {
+      return (
+        (this.currentPage - 1) * this.pageSize + $index + 1
+      );
+    },
     sortChange(e) {
       if (e.order && e.order == "ascending") {
         // 降序
         this.current.sortName = e.prop;
-        this.current.sortOrder = 'asc';
+        this.current.sortOrder = "asc";
         this.$emit("currentPage", this.current);
       } else if (e.order && e.order == "descending") {
         // 升序
         this.current.sortName = e.prop;
-        this.current.sortOrder = 'desc';
+        this.current.sortOrder = "desc";
         this.$emit("currentPage", this.current);
-      }else{
+      } else {
         this.current.sortName = null;
         this.current.sortOrder = null;
         this.$emit("currentPage", this.current);
       }
-    },  
+    },
     initCurrentPage() {
       this.currentPage = 1;
     },

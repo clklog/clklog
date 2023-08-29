@@ -102,7 +102,7 @@ export default {
 .block-line {
   box-sizing: border-box;
   margin: 20px 0 20px 0;
-  width: calc(100% -20px);
+  // width: calc(100% -20px);
   min-height: 300px;
   display: flex;
   justify-content: space-between;

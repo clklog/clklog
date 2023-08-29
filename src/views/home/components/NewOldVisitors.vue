@@ -238,10 +238,10 @@ export default {
             color: #252424;
             font-size: 13px;
             line-height: 14px;
-            color: #3a98e6;
+            color: #3d64e6;
           }
           .w158 {
-            color: #3a98e6;
+            color: #3d64e6;
             font-size: 17px;
             line-height: 17px;
             // font-weight: bold;

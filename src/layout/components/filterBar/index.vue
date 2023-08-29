@@ -285,6 +285,7 @@ export default {
       switch (path) {
         case "/visitorAnalysis/searchAnalysis": {
           let cols = [
+            "index",
             "searchword",
             "pv",
             "pvRate",
@@ -599,7 +600,7 @@ export default {
     }
     .check_item {
       background-color: #ffffff;
-      margin-left: 15px;
+      margin-left: 20px;
       height: 30px;
       border-radius: 4px;
       border: 1px solid #eee;

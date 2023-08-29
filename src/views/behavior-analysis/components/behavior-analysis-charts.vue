@@ -3,7 +3,12 @@
     <div class="chartsIcon">
       <div class="chartLeft">
         <div class="trendHead">
-          <div class="public-firstHead" style="margin-top: 20px; margin-right: 13px;">指标分析图</div>
+          <div
+            class="public-firstHead"
+            style="margin-top: 20px; margin-right: 13px"
+          >
+            指标分析图
+          </div>
           <div class="block">
             <!-- <el-cascader
               v-model="emptyList"
@@ -52,9 +57,9 @@
             :data="userListData"
             :header-cell-style="{
               textAlign: 'center',
-              background: '#F5F7FA',
+              background: '#f4f8fe',
             }"
-             class="public-radius"
+            class="public-radius"
             :cell-style="{ textAlign: 'center' }"
             style="width: 100%; margin-top: 12px; height: 98%"
             @sort-change="sortChange($event)"
@@ -80,6 +85,90 @@
               </template>
             </el-table-column>
             <el-table-column prop="visitorType" label="访客类型" sortable>
+              <template slot-scope="scope">
+                <div
+                  @click="handleCellClick(scope.row.distinctId)"
+                  style="
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  {{ scope.row.visitorType }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="visitCount" label="访客次数" sortable>
+              <template slot-scope="scope">
+                <div
+                  @click="handleCellClick(scope.row.distinctId)"
+                  style="
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  {{ scope.row.visitCount }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="pv" label="浏览量" sortable>
+              <template slot-scope="scope">
+                <div
+                  @click="handleCellClick(scope.row.distinctId)"
+                  style="
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  {{ scope.row.pv }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="visitTime" label="停留时长" sortable>
+              <template slot-scope="scope">
+                <div
+                  @click="handleCellClick(scope.row.distinctId)"
+                  style="
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  {{ scope.row.visitTime }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="avgPv" label="平均访问页数" sortable>
+              <template slot-scope="scope">
+                <div
+                  @click="handleCellClick(scope.row.distinctId)"
+                  style="
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  {{ scope.row.avgPv }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="latestTime" label="上次访问时间" sortable>
+              <template slot-scope="scope">
+                <div
+                  @click="handleCellClick(scope.row.distinctId)"
+                  style="
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  {{ scope.row.latestTime }}
+                </div>
+              </template>
+            </el-table-column>
+            <!-- <el-table-column prop="visitorType" label="访客类型" sortable>
             </el-table-column>
             <el-table-column prop="visitCount" label="访客次数" sortable>
             </el-table-column>
@@ -90,7 +179,7 @@
             <el-table-column prop="avgPv" label="平均访问页数" sortable>
             </el-table-column>
             <el-table-column prop="latestTime" label="上次访问时间" sortable>
-            </el-table-column>
+            </el-table-column> -->
           </el-table>
         </div>
       </div>
@@ -164,8 +253,8 @@ export default {
       current: {
         size: 10,
         page: 1,
-        sortName:null,
-        sortOrder:null,
+        sortName: null,
+        sortOrder: null,
       },
       total: 0,
       pageSize: 10,
@@ -188,20 +277,20 @@ export default {
       if (e.order && e.order == "ascending") {
         // 降序
         this.current.sortName = e.prop;
-        this.current.sortOrder = 'asc';
+        this.current.sortOrder = "asc";
         this.$emit("currentPage", this.current);
       } else if (e.order && e.order == "descending") {
         // 升序
         this.current.sortName = e.prop;
-        this.current.sortOrder = 'desc';
+        this.current.sortOrder = "desc";
         this.$emit("currentPage", this.current);
-      }else{
+      } else {
         this.current.sortName = null;
         this.current.sortOrder = null;
         this.$emit("currentPage", this.current);
       }
-    }, 
-    initCurrentPage(){
+    },
+    initCurrentPage() {
       this.currentPage = 1;
     },
     getChannelList(val) {

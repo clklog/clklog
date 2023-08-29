@@ -39,7 +39,7 @@
           border
           class="public-radius"
           style="width: 100%"
-          :header-cell-style="{ textAlign: 'center' }"
+          :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
           :cell-style="tableHeaderColor"
           @sort-change="sortChange($event)"
         >
@@ -139,7 +139,7 @@ export default {
   },
   data() {
     return {
-      channelList: ["uv", "ipCount", "pv"],
+      channelList: ["index","uri","uv", "ipCount", "pv",],
       flowQuality: ["entryCount", "avgVisitTime"],
       current: {
         size: 10,

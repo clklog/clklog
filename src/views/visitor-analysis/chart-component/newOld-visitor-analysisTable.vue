@@ -6,7 +6,7 @@
       <el-table
         class="public-radius"
         :header-cell-style="{ textAlign: 'center' }"
-        :cell-style="{ textAlign: 'center' }"
+        :cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
         :data="visitorDetailData"
         style="width: 100%"
       >
