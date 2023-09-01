@@ -1,0 +1,40 @@
+server:
+  port: 8002
+logging:
+  file:
+    path: log
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer: # 生产者
+      retries: 3 # 设置大于 0 的值，则客户端会将发送失败的记录重新发送
+      topic: clklog
+      batch-size: 16384
+      buffer-memory: 33554432
+      acks: 0
+      # 指定消息key和消息体的编解码方式
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        linger:
+          ms: 1000
+    consumer:
+      group-id: default-group
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      max-poll-records: 500
+    listener:
+      ack-mode: MANUAL_IMMEDIATE
+  redis:
+    host: localhost
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 8
+receiver:
+  thread-count: 2
+  app-list: hqq
