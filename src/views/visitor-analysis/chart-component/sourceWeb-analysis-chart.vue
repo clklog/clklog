@@ -75,7 +75,7 @@ export default {
       bounceRate: [],
       time: [],
       headLege: [],
-      pointValue: ["浏览量", "访客数"],
+      pointValue: [ "访客数","访问次数"],
       disabledSelect: [],
       seriesdata:[],
     };
@@ -189,7 +189,7 @@ export default {
       } else {
         this.bounceRate = [];
       }
-
+      // #2c7be5,#4c8fe9,#6ba3ed,#8bb6f1,#abcaf5
       let seriesdata = [
         {
           type: "bar",
@@ -202,7 +202,8 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#d5e5fa",
+            color: "#2c7be5",
+            // color: "$pvColor",
           },
         },
         {
@@ -215,7 +216,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#80b0ef",
+            color: "#4c8fe9",
           },
         },
         {
@@ -228,7 +229,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#5695ea",
+            color: "#6ba3ed",
           },
         },
         {
@@ -241,7 +242,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "2c7be5",
+            color: "#8bb6f1",
           },
         },
         {
@@ -254,7 +255,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#1a4a89",
+            color: "#abcaf5",
           },
         },
       ];

@@ -1,8 +1,8 @@
 .el-select-dropdown.is-multiple
   .el-select-dropdown__item.selected
   .checkbox__inner {
-  background-color: #1890ff;
-  border-color: #1890ff;
+  background-color: #2c7be5;
+  border-color: #2c7be5;
   box-sizing: content-box;
   border: 1px solid #ffffff;
   display: flex;
@@ -25,7 +25,8 @@
 }
 .checkbox__inner {
   margin-right: 15px;
-  border: 1px solid #dcdfe6;
+  // border: 1px solid #dcdfe6;
+  border: 1px solid #d8e2ef;
   border-radius: 2px;
   width: 14px;
   height: 14px;

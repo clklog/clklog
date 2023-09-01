@@ -9,7 +9,10 @@
       <div style="display: flex; align-items: center">
         <!-- <img src="@/assets/images/burying-logo.png" alt="" />
         <span>埋点系统</span> -->
-        <span>ClkLog日志分析</span>
+        <!-- <span>ClkLog日志分析</span> -->
+        <div class="logoFlag">
+          <img class="imgLogo" src="@/assets/images/logo.png" alt="" />
+        </div>
         <el-select
           v-model="value"
           placeholder="请选择"
@@ -44,7 +47,7 @@
           @click="clickImg"
         /> -->
         <img
-          src="@/assets/images/avator.jpg"
+          src="@/assets/images/avator.png"
           class="user-avatar"
           @click="clickImg"
         />
@@ -56,13 +59,13 @@
             <i class="el-icon-caret-bottom" />
           </div>
           <el-dropdown-menu slot="dropdown">
-            <router-link to="/visitorAnalysis/trendAnalysis">
+            <!-- <router-link to="/visitorAnalysis/trendAnalysis">
               <el-dropdown-item>访客分析</el-dropdown-item>
             </router-link>
             <router-link to="/behaviorAnalysis/user-behavior-analysis">
               <el-dropdown-item>行为分析</el-dropdown-item>
             </router-link>
-            <el-dropdown-item>v1.2.2</el-dropdown-item>
+            <el-dropdown-item>v1.2.2</el-dropdown-item> -->
             <!-- <agit config user.email
               target="_blank"
               href="https://github.com/PanJiaChen/vue-element-admin/"
@@ -75,7 +78,8 @@
             >
               <el-dropdown-item>Docs</el-dropdown-item>
             </a> -->
-            <el-dropdown-item divided @click.native="logout">
+            <!-- <el-dropdown-item divided @click.native="logout"> -->
+            <el-dropdown-item @click.native="logout">
               <span style="display: block">退出</span>
             </el-dropdown-item>
           </el-dropdown-menu>
@@ -149,9 +153,9 @@ export default {
   methods: {
     initDate() {
       const date = new Date();
-      const year = date.getFullYear(); 
-      const month = date.getMonth() + 1; 
-      const day = date.getDate(); 
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
       const weekMap = [
         "星期日",
         "星期一",
@@ -199,7 +203,7 @@ export default {
     display: flex;
     justify-content: space-between;
     height: 50px;
-    margin-left: 21px;
+    margin-left: 20px;
     .custom_select {
       max-width: 120px;
       ::v-deep {
@@ -220,17 +224,29 @@ export default {
         }
       }
     }
-    img {
-      width: 37px;
-      height: 27px;
-    }
-    span {
-      margin-left: 5px;
+    // img {
+    //   width: 37px;
+    //   height: 27px;
+    // }
+    // span {
+    //   margin-left: 5px;
+    //   margin-right: 70px;
+    //   font-size: 15px;
+    //   font-weight: bold;
+    //   line-height: 17px;
+    //   color: #4d4d4d;
+    // }
+    .logoFlag {
       margin-right: 70px;
       font-size: 15px;
       font-weight: bold;
       line-height: 17px;
       color: #4d4d4d;
+      padding-top: 2px;
+      .imgLogo {
+        height: 44px;
+        // object-fit: cover;
+      }
     }
   }
   // .hamburger-container {

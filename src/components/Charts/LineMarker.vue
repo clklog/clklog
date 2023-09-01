@@ -211,7 +211,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "#d5e5fa",
+                color: "#2c7be5",
               },
             },
             lineStyle: {
@@ -224,7 +224,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "#80b0ef",
+                color: "#4c8fe9",
               },
             },
             lineStyle: {
@@ -237,7 +237,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "#5695ea",
+                color: "#6ba3ed",
                 // borderColor: "#5fb4db",
                 // borderWidth: 12,
               },
@@ -252,7 +252,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "#2c7be5",
+                color: "#8bb6f1",
               },
             },
             lineStyle: {
@@ -265,7 +265,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "#1a4a89",
+                color: "#abcaf5",
               },
             },
             lineStyle: {

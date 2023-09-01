@@ -5,8 +5,8 @@
     <div class="public-Table-minHeight">
       <el-table
         class="public-radius"
-        :header-cell-style="{ textAlign: 'center' }"
-        :cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
+        :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
+        :cell-style="{ textAlign: 'center' }"
         :data="visitorDetailData"
         style="width: 100%"
       >
@@ -33,9 +33,15 @@
             sortable
           /> -->
           <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
-          <el-table-column
+          <!-- <el-table-column
             v-if="newUvRate"
             prop="newUvRate"
+            label="访客数占比"
+            sortable
+          /> -->
+          <el-table-column
+            v-if="uvRate"
+            prop="uvRate"
             label="访客数占比"
             sortable
           />
@@ -64,7 +70,11 @@
             prop="avgPv"
             label="平均访问页数"
             sortable
-          />
+          >
+            <template slot-scope="scope">
+              {{ averageRulesEvent(scope.row.avgPv) }}
+            </template>
+          </el-table-column>
         </el-table-column>
       </el-table>
     </div>
@@ -73,7 +83,7 @@
 
 <script>
 import flowPoint from "@/components/flowPoint/index";
-import { percentage } from "@/utils/percent";
+import { percentage, averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   components: { flowPoint },
@@ -96,14 +106,21 @@ export default {
       avgVisitTime: false,
       bounceRate: false,
       pvRate: false,
+      uvRate: false,
       newUvRate: false,
     };
   },
   methods: {
+    averageRulesEvent(num) {
+      return averageRules(num);
+    },
     getVisitorDetail(val) {
       val.map((item) => {
         if (item.bounceRate) {
           item.bounceRate = percentage(item.bounceRate);
+        }
+        if (item.uvRate) {
+          item.uvRate = percentage(item.uvRate);
         }
         if (item.pvRate) {
           item.pvRate = percentage(item.pvRate);
@@ -113,9 +130,6 @@ export default {
         }
         if (item.avgVisitTime) {
           item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
-        }
-        if (item.avgPv) {
-          item.avgPv = Math.floor(item.avgPv);
         }
       });
       this.visitorDetailData = val.reverse();
@@ -171,6 +185,11 @@ export default {
           this.newUvRate = true;
         } else {
           this.newUvRate = false;
+        }
+        if (val.includes("uvRate")) {
+          this.uvRate = true;
+        } else {
+          this.uvRate = false;
         }
       }
     },

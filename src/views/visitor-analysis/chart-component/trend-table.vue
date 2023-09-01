@@ -7,7 +7,7 @@
       <div class="public-Table-minHeight">
         <el-table
           class="public-radius"
-          :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
+          :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
           :cell-style="{ textAlign: 'center' }"
           :data="
             flowTableList.slice(
@@ -19,53 +19,60 @@
           border
           style="width: 100%"
         >
-          <el-table-column label="日期" prop="statTime" sortable>
+          <el-table-column label="日期" prop="statTime" sortable="custom">
             <template slot-scope="scope">
               {{ scope.row.statTime }}
               <!-- <span v-if="timeType && timeType == 'hour'">时</span> -->
             </template>
           </el-table-column>
           <el-table-column prop="date" label="流量基础指标" width="150">
-            <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
             <el-table-column
-              v-if="pvRate"
-              label="浏览量占比"
-              prop="pvRate"
-              sortable
-              :sort-method="
+              v-if="pv"
+              prop="pv"
+              label="浏览量(PV)"
+              sortable="custom"
+            />
+            <!-- :sort-method="
                 (a, b) => {
                   return a.pvRate - b.pvRate;
                 }
-              "
+              " -->
+            <el-table-column
+              v-if="pvRate"
+              prop="pvRate"
+              label="浏览量占比"
+              sortable="custom"
             >
-              <template slot-scope="scope"> {{ scope.row.pvRate }}% </template>
+              <template slot-scope="scope">
+                {{ percentageFun(scope.row.pvRate) }}</template
+              >
             </el-table-column>
             <el-table-column
               v-if="visitCount"
               prop="visitCount"
               label="访问次数"
-              sortable
+              sortable="custom"
             />
-            <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+            <el-table-column
+              v-if="uv"
+              prop="uv"
+              label="访客数(UV)"
+              sortable="custom"
+            />
             <el-table-column
               v-if="newUv"
               prop="newUv"
               label="新访客数"
-              sortable
+              sortable="custom"
             />
             <el-table-column
               v-if="newUvRate"
               prop="newUvRate"
               label="新访客数占比"
-              sortable
-              :sort-method="
-                (a, b) => {
-                  return a.newUvRate - b.newUvRate;
-                }
-              "
+              sortable="custom"
             >
               <template slot-scope="scope">
-                {{ scope.row.newUvRate }}%
+                {{ percentageFun(scope.row.newUvRate) }}
               </template>
             </el-table-column>
 
@@ -73,7 +80,7 @@
               v-if="ipCount"
               prop="ipCount"
               label="IP数"
-              sortable
+              sortable="custom"
             />
           </el-table-column>
           <!-- :sort-method="
@@ -86,16 +93,16 @@
               v-if="bounceRate"
               prop="bounceRate"
               label="跳出率"
-              sortable
+              sortable="custom"
             >
               <template slot-scope="scope">
-                {{ scope.row.bounceRate }}%
+                {{ percentageFun(scope.row.bounceRate) }}
               </template>
             </el-table-column>
             <el-table-column
               v-if="avgVisitTime"
               label="平均访问时长"
-              sortable
+              sortable="custom"
               prop="avgVisitTime"
             >
               <template slot-scope="scope">
@@ -106,8 +113,12 @@
               v-if="avgPv"
               prop="avgPv"
               label="平均访问页数"
-              sortable
-            />
+              sortable="custom"
+            >
+              <template slot-scope="scope">
+                {{ averageRulesEvent(scope.row.avgPv) }}
+              </template>
+            </el-table-column>
           </el-table-column>
         </el-table>
       </div>
@@ -129,7 +140,7 @@
 
 <script>
 import flowPoint from "@/components/flowPoint/index";
-import { percent } from "@/utils/percent";
+import { percent, percentage, averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   components: { flowPoint },
@@ -151,6 +162,10 @@ export default {
       total: 0,
       pageSize: 10,
       timeType: null,
+      current: {
+        sortName: "",
+        sortOrder: "",
+      },
     };
   },
   mounted() {},
@@ -158,12 +173,32 @@ export default {
     avgTimeEvent(val) {
       return formatTime(Math.floor(val));
     },
-    sortChange(column) {
-      this.pageNum = 1; // return to the first page after sorting
-      this.total = this.flowTableList.length;
-      this.flowTableList = this.flowTableList.sort(
-        this.sortFun(column.prop, column.order === "ascending")
-      );
+    ascDscEvent() {
+      let nameAttr = this.current.sortName;
+      if (nameAttr && this.current.sortOrder === "ascending") {
+        this.flowTableList = this.flowTableList.sort(function (a, b) {
+          return a[nameAttr] - b[nameAttr];
+        });
+      } else if (nameAttr && this.current.sortOrder === "descending") {
+        this.flowTableList = this.flowTableList.sort(function (a, b) {
+          return b[nameAttr] - a[nameAttr];
+        });
+      }
+    },
+    sortChange(e) {
+      if (e.order && e.order == "ascending") {
+        // 降序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = "ascending";
+      } else if (e.order && e.order == "descending") {
+        // 升序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = "descending";
+      } else {
+        this.current.sortName = null;
+        this.current.sortOrder = null;
+      }
+      this.ascDscEvent();
     },
     sortFun(attr, rev) {
       if (rev == undefined) {
@@ -175,11 +210,13 @@ export default {
         a = a[attr];
         b = b[attr];
         if (a < b) {
+          // console.log("降序");
           return rev * -1;
         }
         if (a > b) {
           return rev * 1;
         }
+        // (a,b)=>{return a - b}
         return 0;
       };
     },
@@ -237,29 +274,27 @@ export default {
         }
       }
     },
+    averageRulesEvent(num) {
+      return averageRules(num);
+    },
     percentageFun(val) {
-      return percent(val);
+      if (val == 0) {
+        return 0;
+      } else {
+        return percentage(val);
+      }
     },
     apiDetailList(val, time) {
       this.timeType = time;
       this.currentPage = 1;
       this.flowTableList = val;
       this.flowTableList.map((item) => {
-        if (item.bounceRate) {
-          item.bounceRate = this.percentageFun(item.bounceRate);
-        }
-        if (item.newUvRate) {
-          item.newUvRate = this.percentageFun(item.newUvRate);
-        }
-        if (item.pvRate) {
-          item.pvRate = this.percentageFun(item.pvRate);
-        }
-        if (item.avgPv) {
-          item.avgPv = Math.floor(item.avgPv);
-        }
+        // if (item.avgPv) {
+        //   item.avgPv = Math.floor(item.avgPv);
+        // }
       });
-      // this.total = val.detail.length;
       this.total = val.length;
+      this.ascDscEvent();
     },
     handleSizeChange(val) {
       this.currentPage = 1;

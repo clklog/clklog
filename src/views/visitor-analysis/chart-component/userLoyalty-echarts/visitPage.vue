@@ -1,5 +1,5 @@
 <template>
-  <div class="bar_chart setSpace public-hoverItem">
+  <div class="bar_chart setSpace">
     <div class="public-visited-echarts">
       访问页数
     </div>
@@ -70,7 +70,7 @@ export default {
               position: "top",
             },
             itemStyle: {
-              color: "#3D64E6",
+              color: "#2c7be5",
             },
           },
         ],

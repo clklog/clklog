@@ -1,19 +1,19 @@
 <template>
   <div class="NewOldVisitors block-main public-hoverItem">
-    <div class="block-head"  @click="$router.push('/visitorAnalysis/newOld-visitor-analysis')">
-      <div class="block-title ">新老访客</div>
-      <div
-        class="block-head-icon"
-       
-      >
-       <img src="@/assets/images/icon.png" alt="" width="10px">
+    <div
+      class="block-head"
+      @click="$router.push('/visitorAnalysis/newOld-visitor-analysis')"
+    >
+      <div class="block-title">新老访客</div>
+      <div class="block-head-icon">
+        <img src="@/assets/images/icon.png" alt="" width="10px" />
       </div>
     </div>
     <div class="pieShow">
       <div class="visitor">
         <!-- content -->
         <div class="bid-list-page">
-          <div class="bid-list-header">
+          <div class="bid-list-header" style="padding-bottom: 6px;">
             <div class="header-name w157"></div>
             <div class="header-name w157">老访客</div>
             <div class="header-name w157">新访客</div>
@@ -21,7 +21,7 @@
           <div class="bid-list-record">
             <div class="bid-list-item w157"></div>
             <div class="bid-list-item w158">
-              <p style="color: #a8a8a8">
+              <p class="setGrey">
                 {{ newVisitorCompare(oldVisitor.uv, newVisitor.uv) }}
               </p>
             </div>
@@ -29,13 +29,13 @@
               <p>{{ oldVisitorCompare(newVisitor.uv, oldVisitor.uv) }}</p>
             </div>
           </div>
-          <div style="margin-top: 10px">
+          <div>
             <div class="bid-list-record">
               <div class="bid-list-item w157 lettSpace">
                 <p>浏览量</p>
               </div>
               <div class="bid-list-item w159 lettSpace">
-                <p style="color: rgb(155, 156, 156)">
+                <p class="setGrey">
                   {{ oldVisitor.pv || "--" }}
                 </p>
               </div>
@@ -49,7 +49,7 @@
                 <p>访客数</p>
               </div>
               <div class="bid-list-item w159 lettSpace">
-                <p style="color: rgb(155, 156, 156)">
+                <p class="setGrey">
                   {{ oldVisitor.uv || "--" }}
                 </p>
               </div>
@@ -63,11 +63,15 @@
                 <p>跳出率</p>
               </div>
               <div class="bid-list-item w159 lettSpace">
-                <p style="color: rgb(155, 156, 156)" v-if="oldVisitor.bounceRate">{{ percentageFun(oldVisitor.bounceRate) }}</p>
-                  <p v-else>--</p>
+                <p class="setGrey" v-if="oldVisitor.bounceRate">
+                  {{ percentageFun(oldVisitor.bounceRate) }}
+                </p>
+                <p v-else>--</p>
               </div>
               <div class="bid-list-item w159 lettSpace">
-                <p v-if="newVisitor.bounceRate">{{ percentageFun(newVisitor.bounceRate) }}</p>
+                <p v-if="newVisitor.bounceRate">
+                  {{ percentageFun(newVisitor.bounceRate) }}
+                </p>
                 <p v-else>--</p>
               </div>
             </div>
@@ -77,7 +81,7 @@
                 <p>平均访问时长</p>
               </div>
               <div class="bid-list-item w159 lettSpace">
-                <p style="color: rgb(155, 156, 156)">
+                <p class="setGrey">
                   {{ formatTimeFun(oldVisitor.avgVisitTime) || "--" }}
                 </p>
               </div>
@@ -90,7 +94,7 @@
                 <p>平均访问页数</p>
               </div>
               <div class="bid-list-item w159 lettSpace">
-                <p style="color: rgb(155, 156, 156)">
+                <p class="setGrey">
                   {{ Math.floor(oldVisitor.avgPv) || "--" }}
                 </p>
               </div>
@@ -159,12 +163,12 @@ export default {
     },
   },
   methods: {
-    formatTimeFun(val){
-      val =  Math.floor(val);
+    formatTimeFun(val) {
+      val = Math.floor(val);
       return formatTime(val);
     },
-    percentageFun(val){
-        return percentage(val)
+    percentageFun(val) {
+      return percentage(val);
     },
     getVisitor() {
       getVisitorApi(this.params).then((res) => {
@@ -192,6 +196,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.setGrey {
+  // color: #9b9c9c;
+  color: #fd7e14;
+}
+.w158 {
+  color: #2c7be5;
+  font-size: 17px;
+  line-height: 17px;
+  // font-weight: bold;
+}
 .NewOldVisitors {
   .pieShow {
     display: flex;
@@ -206,6 +220,7 @@ export default {
         .bid-list-header {
           display: flex;
           .header-name {
+            color: #4d4d4d;
             width: 33%;
             justify-content: center;
             height: 30px;
@@ -230,7 +245,8 @@ export default {
             align-items: center;
           }
           .w157 {
-            color: #252424;
+            // color: #252424;
+            color: #4d4d4d;
             font-size: 13px;
             line-height: 14px;
           }
@@ -238,13 +254,7 @@ export default {
             color: #252424;
             font-size: 13px;
             line-height: 14px;
-            color: #3d64e6;
-          }
-          .w158 {
-            color: #3d64e6;
-            font-size: 17px;
-            line-height: 17px;
-            // font-weight: bold;
+            color: #2c7be5;
           }
         }
       }

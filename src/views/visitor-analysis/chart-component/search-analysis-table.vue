@@ -7,7 +7,7 @@
         <!-- textAlign: 'center', -->
         <el-table
           class="public-radius"
-          :header-cell-style="{ background: '#f4f8fe' }"
+          :header-cell-style="{ background: '#eaf2fc' }"
           :cell-style="tableHeaderColor"
           :data="searchTableList"
           border
@@ -32,82 +32,91 @@
             prop="pv"
             align="center"
             label="搜索次数"
-            :sort-orders="['descending', 'ascending']"
-            :sortable="true"
+            sortable="custom"
           >
           </el-table-column>
           <el-table-column
             align="center"
             label="搜索次数占比"
-            sortable
-            :sort-method="
-              (a, b) => {
-                return a.pvRate - b.pvRate;
-              }
-            "
+            sortable="custom"
           >
-            <template slot-scope="scope"> {{ scope.row.pvRate }}% </template>
+            <template slot-scope="scope"> {{ scope.row.pvRate }}</template>
           </el-table-column>
           <!-- “访问次数”，“访问次数占比”，“访客数”，“新访客数”， “IP数”，“IP数占比” -->
           <el-table-column
             align="center"
             prop="visitCount"
             label="访问次数"
-            sortable
+            sortable="custom"
           >
           </el-table-column>
           <el-table-column
             align="center"
             prop="visitCountRate"
             label="访问次数占比"
-            sortable
+            sortable="custom"
           >
+            <template slot-scope="scope">
+              {{ scope.row.visitCountRate }}
+            </template>
           </el-table-column>
-          <el-table-column align="center" prop="uv" label="访客数" sortable>
+          <el-table-column
+            align="center"
+            prop="uv"
+            label="访客数"
+            sortable="custom"
+          >
           </el-table-column>
           <el-table-column
             align="center"
             prop="newUv"
             label="新访客数"
-            sortable
+            sortable="custom"
           >
           </el-table-column>
-          <el-table-column align="center" prop="ipCount" label="IP数" sortable>
+          <el-table-column
+            align="center"
+            prop="ipCount"
+            label="IP数"
+            sortable="custom"
+          >
           </el-table-column>
           <el-table-column
             align="center"
             prop="ipCountRate"
             label="IP数占比"
-            sortable
+            sortable="custom"
           >
+            <template slot-scope="scope">
+              {{ scope.row.ipCountRate }}
+            </template>
           </el-table-column>
 
           <el-table-column
             align="center"
             prop="avgVisitTime"
             label="平均访问时长"
-            sortable
+            sortable="custom"
           >
           </el-table-column>
           <el-table-column
             align="center"
             prop="avgPv"
             label="平均访问页数"
-            sortable
+            sortable="custom"
           >
+            <template slot-scope="scope">
+              {{ averageRulesEvent(scope.row.avgPv) }}
+            </template>
           </el-table-column>
-          <el-table-column
-            align="center"
-            label="跳出率"
-            sortable
-            :sort-method="
+          <el-table-column align="center" label="跳出率" sortable="custom">
+            <!-- :sort-method="
               (a, b) => {
                 return a.bounceRate - b.bounceRate;
               }
-            "
-          >
+            " -->
             <template slot-scope="scope">
-              {{ scope.row.bounceRate }}%
+              {{ scope.row.bounceRate }}
             </template>
           </el-table-column>
         </el-table>
@@ -132,7 +141,7 @@
 </template>
 
 <script>
-import { percent } from "@/utils/percent";
+import { percent, percentage, averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   data() {
@@ -152,10 +161,11 @@ export default {
   },
   created() {},
   methods: {
+    averageRulesEvent(num) {
+      return averageRules(num);
+    },
     getIndex($index) {
-      return (
-        (this.currentPage - 1) * this.pageSize + $index + 1
-      );
+      return (this.currentPage - 1) * this.pageSize + $index + 1;
     },
     tableHeaderColor({ row, column, rowIndex, columnIndex }) {
       if (columnIndex === 1) {
@@ -165,7 +175,7 @@ export default {
       }
     },
     percentageFun(val) {
-      return percent(val);
+      return percentage(val);
     },
     sortChange(e) {
       if (e.order && e.order == "ascending") {
@@ -202,9 +212,6 @@ export default {
         }
         if (item.avgVisitTime) {
           item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
-        }
-        if (item.avgPv) {
-          item.avgPv = Math.floor(item.avgPv);
         }
       });
       this.total = val.total;

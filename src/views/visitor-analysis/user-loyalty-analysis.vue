@@ -84,7 +84,7 @@ export default {
 <style lang="scss" scoped>
 .userLoyalty {
   height: 1109px;
-  margin: 15px;
+  margin: 20px;
   background: #fff;
   padding-top: 18px;
   padding-left: 16px;

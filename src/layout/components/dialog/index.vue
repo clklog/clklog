@@ -8,47 +8,53 @@
       @close="resetForm()"
     >
       <div class="el-dialog-div">
-        <div class="left-item">
-          <div class="visitorInfo commonBackgrond">
+        <div class="left-item ">
+          <div class="visitorInfo commonBackgrond public-hoverItem">
             <div class="setImg">
-              <img src="@/assets/images/avator.jpg" alt="" />
+              <img src="@/assets/images/avator.png" alt="" />
             </div>
             <div class="visitDetail">
               <div class="title common-title">访客信息</div>
               <div style="display: flex">
-                <div class="gap" style="padding-right: 10px; width: 373px">
-                  <div
-                    class="lable"
-                    v-if="userBaseInfo && userBaseInfo.distinctId"
-                  >
-                    ID:
-                    <el-popover
-                      placement="top-start"
-                      trigger="hover"
-                      v-if="userBaseInfo.distinctId.length > 52"
+                <div class="gap" style="width: 380px">
+                  <div style="display: flex">
+                    <div
+                      class="lable"
+                      style="width: 50%; padding-right: 10px"
+                      v-if="userBaseInfo && userBaseInfo.distinctId"
                     >
-                      <div style="font-size: 12px">
-                        {{ userBaseInfo.distinctId }}
-                      </div>
-                      <div
-                        slot="reference"
-                        class="overItem"
-                        style="cursor: pointer"
+                      ID:
+                      <el-popover
+                        placement="top-start"
+                        trigger="hover"
+                        v-if="userBaseInfo.distinctId.length > 23"
                       >
+                        <div style="font-size: 12px">
+                          {{ userBaseInfo.distinctId }}
+                        </div>
+                        <div
+                          slot="reference"
+                          class="overItem"
+                          style="cursor: pointer"
+                        >
+                          {{ userBaseInfo.distinctId || "--" }}
+                        </div>
+                      </el-popover>
+                      <div v-else class="overItem">
                         {{ userBaseInfo.distinctId || "--" }}
                       </div>
-                    </el-popover>
-                    <div v-else class="overItem">
-                      {{ userBaseInfo.distinctId || "--" }}
+                    </div>
+                    <div
+                      class="lable"
+                      v-if="userBaseInfo.visitorType"
+                      style="width: 50%; text-align: right; padding-left: 10px"
+                    >
+                      类型：
+                      <span>{{ userBaseInfo.visitorType }}</span>
                     </div>
                   </div>
-                  <div
-                    style="
-                      display: flex;
-                      width: 373px;
-                      justify-content: space-between;
-                    "
-                  >
+
+                  <div style="display: flex; justify-content: space-between">
                     <div
                       class="lable"
                       style="width: 50%; text-align: left"
@@ -60,24 +66,7 @@
                         {{ userBaseInfo.city }}</span
                       >
                     </div>
-                    <div
-                      class="lable"
-                      v-if="userBaseInfo.visitorType"
-                      style="width: 50%; text-align: right"
-                    >
-                      类型：
-                      <span>{{ userBaseInfo.visitorType }}</span>
-                    </div>
                   </div>
-                  <!-- <div
-                    class="lable"
-                    v-if="userBaseInfo.country || userBaseInfo.city"
-                  >
-                    地域：
-                    <span
-                      >{{ userBaseInfo.country }} {{ userBaseInfo.city }}</span
-                    >
-                  </div> -->
                   <div class="lable" v-if="userBaseInfo.channel">
                     渠道：
                     <span>{{ userBaseInfo.channel }}</span>
@@ -87,7 +76,7 @@
               <div
                 style="
                   font-size: 12px;
-                  width: 373px;
+                  width: 380px;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -101,7 +90,7 @@
             </div>
           </div>
 
-          <div class="total commonBackgrond">
+          <div class="total commonBackgrond public-hoverItem">
             <div class="total_lable common-title">总计</div>
             <div class="total-head">
               <!-- find1 -->
@@ -128,7 +117,7 @@
             </div>
           </div>
 
-          <div class="device commonBackgrond">
+          <div class="device commonBackgrond public-hoverItem">
             <span class="device-label common-title">设备</span>
             <div class="describe">
               来自智能手机设备的
@@ -137,7 +126,7 @@
             </div>
           </div>
 
-          <div class="whereFrom commonBackgrond">
+          <div class="whereFrom commonBackgrond public-hoverItem">
             <span class="device-label common-title"> 位置 </span>
             <div
               class="describe"
@@ -184,7 +173,7 @@
               v-for="(item, index) in visitorSessionList"
               :key="index"
             >
-              <div class="right_body-con">
+              <div class="right_body-con public-hoverItem">
                 <div class="right_body_title">
                   <div class="body-left common-title">
                     访问#{{ getIndex(index) }}
@@ -485,10 +474,10 @@ export default {
 @import "~@/styles/components/el-pagination.scss";
 ::v-deep {
   .el-dialog__header {
-    background-color: #efefef;
+    background-color: #edf2f9;
   }
   .el-dialog__body {
-    background-color: #efefef;
+    background-color: #edf2f9;
     padding: 15px 15px;
   }
 }
@@ -510,7 +499,7 @@ export default {
     padding: 15px 15px;
     padding-top: 0;
     .visitorInfo {
-      max-width: 516px;
+      width: 516px;
       overflow: hidden;
       min-height: 100px;
       border-radius: 6px;
@@ -521,12 +510,12 @@ export default {
         // width: 125px;
         width: 90px;
         height: 100%;
-        overflow: hidden;
+        // overflow: hidden;
         display: flex;
         // align-items: center;
         box-sizing: border-box;
         img {
-          width: 90px;
+          width: 89px;
           height: 90px;
           object-fit: cover;
           background: rgba(0, 0, 0, 0);
@@ -535,8 +524,9 @@ export default {
       }
       .visitDetail {
         box-sizing: border-box;
-        width: 373px;
-        // width: 337px;
+        // width: 373px;
+        overflow: hidden;
+
         min-height: 100px;
         margin-left: 15px;
       }
@@ -575,7 +565,7 @@ export default {
         font-weight: 500;
         line-height: 13px;
         line-height: 20px;
-        color: #3d64e6;
+        color: #2c7be5;
         .firstTime {
           width: 100%;
           text-align: left;
@@ -610,7 +600,7 @@ export default {
       color: #5a607f;
       .number {
         font-size: 18px;
-        color: #3d64e6;
+        color: #2c7be5;
         font-weight: 500;
       }
     }
@@ -634,7 +624,7 @@ export default {
     // height: 750px;
     // overflow-y: auto;
     // overflow-x: hidden;
-    background-color: #efefef;
+    background-color: #edf2f9;
     // background: #fafafb;
     // border-radius: 6px;
     // padding: 12px;
@@ -651,7 +641,7 @@ export default {
         cursor: pointer;
         width: 54px;
         height: 21px;
-        border: 1px solid #3d64e6;
+        border: 1px solid #2c7be5;
         border-radius: 4px;
         font-size: 12px;
         font-weight: 400;
@@ -699,13 +689,13 @@ export default {
           }
         }
         .line {
-          border-bottom: 1px solid #efefef;
+          border-bottom: 1px solid #edf2f9;
           width: 100%;
         }
         .right_body_http {
           min-height: 50px;
           line-height: 13px;
-          color: #3d64e6;
+          color: #2c7be5;
           font-size: 13px;
           text-align: right;
           position: relative;

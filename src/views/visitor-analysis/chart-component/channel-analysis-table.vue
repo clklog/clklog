@@ -16,43 +16,43 @@
             </div> -->
             <div
               class="bid-list-item w111"
-              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+              :style="index == 0 ? 'color:#2c7be5' : 'color:#4d4d4d'"
             >
               <p>{{ item.pv || "--" }}</p>
             </div>
             <div
               class="bid-list-item w111"
-              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+              :style="index == 0 ? 'color:#2c7be5' : 'color:#4d4d4d'"
             >
               <p>{{ item.visitCount || "--" }}</p>
             </div>
             <div
               class="bid-list-item w111"
-              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+              :style="index == 0 ? 'color:#2c7be5' : 'color:#4d4d4d'"
             >
               <p>{{ item.uv || "--" }}</p>
             </div>
             <div
               class="bid-list-item w111"
-              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+              :style="index == 0 ? 'color:#2c7be5' : 'color:#4d4d4d'"
             >
               <p>{{ item.ipCount || "--" }}</p>
             </div>
             <div
               class="bid-list-item w111"
-              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+              :style="index == 0 ? 'color:#2c7be5' : 'color:#4d4d4d'"
             >
               <p>{{ item.avgPv || "--" }}</p>
             </div>
             <div
               class="bid-list-item w111"
-              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+              :style="index == 0 ? 'color:#2c7be5' : 'color:#4d4d4d'"
             >
               <p>{{ item.visitTime || "--" }}</p>
             </div>
             <div
               class="bid-list-item w111"
-              :style="index == 0 ? 'color:#3d64e6' : 'color:#4d4d4d'"
+              :style="index == 0 ? 'color:#2c7be5' : 'color:#4d4d4d'"
             >
               <p>{{ item.bounceRate || "--" }}</p>
             </div>
@@ -61,20 +61,20 @@
       </div>
     </div>
 
-    <div class="chartsIcon">
+    <div class="chartsIcon public-hoverItem">
       <div class="public-firstHead">渠道分析</div>
       <flowPoint ref="flowPoint" @flowPoint="flowPoint" byChannel></flowPoint>
       <div>
         <div class="public-Table-minHeight">
           <el-table
-           class="public-radius"
+            class="public-radius"
             :data="
               channelTableData.slice(
                 (currentPage - 1) * pageSize,
                 currentPage * pageSize
               )
             "
-            :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
+            :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
             :cell-style="{ textAlign: 'center' }"
             border
             style="width: 100%"
@@ -167,7 +167,11 @@
                 prop="avgPv"
                 label="平均访问页数"
                 sortable
-              />
+              >
+                <template slot-scope="scope">
+                  {{ averageRulesEvent(scope.row.avgPv) }}
+                </template>
+              </el-table-column>
               <!-- <el-table-column
                 v-if="avgPvRate"
                 prop="avgPvRate"
@@ -197,7 +201,7 @@
 <script>
 import originView from "@/components/origin-view/index";
 import flowPoint from "@/components/flowPoint/index";
-import { percentage } from "@/utils/percent";
+import { percentage,averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   components: { originView, flowPoint },
@@ -234,6 +238,9 @@ export default {
     };
   },
   methods: {
+    averageRulesEvent(num) {
+      return averageRules(num);
+    },
     getChannelList(val) {
       this.channelTableData = val.sort((a, b) => {
         if (a.channel === "全部") {
@@ -268,9 +275,6 @@ export default {
         }
         if (item.visitTimeRate) {
           item.visitTimeRate = percentage(item.visitTimeRate);
-        }
-        if (item.avgPv) {
-          item.avgPv = Math.floor(item.avgPv);
         }
       });
       const filteredArr = this.channelTableData.filter(
@@ -454,7 +458,7 @@ img {
   font-size: 16px;
   font-weight: 600;
   line-height: 16px;
-  color: #3d64e6;
+  color: #2c7be5;
 }
 .chartsIcon {
   position: relative;

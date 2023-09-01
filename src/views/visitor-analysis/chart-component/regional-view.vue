@@ -245,7 +245,7 @@ export default {
       .w158 {
         font-size: 16px;
         font-weight: bold;
-        color: #3d64e6;
+        color: #2c7be5;
         line-height: 17px;
       }
     }

@@ -547,7 +547,7 @@ export default {
         margin-left: 7px;
       }
       .w157 {
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 400;
         line-height: 14px;
         color: #4d4d4d;
@@ -555,7 +555,7 @@ export default {
       .w158 {
         font-size: 16px;
         font-weight: bold;
-        color: #3d64e6;
+        color: #2c7be5;
         line-height: 17px;
       }
     }

@@ -142,7 +142,7 @@ export default {
               position: "top",
             },
             itemStyle: {
-              color: "#3D64E6",
+              color: "#2c7be5",
             },
           },
         //   {
@@ -155,7 +155,7 @@ export default {
         //       position: "top",
         //     },
         //     itemStyle: {
-        //       color: "#3d64e6",
+        //       color: "#2c7be5",
         //     },
         //   },
         ],

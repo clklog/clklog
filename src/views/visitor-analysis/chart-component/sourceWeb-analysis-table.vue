@@ -1,28 +1,23 @@
 <template>
   <div class="chartsIcon public-hoverItem">
     <div class="public-firstHead">来源网站分析</div>
-      <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
+    <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
     <div>
       <div class="public-Table-minHeight">
         <el-table
-        class="public-radius"
-          :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
+          class="public-radius"
+          :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
           :cell-style="tableHeaderColor"
           :data="getSourceSiteList"
           border
           @sort-change="sortChange($event)"
           style="width: 100%"
         >
-          <el-table-column
-              label="序号"
-              type="index"
-              width="150"
-              align="center"
-            >
-              <template slot-scope="scope">
-                <span v-text="getIndex(scope.$index)"> </span>
-              </template>
-            </el-table-column>
+          <el-table-column label="序号" type="index" width="150" align="center">
+            <template slot-scope="scope">
+              <span v-text="getIndex(scope.$index)"> </span>
+            </template>
+          </el-table-column>
           <el-table-column
             prop="sourcesite"
             width="250"
@@ -30,37 +25,47 @@
             label="来源网站"
           />
           <el-table-column label="流量基础指标">
-            <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
+            <el-table-column
+              v-if="pv"
+              prop="pv"
+              label="浏览量(PV)"
+              sortable="custom"
+            />
             <el-table-column
               v-if="pvRate"
               prop="pvRate"
               label="浏览量占比"
-              sortable
+              sortable="custom"
             />
             <el-table-column
               v-if="visitCount"
               prop="visitCount"
               label="访问次数"
-              sortable
+              sortable="custom"
             />
-            <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+            <el-table-column
+              v-if="uv"
+              prop="uv"
+              label="访客数(UV)"
+              sortable="custom"
+            />
             <el-table-column
               v-if="newUv"
               prop="newUv"
               label="新访客数"
-              sortable
+              sortable="custom"
             />
             <el-table-column
               v-if="newUvRate"
               prop="newUvRate"
               label="新访客数占比"
-              sortable
+              sortable="custom"
             />
             <el-table-column
               v-if="ipCount"
               prop="ipCount"
               label="IP数"
-              sortable
+              sortable="custom"
             />
           </el-table-column>
           <el-table-column prop="date" label="流量质量指标">
@@ -68,20 +73,24 @@
               v-if="bounceRate"
               prop="bounceRate"
               label="跳出率"
-              sortable
+              sortable="custom"
             />
             <el-table-column
               v-if="avgVisitTime"
               prop="avgVisitTime"
               label="平均访问时长"
-              sortable
+              sortable="custom"
             />
             <el-table-column
               v-if="avgPv"
               prop="avgPv"
               label="平均访问页数"
-              sortable
-            />
+              sortable="custom"
+            >
+              <template slot-scope="scope">
+                {{ averageRulesEvent(scope.row.avgPv) }}
+              </template>
+            </el-table-column>
           </el-table-column>
         </el-table>
       </div>
@@ -103,7 +112,7 @@
 
 <script>
 import flowPoint from "@/components/flowPoint/index";
-import { percentage } from "@/utils/percent";
+import { percentage, averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   components: { flowPoint },
@@ -112,8 +121,8 @@ export default {
       current: {
         size: 10,
         page: 1,
-        sortName:null,
-        sortOrder:null,
+        sortName: null,
+        sortOrder: null,
       },
       channelList: ["pv", "visitCount", "newUvRate", "pvRate"],
       flowQuality: ["avgPv"],
@@ -134,6 +143,9 @@ export default {
     };
   },
   methods: {
+    averageRulesEvent(num) {
+      return averageRules(num);
+    },
     tableHeaderColor({ row, column, rowIndex, columnIndex }) {
       if (columnIndex === 1) {
         return "text-align:left";
@@ -142,49 +154,45 @@ export default {
       }
     },
     getIndex($index) {
-      return (
-        (this.currentPage - 1) * this.pageSize + $index + 1
-      );
+      return (this.currentPage - 1) * this.pageSize + $index + 1;
     },
     sortChange(e) {
       if (e.order && e.order == "ascending") {
         // 降序
         this.current.sortName = e.prop;
-        this.current.sortOrder = 'asc';
+        this.current.sortOrder = "asc";
         this.$emit("currentPage", this.current);
       } else if (e.order && e.order == "descending") {
         // 升序
         this.current.sortName = e.prop;
-        this.current.sortOrder = 'desc';
+        this.current.sortOrder = "desc";
         this.$emit("currentPage", this.current);
-      }else{
+      } else {
         this.current.sortName = null;
         this.current.sortOrder = null;
         this.$emit("currentPage", this.current);
       }
-    },  
+    },
+
     getSourceSite(val) {
       val.rows.map((item) => {
         if (item.bounceRate) {
           item.bounceRate = percentage(item.bounceRate);
         }
-        if (item.newUvRate) {
-          item.newUvRate = percentage(item.newUvRate);
-        }
+        // if (item.newUvRate) {
+        //   item.newUvRate = percentage(item.newUvRate);
+        // }
         if (item.pvRate) {
           item.pvRate = percentage(item.pvRate);
         }
         if (item.avgVisitTime) {
           item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
         }
-        if (item.avgPv) {
-          item.avgPv = Math.floor(item.avgPv);
-        }
       });
       this.getSourceSiteList = val.rows;
       this.total = val.total;
     },
-    initCurrentPage(){
+    initCurrentPage() {
       this.currentPage = 1;
     },
     handleSizeChange(val) {
@@ -253,7 +261,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-::v-deep{
+::v-deep {
   @import "~@/styles/components/el-pagination.scss";
 }
 .chartsIcon {

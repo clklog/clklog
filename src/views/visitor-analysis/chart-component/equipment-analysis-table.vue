@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="chartsIcon">
+    <div class="chartsIcon public-hoverItem">
       <div class="public-firstHead">设备分析</div>
       <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
       <div>
-        <div class="public-Table-minHeight public-hoverItem">
+        <div class="public-Table-minHeight ">
           <el-table
             :data="equipmentList"
-            :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
+            :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
             :cell-style="{ textAlign: 'center' }"
             border
             class="public-radius"
@@ -32,43 +32,43 @@
                 v-if="pv"
                 prop="pv"
                 label="浏览量(PV)"
-                sortable
+                sortable="custom"
               />
               <el-table-column
                 v-if="pvRate"
                 prop="pvRate"
                 label="浏览量占比"
-                sortable
+                sortable="custom"
               />
               <el-table-column
                 v-if="visitCount"
                 prop="visitCount"
                 label="访问次数"
-                sortable
+                sortable="custom"
               />
               <el-table-column
                 v-if="newUv"
                 prop="newUv"
                 label="新访客数"
-                sortable
+                sortable="custom"
               />
               <el-table-column
                 v-if="uv"
                 prop="uv"
                 label="访客数(UV)"
-                sortable
+                sortable="custom"
               />
               <el-table-column
                 v-if="newUvRate"
                 prop="newUvRate"
                 label="新访客数占比"
-                sortable
+                sortable="custom"
               />
               <el-table-column
                 v-if="ipCount"
                 prop="ipCount"
                 label="IP数"
-                sortable
+                sortable="custom"
               />
             </el-table-column>
             <el-table-column prop="date" label="流量质量指标">
@@ -76,20 +76,24 @@
                 v-if="bounceRate"
                 prop="bounceRate"
                 label="跳出率"
-                sortable
+                sortable="custom"
               />
               <el-table-column
                 v-if="avgVisitTime"
                 prop="avgVisitTime"
                 label="平均访问时长"
-                sortable
+                sortable="custom"
               />
               <el-table-column
                 v-if="avgPv"
                 prop="avgPv"
                 label="平均访问页数"
-                sortable
-              />
+                sortable="custom"
+              >
+                <template slot-scope="scope">
+                  {{ averageRulesEvent(scope.row.avgPv) }}
+                </template>
+              </el-table-column>
             </el-table-column>
           </el-table>
         </div>
@@ -112,7 +116,7 @@
 
 <script>
 import flowPoint from "@/components/flowPoint/index";
-import { percentage } from "@/utils/percent";
+import { percentage,averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   components: { flowPoint },
@@ -144,10 +148,11 @@ export default {
     };
   },
   methods: {
+    averageRulesEvent(num) {
+      return averageRules(num);
+    },
     getIndex($index) {
-      return (
-        (this.currentPage - 1) * this.pageSize + $index + 1
-      );
+      return (this.currentPage - 1) * this.pageSize + $index + 1;
     },
     equipmentTableEvent(val) {
       this.equipmentList = val.rows;
@@ -163,9 +168,6 @@ export default {
         }
         if (item.avgVisitTime) {
           item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
-        }
-        if (item.avgPv) {
-          item.avgPv = Math.floor(item.avgPv);
         }
       });
       this.total = val.total;

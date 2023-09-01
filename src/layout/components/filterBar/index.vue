@@ -1,9 +1,8 @@
 <template>
-  <!-- class="documentation-container" -->
   <div class="documentation-container">
     <div class="checkContent">
-      <div style="display: flex; margin-top: 11px">
-        <div class="check_item">
+      <div style="display: flex; padding-top: 15px">
+        <div class="check_item public_border_color">
           <span>时间:</span>
           <el-radio-group
             v-model="timeFlag"
@@ -56,13 +55,9 @@
 
         <div v-if="ByArea" class="areaContent">
           <div class="areaItem">
-            <div class="areaHead">地域</div>
+            <div class="areaHead public_border_color">地域</div>
             <!-- 气泡弹框 -->
-            <div class="area_select">
-              <!-- <i v-if="popflag" class="el-icon-arrow-up iconArrow" ></i>
-              <i v-else class="el-icon-arrow-down iconArrow" @click="btnShowEvent"></i> -->
-              <!-- <i v-if="popflag" class="el-icon-arrow-up iconArrow" ></i> -->
-
+            <div class="area_select sing_special_popover">
               <el-popover
                 placement="bottom"
                 width="510"
@@ -82,13 +77,10 @@
                   </el-radio-group>
                   <div class="popCancle" @click="canclePopEvent">X</div>
                 </div>
-                <div class="areaBox" slot="reference">
+                <div class="areaBox public_font_color" slot="reference">
                   {{ areaValue }}
                   <i v-if="popflag" class="el-icon-arrow-up iconArrow"></i>
-                  <i
-                    v-else
-                    class="el-icon-arrow-down iconArrow"
-                  ></i>
+                  <i v-else class="el-icon-arrow-down iconArrow"></i>
                 </div>
               </el-popover>
             </div>
@@ -96,9 +88,9 @@
         </div>
       </div>
 
-      <div class="channel">
+      <div class="channelSecond">
         <div style="display: flex">
-          <div class="check_item" v-if="!byChnnel">
+          <div class="check_item public_border_color" v-if="!byChnnel">
             <span>渠道:</span>
             <el-radio-group v-model="channelValue" style="margin-right: 10px">
               <el-radio
@@ -109,7 +101,7 @@
               >
             </el-radio-group>
           </div>
-          <div class="check_item">
+          <div class="check_item public_border_color">
             <span>访客:</span>
             <el-radio-group v-model="visitorType" class="checkBoxStyle">
               <el-radio label="">全部</el-radio>
@@ -176,6 +168,53 @@ export default {
           // today.setHours(0, 0, 0, 0);
           return date.getTime() > today.getTime();
         },
+        shortcuts: [
+          {
+            text: "近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "近六个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 180);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "近一年",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 365);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
       },
       showBtn: true,
       dateRange: null, //日期范围
@@ -505,9 +544,17 @@ export default {
   },
 };
 </script>
+<style lang="scss">
+// .sing_special_popover {
+//   .el-popover {
+//     background-color: red !important;
+//   }
+// }
+</style>
 <style lang="scss" scoped>
 ::v-deep {
   @import "~@/styles/components/custom-radio.scss";
+
   // 日历样式start
   .el-range-editor--medium .el-range-input {
     font-size: 13px;
@@ -533,22 +580,21 @@ export default {
   width: 20px;
   height: 20px;
   border-radius: 4px;
-  border: 1px #efefef solid;
+  border: 1px #d8e2ef solid;
   line-height: 20px;
   text-align: center;
 }
 .documentation-container {
   box-sizing: border-box;
-  min-height: 94px;
+  min-height: 103px;
   padding-bottom: 20px;
   width: 100%;
   .checkContent {
     position: fixed;
     width: 100%;
-    min-height: 94px;
+    min-height: 103px;
     z-index: 500;
     background-color: #fff;
-    // width: calc(100% - 209px);
     border-bottom: 1px #eee solid;
     .areaContent {
       height: 30px;
@@ -558,7 +604,6 @@ export default {
         .iconArrow {
           position: absolute;
           font-size: 13px;
-          //  line-height: 30px;
           top: 3px;
           right: 5px;
           transform: translate(0, 50%);
@@ -575,20 +620,18 @@ export default {
           font-size: 13px;
           font-weight: 400;
           color: #4d4d4d;
-          border: 1px solid #eee;
           border-top-left-radius: 5px;
           border-bottom-left-radius: 5px;
         }
 
         .areaBox {
-          // min-width: 78px;
           position: relative;
           height: 28px !important;
           line-height: 30px;
           font-size: 12px;
           font-weight: 400;
-          color: #4d4d4d;
-          border: 1px solid #eee;
+          border: 1px solid #d8e2ef;
+          border-left: 0px;
           border-top-right-radius: 5px;
           border-bottom-right-radius: 5px;
           padding: 0 8px;
@@ -603,10 +646,8 @@ export default {
       margin-left: 20px;
       height: 30px;
       border-radius: 4px;
-      border: 1px solid #eee;
       display: flex;
       align-items: center;
-      // width: 30%;
       span {
         font-size: 13px;
         font-weight: 400;
@@ -620,24 +661,23 @@ export default {
     }
     .btnEvent {
       cursor: pointer;
-      width: 54px;
-      height: 21px;
-      border: 1px solid #3d64e6;
+      width: 65px;
+      height: 28px;
+      color: #194580;
+      font-weight: 600px;
+      border: 1px solid #d8e2ef;
       border-radius: 4px;
       font-size: 12px;
-      font-weight: 400;
-      line-height: 21px;
+      line-height: 28px;
       text-align: center;
-      color: #656d92;
     }
     .SetSpace {
       margin-right: 9px;
     }
-    .channel {
+    .channelSecond {
       width: 100%;
       display: flex;
-      margin: 11px 0;
-      // justify-content: space-between;
+      padding: 12px 0 15px 0;
       align-items: center;
       position: relative;
     }

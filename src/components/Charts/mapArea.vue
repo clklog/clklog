@@ -57,21 +57,8 @@ export default {
       getAreaList: null,
     };
   },
-  mounted() {
-    // this.showScatterInGeo();
-  },
   methods: {
     getMapChartsData(val) {
-      // let result = val.reduce((resp, obj) => {
-      //   var originObj = resp.find((item) => item.province === obj.province);
-      //   if (originObj) {
-      //     originObj.pv += obj.pv;
-      //   } else {
-      //     resp.push(obj);
-      //   }
-      //   return resp;
-      // }, []);
-      // 加载接口数据清除
       this.provinceList.map((item) => {
         item.value = 0;
       });
@@ -83,11 +70,6 @@ export default {
         this.provinceList[i].uv = 0;
         this.provinceList[i].uvRate = 0;
         for (let j = 0; j < result.length; j++) {
-          // if (this.provinceList[i].name == result[j].province) {
-          //   this.provinceList[i].value = result[j].pv;
-          //   // this.provinceList[i]. = result[j].pv;
-          //   maxValue.push(result[j].pv);
-          // }
           if (this.provinceList[i].name == result[j].province) {
             this.provinceList[i].value = result[j].visitCount;
             this.provinceList[i].visitCountRate = percentage(result[j].visitCountRate) ;
@@ -118,7 +100,6 @@ export default {
     },
     showScatterInGeo() {
       // 2. 注册可用的地图，只在 geo 组件或者map图表类型中使用
-
       this.$echarts.registerMap("china", chinamap);
       this.myChart = this.$echarts.init(
         document.getElementById("echart_china")
@@ -175,7 +156,7 @@ export default {
           top: "bottom",
           text: ["高", "低"],
           calculable: true,
-          color: ["#0b50b9", "#fff"],
+          color: ["#2c7be5", "#fff"],
         },
         series: [
           {

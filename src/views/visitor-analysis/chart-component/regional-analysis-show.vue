@@ -210,7 +210,8 @@ export default {
           text: ["高", "低"],
           calculable: true,
           // orient: "horizontal",
-          color: ["#0b50b9", "#fff"],
+          // color: ["#0b50b9", "#fff"],
+          color: ["#2c7be5", "#fff"],
         },
         series: [
           {

@@ -1,0 +1,54 @@
+.el-table--enable-row-hover .el-table__body tr:hover > td {
+  background-color: #e4eefc !important;
+}
+
+.el-table--border {
+  border-color: #d8e2ef !important;
+}
+
+.el-table::before,
+.el-table--group::after,
+.el-table--border::after {
+  content: "";
+  position: absolute;
+  background-color: #d8e2ef;
+  z-index: 1;
+}
+
+.el-radio {
+  color: #194580;
+}
+
+.el-radio__input.is-checked + .el-radio__label {
+  color: #194580 !important;
+}
+
+.el-radio-button__inner {
+  color: #194580;
+}
+
+.public_font_color {
+  color: #194580 !important;
+}
+
+.public_indicator {
+  background-color: #fbfcfe !important;
+  border: 1px solid #d8e2ef !important;
+}
+
+.el-popover {
+  background-color: #fbfcfe;
+  border: 1px solid #d8e2ef;
+}
+
+.el-input__inner {
+  border: 1px solid #d8e2ef;
+}
+
+.public_border_color {
+  border: 1px solid #d8e2ef;
+}
+
+.el-radio-button__orig-radio:disabled + .el-radio-button__inner {
+  border-color: #d8e2ef;
+}

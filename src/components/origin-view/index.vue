@@ -5,7 +5,8 @@
         <div class="header-name w156" v-if="!byChannel"></div>
         <div class="header-name w156">
           浏览量
-          <el-popover
+          <div class="parentPosition">
+            <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -24,87 +25,102 @@
               alt=""
             />
           </el-popover>
+          </div>
+        
         </div>
         <div class="header-name w156">
           访问次数
-          <el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              选定时间段内用户访问应用的总次数。
-              <div class="setFontTop">
-                用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
+          <div class="parentPosition">
+            <el-popover
+              placement="bottom-start"
+              width="200"
+              trigger="hover"
+              class="popImg"
+            >
+              <div style="padding: 5px; font-size: 12px">
+                选定时间段内用户访问应用的总次数。
+                <div class="setFontTop">
+                  用户首次访问或距离上次访问超过30分钟再次访问会被记录为一个新的访问。
+                </div>
               </div>
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
+              <img
+                slot="reference"
+                class="icon-question"
+                src="@/assets/images/question.png"
+                alt=""
+              />
+            </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          访客数<el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              选定时间段内访问应用的独立访客数。
-              <div class="setFontTop">访客数以Cookie或设备ID为依据，选定时间段内同一访客多次访问应用只计算为一个访客。
-            </div>
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
+          访客数
+          <div class="parentPosition">
+            <el-popover
+              placement="bottom-start"
+              width="200"
+              trigger="hover"
+              class="popImg"
+            >
+              <div style="padding: 5px; font-size: 12px">
+                选定时间段内访问应用的独立访客数。
+                <div class="setFontTop">访客数以Cookie或设备ID为依据，选定时间段内同一访客多次访问应用只计算为一个访客。
+              </div>
+              </div>
+              <img
+                slot="reference"
+                class="icon-question"
+                src="@/assets/images/question.png"
+                alt=""
+              />
+            </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          IP数<el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              选定时间段内访问应用的独立IP数。
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
+          IP数
+          <div class="parentPosition">
+            <el-popover
+              placement="bottom-start"
+              width="200"
+              trigger="hover"
+              class="popImg"
+            >
+              <div style="padding: 5px; font-size: 12px">
+                选定时间段内访问应用的独立IP数。
+              </div>
+              <img
+                slot="reference"
+                class="icon-question"
+                src="@/assets/images/question.png"
+                alt=""
+              />
+            </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          平均访问页数<el-popover
-            placement="bottom-start"
-            width="200"
-            trigger="hover"
-            class="popImg"
-          >
-            <div style="padding: 5px; font-size: 12px">
-              平均访问页数 = 浏览量 / 访问次数 。
-            </div>
-            <img
-              slot="reference"
-              class="icon-question"
-              src="@/assets/images/question.png"
-              alt=""
-            />
-          </el-popover>
+          平均访问页数
+          <div class="parentPosition">
+            <el-popover
+              placement="bottom-start"
+              width="200"
+              trigger="hover"
+              class="popImg"
+            >
+              <div style="padding: 5px; font-size: 12px">
+                平均访问页数 = 浏览量 / 访问次数 。
+              </div>
+              <img
+                slot="reference"
+                class="icon-question"
+                src="@/assets/images/question.png"
+                alt=""
+              />
+            </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          平均访问时长<el-popover
+          平均访问时长
+          <div class="parentPosition">
+          <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -122,9 +138,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          跳出率<el-popover
+          跳出率
+          <div class="parentPosition">
+          <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -140,6 +159,7 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
       </div>
     </div>
@@ -149,6 +169,7 @@
         <div class="bid-list-header">
         <div class="header-name w156">
           浏览量(PV)
+          <div class="parentPosition">
           <el-popover
             placement="bottom-start"
             width="200"
@@ -168,9 +189,11 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
           访问次数
+          <div class="parentPosition">
           <el-popover
             placement="bottom-start"
             width="200"
@@ -190,9 +213,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          访客数<el-popover
+          访客数
+          <div class="parentPosition">
+          <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -211,9 +237,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          IP数<el-popover
+          IP数
+          <div class="parentPosition">
+          <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -229,9 +258,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          平均访问页数<el-popover
+          平均访问页数
+          <div class="parentPosition">
+          <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -247,9 +279,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          平均访问时长<el-popover
+          平均访问时长
+          <div class="parentPosition">
+          <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -268,9 +303,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          跳出率<el-popover
+          跳出率
+          <div class="parentPosition">
+          <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -286,6 +324,7 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
       </div>
       <div class="bid-list-record">
@@ -317,6 +356,7 @@
         <div class="bid-list-header">
         <div class="header-name w156">
             访客数
+            <div class="parentPosition">
           <el-popover
             placement="bottom-start"
             width="200"
@@ -336,9 +376,11 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
             新访客数
+            <div class="parentPosition">
           <el-popover
             placement="bottom-start"
             width="200"
@@ -355,9 +397,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-            新访客数占比<el-popover
+            新访客数占比
+            <div class="parentPosition">
+            <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -373,9 +418,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-            回流用户<el-popover
+            回流用户
+            <div class="parentPosition">
+            <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -391,10 +439,13 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
       
         <div class="header-name w156">
-            沉默用户<el-popover
+            沉默用户
+            <div class="parentPosition">
+            <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -410,9 +461,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-            流失用户<el-popover
+            流失用户
+            <div class="parentPosition">
+            <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -428,6 +482,7 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
       </div>
       <div class="bid-list-record">
@@ -466,6 +521,7 @@
         <div class="bid-list-header">
         <div class="header-name w156">
           浏览量(PV)
+          <div class="parentPosition">
           <el-popover
             placement="bottom-start"
             width="200"
@@ -486,9 +542,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          访客数<el-popover
+          访客数
+          <div class="parentPosition">
+          <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -506,9 +565,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-            贡献下游浏览量<el-popover
+            贡献下游浏览量
+            <div class="parentPosition">
+            <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -524,9 +586,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-            退出页次数<el-popover
+            退出页次数
+            <div class="parentPosition">
+            <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -542,10 +607,13 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
       
         <div class="header-name w156">
-            平均访问时长<el-popover
+            平均访问时长
+            <div class="parentPosition">
+            <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -564,9 +632,12 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
         <div class="header-name w156">
-          跳出率<el-popover
+          跳出率
+          <div class="parentPosition">
+          <el-popover
             placement="bottom-start"
             width="200"
             trigger="hover"
@@ -582,6 +653,7 @@
               alt=""
             />
           </el-popover>
+          </div>
         </div>
       </div>
       <div class="bid-list-record" >
@@ -673,8 +745,18 @@ export default {
 ::v-deep.setFontTop{
     margin-top:5px;
   }
+  .parentPosition{
+    position: relative;
+    .popImg{
+      position: absolute;
+      left:0;
+      transform: translate(0,-50%);//左右上下
+    }
+  }
+  
 .bid-list-header {
   padding-bottom: 10px;
+  padding-top: 15px;
   display: flex;
   .header-name {
     width: 14%;
@@ -715,7 +797,7 @@ export default {
       .w158 {
         font-size: 16px;
         font-weight: bold;
-        color: #3d64e6;
+        color: #2c7be5;
         line-height: 17px;
       }
     }

@@ -1,6 +1,6 @@
 <template>
   <!-- 公用流量指标 -->
-  <div class="flow-indicator">
+  <div class="flow-indicator public_indicator">
     <div class="flow-item">
       <div class="flow-title">流量基础指标</div>
       <el-checkbox-group
@@ -18,7 +18,7 @@
         <el-checkbox v-if="byChannel" label="uvRate">访客数占比</el-checkbox>
         <el-checkbox v-if="!byNewOldVisit" label="newUv">新访客数</el-checkbox>
         <el-checkbox v-if="!byNewOldVisit" label="newUvRate">新访客数占比</el-checkbox>
-        <el-checkbox label="newUvRate" v-if="byNewOldVisit">访客数占比</el-checkbox>
+        <el-checkbox label="uvRate" v-if="byNewOldVisit">访客数占比</el-checkbox>
         <el-checkbox label="ipCount" >IP数</el-checkbox>
         <el-checkbox
           v-if="byChannel"
@@ -231,7 +231,8 @@ export default {
   .flow-indicator {
     margin-top: 10px;
     min-height: 58px;
-    background: rgba(252, 252, 252, 0.39);
+    // background: rgba(252, 252, 252, 0.39);
+    // background: red;
     border: 1px solid #f0f0f5;
     border-radius: 6px;
     box-sizing: border-box;
@@ -245,6 +246,7 @@ export default {
       margin-top: 12px;
       margin-left: 10px;
       .flow-title {
+        white-space: nowrap;
         margin-right: 21px;
         font-size: 13px;
         font-weight: 400;

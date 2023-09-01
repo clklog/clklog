@@ -1,7 +1,7 @@
 <template>
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams" ByArea></FilterBar>
-    <div class="Overview">
+    <div class="Overview public-hoverItem">
       <div class="public-firstHead">用户概览</div>
       <div class="bid-list-page">
         <originView ref="originView" byVisit></originView>
@@ -172,7 +172,7 @@ export default {
       .w158 {
         font-size: 16px;
         font-weight: bold;
-        color: #3d64e6;
+        color: #2c7be5;
         line-height: 17px;
       }
     }

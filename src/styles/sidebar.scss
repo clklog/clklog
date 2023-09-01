@@ -5,8 +5,12 @@
     margin-left: $sideBarWidth;
     position: relative;
     top: 50px;
-    background: rgba(170, 170, 170, 0.12)!important;
+    // background: rgba(170, 170, 170, 0.12)!important;
+    // background-color: #edf2f9;
+    background-color: #eaf2fc;
+    // background-color:rgba(237,  242,  249,0.52);
   }
+
 
   .sidebar-container {
     transition: width 0.28s;

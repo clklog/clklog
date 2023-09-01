@@ -1,7 +1,7 @@
 <template>
-  <div class="chartsIcon">
-    <div class="public-firstHead">受访页面分析</div>
-    <div class="flow-indicator">
+  <div class="chartsIcon public-hoverItem ">
+    <div class="public-firstHead ">受访页面分析</div>
+    <div class="flow-indicator public_indicator">
       <div class="flow-item">
         <div class="flow-title">流量基础指标</div>
         <el-checkbox-group
@@ -33,13 +33,13 @@
     </div>
     <!-- class="public-table-block" -->
     <div>
-      <div class="public-Table-minHeight public-hoverItem">
+      <div class="public-Table-minHeight ">
         <el-table
           :data="vistedTableData"
           border
           class="public-radius"
           style="width: 100%"
-          :header-cell-style="{ textAlign: 'center', background: '#f4f8fe' }"
+          :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
           :cell-style="tableHeaderColor"
           @sort-change="sortChange($event)"
         >
@@ -66,13 +66,13 @@
             </template> -->
           </el-table-column>
           <el-table-column label="流量基础指标">
-            <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
-            <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+            <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable="custom" />
+            <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable="custom" />
             <el-table-column
               v-if="ipCount"
               prop="ipCount"
               label="IP数"
-              sortable
+              sortable="custom"
             />
           </el-table-column>
           <el-table-column prop="date" label="流量质量指标">
@@ -81,31 +81,31 @@
               v-if="entryCount"
               prop="entryCount"
               label="入口页次数"
-              sortable
+              sortable="custom"
             />
             <el-table-column
               v-if="downPvCount"
               prop="downPvCount"
               label="贡献下游浏览量"
-              sortable
+              sortable="custom"
             />
             <el-table-column
               v-if="exitCount"
               prop="exitCount"
               label="退出页次数"
-              sortable
+              sortable="custom"
             />
             <el-table-column
               v-if="avgVisitTime"
               prop="avgVisitTime"
               label="平均访问时长"
-              sortable
+              sortable="custom"
             />
             <el-table-column
               v-if="exitRate"
               prop="exitRate"
               label="退出率"
-              sortable
+              sortable="custom"
             />
             
           </el-table-column>
@@ -335,7 +335,6 @@ export default {
   padding: 22px;
   .flow-indicator {
     min-height: 58px;
-    background: rgba(252, 252, 252, 0.39);
     border: 1px solid #f0f0f5;
     border-radius: 6px;
     box-sizing: border-box;

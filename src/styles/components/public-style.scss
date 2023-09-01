@@ -11,7 +11,6 @@
   margin: 20px 0;
   padding: 22px;
   background: #fff;
-  
 }
 .public-Table-minHeight {
   margin-top: 15px;
@@ -35,6 +34,10 @@
 // page every block
 .public-hoverItem {
   border-radius: 6px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+.public-hoverItem:hover {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
 }
 // page 概览间距整体调整
 .Overview {

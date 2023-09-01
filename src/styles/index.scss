@@ -7,11 +7,8 @@
 @import "./btn.scss";
 @import "./components/element-unifystyle.scss";
 @import "./components/public-style.scss";
-
-// table hover后的颜色
-.el-table--enable-row-hover .el-table__body tr:hover > td {
-  background-color: #f7fafe !important;
-}
+@import "./components/custom-color.scss";
+@import "./components/element-unify-style.scss";  //filterbar统一样式
 
 body {
   height: 100%;
@@ -212,6 +209,7 @@ aside {
   white-space: nowrap;
 }
 .block-main {
+  overflow: hidden;
   box-sizing: border-box;
   padding: 25px 25px;
   background-color: #fff;
@@ -230,7 +228,7 @@ aside {
       color: #4d4d4d;
     }
     .block-head-icon {
-      box-sizing:content-box;
+      box-sizing: content-box;
       margin-left: auto;
       // width: 50%;
       text-align: right;
@@ -307,12 +305,9 @@ aside {
 // 流量基础指标多选checkbox统一样式
 .flow-indicator {
   min-height: 58px;
-  // background: rgba(252, 252, 252, 0.39);
-  background: #fff;
   border: 1px solid #f0f0f5;
   border-radius: 6px;
   box-sizing: border-box;
-  // margin: 12px;
   .setSpace {
     margin-top: 2px !important;
     margin-bottom: 12px;

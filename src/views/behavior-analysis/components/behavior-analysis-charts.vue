@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="chartsIcon">
+    <div class="chartsIcon public-hoverItem">
       <div class="chartLeft">
         <div class="trendHead">
           <div
@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <div class="search_wrappy">
+    <div class="search_wrappy public-hoverItem">
       <div class="search_table">
         <span class="public-firstHead">用户列表</span>
         <div class="setTable">
@@ -57,7 +57,7 @@
             :data="userListData"
             :header-cell-style="{
               textAlign: 'center',
-              background: '#f4f8fe',
+              background: '#eaf2fc',
             }"
             class="public-radius"
             :cell-style="{ textAlign: 'center' }"
@@ -84,7 +84,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="visitorType" label="访客类型" sortable>
+            <el-table-column prop="visitorType" label="访客类型" sortable="custom">
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -98,7 +98,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="visitCount" label="访客次数" sortable>
+            <el-table-column prop="visitCount" label="访客次数" sortable="custom">
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -112,7 +112,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="pv" label="浏览量" sortable>
+            <el-table-column prop="pv" label="浏览量" sortable="custom">
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -126,7 +126,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="visitTime" label="停留时长" sortable>
+            <el-table-column prop="visitTime" label="停留时长" sortable="custom">
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -140,7 +140,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="avgPv" label="平均访问页数" sortable>
+            <el-table-column prop="avgPv" label="平均访问页数" sortable="custom">
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -150,11 +150,11 @@
                     text-overflow: ellipsis;
                   "
                 >
-                  {{ scope.row.avgPv }}
+                {{ averageRulesEvent(scope.row.avgPv) }}
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="latestTime" label="上次访问时间" sortable>
+            <el-table-column prop="latestTime" label="上次访问时间" sortable="custom">
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -168,17 +168,17 @@
                 </div>
               </template>
             </el-table-column>
-            <!-- <el-table-column prop="visitorType" label="访客类型" sortable>
+            <!-- <el-table-column prop="visitorType" label="访客类型" sortable="custom">
             </el-table-column>
-            <el-table-column prop="visitCount" label="访客次数" sortable>
+            <el-table-column prop="visitCount" label="访客次数" sortable="custom">
             </el-table-column>
-            <el-table-column prop="pv" label="浏览量" sortable>
+            <el-table-column prop="pv" label="浏览量" sortable="custom">
             </el-table-column>
-            <el-table-column prop="visitTime" label="停留时长" sortable>
+            <el-table-column prop="visitTime" label="停留时长" sortable="custom">
             </el-table-column>
-            <el-table-column prop="avgPv" label="平均访问页数" sortable>
+            <el-table-column prop="avgPv" label="平均访问页数" sortable="custom">
             </el-table-column>
-            <el-table-column prop="latestTime" label="上次访问时间" sortable>
+            <el-table-column prop="latestTime" label="上次访问时间" sortable="custom">
             </el-table-column> -->
           </el-table>
         </div>
@@ -204,6 +204,7 @@
 <script>
 import echarts from "echarts";
 import dialogs from "@/layout/components/dialog/index";
+import { percent, percentage, averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   components: {
@@ -211,7 +212,7 @@ export default {
   },
   data() {
     return {
-      pointValue: ["浏览量", "访客数"],
+      pointValue: [ "访客数","访问次数"],
       chart: null,
       emptyList: "",
       options: [
@@ -273,6 +274,9 @@ export default {
     this.chart = null;
   },
   methods: {
+    averageRulesEvent(num) {
+      return averageRules(num);
+    },
     sortChange(e) {
       if (e.order && e.order == "ascending") {
         // 降序
@@ -313,9 +317,6 @@ export default {
     getUserListEvent(val) {
       this.userListData = val.rows;
       val.rows.map((item) => {
-        if (item.avgPv) {
-          item.avgPv = Math.floor(item.avgPv);
-        }
         if (item.visitTime) {
           item.visitTime = formatTime(Math.floor(item.visitTime));
         }
@@ -432,7 +433,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#d5e5fa",
+            color: "#2c7be5",
           },
         },
         {
@@ -445,7 +446,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#80b0ef",
+            color: "#4c8fe9",
           },
         },
         {
@@ -458,7 +459,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#5695ea",
+            color: "#6ba3ed",
           },
         },
         {
@@ -471,7 +472,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#2c7be5",
+            color: "#8bb6f1",
           },
         },
         {
@@ -484,7 +485,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#1a4a89",
+            color: "#abcaf5",
           },
         },
       ];
@@ -619,7 +620,7 @@ img {
 .search_wrappy {
   border-radius: 6px;
   position: relative;
-  margin: 15px;
+  margin: 20px;
   background-color: #fff;
   min-height: 647px;
   padding: 22px;

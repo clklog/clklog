@@ -1,6 +1,6 @@
 <template>
     <div class="TopFilter">
-      <div class="radio-com">
+      <div class="radio-com public_border_color">
         <span class="radio-com-label">时间：</span>
         <el-radio-group v-model="timeType" class="radio-com-el">
           <el-radio label="day">今日</el-radio>
@@ -10,7 +10,7 @@
         </el-radio-group>
       </div>
 
-      <div class="radio-com">
+      <div class="radio-com public_border_color">
         <span class="radio-com-label">渠道：</span>
         <el-radio-group class="radio-com-el" v-model="channelValue">
           <el-radio label="">全部</el-radio>
