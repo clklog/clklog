@@ -1,0 +1,29 @@
+springdoc:
+  swagger-ui:
+    enabled: true
+    tagsSorter: alpha
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.zcunsoft.clklog.api.controllers
+server:
+  port: 8087
+spring:
+  application.name: clklog-api
+  datasource:
+    clickhouse:
+      jdbc-url: jdbc:clickhouse://localhost:8123/default
+      username: default
+      password: 123456
+      driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+      connection-timeout: 20000
+      maximum-pool-size: 5
+logging:
+  file:
+    path: log
+clklogapi:
+  access-control-allow-origin: "*"
+  project-name: hqq
