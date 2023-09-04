@@ -1316,8 +1316,8 @@ public class ReportServiceImpl implements IReportService {
     public GetVisitorSessionUriListPageResponse getGetVisitorSessionUriList(
             GetVisitorSessionUriListPageRequest getVisitorSessionUriListPageRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
-        String getListSql = "select t.distinct_id as distinct_id,t.url as uri,t.event_session_id as event_session_id,t.log_time as log_time from sensors.log_analysis t ";
-        String getCountSql = "select count(1) from sensors.log_analysis t ";
+        String getListSql = "select t.distinct_id as distinct_id,t.url as uri,t.event_session_id as event_session_id,t.log_time as log_time from log_analysis t ";
+        String getCountSql = "select count(1) from log_analysis t ";
         List<LogAnalysisbysessionuri> logAnalysisbysessionuriList = new ArrayList<LogAnalysisbysessionuri>();
         Integer total = 0;
         if (StringUtils.isNotBlank(getVisitorSessionUriListPageRequest.getDistinctId()) && StringUtils.isNotBlank(getVisitorSessionUriListPageRequest.getEventSessionId())) {

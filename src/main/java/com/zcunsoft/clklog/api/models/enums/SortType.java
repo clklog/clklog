@@ -1,9 +1,11 @@
 package com.zcunsoft.clklog.api.models.enums;
 
-import com.zcunsoft.clklog.api.utils.StringUtils;
+
 
 import java.util.Arrays;
 import java.util.List;
+
+import com.zcunsoft.clklog.api.utils.StringUtils;
 
 public enum SortType {
 
@@ -76,7 +78,7 @@ public enum SortType {
     private static String getSortSqlFormat(String sortName,String sortOrder) {
     	
     	if("avgPv".equals(sortName)) {
-    		return " order by pv/visit_count "+ sortOrder;
+    		return " order by if(visit_count == 0 , 0 ,pv/visit_count) "+ sortOrder;
     	}
     	if("pvRate".equals(sortName)) {
     		return " order by pv "+ sortOrder;
@@ -94,13 +96,13 @@ public enum SortType {
     		return " order by ip_count "+ sortOrder;
     	}
     	if("avgVisitTime".equals(sortName)) {
-			return " order by visit_time/visit_count "+ sortOrder;
+			return " order by if(visit_count == 0 , 0 ,visit_time/visit_count) "+ sortOrder;
 		}
     	if("bounceRate".equals(sortName)) {
-			return " order by bounce_count/visit_count "+ sortOrder;
+			return " order by if(visit_count == 0 , 0 ,bounce_count/visit_count) "+ sortOrder;
 		}
     	if("exitRate".equals(sortName)) {
-			return " order by exit_count/visit_count "+ sortOrder;
+			return " order by if(visit_count == 0 , 0 ,exit_count/visit_count) "+ sortOrder;
 		}
     	if("visitorType".equals(sortName)) {
     		return " order by is_first_day "+ sortOrder;
