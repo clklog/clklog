@@ -86,8 +86,8 @@ public class ExcelExportUtils  {
 				add("ipCount");
 				add("ipCountRate");
 				add("bounceRate");
-				add("downPvCount");
 				add("entryCount");
+				add("downPvCount");
 				add("exitCount");
 				add("exitRate");
 				add("visitTime");
@@ -158,7 +158,7 @@ public class ExcelExportUtils  {
         CellStyle bodyStyle = getBodyCellStyle(workbook);
         CellStyle floatStyle = getFloatCellStyle(workbook);
         
-        List<String> totalCols = Arrays.asList("pv","visitCount","downPvCount","exitCount","avgVisitTime","bounceRate");
+        List<String> totalCols = Arrays.asList("pv","uv","downPvCount","exitCount","avgVisitTime","bounceRate");
         createTotalSheet(workbook, totalCols, total, "流量概览", headStyle, bodyStyle, floatStyle);
         
         
@@ -420,6 +420,12 @@ public class ExcelExportUtils  {
         	}
         	detailColumns[i] = colType.getName();
         	detailColWidths[i] =  colType.getWidth();
+        	if("pv".equals(cols.get(i))) {
+        		detailColumns[i] = "搜索次数";
+        	} 
+        	if("pvRate".equals(cols.get(i))) {
+        		detailColumns[i] = "搜索次数占比(%)";
+        	} 
         }
         int detailRowIndex = DETAIL_ROW_INDEX;
         int detailHeadColIndex =DETAIL_COL_INDEX;
@@ -507,12 +513,12 @@ public class ExcelExportUtils  {
          if(cols.contains("bounceRate")) {
          	addCellWithStyle(row, detailColIndex++, floatStyle).setCellValue(flowDetail.getBounceRate());
          }
+         if(cols.contains("entryCount")) {
+            	addCellWithStyle(row, detailColIndex++, bodyStyle).setCellValue(flowDetail.getEntryCount());
+           }
          if(cols.contains("downPvCount")) {
             	addCellWithStyle(row, detailColIndex++, bodyStyle).setCellValue(flowDetail.getDownPvCount());
            }
-         if(cols.contains("entryCount")) {
-           	addCellWithStyle(row, detailColIndex++, bodyStyle).setCellValue(flowDetail.getEntryCount());
-          }
          
          if(cols.contains("exitCount")) {
            	addCellWithStyle(row, detailColIndex++, bodyStyle).setCellValue(flowDetail.getExitCount());

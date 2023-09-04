@@ -12,8 +12,8 @@ public enum SortType {
 	VisitUriDetail("VisitUriDetail", "受访页面分析", "pv", "desc",new String[]{"pv","uv","ipCount","exitCount", "entryCount","downPvCount","avgVisitTime","exitRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"}),
 	SourceWebSiteDetail("SourceWebSiteDetail", "来源网站分析", "pv","desc", new String[]{"pv", "visitCount","newUv", "uv","ipCount","avgVisitTime","avgPv","bounceRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"}),
 	DeviceDetail("DeviceDetail", "设备分析", "pv","desc", new String[]{"pv", "visitCount","newUv", "uv","ipCount","avgVisitTime","avgPv","bounceRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"}),
-	VisitorList("VisitorList", "用户列表", "pv","desc", new String[]{"pv", "visitCount","visitTime", "latestTime","avgPv","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"}),
-	SearchWordDetail("SearchWordDetail", "搜索词分析", "pv","desc", new String[]{"statTime","pv", "visitCount","visitTime", "bounceCount","searchword","avgVisitTime","avgPv","bounceRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"}),
+	VisitorList("VisitorList", "用户列表", "pv","desc", new String[]{"pv", "visitCount","visitTime", "latestTime","avgPv","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate","visitorType"}),
+	SearchWordDetail("SearchWordDetail", "搜索词分析", "pv","desc", new String[]{"statTime","pv", "visitCount","visitTime", "bounceCount","searchword","avgVisitTime","avgPv","bounceRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate","uv","newUv","ipCount"}),
 	ChannelDetail("ChannelDetail", "渠道分析", "pv","desc", new String[]{"pv", "visitCount","newUv", "uv","ipCount","visitTime", "bounceCount","avgVisitTime","avgPv","bounceRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"});
 	
 	private String code;
@@ -102,6 +102,9 @@ public enum SortType {
     	if("exitRate".equals(sortName)) {
 			return " order by exit_count/visit_count "+ sortOrder;
 		}
+    	if("visitorType".equals(sortName)) {
+    		return " order by is_first_day "+ sortOrder;
+    	}
     	return " order by "+StringUtils.toUnderScoreCase(sortName)+" "+ sortOrder;
     }
     
