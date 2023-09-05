@@ -78,6 +78,7 @@ export default {
       pointValue: [ "访客数","访问次数"],
       disabledSelect: [],
       seriesdata:[],
+      cologStyle:this.$store.state.settings.cologStyle,
     };
   },
   mounted() {},
@@ -202,8 +203,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#2c7be5",
-            // color: "$pvColor",
+            color:this.cologStyle.$pv,
           },
         },
         {
@@ -216,7 +216,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#4c8fe9",
+            color:this.cologStyle.$uv,
           },
         },
         {
@@ -229,7 +229,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#6ba3ed",
+            color:this.cologStyle.$visitCount,
           },
         },
         {
@@ -242,7 +242,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#8bb6f1",
+            color: this.cologStyle.$ipCount,
           },
         },
         {
@@ -255,7 +255,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#abcaf5",
+            color:this.cologStyle.$bounceRate,
           },
         },
       ];

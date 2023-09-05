@@ -14,6 +14,15 @@
         <settings />
       </right-panel>
     </div>
+    <!-- 浮动logo -->
+    <div class="logoConItem">
+      <!-- <img class="logoImg" src="@/assets/images/logoFIxed.png" alt=""> -->
+
+      <!-- <img class="logoImg" src="@/assets/images/logo.png" alt=""> -->
+      <div class="logoName">POWERED BY</div>
+      <img class="logoImg" src="@/assets/images/logoFIxed.png" alt="" />
+      
+    </div>
   </div>
 </template>
 
@@ -62,7 +71,24 @@ export default {
 <style lang="scss" scoped>
   @import "~@/styles/mixin.scss";
   @import "~@/styles/variables.scss";
-
+  .logoConItem{
+    position: fixed;
+    left: 16px;
+    bottom: 5px;;
+    display: flex;
+    z-index: 2000;
+    .logoImg{
+      height: 16px;
+      object-fit: cover;
+     
+    }
+    .logoName{
+      padding-right: 5px;
+      font-size: 12px;
+      color: #909399;
+      line-height: 22px;
+    }
+  }
   .app-wrapper {
     @include clearfix;
     position: relative;

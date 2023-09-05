@@ -327,7 +327,7 @@
           </div>
         </div>
       </div>
-      <div class="bid-list-record">
+      <div class="bid-list-record" v-if="originData">
         <div class="bid-list-item w158">
           <p>{{ (originData && originData.pv) || "--" }}</p>
         </div>
@@ -341,7 +341,7 @@
           <p>{{ (originData && originData.ipCount) || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
-          <p>{{ Math.floor(originData && originData.avgPv) || "--" }}</p>
+          <p>{{ averageRulesEvent(originData.avgPv) || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
           <p>{{ formatTimeFun(originData && originData.avgVisitTime) || "--" }}</p>
@@ -693,7 +693,7 @@
 </template>
 
 <script>
-import { percentage } from "@/utils/percent";
+import { percentage,averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   name: "originName",
@@ -726,12 +726,14 @@ export default {
     }
   },
   methods:{
+    averageRulesEvent(num) {
+      return averageRules(num);
+    },
     formatTimeFun(val){
       val =  Math.floor(val);
       return formatTime(val);
     },
     originEvent(val){
-        // console.log(val,4324);
         this.originData = val;
     },
     percentageFun(val) {

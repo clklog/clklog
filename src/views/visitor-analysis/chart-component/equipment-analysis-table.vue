@@ -7,18 +7,17 @@
         <div class="public-Table-minHeight ">
           <el-table
             :data="equipmentList"
-            :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
+            :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
             :cell-style="{ textAlign: 'center' }"
             border
             class="public-radius"
             @sort-change="sortChange($event)"
             style="width: 100%"
           >
-            <!-- <el-table-column type="index" label="序号" width="150" /> -->
             <el-table-column
               label="序号"
               type="index"
-              width="150"
+              width="80"
               align="center"
             >
               <template slot-scope="scope">
@@ -166,7 +165,7 @@ export default {
         if (item.pvRate) {
           item.pvRate = percentage(item.pvRate);
         }
-        if (item.avgVisitTime) {
+        if (item.avgVisitTime || item.avgVisitTime == 0) {
           item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
         }
       });

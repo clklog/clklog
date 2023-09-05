@@ -2,12 +2,11 @@
   <div class="chartsIcon public-table-block public-hoverItem">
     <div class="public-firstHead">趋势分析</div>
     <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
-    <!-- class="public-table-block" -->
     <div>
       <div class="public-Table-minHeight">
         <el-table
           class="public-radius"
-          :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
+          :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
           :cell-style="{ textAlign: 'center' }"
           :data="
             flowTableList.slice(
@@ -198,6 +197,9 @@ export default {
         this.current.sortName = null;
         this.current.sortOrder = null;
       }
+      if (this.current.sortName == "statTime") {
+        this.$emit("currentPage");
+      }
       this.ascDscEvent();
     },
     sortFun(attr, rev) {
@@ -288,11 +290,11 @@ export default {
       this.timeType = time;
       this.currentPage = 1;
       this.flowTableList = val;
-      this.flowTableList.map((item) => {
-        // if (item.avgPv) {
-        //   item.avgPv = Math.floor(item.avgPv);
-        // }
-      });
+      if (this.current.sortName && this.current.sortName == "statTime") {
+        if (this.current.sortOrder == "descending") {
+          this.flowTableList = this.flowTableList.reverse();
+        }
+      }
       this.total = val.length;
       this.ascDscEvent();
     },

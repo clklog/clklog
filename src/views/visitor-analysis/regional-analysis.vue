@@ -3,7 +3,7 @@
     <FilterBar @setFilterBarParams="setFilterBarParams" />
     <div class="public-block">
       <div class="Overview public-hoverItem">
-        <div class="public-firstHead" >流量概览</div>
+        <div class="public-firstHead">流量概览</div>
         <originView ref="originView" byAreaAnaly></originView>
       </div>
       <regionalShow ref="regionalShow"></regionalShow>
@@ -58,7 +58,6 @@ export default {
     commonParams(val) {
       this.getAreaDetailTotal(val);
       this.getAreaProvinceList();
-      // this.getAreaDetailTop10();
       this.getArea();
     },
   },
@@ -67,8 +66,9 @@ export default {
     getAreaDetailTotal(val) {
       getAreaDetailTotalApi(val).then((res) => {
         if (res.code == 200) {
-          // this.$refs.regionalView.getDetailView(res.data);
-          this.$refs.originView.originEvent(res.data);
+          this.$nextTick(() => {
+            this.$refs.originView.originEvent(res.data);
+          });
         }
       });
     },

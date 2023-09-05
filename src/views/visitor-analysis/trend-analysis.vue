@@ -14,7 +14,7 @@
         <originView ref="originView" byAreaAnaly></originView>
       </div>
       <indicatorChart ref="indicatorChart" />
-      <trendTable ref="trendTable" />
+      <trendTable @currentPage="currentPage" ref="trendTable" />
     </div>
   </div>
 </template>
@@ -90,6 +90,9 @@ export default {
     },
     setFilterBarParams(val) {
       this.filterBarParams = copyObj(val);
+    },
+    currentPage() {
+      this.getFlowTrendDetail();
     },
   },
 };

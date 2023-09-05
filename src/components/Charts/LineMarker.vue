@@ -39,6 +39,7 @@ export default {
       statTime: [],
       headLege: [],
       flowTrendList: [],
+      cologStyle:this.$store.state.settings.cologStyle,
     };
   },
   mounted() {
@@ -211,7 +212,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "#2c7be5",
+                color:this.cologStyle.$pv,
               },
             },
             lineStyle: {
@@ -224,7 +225,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "#4c8fe9",
+                color:this.cologStyle.$uv,
               },
             },
             lineStyle: {
@@ -237,7 +238,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "#6ba3ed",
+                color:this.cologStyle.$visitCount,
                 // borderColor: "#5fb4db",
                 // borderWidth: 12,
               },
@@ -252,7 +253,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "#8bb6f1",
+                color: this.cologStyle.$ipCount,
               },
             },
             lineStyle: {
@@ -265,7 +266,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color: "#abcaf5",
+                color:this.cologStyle.$bounceRate,
               },
             },
             lineStyle: {

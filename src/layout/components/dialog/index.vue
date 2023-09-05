@@ -8,7 +8,7 @@
       @close="resetForm()"
     >
       <div class="el-dialog-div">
-        <div class="left-item ">
+        <div class="left-item">
           <div class="visitorInfo commonBackgrond public-hoverItem">
             <div class="setImg">
               <img src="@/assets/images/avator.png" alt="" />
@@ -242,7 +242,7 @@
                           <div
                             style="
                               width: 1px;
-                              min-height: 40px;
+                              min-height: 30px;
                               border-left: 1px solid #b8b8b8;
                               margin: 5px 0 5px 6px;
                             "
@@ -319,7 +319,6 @@ export default {
   data() {
     return {
       total: 0,
-      // pageSize: 3,
       pageSize: 10,
       currentPage: 1,
       centerDialogVisible: false,
@@ -332,11 +331,6 @@ export default {
       allVisitListUrl: [],
     };
   },
-  mounted() {
-    let a = "18590c236842d6-007c5010db20a89-247a1d38-329160-18590";
-    console.log(a.length, "244332");
-    // this.getVisitorSessionUriList();
-  },
   methods: {
     formatTimeData(val) {
       return formatTime(Math.floor(val));
@@ -347,8 +341,6 @@ export default {
     },
     toVisitHttp(val, index) {
       this.visitListUrl = null; //重新赋值
-      // console.log(val, index, "val----------");
-
       this.getVisitorSessionUriList(val);
       this.clickIndex = index;
       this.loading = true;
@@ -406,7 +398,6 @@ export default {
               }
             }
           });
-          // console.log(this.visitorSessionList, "处理后一级会话");
         } else {
           this.loading = false;
         }
@@ -449,19 +440,11 @@ export default {
       this.currentPage = 1;
       this.visitListUrl = null;
     },
-    // user baseInfo
     getVisitorDetailinfo() {
       let params = { distinctId: this.distinctId };
       getVisitorDetailinfoApi(params).then((res) => {
         if (res.code == 200) {
           this.userBaseInfo = res.data;
-          // this.userBaseInfo.avgVisitTime = formatTime(Math.floor(this.userBaseInfo.avgVisitTime))
-          // this.userBaseInfo.avgVisitTime = Math.floor(
-          //   Math.floor(this.userBaseInfo.avgVisitTime) / 60
-          // );
-          // this.userBaseInfo.visitTime = Math.floor(
-          //   Math.floor(this.userBaseInfo.visitTime) / 60
-          // );
           this.userBaseInfo.avgPv = Math.floor(this.userBaseInfo.avgPv);
         }
       });
@@ -492,12 +475,15 @@ export default {
 }
 .el-dialog-div {
   display: flex;
+  justify-content: center;
+  // justify-content: space-between;
   .left-item {
     min-width: 516px;
     min-height: 450px;
     max-height: 960px;
-    padding: 15px 15px;
-    padding-top: 0;
+    // padding: 15px 15px;
+    // padding-top: 0;
+    box-sizing: border-box;
     .visitorInfo {
       width: 516px;
       overflow: hidden;
@@ -507,12 +493,10 @@ export default {
       padding: 15px;
       box-sizing: border-box;
       .setImg {
-        // width: 125px;
         width: 90px;
         height: 100%;
-        // overflow: hidden;
         display: flex;
-        // align-items: center;
+        margin-top: 7px;
         box-sizing: border-box;
         img {
           width: 89px;
@@ -524,11 +508,9 @@ export default {
       }
       .visitDetail {
         box-sizing: border-box;
-        // width: 373px;
         overflow: hidden;
-
         min-height: 100px;
-        margin-left: 15px;
+        margin-left: 20px;
       }
       .lable {
         display: flex;
@@ -553,11 +535,11 @@ export default {
       }
     }
     .total {
-      margin-top: 15px;
+      margin-top: 20px;
       width: 516px;
       min-height: 140px;
       border-radius: 6px;
-      padding: 12px;
+      padding: 15px;
       .visit_Time {
         display: flex;
         padding-top: 15px;
@@ -589,8 +571,8 @@ export default {
       width: 516px;
       height: 76px;
       border-radius: 6px;
-      padding: 12px;
-      margin-top: 15px;
+      padding: 15px;
+      margin-top: 20px;
     }
     .describe {
       box-sizing: border-box;
@@ -605,29 +587,21 @@ export default {
       }
     }
     .whereFrom {
-      padding: 11px;
+      padding: 15px;
       box-sizing: border-box;
-      margin-top: 16px;
+      margin-top: 20px;
       width: 516px;
       min-height: 50px;
-      // background: #fafafb;
       border-radius: 6px;
       display: flex;
       flex-direction: column;
     }
   }
   .right-item {
-    margin-left: 15px;
-    // width: 525px;
+    min-width: 501px;
+    margin-left: 20px;
     min-height: 584px;
-    // max-height: 750px;
-    // height: 750px;
-    // overflow-y: auto;
-    // overflow-x: hidden;
     background-color: #edf2f9;
-    // background: #fafafb;
-    // border-radius: 6px;
-    // padding: 12px;
     .right-head {
       display: flex;
       justify-content: space-between;
@@ -651,7 +625,6 @@ export default {
       }
     }
     .warry-body {
-      // height: calc(100%-52px);
       min-height: 600px;
       max-height: 725px;
       overflow-y: auto;
@@ -659,11 +632,7 @@ export default {
     }
     .right-body {
       width: 501px;
-      // min-height: 40px;
-      // min-height: 40px;
-      // max-height: 650px;
       height: 40x;
-
       .right_body-con {
         padding: 5px 15px;
         box-sizing: border-box;
@@ -723,64 +692,6 @@ export default {
           }
         }
       }
-      // background: #fafafb;
-      // border: 1px solid #f0f0f5;
-      // border-radius: 5px;
-      // padding: 15px;
-      // overflow: auto;
-      // overflow-x: hidden;
-      // margin-bottom: 15px;
-      // .right-body-head {
-      //   display: flex;
-      //   justify-content: space-between;
-      //   .body-left {
-      //     display: -webkit-box;
-      //     -webkit-box-orient: vertical;
-      //     -webkit-line-clamp: 2;
-      //     max-height: 30px;
-      //     line-clamp: 2;
-      //     font-size: 12px;
-      //     font-weight: 400;
-      //     line-height: 15px;
-      //     color: #4d4d4d;
-      //     width: 250px;
-      //     overflow: hidden;
-      //     text-overflow: ellipsis;
-      //   }
-      // }
-
-      // .body-right {
-      //   display: flex;
-      //   flex-direction: column;
-      //   text-align: right;
-      // }
-      // span {
-      //   font-size: 12px;
-      //   font-weight: 400;
-      //   line-height: 13px;
-      //   color: #4d4d4d;
-      // }
-      // .lined {
-      //   width: 468px;
-      //   height: 0px;
-      //   border: 1px solid #f0f0f5;
-      //   margin: 0 auto;
-      // }
-      // .webAddress {
-      //   font-size: 12px;
-      //   line-height: 20px;
-      //   color: #5a607f;
-      //   padding-top: 13px;
-      //   padding-bottom: 26px;
-      // }
-      // .ipAdress {
-      //   display: flex;
-      //   align-items: center;
-      //   font-size: 12px;
-      //   font-weight: 500;
-      //   line-height: 26px;
-      //   color: #5a607f;
-      // }
     }
   }
 }

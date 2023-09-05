@@ -6,14 +6,14 @@
       <div class="public-Table-minHeight">
         <el-table
           class="public-radius"
-          :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
+          :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
           :cell-style="tableHeaderColor"
           :data="getSourceSiteList"
           border
           @sort-change="sortChange($event)"
           style="width: 100%"
         >
-          <el-table-column label="序号" type="index" width="150" align="center">
+          <el-table-column label="序号" type="index" width="80" align="center">
             <template slot-scope="scope">
               <span v-text="getIndex(scope.$index)"> </span>
             </template>
@@ -179,13 +179,13 @@ export default {
         if (item.bounceRate) {
           item.bounceRate = percentage(item.bounceRate);
         }
-        // if (item.newUvRate) {
-        //   item.newUvRate = percentage(item.newUvRate);
-        // }
+        if (item.newUvRate) {
+          item.newUvRate = percentage(item.newUvRate);
+        }
         if (item.pvRate) {
           item.pvRate = percentage(item.pvRate);
         }
-        if (item.avgVisitTime) {
+        if (item.avgVisitTime || item.avgVisitTime == 0) {
           item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
         }
       });

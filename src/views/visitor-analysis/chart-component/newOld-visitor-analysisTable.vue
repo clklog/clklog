@@ -5,12 +5,12 @@
     <div class="public-Table-minHeight">
       <el-table
         class="public-radius"
-        :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
+        :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
         :cell-style="{ textAlign: 'center' }"
         :data="visitorDetailData"
         style="width: 100%"
       >
-        <el-table-column type="index" label="序号" width="150" />
+        <el-table-column type="index" label="序号" width="80" />
         <el-table-column prop="visitorType" label="访客类型" width="150" />
         <el-table-column prop="date" label="流量基础指标">
           <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
@@ -19,32 +19,40 @@
             prop="pvRate"
             label="浏览量占比"
             sortable
-          />
+            :sort-method="
+              (a, b) => {
+                return a.pvRate - b.pvRate;
+              }
+            "
+          >
+            <template slot-scope="scope">
+              {{ percentageEvent(scope.row.pvRate) }}
+            </template>
+          </el-table-column>
           <el-table-column
             v-if="visitCount"
             prop="visitCount"
             label="访问次数"
             sortable
           />
-          <!-- <el-table-column
-            v-if="newUv"
-            prop="newUv"
-            label="新访客数"
-            sortable
-          /> -->
+
           <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
-          <!-- <el-table-column
-            v-if="newUvRate"
-            prop="newUvRate"
-            label="访客数占比"
-            sortable
-          /> -->
+
           <el-table-column
             v-if="uvRate"
             prop="uvRate"
             label="访客数占比"
             sortable
-          />
+            :sort-method="
+              (a, b) => {
+                return a.uvRate - b.uvRate;
+              }
+            "
+          >
+            <template slot-scope="scope">
+              {{ percentageEvent(scope.row.uvRate) }}
+            </template>
+          </el-table-column>
           <el-table-column
             v-if="ipCount"
             prop="ipCount"
@@ -58,13 +66,32 @@
             prop="bounceRate"
             label="跳出率"
             sortable
-          />
+            :sort-method="
+              (a, b) => {
+                return a.bounceRate - b.bounceRate;
+              }
+            "
+          >
+            <template slot-scope="scope">
+              {{ percentageEvent(scope.row.bounceRate) }}
+            </template>
+          </el-table-column>
           <el-table-column
             v-if="avgVisitTime"
             prop="avgVisitTime"
             label="平均访问时长"
             sortable
-          />
+            :sort-method="
+              (a, b) => {
+                return a.avgVisitTime - b.avgVisitTime;
+              }
+            "
+          >
+            <!-- avgVisitTimeEvent -->
+            <template slot-scope="scope">
+              {{ avgVisitTimeEvent(scope.row.avgVisitTime) }}
+            </template>
+          </el-table-column>
           <el-table-column
             v-if="avgPv"
             prop="avgPv"
@@ -111,27 +138,16 @@ export default {
     };
   },
   methods: {
+    percentageEvent(val) {
+      return percentage(val);
+    },
     averageRulesEvent(num) {
       return averageRules(num);
     },
+    avgVisitTimeEvent(num) {
+      return formatTime(Math.floor(num));
+    },
     getVisitorDetail(val) {
-      val.map((item) => {
-        if (item.bounceRate) {
-          item.bounceRate = percentage(item.bounceRate);
-        }
-        if (item.uvRate) {
-          item.uvRate = percentage(item.uvRate);
-        }
-        if (item.pvRate) {
-          item.pvRate = percentage(item.pvRate);
-        }
-        if (item.newUvRate) {
-          item.newUvRate = percentage(item.newUvRate);
-        }
-        if (item.avgVisitTime) {
-          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
-        }
-      });
       this.visitorDetailData = val.reverse();
     },
     flowPoint(val) {

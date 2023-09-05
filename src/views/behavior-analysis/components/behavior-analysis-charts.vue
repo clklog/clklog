@@ -57,7 +57,7 @@
             :data="userListData"
             :header-cell-style="{
               textAlign: 'center',
-              background: '#eaf2fc',
+              background: '#f7fafe  ',
             }"
             class="public-radius"
             :cell-style="{ textAlign: 'center' }"
@@ -84,7 +84,11 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="visitorType" label="访客类型" sortable="custom">
+            <el-table-column
+              prop="visitorType"
+              label="访客类型"
+              sortable="custom"
+            >
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -98,7 +102,11 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="visitCount" label="访客次数" sortable="custom">
+            <el-table-column
+              prop="visitCount"
+              label="访客次数"
+              sortable="custom"
+            >
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -126,7 +134,11 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="visitTime" label="停留时长" sortable="custom">
+            <el-table-column
+              prop="visitTime"
+              label="停留时长"
+              sortable="custom"
+            >
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -140,7 +152,11 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="avgPv" label="平均访问页数" sortable="custom">
+            <el-table-column
+              prop="avgPv"
+              label="平均访问页数"
+              sortable="custom"
+            >
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -150,11 +166,15 @@
                     text-overflow: ellipsis;
                   "
                 >
-                {{ averageRulesEvent(scope.row.avgPv) }}
+                  {{ averageRulesEvent(scope.row.avgPv) }}
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="latestTime" label="上次访问时间" sortable="custom">
+            <el-table-column
+              prop="latestTime"
+              label="上次访问时间"
+              sortable="custom"
+            >
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -168,18 +188,6 @@
                 </div>
               </template>
             </el-table-column>
-            <!-- <el-table-column prop="visitorType" label="访客类型" sortable="custom">
-            </el-table-column>
-            <el-table-column prop="visitCount" label="访客次数" sortable="custom">
-            </el-table-column>
-            <el-table-column prop="pv" label="浏览量" sortable="custom">
-            </el-table-column>
-            <el-table-column prop="visitTime" label="停留时长" sortable="custom">
-            </el-table-column>
-            <el-table-column prop="avgPv" label="平均访问页数" sortable="custom">
-            </el-table-column>
-            <el-table-column prop="latestTime" label="上次访问时间" sortable="custom">
-            </el-table-column> -->
           </el-table>
         </div>
       </div>
@@ -212,7 +220,7 @@ export default {
   },
   data() {
     return {
-      pointValue: [ "访客数","访问次数"],
+      pointValue: ["访客数", "访问次数"],
       chart: null,
       emptyList: "",
       options: [
@@ -260,6 +268,7 @@ export default {
       total: 0,
       pageSize: 10,
       currentPage: 1,
+      cologStyle: this.$store.state.settings.cologStyle,
     };
   },
   mounted() {
@@ -317,13 +326,11 @@ export default {
     getUserListEvent(val) {
       this.userListData = val.rows;
       val.rows.map((item) => {
-        if (item.visitTime) {
+        if (item.visitTime || item.visitTime == 0) {
           item.visitTime = formatTime(Math.floor(item.visitTime));
         }
-        //   // item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
       });
       this.total = val.total;
-      // console.log(this.userListData, "用户列表数据");
     },
     handleCellClick(val) {
       this.$refs.child.callMethod(val);
@@ -433,7 +440,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#2c7be5",
+            color: this.cologStyle.$pv,
           },
         },
         {
@@ -446,7 +453,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#4c8fe9",
+            color: this.cologStyle.$uv,
           },
         },
         {
@@ -459,7 +466,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#6ba3ed",
+            color: this.cologStyle.$visitCount,
           },
         },
         {
@@ -472,7 +479,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#8bb6f1",
+            color: this.cologStyle.$ipCount,
           },
         },
         {
@@ -485,7 +492,7 @@ export default {
             position: "top",
           },
           itemStyle: {
-            color: "#abcaf5",
+            color: this.cologStyle.$bounceRate,
           },
         },
       ];
@@ -566,9 +573,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import "~@/styles/components/custom-select.scss";
 ::v-deep {
   @import "~@/styles/components/el-pagination.scss";
-  @import "~@/styles/components/custom-select.scss";
 }
 .trafficHead {
   font-size: 16px;
@@ -622,7 +629,7 @@ img {
   position: relative;
   margin: 20px;
   background-color: #fff;
-  min-height: 647px;
+  min-height: 530px;
   padding: 22px;
 }
 .search_table {

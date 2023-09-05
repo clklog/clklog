@@ -145,6 +145,7 @@ export default {
   .el-radio-button--mini .el-radio-button__inner {
     height: 30px;
   }
+  
 }
 .TrendChart {
   .block-head {
@@ -154,10 +155,5 @@ export default {
   .point {
     padding-right: 10px;
   }
-  // .custom_select
-  //     .el-select-dropdown.is-multiple
-  //     .el-select-dropdown__item.selected::after {
-  //     display: none !important;
-  //   }
 }
 </style>

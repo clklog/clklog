@@ -39,11 +39,11 @@
           border
           class="public-radius"
           style="width: 100%"
-          :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
+          :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
           :cell-style="tableHeaderColor"
           @sort-change="sortChange($event)"
         >
-          <el-table-column label="序号" type="index" width="150" align="center">
+          <el-table-column label="序号" type="index" width="80" align="center">
             <template slot-scope="scope">
               <span v-text="getIndex(scope.$index)"> </span>
             </template>
@@ -219,7 +219,7 @@ export default {
         if (item.exitRate) {
           item.exitRate = percentage(item.exitRate);
         }
-        if (item.avgVisitTime) {
+        if (item.avgVisitTime || item.avgVisitTime == 0) {
           item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
         }
         if (item.avgPv) {

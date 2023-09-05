@@ -1,20 +1,18 @@
 <template>
   <div>
     <div class="search_wrappy public-table-block public-hoverItem">
-      <!-- <div class="search_table"> -->
       <span class="public-firstHead">站外搜索词分析</span>
       <div class="public-Table-minHeight">
-        <!-- textAlign: 'center', -->
         <el-table
           class="public-radius"
-          :header-cell-style="{ background: '#eaf2fc' }"
+          :header-cell-style="{ background: '#f7fafe ' }"
           :cell-style="tableHeaderColor"
           :data="searchTableList"
           border
           @sort-change="sortChange($event)"
           style="width: 100%; margin-top: 12px"
         >
-          <el-table-column label="序号" type="index" width="150" align="center">
+          <el-table-column label="序号" type="index" width="80" align="center">
             <template slot-scope="scope">
               <span v-text="getIndex(scope.$index)"> </span>
             </template>
@@ -39,10 +37,10 @@
             align="center"
             label="搜索次数占比"
             sortable="custom"
+            prop="pvRate"
           >
             <template slot-scope="scope"> {{ scope.row.pvRate }}</template>
           </el-table-column>
-          <!-- “访问次数”，“访问次数占比”，“访客数”，“新访客数”， “IP数”，“IP数占比” -->
           <el-table-column
             align="center"
             prop="visitCount"
@@ -91,7 +89,16 @@
               {{ scope.row.ipCountRate }}
             </template>
           </el-table-column>
-
+          <el-table-column
+            prop="bounceRate"
+            align="center"
+            label="跳出率"
+            sortable="custom"
+          >
+            <template slot-scope="scope">
+              {{ scope.row.bounceRate }}
+            </template>
+          </el-table-column>
           <el-table-column
             align="center"
             prop="avgVisitTime"
@@ -107,16 +114,6 @@
           >
             <template slot-scope="scope">
               {{ averageRulesEvent(scope.row.avgPv) }}
-            </template>
-          </el-table-column>
-          <el-table-column align="center" label="跳出率" sortable="custom">
-            <!-- :sort-method="
-              (a, b) => {
-                return a.bounceRate - b.bounceRate;
-              }
-            " -->
-            <template slot-scope="scope">
-              {{ scope.row.bounceRate }}
             </template>
           </el-table-column>
         </el-table>
@@ -210,7 +207,7 @@ export default {
         if (item.ipCountRate) {
           item.ipCountRate = this.percentageFun(item.ipCountRate);
         }
-        if (item.avgVisitTime) {
+        if (item.avgVisitTime || item.avgVisitTime == 0) {
           item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
         }
       });

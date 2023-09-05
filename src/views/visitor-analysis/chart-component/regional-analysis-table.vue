@@ -1,18 +1,18 @@
 <template>
   <div class="chartsIcon public-hoverItem">
-    <div class="public-firstHead ">地域分析</div>
+    <div class="public-firstHead">地域分析</div>
     <flowPoint ref="flowPoint" @flowPoint="flowPoint"></flowPoint>
     <div>
-      <div class="public-Table-minHeight ">
+      <div class="public-Table-minHeight">
         <el-table
           class="public-radius"
           :data="tableDetailList"
           border
-          :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
+          :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
           :cell-style="{ textAlign: 'center' }"
           @sort-change="sortChange($event)"
         >
-          <el-table-column label="序号" type="index" width="150" align="center">
+          <el-table-column label="序号" type="index" width="80" align="center">
             <template slot-scope="scope">
               <span v-text="getIndex(scope.$index)"> </span>
             </template>
@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import { percentage,averageRules } from "@/utils/percent";
+import { percentage, averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 import flowPoint from "@/components/flowPoint/index";
 import { getAreaDetailListApi } from "@/api/trackingapi/area.js";
@@ -195,10 +195,13 @@ export default {
             if (item.pvRate) {
               item.pvRate = percentage(item.pvRate);
             }
-            if (item.province == "未知省份") {
+            if (
+              item.province == "未知省份" ||
+              (item.country && item.country != "中国")
+            ) {
               item.province = item.country + "-" + item.province;
             }
-            if (item.avgVisitTime) {
+            if (item.avgVisitTime || item.avgVisitTime == 0) {
               item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
             }
           });

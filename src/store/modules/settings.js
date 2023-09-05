@@ -8,7 +8,14 @@ const state = {
   showSettings: showSettings,
   tagsView: tagsView,
   fixedHeader: fixedHeader,
-  sidebarLogo: sidebarLogo
+  sidebarLogo: sidebarLogo,
+  cologStyle:{
+    $pv : "#215cac",
+    $uv: "#2c7be5",
+    $visitCount : "#619cec",
+    $ipCount: "#96bdf2",
+    $bounceRate : "#cadef9",
+  }
 }
 
 const mutations = {

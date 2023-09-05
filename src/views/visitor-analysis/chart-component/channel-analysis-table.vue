@@ -5,15 +5,11 @@
         <div class="public-firstHead">流量概览</div>
         <div class="bid-list-page">
           <originView ref="originView" byChannel></originView>
-          <!-- <originView ref="originView" byAreaAnaly></originView> -->
           <div
             class="bid-list-record"
             v-for="(item, index) in filterChannelList"
             :key="index"
           >
-            <!-- <div class="bid-list-item w157">
-              <p>{{ item.channel || "--" }}</p>
-            </div> -->
             <div
               class="bid-list-item w111"
               :style="index == 0 ? 'color:#2c7be5' : 'color:#4d4d4d'"
@@ -42,13 +38,13 @@
               class="bid-list-item w111"
               :style="index == 0 ? 'color:#2c7be5' : 'color:#4d4d4d'"
             >
-              <p>{{ item.avgPv || "--" }}</p>
+              <p>{{ averageRulesEvent(item.avgPv) || "--" }}</p>
             </div>
             <div
               class="bid-list-item w111"
               :style="index == 0 ? 'color:#2c7be5' : 'color:#4d4d4d'"
             >
-              <p>{{ item.visitTime || "--" }}</p>
+              <p>{{ formatTimeEvent(item.avgVisitTime) || "--" }}</p>
             </div>
             <div
               class="bid-list-item w111"
@@ -74,12 +70,13 @@
                 currentPage * pageSize
               )
             "
-            :header-cell-style="{ textAlign: 'center', background: '#eaf2fc' }"
+            @sort-change="sortChange($event)"
+            :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
             :cell-style="{ textAlign: 'center' }"
             border
             style="width: 100%"
           >
-            <el-table-column type="index" label="序号" width="150" />
+            <el-table-column type="index" label="序号" width="80" />
             <el-table-column prop="channel" label="渠道类型" width="150" />
             <el-table-column prop="date" label="流量基础指标" width="150">
               <el-table-column
@@ -155,7 +152,11 @@
                 label="平均访问时长"
                 sortable
                 v-if="avgVisitTime"
-              />
+              >
+                <template slot-scope="scope">
+                  {{ formatTimeEvent(scope.row.avgVisitTime) }}
+                </template>
+              </el-table-column>
               <el-table-column
                 v-if="visitTimeRate"
                 prop="visitTimeRate"
@@ -172,13 +173,6 @@
                   {{ averageRulesEvent(scope.row.avgPv) }}
                 </template>
               </el-table-column>
-              <!-- <el-table-column
-                v-if="avgPvRate"
-                prop="avgPvRate"
-                label="平均访问页数占比"
-                sortable
-              /> -->
-              <!-- <el-table-column prop="amount10" label="平均访问页数" sortable /> -->
             </el-table-column>
           </el-table>
         </div>
@@ -201,7 +195,7 @@
 <script>
 import originView from "@/components/origin-view/index";
 import flowPoint from "@/components/flowPoint/index";
-import { percentage,averageRules } from "@/utils/percent";
+import { percentage, averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   components: { originView, flowPoint },
@@ -226,7 +220,6 @@ export default {
       newUvRate: false,
       visitTimeRate: false,
       avgPvRate: false,
-      // pvRate visitCount visitCountRate uvRate ipCountRate
       pvRate: false,
       visitCount: false,
       visitCountRate: false,
@@ -235,9 +228,38 @@ export default {
       currentPage: 1,
       total: 0,
       pageSize: 10,
+      current: {
+        sortName: "",
+        sortOrder: "",
+      },
     };
   },
   methods: {
+    sortChange(e) {
+      console.log(243, "43243");
+      if (e.order && e.order == "ascending") {
+        // 降序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = "ascending";
+      } else if (e.order && e.order == "descending") {
+        // 升序
+        this.current.sortName = e.prop;
+        this.current.sortOrder = "descending";
+      }
+      this.ascDscEvent();
+    },
+    ascDscEvent() {
+      let nameAttr = this.current.sortName;
+      if (nameAttr && this.current.sortOrder === "ascending") {
+        this.channelTableData = this.channelTableData.sort(function (a, b) {
+          return a[nameAttr] - b[nameAttr];
+        });
+      } else if (nameAttr && this.current.sortOrder === "descending") {
+        this.channelTableData = this.channelTableData.sort(function (a, b) {
+          return b[nameAttr] - a[nameAttr];
+        });
+      }
+    },
     averageRulesEvent(num) {
       return averageRules(num);
     },
@@ -270,9 +292,6 @@ export default {
         if (item.pvRate) {
           item.pvRate = percentage(item.pvRate);
         }
-        if (item.avgVisitTime) {
-          item.avgVisitTime = formatTime(Math.floor(item.avgVisitTime));
-        }
         if (item.visitTimeRate) {
           item.visitTimeRate = percentage(item.visitTimeRate);
         }
@@ -281,6 +300,9 @@ export default {
         (item) => item.channel !== "网站"
       );
       this.filterChannelList = filteredArr;
+    },
+    formatTimeEvent(val) {
+      return formatTime(Math.floor(val));
     },
     // 分页器
     handleSizeChange(val) {

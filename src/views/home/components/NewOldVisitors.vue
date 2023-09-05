@@ -164,8 +164,7 @@ export default {
   },
   methods: {
     formatTimeFun(val) {
-      val = Math.floor(val);
-      return formatTime(val);
+      return formatTime(Math.floor(val));
     },
     percentageFun(val) {
       return percentage(val);

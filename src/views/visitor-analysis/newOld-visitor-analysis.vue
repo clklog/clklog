@@ -24,14 +24,14 @@ export default {
   components: {
     FilterBar,
     newOldAnalysis,
-    originView
+    originView,
   },
   data() {
     return {
       filterBarParams: null,
       pageNum: 1,
       pageSize: 10,
-      visitorTotal:null,
+      visitorTotal: null,
     };
   },
   mounted() {},
@@ -48,7 +48,7 @@ export default {
     commonParams() {
       this.getVisitorTotal();
       // this.getVisitorList();
-      this.getVisitorDetail()
+      this.getVisitorDetail();
     },
   },
 
@@ -60,18 +60,21 @@ export default {
       getVisitorTotalApi(this.commonParams).then((res) => {
         if (res.code == 200) {
           this.visitorTotal = res.data;
-          this.$refs.originView.originEvent(res.data)
+          this.$nextTick(() => {
+            this.$refs.originView.originEvent(res.data);
+          });
         }
       });
     },
     getVisitorDetail() {
       getVisitorDetailApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.newOldAnalysis.getVisitorDetail(res.data)
+          this.$nextTick(() => {
+            this.$refs.newOldAnalysis.getVisitorDetail(res.data);
+          });
         }
       });
     },
-   
   },
 };
 </script>

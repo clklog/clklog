@@ -117,18 +117,18 @@ export default {
           value: "hqq",
           label: "货清清",
         },
-        {
-          value: "在线拍",
-          label: "在线拍",
-        },
-        {
-          value: "上海机动车",
-          label: "上海机动车",
-        },
-        {
-          value: "国拍租房",
-          label: "国拍租房",
-        },
+        // {
+        //   value: "在线拍",
+        //   label: "在线拍",
+        // },
+        // {
+        //   value: "上海机动车",
+        //   label: "上海机动车",
+        // },
+        // {
+        //   value: "国拍租房",
+        //   label: "国拍租房",
+        // },
       ],
       value: "",
       dateTime: "",
@@ -277,8 +277,9 @@ export default {
     align-items: center;
     height: 100%;
     line-height: 50px;
+    margin-right: 7px;
     .dataTime {
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 400;
       line-height: 14px;
       color: #656d92;
@@ -296,7 +297,8 @@ export default {
 
     .right-menu-item {
       display: inline-block;
-      padding: 0 8px;
+      // padding: 0 8px;
+      // padding-right: 8px;
       height: 100%;
       font-size: 18px;
       color: #5a5e66;
@@ -317,6 +319,8 @@ export default {
 
       .avatar-wrapper {
         margin-top: 5px;
+        left:2px;
+        top: -9px;
         position: relative;
 
         .el-icon-caret-bottom {

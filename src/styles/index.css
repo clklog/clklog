@@ -570,7 +570,7 @@
 }
 
 .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background-color: #e4eefc !important;
+  background-color: #eef4fd !important;
 }
 
 .el-table--border {
@@ -610,6 +610,7 @@
 .el-popover {
   background-color: #fbfcfe;
   border: 1px solid #d8e2ef;
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) !important;
 }
 
 .el-input__inner {

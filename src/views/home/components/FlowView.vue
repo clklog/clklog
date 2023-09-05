@@ -1,6 +1,6 @@
 <template>
   <div class="FlowView block-main public-hoverItem">
-    <div class="block-head">
+    <div class="block-head" style="margin-bottom: 0px;">
       <div class="block-title">流量概览</div>
     </div>
     <div class="bid-list-page">
@@ -26,7 +26,7 @@
           <p>{{ current.ipCount || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
-          <p>{{ Math.floor(current.avgPv) || "--" }}</p>
+          <p>{{ averageRulesEvent(current.avgPv) || "--" }}</p>
         </div>
         <div class="bid-list-item w158">
           <p>{{ formatTimeFun(current.avgVisitTime) || "--" }}</p>
@@ -58,7 +58,7 @@
           <p>{{ previous.ipCount || "--" }}</p>
         </div>
         <div class="bid-list-item w157">
-          <p>{{  Math.floor(previous.avgPv) || "--" }}</p>
+          <p>{{ averageRulesEvent(previous.avgPv) || "--" }}</p>
         </div>
         <div class="bid-list-item w157">
           <p>{{ formatTimeFun(previous.avgVisitTime) || "--" }}</p>
@@ -417,7 +417,7 @@
 <script>
 import originView from "@/components/origin-view/index";
 import { getFlowApi } from "@/api/trackingapi/flow";
-import { percentage } from "@/utils/percent";
+import { percentage ,averageRules} from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   name: "FlowView",
@@ -455,6 +455,9 @@ export default {
   },
   watch: {},
   methods: {
+    averageRulesEvent(num) {
+      return averageRules(num);
+    },
     formatTimeFun(val){
       val =  Math.floor(val);
       return formatTime(val);
