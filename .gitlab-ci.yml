@@ -1,0 +1,23 @@
+image: openjdk:8-slim
+
+variables:
+  MAVEN_CLI_OPTS: "-s $CI_PROJECT_DIR/.m2/settings.xml --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_USER_HOME: "$CI_PROJECT_DIR/.m2"
+
+stages:
+  - build
+
+cache:
+  paths:
+  - .m2/repository
+  - .m2/wrapper
+
+maven-build:
+  stage: build
+  script:
+  - ./mvnw $MAVEN_CLI_OPTS package
+  artifacts:
+    name: "$CI_PROJECT_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+    - "target/*.jar"
