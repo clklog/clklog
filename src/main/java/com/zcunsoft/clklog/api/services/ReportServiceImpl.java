@@ -1,6 +1,7 @@
 package com.zcunsoft.clklog.api.services;
 
 import com.zcunsoft.clklog.api.cfg.ClklogApiSetting;
+import com.zcunsoft.clklog.api.constant.Constants;
 import com.zcunsoft.clklog.api.entity.clickhouse.*;
 import com.zcunsoft.clklog.api.handlers.ConstsDataHolder;
 import com.zcunsoft.clklog.api.models.TimeFrame;
@@ -478,7 +479,7 @@ public class ReportServiceImpl implements IReportService {
             areaDetail.setIpCount(flowDetail.getIpCount());
             areaDetail.setNewUv(flowDetail.getNewUv());
             areaDetail.setCountry(areaDetailbydate.getCountry());
-            areaDetail.setProvince(areaDetailbydate.getProvince());
+            areaDetail.setProvince(StringUtils.equalsIgnoreCase("未知省份", areaDetailbydate.getProvince()) ? Constants.DEFAULT_PROVICE : areaDetailbydate.getProvince());
             areaDetail.setPv(flowDetail.getPv());
             areaDetail.setPvRate(flowDetail.getPvRate());
             areaDetail.setUv(flowDetail.getUv());
@@ -950,7 +951,7 @@ public class ReportServiceImpl implements IReportService {
         GetDeviceDetailPageResponseData responseData = new GetDeviceDetailPageResponseData();
         for (DeviceDetailbydate deviceDetailbydate : deviceDetailbydateList) {
             FlowDetail flowDetail = assemblyFlowDetail(deviceDetailbydate, totalDeviceDetailbydate);
-            flowDetail.setDevice(deviceDetailbydate.getDevice());
+            flowDetail.setDevice(StringUtils.isEmpty(deviceDetailbydate.getDevice()) ? Constants.DEFAULT_DEVICE : deviceDetailbydate.getDevice());
             flowDetailList.add(flowDetail);
         }
         responseData.setTotal(total);
