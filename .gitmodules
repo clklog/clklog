@@ -13,6 +13,3 @@
 [submodule "receiver"]
 	path = receiver
 	url = ../clklog-receiver.git
-[submodule "docs"]
-	path = docs
-	url = ../clklog-docs.git
