@@ -1,0 +1,18 @@
+[submodule "api"]
+	path = api
+	url = ../clklog-api.git
+[submodule "ui"]
+	path = ui
+	url = ../clklog-ui.git
+[submodule "scripts"]
+	path = scripts
+	url = ../clklog-scripts.git
+[submodule "processing"]
+	path = processing
+	url = ../clklog-processing.git
+[submodule "receiver"]
+	path = receiver
+	url = ../clklog-receiver.git
+[submodule "docs"]
+	path = docs
+	url = ../clklog-docs.git
