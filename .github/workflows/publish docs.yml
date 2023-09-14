@@ -1,0 +1,23 @@
+name: pages build and deployment aliyun oss
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: fangbinwei/aliyun-oss-website-action@v1
+        with:
+          accessKeyId: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+          accessKeySecret: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+          bucket: ${{ secrets.ALIYUN_WEBSITE_CLKLOG_BUCKET }}
+          endpoint: oss-cn-shanghai.aliyuncs.com
+          folder: docs
