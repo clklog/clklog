@@ -1,6 +1,7 @@
 package com.zcunsoft.clklog.api.services;
 
 import com.zcunsoft.clklog.api.cfg.ClklogApiSetting;
+import com.zcunsoft.clklog.api.constant.Constants;
 import com.zcunsoft.clklog.api.entity.clickhouse.*;
 import com.zcunsoft.clklog.api.handlers.ConstsDataHolder;
 import com.zcunsoft.clklog.api.models.TimeFrame;
@@ -478,7 +479,7 @@ public class ReportServiceImpl implements IReportService {
             areaDetail.setIpCount(flowDetail.getIpCount());
             areaDetail.setNewUv(flowDetail.getNewUv());
             areaDetail.setCountry(areaDetailbydate.getCountry());
-            areaDetail.setProvince(areaDetailbydate.getProvince());
+            areaDetail.setProvince(StringUtils.equalsIgnoreCase("未知省份", areaDetailbydate.getProvince()) ? Constants.DEFAULT_PROVICE : areaDetailbydate.getProvince());
             areaDetail.setPv(flowDetail.getPv());
             areaDetail.setPvRate(flowDetail.getPvRate());
             areaDetail.setUv(flowDetail.getUv());
@@ -950,7 +951,7 @@ public class ReportServiceImpl implements IReportService {
         GetDeviceDetailPageResponseData responseData = new GetDeviceDetailPageResponseData();
         for (DeviceDetailbydate deviceDetailbydate : deviceDetailbydateList) {
             FlowDetail flowDetail = assemblyFlowDetail(deviceDetailbydate, totalDeviceDetailbydate);
-            flowDetail.setDevice(deviceDetailbydate.getDevice());
+            flowDetail.setDevice(StringUtils.isEmpty(deviceDetailbydate.getDevice()) ? Constants.DEFAULT_DEVICE : deviceDetailbydate.getDevice());
             flowDetailList.add(flowDetail);
         }
         responseData.setTotal(total);
@@ -1268,11 +1269,12 @@ public class ReportServiceImpl implements IReportService {
         List<VisitorDetailbysession> visitorDetailbysessionList = new ArrayList<VisitorDetailbysession>();
         Integer total = 0;
         if (StringUtils.isNotBlank(getVisitorSessionListPageRequest.getDistinctId())) {
-            getListSql += " where t.distinct_id = '" + getVisitorSessionListPageRequest.getDistinctId() + "' ";
+            getListSql += " where t.distinct_id = (:distinctId) ";
             getListSql += " group by t.event_session_id,t.distinct_id,t.sourcesite,t.searchword ";
-            getCountSql += " where t.distinct_id = '" + getVisitorSessionListPageRequest.getDistinctId() + "' ";
+            getCountSql += " where t.distinct_id = (:distinctId) ";
             getCountSql += " group by t.event_session_id,t.distinct_id,t.sourcesite,t.searchword) ";
             getListSql += " order by first_time desc limit " + (getVisitorSessionListPageRequest.getPageNum() - 1) * getVisitorSessionListPageRequest.getPageSize() + "," + getVisitorSessionListPageRequest.getPageSize();
+            paramMap.addValue("distinctId", getVisitorSessionListPageRequest.getDistinctId());
             visitorDetailbysessionList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorDetailbysession>(VisitorDetailbysession.class));
             total = clickHouseJdbcTemplate.queryForObject(getCountSql, paramMap, Integer.class);
         }
@@ -1316,14 +1318,16 @@ public class ReportServiceImpl implements IReportService {
     public GetVisitorSessionUriListPageResponse getGetVisitorSessionUriList(
             GetVisitorSessionUriListPageRequest getVisitorSessionUriListPageRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
-        String getListSql = "select t.distinct_id as distinct_id,t.url as uri,t.event_session_id as event_session_id,t.log_time as log_time from sensors.log_analysis t ";
-        String getCountSql = "select count(1) from sensors.log_analysis t ";
+        String getListSql = "select t.distinct_id as distinct_id,t.url as uri,t.event_session_id as event_session_id,t.log_time as log_time from log_analysis t ";
+//        String getCountSql = "select count(1) from log_analysis t ";
         List<LogAnalysisbysessionuri> logAnalysisbysessionuriList = new ArrayList<LogAnalysisbysessionuri>();
         Integer total = 0;
         if (StringUtils.isNotBlank(getVisitorSessionUriListPageRequest.getDistinctId()) && StringUtils.isNotBlank(getVisitorSessionUriListPageRequest.getEventSessionId())) {
-            getListSql += " where t.event in('$pageview','$AppViewScreen','$MPViewScreen') and t.distinct_id = '" + getVisitorSessionUriListPageRequest.getDistinctId() + "'" + " and t.event_session_id = '" + getVisitorSessionUriListPageRequest.getEventSessionId() + "'";
-            getCountSql += " where t.event in('$pageview','$AppViewScreen','$MPViewScreen') and t.distinct_id = '" + getVisitorSessionUriListPageRequest.getDistinctId() + "'" + " and t.event_session_id = '" + getVisitorSessionUriListPageRequest.getEventSessionId() + "'";
+            getListSql += " where t.event in('$pageview','$AppViewScreen','$MPViewScreen') and t.distinct_id = (:distinctId)  and t.event_session_id = (:eventSessionId) ";
+//            getCountSql += " where t.event in('$pageview','$AppViewScreen','$MPViewScreen') and t.distinct_id = (:distinctId)  and t.event_session_id = (:eventSessionId) ";
             getListSql += " order by t.log_time asc limit " + (getVisitorSessionUriListPageRequest.getPageNum() - 1) * getVisitorSessionUriListPageRequest.getPageSize() + "," + getVisitorSessionUriListPageRequest.getPageSize();
+            paramMap.addValue("distinctId", getVisitorSessionUriListPageRequest.getDistinctId());
+            paramMap.addValue("eventSessionId", getVisitorSessionUriListPageRequest.getEventSessionId());
             logAnalysisbysessionuriList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<LogAnalysisbysessionuri>(LogAnalysisbysessionuri.class));
 //            total = clickHouseJdbcTemplate.queryForObject(getCountSql, paramMap, Integer.class);
         }
@@ -1353,9 +1357,10 @@ public class ReportServiceImpl implements IReportService {
         String getVisitorSummarySql = "select count(1) as visit_count,sum(t1.visit_time) as visit_time,min(t1.first_time) as first_time,max(t1.latest_time) as latest_time,sum(t1.pv) as pv from (select event_session_id AS event_session_id,sum(visit_time) as visit_time,min(first_time) as first_time,max(latest_time) as latest_time,sum(pv) as pv from visitor_detail_bysession t ";
         String getVisitorSummaryByAreaSql = "select t.distinct_id as distinct_id,t.country as country,t.city as city,t.province as province from visitor_detail_byinfo t ";
         if (StringUtils.isNotBlank(getVisitorDetailinfoRequest.getDistinctId())) {
-            getVisitorDetailinfoSql += " where t.distinct_id = '" + getVisitorDetailinfoRequest.getDistinctId() + "'";
-            getVisitorSummarySql += " where t.distinct_id = '" + getVisitorDetailinfoRequest.getDistinctId() + "'";
-            getVisitorSummaryByAreaSql += " where t.distinct_id = '" + getVisitorDetailinfoRequest.getDistinctId() + "'";
+            getVisitorDetailinfoSql += " where t.distinct_id = (:distinctId) ";
+            getVisitorSummarySql += " where t.distinct_id = (:distinctId) ";
+            getVisitorSummaryByAreaSql += " where t.distinct_id = (:distinctId) ";
+            paramMap.addValue("distinctId", getVisitorDetailinfoRequest.getDistinctId());
         }
         getVisitorDetailinfoSql += " order by t.latest_time desc limit 1";
         getVisitorSummarySql += " group by t.event_session_id) t1 ";

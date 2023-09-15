@@ -238,7 +238,8 @@ public class ExportReportServiceImpl implements IExportReportService {
 
         for (AreaDetailbydate areaDetailbydate : areaDetailbydateList) {
             FlowDetail flowDetail = assemblyFlowDetail(areaDetailbydate, totalAreaDetailbydate);
-            flowDetail.setProvince(StringUtils.equals(Constants.DEFAULT_COUNTRY, areaDetailbydate.getCountry()) ? areaDetailbydate.getProvince() : (areaDetailbydate.getCountry()+"-"+areaDetailbydate.getProvince()));
+            String province = StringUtils.equalsIgnoreCase("未知省份", areaDetailbydate.getProvince()) ? Constants.DEFAULT_PROVICE : areaDetailbydate.getProvince();
+            flowDetail.setProvince(StringUtils.equals(Constants.DEFAULT_COUNTRY, areaDetailbydate.getCountry()) ? province : (areaDetailbydate.getCountry()+"-"+province));
             areaDetailList.add(flowDetail);
         }
         return areaDetailList;
@@ -498,7 +499,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         GetDeviceDetailResponse response = new GetDeviceDetailResponse();
         for (DeviceDetailbydate deviceDetailbydate : deviceDetailbydateList) {
             FlowDetail flowDetail = assemblyFlowDetail(deviceDetailbydate, totalDeviceDetailbydate);
-            flowDetail.setDevice(deviceDetailbydate.getDevice());
+            flowDetail.setDevice(StringUtils.isEmpty(deviceDetailbydate.getDevice()) ? Constants.DEFAULT_DEVICE : deviceDetailbydate.getDevice());
             flowDetailList.add(flowDetail);
         }
         response.setData(flowDetailList);
