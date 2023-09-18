@@ -9,7 +9,7 @@ ClkLog是一款记录用户行为分析和画像的免费可商用开源软件�
 
 - **数据采集**：支持网页、小程序、IOS、Android等多端数据采集
 
-- **数据治理**：制定清洗规制、实现数据自动化清洗和治理
+<!-- - **数据治理**：制定清洗规制、实现数据自动化清洗和治理 -->
 
 - **流量概览**：提供流量渠道、设备、地域、访客类型多维度分析
 
@@ -27,30 +27,20 @@ ClkLog是一款记录用户行为分析和画像的免费可商用开源软件�
 
 ## 项目组成
 
-- **接收服务 clklog-receiver】**：接收客服端采集的日志，存入kafka。
-
-  <a href="https://github.com/clklog/clklog-receiver" target="_blank">[GitHub 下载]</a>
+- **接收服务 【clklog-receiver】**：接收客服端采集的日志，存入kafka。
 
 - **处理脚本 【clickhouse-script】**：基于Clickhouse集群中的log_analysis表进行多维计算，获得各个维度上的统计报表。使用Cron来进行任务的定时调度。
 
-  <a href="https://github.com/clklog/clklog-scripts" target="_blank">[GitHub 下载]</a>
-
 - **处理服务  【clklog-processing】**： 依托flink，消费kafka数据，存入clickhouse。
-
-  <a href="https://github.com/clklog/clklog-processing" target="_blank">[GitHub 下载]</a>
 
 - **统计接口 【clklog-api】**： 提供多维度数据统计接口。
 
-  <a href="https://github.com/clklog/clklog-api" target="_blank">[GitHub 下载]</a>
-
 - **统计展示 【clklog-ui】**：基于 vue-element-admin 实现的统计分析数据界面展示。
-
- <a href="https://github.com/clklog/clklog-ui" target="_blank">[GitHub 下载]</a>
 
 ## 示意图
 
-| ![](assets/imgs/1.png) | ![](assets/imgs/2.png) |
-| ---------------------- | ---------------------- |
-| ![](assets/imgs/3.png) | ![](assets/imgs/4.png) |
-| ![](assets/imgs/5.png) | ![](assets/imgs/6.png) |
-| ![](assets/imgs/7.png) | ![](assets/imgs/8.png) |
+| ![](../assets/imgs/1.png) | ![](../assets/imgs/2.png) |
+| ------------------------- | ------------------------- |
+| ![](../assets/imgs/3.png) | ![](../assets/imgs/4.png) |
+| ![](../assets/imgs/5.png) | ![](../assets/imgs/6.png) |
+| ![](../assets/imgs/7.png) | ![](../assets/imgs/8.png) |

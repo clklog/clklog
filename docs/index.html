@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>ClickLog</title>
+    <title>ClkLog</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="description" content="Description" />
     <link rel="shortcut icon" href="icon.png" type="image/x-icon" />
@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" sizes="any" href="icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <link rel="stylesheet" href="assets/css/font.css" />
-    <link rel="stylesheet" href="assets/css/style@1.0.1.css" />
+    <link rel="stylesheet" href="assets/css/style@1.0.2.css" />
   </head>
   <body>
     <nav>
@@ -20,7 +20,7 @@
     <script>
       window.$docsify = {
         name: 'CLKLOG',
-        logo: 'assets/imgs/logo.png',
+        logo: '/assets/imgs/logo.png',
         // 仓库地址，点击右上角的Github章鱼猫头像会跳转到此地址
         repo: 'https://github.com/clklog',
         auto2top: true,
@@ -33,13 +33,15 @@
         // 封面支持，默认加载的是项目根目录下的_coverpage.md文件
         coverpage: true,
         onlyCover: true,
+        // 页脚信息插件
+        loadFooter: true,
+        // 封面支持，默认加载的是项目根目录下的_footer.md文件
         // 最大支持渲染的标题层级
         maxLevel: 3,
         // 自定义侧边栏后默认不会再生成目录，设置生成目录的最大层级（建议配置为2-4）
         subMaxLevel: 3,
         // 小屏设备下合并导航栏到侧边栏
         mergeNavbar: true,
-
         notFoundPage: 'my404.md',
         search: {
           paths: 'auto',
@@ -52,6 +54,28 @@
           fontsize: '0.9em',
           color: 'rgb(90,90,90)',
           language: 'chinese'
+        },
+        // pagination: {
+        //   // previousText: '上一页',
+        //   // nextText: '下一页',
+        //   crossChapter: true,
+        //   crossChapterText: true
+        // },
+        // share: { reddit: true, linkedin: true, facebook: true, twitter: true, whatsapp: true, telegram: true }
+        'flexible-alerts': {
+          style: 'flat',
+          note: {
+            label: '信息'
+          },
+          tip: {
+            label: '提示'
+          },
+          warning: {
+            label: '注意'
+          },
+          attention: {
+            label: '切记'
+          }
         }
       }
     </script>
@@ -62,5 +86,10 @@
     <script src="assets/plugins/docsify-copy-code.js" rel="stylesheet"></script>
     <!-- <script src="assets/plugins/countable.js" rel="stylesheet"></script> -->
     <script src="assets/plugins/prismjs@1.22.0/components/prism-java.min.js" rel="stylesheet"></script>
+    <script src="https://unpkg.com/docsify-plugin-flexible-alerts"></script>
+    <script src="assets/plugins/docsify-footer.min.js"></script>
+    <script src="assets/plugins/docsify-pagination.min.js"></script>
+    <!-- 
+    <script src="//unpkg.com/docsify-share/build/index.min.js"></script> -->
   </body>
 </html>
