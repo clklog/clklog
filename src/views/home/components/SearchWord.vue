@@ -2,7 +2,7 @@
   <div class="SearchWord block-main public-hoverItem">
     <div
       class="block-head"
-      @click="$router.push('/visitorAnalysis/searchAnalysis')"
+      @click="$router.push('/visitorAnalysis/search')"
     >
       <div class="block-title">Top10搜索词</div>
       <div class="block-head-icon">

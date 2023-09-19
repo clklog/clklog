@@ -1,6 +1,6 @@
 <template>
   <div class="SourceWebsite block-main public-hoverItem">
-    <div class="block-head" @click="$router.push('/visitorAnalysis/sourceWebAnalysis')">
+    <div class="block-head" @click="$router.push('/visitorAnalysis/sourceWeb')">
       <div class="block-title">Top10来源网站</div>
       <div
         class="block-head-icon"

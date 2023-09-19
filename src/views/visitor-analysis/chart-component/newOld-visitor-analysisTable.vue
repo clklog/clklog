@@ -8,6 +8,7 @@
         :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
         :cell-style="{ textAlign: 'center' }"
         :data="visitorDetailData"
+        border
         style="width: 100%"
       >
         <el-table-column type="index" label="序号" width="80" />

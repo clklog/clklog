@@ -11,21 +11,21 @@ const componentsRouter = {
   },
   children: [
     {
-      path: 'trendAnalysis',
+      path: 'trend',
       component: () => import('@/views/visitor-analysis/trend-analysis'),
-      name: 'trendAnalysis',
+      name: 'trend',
       meta: { title: '趋势分析' }
     },
     {
-      path: 'searchAnalysis',
+      path: 'search',
       component: () => import('@/views/visitor-analysis/search-analysis'),
-      name: 'searchAnalysis',
+      name: 'search',
       meta: { title: '站外搜索' }
     },
     {
-      path: 'regionalAnalysis',
+      path: 'regional',
       component: () => import('@/views/visitor-analysis/regional-analysis'),
-      name: 'regionalAnalysis',
+      name: 'regional',
       meta: { title: '地域分析' }
     },
     {
@@ -35,36 +35,92 @@ const componentsRouter = {
       meta: { title: '受访页面' }
     },
     {
-      path: 'sourceWebAnalysis',
+      path: 'sourceWeb',
       component: () => import('@/views/visitor-analysis/sourceWeb-analysis'),
       name: 'sourceWebAnalysis',
       meta: { title: '来源网站' }
     },
     {
-      path: 'newOld-visitor-analysis',
+      path: 'newoldVisitor',
       component: () => import('@/views/visitor-analysis/newOld-visitor-analysis'),
-      name: 'newOld-visitor-analysis',
+      name: 'newoldVisitor',
       meta: { title: '新老访客' }
     },
     {
-      path: 'userLoyaltyAnalysis',
+      path: 'userLoyalty',
       component: () => import('@/views/visitor-analysis/user-loyalty-analysis'),
-      name: 'userLoyaltyAnalysis',
+      name: 'userLoyalty',
       meta: { title: '用户忠诚度' }
     },
     {
-      path: 'equipment-analysis',
+      path: 'equipment',
       component: () => import('@/views/visitor-analysis/equipment-analysis'),
-      name: 'equipment-analysis',
+      name: 'equipment',
       meta: { title: '设备' }
     },
     {
-      path: 'channel-analysis',
+      path: 'channel',
       component: () => import('@/views/visitor-analysis/channel-analysis'),
-      name: 'channel-analysis',
+      name: 'channel',
       meta: { title: '渠道' }
     }
   ]
+  // children: [
+  //   {
+  //     path: 'trendAnalysis',
+  //     component: () => import('@/views/visitor-analysis/trend-analysis'),
+  //     name: 'trendAnalysis',
+  //     meta: { title: '趋势分析' }
+  //   },
+  //   {
+  //     path: 'searchAnalysis',
+  //     component: () => import('@/views/visitor-analysis/search-analysis'),
+  //     name: 'searchAnalysis',
+  //     meta: { title: '站外搜索' }
+  //   },
+  //   {
+  //     path: 'regionalAnalysis',
+  //     component: () => import('@/views/visitor-analysis/regional-analysis'),
+  //     name: 'regionalAnalysis',
+  //     meta: { title: '地域分析' }
+  //   },
+  //   {
+  //     path: 'visitedPage',
+  //     component: () => import('@/views/visitor-analysis/visited-page'),
+  //     name: 'visitedPage',
+  //     meta: { title: '受访页面' }
+  //   },
+  //   {
+  //     path: 'sourceWebAnalysis',
+  //     component: () => import('@/views/visitor-analysis/sourceWeb-analysis'),
+  //     name: 'sourceWebAnalysis',
+  //     meta: { title: '来源网站' }
+  //   },
+  //   {
+  //     path: 'newOld-visitor-analysis',
+  //     component: () => import('@/views/visitor-analysis/newOld-visitor-analysis'),
+  //     name: 'newOld-visitor-analysis',
+  //     meta: { title: '新老访客' }
+  //   },
+  //   {
+  //     path: 'userLoyaltyAnalysis',
+  //     component: () => import('@/views/visitor-analysis/user-loyalty-analysis'),
+  //     name: 'userLoyaltyAnalysis',
+  //     meta: { title: '用户忠诚度' }
+  //   },
+  //   {
+  //     path: 'equipment-analysis',
+  //     component: () => import('@/views/visitor-analysis/equipment-analysis'),
+  //     name: 'equipment-analysis',
+  //     meta: { title: '设备' }
+  //   },
+  //   {
+  //     path: 'channel-analysis',
+  //     component: () => import('@/views/visitor-analysis/channel-analysis'),
+  //     name: 'channel-analysis',
+  //     meta: { title: '渠道' }
+  //   }
+  // ]
 }
 
 export default componentsRouter

@@ -6,7 +6,7 @@
           <div class="trafficHead">Top10来源网站</div>
           <div
             class="iconFlag"
-            @click="$router.push('/visitorAnalysis/sourceWebAnalysis')"
+            @click="$router.push('/visitorAnalysis/sourceWeb')"
           >
             >
           </div>

@@ -196,6 +196,7 @@ export default {
       } else {
         this.current.sortName = null;
         this.current.sortOrder = null;
+        this.$emit("currentPage");
       }
       if (this.current.sortName == "statTime") {
         this.$emit("currentPage");

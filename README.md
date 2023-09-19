@@ -1,4 +1,3 @@
-
 ## 功能
 
 ```
@@ -8,7 +7,7 @@
   - 页面权限
   - 指令权限
   - 权限配置
-  
+
   - 二步登录
 
 - 多环境发布
@@ -58,8 +57,12 @@ npm install --registry=https://registry.npm.taobao.org
 npm run dev
 ```
 
-浏览器访问 http://localhost:9527
+### npm run dev 失败, 需要建立一个 '.env.development'文件,配置代理地址。
 
+ENV = 'development'
+VUE_APP_BASE_API = '/DEV-API'
+VUE_APP_BASE_API_PROXY = '代理地址'
+  
 ## 发布
 
 ```bash
@@ -90,3 +93,4 @@ npm run lint -- --fix
 [在线 Demo](https://demo.clklog.com)
 
 ## Donate
+```

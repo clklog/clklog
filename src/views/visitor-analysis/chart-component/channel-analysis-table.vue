@@ -245,6 +245,10 @@ export default {
         // 升序
         this.current.sortName = e.prop;
         this.current.sortOrder = "descending";
+      }else {
+        this.current.sortName = null;
+        this.current.sortOrder = null;
+        this.$emit("currentPage");
       }
       this.ascDscEvent();
     },
@@ -297,7 +301,8 @@ export default {
         }
       });
       const filteredArr = this.channelTableData.filter(
-        (item) => item.channel !== "网站"
+        // (item) => item.channel !== "网站"
+        (item) => item.channel == "全部"
       );
       this.filterChannelList = filteredArr;
     },

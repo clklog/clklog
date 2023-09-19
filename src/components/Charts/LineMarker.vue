@@ -39,7 +39,7 @@ export default {
       statTime: [],
       headLege: [],
       flowTrendList: [],
-      cologStyle:this.$store.state.settings.cologStyle,
+      cologStyle: this.$store.state.settings.cologStyle,
     };
   },
   mounted() {
@@ -76,7 +76,7 @@ export default {
         if (item.statTime) {
           item.statTime = item.statTime.replace(/2023-/g, "");
           if (item.statTime.length <= 2) {
-            item.statTime = item.statTime + "时"
+            item.statTime = item.statTime + "时";
           }
           return statTime.push(item.statTime);
         } else {
@@ -168,6 +168,17 @@ export default {
             color: "black",
           },
         },
+        dataZoom: [
+          {
+            type: "inside",
+            startValue: 0,
+            endValue: 24,
+            minValueSpan: 10,
+            zoomOnMouseWheel: false, // 关闭滚轮缩放
+            moveOnMouseWheel: true, // 开启滚轮平移
+            moveOnMouseMove: true, // 鼠标移动能触发数据窗口平移
+          },
+        ],
         grid: {
           top: 100,
           left: "2%",
@@ -189,8 +200,8 @@ export default {
               show: false,
             },
             axisLabel: {
-              interval: 0, 
-              rotate: "45", 
+              interval: 0,
+              rotate: "45",
             },
           },
         ],
@@ -212,7 +223,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color:this.cologStyle.$pv,
+                color: this.cologStyle.$pv,
               },
             },
             lineStyle: {
@@ -225,7 +236,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color:this.cologStyle.$uv,
+                color: this.cologStyle.$uv,
               },
             },
             lineStyle: {
@@ -238,7 +249,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color:this.cologStyle.$visitCount,
+                color: this.cologStyle.$visitCount,
                 // borderColor: "#5fb4db",
                 // borderWidth: 12,
               },
@@ -266,7 +277,7 @@ export default {
             type: "line",
             itemStyle: {
               normal: {
-                color:this.cologStyle.$bounceRate,
+                color: this.cologStyle.$bounceRate,
               },
             },
             lineStyle: {

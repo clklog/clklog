@@ -1,6 +1,6 @@
 <template>
   <div class="TrendChart block-main public-hoverItem">
-    <div class="block-head"  @click="$router.push('/visitorAnalysis/trendAnalysis')">
+    <div class="block-head"  @click="$router.push('/visitorAnalysis/trend')">
       <div class="block-title">趋势图</div>
       <!-- collapse-tags -->
       <!-- <el-cascader

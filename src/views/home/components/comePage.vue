@@ -54,7 +54,7 @@
           <div class="trafficHead">Top10搜索词</div>
           <div
             class="iconFlag"
-            @click="$router.push('/visitorAnalysis/searchAnalysis')"
+            @click="$router.push('/visitorAnalysis/search')"
           >
             >
           </div>

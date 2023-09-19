@@ -1,6 +1,6 @@
 <template>
   <div class="documentation-container block-main public-hoverItem">
-    <div class="block-head" @click="$router.push('/visitorAnalysis/regionalAnalysis')">
+    <div class="block-head" @click="$router.push('/visitorAnalysis/regional')">
       <div class="block-title" >地域分布</div>
       <div
         class="block-head-icon"

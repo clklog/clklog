@@ -1,7 +1,7 @@
 <template>
   <div>
-    <FilterBar byChnnel  @setFilterBarParams="setFilterBarParams"></FilterBar>
-    <channelTable ref="channelTable"></channelTable>
+    <FilterBar byChnnel @setFilterBarParams="setFilterBarParams"></FilterBar>
+    <channelTable ref="channelTable" @currentPage="currentPage"></channelTable>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ import { percentage } from "@/utils/percent";
 export default {
   components: {
     FilterBar,
-    channelTable
+    channelTable,
   },
   data() {
     return {
@@ -36,18 +36,21 @@ export default {
       this.getChannelDetail();
     },
   },
-  methods:{
+  methods: {
     getChannelDetail() {
       getChannelDetailApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-        this.$refs.channelTable.getChannelList(res.data)
+          this.$refs.channelTable.getChannelList(res.data);
         }
       });
     },
     setFilterBarParams(val) {
       this.filterBarParams = copyObj(val);
     },
-  }
+    currentPage() {
+      this.getChannelDetail();
+    },
+  },
 };
 </script>
 

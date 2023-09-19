@@ -58,8 +58,9 @@ export default {
   },
   watch: {
     commonParams(val) {
-      this.getFlowTrendDetail();
       this.getFlowTotalView();
+      this.getFlowTrendDetail(val);
+      // this.getFlowEcharts();
     },
   },
   methods: {
@@ -72,19 +73,17 @@ export default {
           this.$refs.originView.originEvent(res.data);
         }
       });
-      // getFlowTrendApi(this.commonParams).then((res) => {
-      //   if (res.code == 200) {
-      //     // console.log(this.commonParams,"commonParams---");
-      //     this.$refs.indicatorChart.apiDetailList(res.data,);
-      //   }
-      // });
     },
-    getFlowTrendDetail() {
-      // getFlowTrendDetailApi(this.commonParams).then((res) => {
+    getFlowTrendDetail(noEchart) {
+        console.log(noEchart,"noEchart");
       getFlowDetailApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.trendTable.apiDetailList(res.data,this.commonParams.timeType);
-          this.$refs.indicatorChart.apiDetailList(res.data,)
+          if (noEchart) {
+            this.$refs.trendTable.apiDetailList(JSON.parse(JSON.stringify(res.data)),this.commonParams.timeType);
+            this.$refs.indicatorChart.apiDetailList(res.data,)
+          }else{
+            this.$refs.trendTable.apiDetailList(JSON.parse(JSON.stringify(res.data)),this.commonParams.timeType);
+          }
         }
       });
     },

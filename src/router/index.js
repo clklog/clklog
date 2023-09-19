@@ -47,24 +47,9 @@ export const constantRoutes = [
         component: () => import('@/views/home/index'),
         name: 'Documentation',
         meta: { title: '首页', icon: 'homepage', affix: true }
-        // meta: { title: '首页', icon: 'documentation', affix: true }
       }
     ]
   },
-  {
-    path: '/profile',
-    component: Layout,
-    redirect: '/profile/index',
-    hidden: true,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/profile/index'),
-        name: 'Profile',
-        meta: { title: 'Profile', icon: 'user', noCache: true }
-      }
-    ]
-  }
 ]
 
 export const asyncRoutes = [
@@ -81,8 +66,6 @@ const createRouter = () => new Router({
 })
 
 const router = createRouter()
-
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router

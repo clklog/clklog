@@ -240,6 +240,17 @@ export default {
             color: "black",
           },
         },
+        dataZoom: [
+          {
+            type: "inside",
+            startValue: 0,
+            endValue: 24,
+            minValueSpan: 10,
+            zoomOnMouseWheel: false, // 关闭滚轮缩放
+            moveOnMouseWheel: true, // 开启滚轮平移
+            moveOnMouseMove: true, // 鼠标移动能触发数据窗口平移
+          },
+        ],
         grid: {
           top: 100,
           left: "2%",
