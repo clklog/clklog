@@ -126,4 +126,8 @@ class LogBean extends Serializable {
   //2023-06-07
 
   var event_session_id: String = ""
+
+  var raw_url: String =""
+
+
 }

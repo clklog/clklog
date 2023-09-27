@@ -139,6 +139,7 @@ class LogRichMapper extends RichMapFunction[String, ListBuffer[LogBean]] {
       if (properties.containsKey("$viewport_width")) logBean.viewport_width = properties.getString("$viewport_width")
       if (properties.containsKey("$referrer")) logBean.referrer = properties.getString("$referrer")
       if (properties.containsKey("$url")) logBean.url = properties.getString("$url")
+      if (properties.containsKey("raw_url")) logBean.raw_url = properties.getString("raw_url")
       if (properties.containsKey("$url_path")) logBean.url_path = properties.getString("$url_path")
       if (properties.containsKey("$title")) logBean.title = properties.getString("$title")
       if (properties.containsKey("$latest_referrer")) logBean.latest_referrer = properties.getString("$latest_referrer")

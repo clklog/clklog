@@ -50,7 +50,7 @@ object JieXiJson {
     "manufacturer,matched_key,matching_key_list,model,network_type,os,os_version,receive_time,screen_name,screen_orientation," +
     "short_url_key,short_url_target,source_package_name,track_signup_original_id,user_agent,utm_campaign,utm_content,utm_matching_type,utm_medium,utm_source," +
     "utm_term,viewport_position,wifi,kafka_data_time,project_token,crc,is_compress,event_duration,adv_id,user_key," +
-    "is_logined,download_channel,event_session_id)" +
+    "is_logined,download_channel,event_session_id,raw_url)" +
     " values " +
     "(?,?,?,?,?,?,?,?,?,?," +
     "?,?,?,?,?,?,?,?,?,?," +
@@ -62,7 +62,7 @@ object JieXiJson {
     "?,?,?,?,?,?,?,?,?,?," +
     "?,?,?,?,?,?,?,?,?,?," +
     "?,?,?,?,?,?,?,?,?,?," +
-    "?,?,?)"   //每一行十个字段
+    "?,?,?,?)"   //每一行十个字段
 
   val clickhouseSink = new LogAnalysisClickHouseSink(sql)
   value.addSink(clickhouseSink)
