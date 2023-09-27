@@ -23,4 +23,7 @@ public class LogAnalysisbysessionuri {
 	@Column
 	Timestamp logTime;
 	
+	@Column
+	String title;
+	
 }
