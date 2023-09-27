@@ -71,7 +71,6 @@ public class KafkaController {
                 }
             }
             String ip = getIpAddr(request);
-            ip="61.169.38.134";
             try {
                 String dataFinal, decodedString = null;
                 if (queryCriteria.getData_list() != null) {

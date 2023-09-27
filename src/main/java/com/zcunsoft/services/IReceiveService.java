@@ -11,4 +11,12 @@ public interface IReceiveService {
     String analysisData(QueryCriteria queryCriteria);
 
     void enqueueKafka(List<QueryCriteria> queryCriteriaList);
+
+    void loadCity();
+
+    void loadProvince();
+
+    void loadCountry();
+
+    void loadUrlRule();
 }

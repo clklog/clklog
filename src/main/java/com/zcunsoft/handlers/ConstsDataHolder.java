@@ -1,6 +1,7 @@
 package com.zcunsoft.handlers;
 
 import com.zcunsoft.dto.QueryCriteria;
+import com.zcunsoft.model.Rule;
 import lombok.Data;
 
 import java.util.concurrent.BlockingQueue;
@@ -22,5 +23,5 @@ public class ConstsDataHolder {
 	private final BlockingQueue<QueryCriteria> logQueue = new LinkedBlockingQueue<>();
 
 
-
+	private final ConcurrentMap<String, Rule> htUrlReg = new ConcurrentHashMap<String, Rule>();
 }

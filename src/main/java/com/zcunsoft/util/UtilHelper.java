@@ -1,8 +1,13 @@
 package com.zcunsoft.util;
 
+import com.zcunsoft.model.Rule;
+
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 // TODO: Auto-generated Javadoc
 
@@ -88,4 +93,30 @@ public final class UtilHelper {
         }
     }
 
+    public static String parseUrl(String rawurl, ConcurrentMap<String, Rule> htUrlReg) {
+        String[] urlPairArray = rawurl.split("((?=[?#/&])|(?<=[?#/&]))", -1);
+        StringBuilder parsedUrl = new StringBuilder();
+        HashMap<String, String> delimiterMap = new HashMap<>();
+        delimiterMap.put("/", "/");
+        delimiterMap.put("?", "？");
+        delimiterMap.put("&", "&");
+        delimiterMap.put("#", "#");
+
+        for (String urlPair : urlPairArray) {
+            if (delimiterMap.containsKey(urlPair)) {
+                parsedUrl.append(urlPair);
+            } else {
+                String parseUrlPair = urlPair;
+                for (Map.Entry<String, Rule> urlReg : htUrlReg.entrySet()) {
+                    if (urlReg.getValue().getType().equalsIgnoreCase("replace")) {
+                        parseUrlPair = parseUrlPair.replaceAll(urlReg.getValue().getValue(), "{" + urlReg.getKey() + "}");
+                    } else if (urlReg.getValue().getType().equalsIgnoreCase("remove")) {
+                        parseUrlPair = parseUrlPair.replaceAll(urlReg.getValue().getValue(), "");
+                    }
+                }
+                parsedUrl.append(parseUrlPair);
+            }
+        }
+        return parsedUrl.toString();
+    }
 }

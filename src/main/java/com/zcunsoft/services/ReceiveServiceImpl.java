@@ -1,5 +1,7 @@
 package com.zcunsoft.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ip2location.IP2Location;
@@ -8,7 +10,9 @@ import com.zcunsoft.cfg.ReceiverSetting;
 import com.zcunsoft.dto.QueryCriteria;
 import com.zcunsoft.dto.Region;
 import com.zcunsoft.handlers.ConstsDataHolder;
+import com.zcunsoft.model.Rule;
 import com.zcunsoft.util.ReceiverObjectMapper;
+import com.zcunsoft.util.UtilHelper;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import nl.basjes.parse.useragent.AgentField;
 import nl.basjes.parse.useragent.UserAgent;
@@ -26,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentMap;
 
 @Service
 public class ReceiveServiceImpl implements IReceiveService {
@@ -51,6 +56,9 @@ public class ReceiveServiceImpl implements IReceiveService {
 
     private final IP2Location locIpV4 = new IP2Location();
     private final IP2Location locIpV6 = new IP2Location();
+
+    private final TypeReference<Rule> ruleTypeReference = new TypeReference<Rule>() {
+    };
 
     public ReceiveServiceImpl(ConstsDataHolder constsDataHolder, ReceiverObjectMapper objectMapper, StringRedisTemplate queueRedisTemplate, AbstractUserAgentAnalyzer userAgentAnalyzer, KafkaTemplate<String, String> kafkaTemplate, ReceiverSetting serverSettings) {
         this.objectMapper = objectMapper;
@@ -170,13 +178,11 @@ public class ReceiveServiceImpl implements IReceiveService {
             JsonNode array = objectMapper.readTree(dataFinal);
             if (array.isArray()) {
                 for (JsonNode objNode : array) {
-                    setUa(ua, objNode);
-                    setRegion(region, objNode);
+                    setProperty(objNode, ua, region);
                 }
                 dataFinal = objectMapper.writeValueAsString(array);
             } else {
-                setUa(ua, array);
-                setRegion(region, array);
+                setProperty(array, ua, region);
                 dataFinal = objectMapper.writeValueAsString(array);
             }
         } catch (Exception ex) {
@@ -202,20 +208,7 @@ public class ReceiveServiceImpl implements IReceiveService {
         }
     }
 
-    private void setRegion(Region region, JsonNode jsonObject) {
-        try {
-            if (jsonObject.get("properties") != null) {
-                ObjectNode objectNode = ((ObjectNode) jsonObject.get("properties"));
-                objectNode.put("country", region.getCountry());
-                objectNode.put("province", region.getProvince());
-                objectNode.put("city", region.getCity());
-            }
-        } catch (Exception ex) {
-
-        }
-    }
-
-    private void setUa(String ua, JsonNode jsonObject) {
+    private void setProperty(JsonNode jsonObject, String ua, Region region) {
         try {
             if (jsonObject.get("properties") != null) {
                 UserAgent userAgent = userAgentAnalyzer.parse(ua);
@@ -266,21 +259,89 @@ public class ReceiveServiceImpl implements IReceiveService {
                     objectNode.put("$manufacturer", brand);
                 }
 
-                // lib
-                JsonNode jnLib = jsonObject.get("lib");
-                String libValue = jnLib.get("$lib").asText();
-                if ("js".equalsIgnoreCase(libValue)) {
-                    ObjectNode onLib = ((ObjectNode) jnLib);
-                    AgentField os = userAgent.get(UserAgent.OPERATING_SYSTEM_CLASS);
-                    if (!os.isDefaultValue()) {
-                        libValue = os.getValue();
-                    }
-                    onLib.put("$lib", libValue);
-                }
+                //ip address info
+                objectNode.put("country", region.getCountry());
+                objectNode.put("province", region.getProvince());
+                objectNode.put("city", region.getCity());
 
+                // parse url
+                JsonNode jnUrl = objectNode.get("$url");
+                if (jnUrl != null) {
+                    String rawUrl = jnUrl.asText();
+                    System.out.println(rawUrl);
+                    objectNode.put("raw_url", rawUrl);
+                    String parsedUrl = UtilHelper.parseUrl(rawUrl, constsDataHolder.getHtUrlReg());
+                    objectNode.put("$url", parsedUrl);
+                }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("setProperty err,", ex);
+        }
+    }
+
+    @Override
+    public void loadCity() {
+        List<String> lineCityList = UtilHelper
+                .loadFileAllLine(System.getProperty("user.dir") + File.separator + "iplib" + File.separator
+                        + "chinacity.txt");
+
+        ConcurrentMap<String, String> htForCity = constsDataHolder.getHtForCity();
+        for (String line : lineCityList) {
+
+            String[] pair = line.split(",");
+            if (pair.length >= 2) {
+                htForCity.put(pair[0].toLowerCase(Locale.ROOT), pair[1]);
+            }
+        }
+    }
+
+    @Override
+    public void loadProvince() {
+        List<String> lineProvinceList = UtilHelper
+                .loadFileAllLine(System.getProperty("user.dir") + File.separator + "iplib" + File.separator
+                        + "chinaprovince.txt");
+
+        ConcurrentMap<String, String> htForProvince = constsDataHolder.getHtForProvince();
+        for (String line : lineProvinceList) {
+
+            String[] pair = line.split(",");
+            if (pair.length >= 2) {
+                htForProvince.put(pair[0].toLowerCase(Locale.ROOT), pair[1]);
+            }
+        }
+    }
+
+    @Override
+    public void loadCountry() {
+        List<String> countryList = UtilHelper
+                .loadFileAllLine(System.getProperty("user.dir") + File.separator + "iplib" + File.separator
+                        + "country.txt");
+
+        ConcurrentMap<String, String> htForCountry = constsDataHolder.getHtForCountry();
+        for (String line : countryList) {
+
+            String[] pair = line.split(",");
+            if (pair.length >= 2) {
+                htForCountry.put(pair[0].toLowerCase(Locale.ROOT), pair[1]);
+            }
+        }
+    }
+
+    @Override
+    public void loadUrlRule() {
+        List<String> ruleList = UtilHelper
+                .loadFileAllLine(System.getProperty("user.dir") + File.separator + "rules" + File.separator
+                        + "url.rules");
+        ConcurrentMap<String, Rule> htForUrlRules = constsDataHolder.getHtUrlReg();
+        for (String line : ruleList) {
+            try {
+                Rule rule = objectMapper.readValue(line,
+                        ruleTypeReference);
+                htForUrlRules.put(rule.getObject(), rule);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

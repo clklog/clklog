@@ -1,0 +1,14 @@
+{object:"setId",value:"(?<=setId=)\\w+",type:"reserve"}
+{object:"open", value:"\\d+(?=\\=open)",type:"remove"}
+{object:"id", value:"(?<=id=)\\w+",type:"reserve"}
+{object:"time", value:"(?<=time=)\\d+",type:"remove"}
+{object:"t", value:"(?<=t=)\\d+",type:"remove"}
+{object:"timestamp", value:"(?<=timestamp=)\\d+",type:"remove"}
+{object:"r", value:"(?<=r=)0.\\d+",type:"remove"}
+{object:"code", value:"(?<=code=)\\w+",type:"remove"}
+{object:"goodsId", value:"(?<=goodsId=)\\w+",type:"reserve"}
+{object:"orderNo", value:"(?<=orderNo=)\\w+",type:"reserve"}
+{object:"shopId", value:"(?<=shopId=)\\w+",type:"reserve"}
+{object:"userCode", value:"(?<=EQU)\\w+",type:"reserve"}
+{object:"query", value:"(?<=query=)\\{[\\w\\W]+",type:"reserve"}
+{object:"searchStr", value:"(?<=searchStr=)[\\w\\W]+",type:"reserve"}
