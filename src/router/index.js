@@ -5,6 +5,7 @@ import Layout from '@/layout'
 import visitorAnalysis from './modules/visitor-analysis'
 import behaviorAnalysis from './modules/behavior-analysis'
 import userBehavior from './modules/user-behavior'
+import logDataAnalysis from './modules/logoData-analysis'
 export const constantRoutes = [
   {
     path: '/redirect',
@@ -38,6 +39,9 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    // path: '/',
+    // component: Layout,
+    // redirect: '/index',
     path: '/',
     component: Layout,
     redirect: '/index',
@@ -56,6 +60,7 @@ export const asyncRoutes = [
   visitorAnalysis,
   behaviorAnalysis,
   // userBehavior, //用户分析页面
+  // { path: '*', redirect: '/index', hidden: true }
   { path: '*', redirect: '/index', hidden: true }
 ]
 

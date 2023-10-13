@@ -48,7 +48,14 @@
               <span v-text="getIndex(scope.$index)"> </span>
             </template>
           </el-table-column>
-          <el-table-column prop="uri" label="页面URL" width="400" :show-overflow-tooltip="true">
+          <!-- prop="uri" -->
+          <el-table-column  label="页面URL" width="400" :show-overflow-tooltip="true">
+            <template slot-scope="scope">
+              {{ scope.row.title }}<br>
+              {{ scope.row.uri }}
+             
+              <!-- <span v-if="timeType && timeType == 'hour'">时</span> -->
+            </template>
             <!-- <template slot-scope="scope">
               <el-popover trigger="hover" placement="top">
                 <div>{{ scope.row.uri }}</div>

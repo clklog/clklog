@@ -22,12 +22,12 @@
         style="margin-left: 20px; min-width: 280px"
         @change="handleCheckPointer"
       >
+      <!-- :disabled="disabledSelect.includes(item.value)" -->
         <el-option
           v-for="item in options"
           :key="item.value"
           :label="item.label"
           :value="item.value"
-          :disabled="disabledSelect.includes(item.value)"
         >
           <div style="display: flex; align-items: center">
             <span class="checkbox__inner"><div class="inner-box"></div></span>

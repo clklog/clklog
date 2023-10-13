@@ -19,6 +19,7 @@
               clearable
               collapse-tags
             /> -->
+            <!-- :disabled="disabledSelect.includes(item.value)" -->
             <el-select
               class="custom_select"
               v-model="pointValue"
@@ -32,7 +33,7 @@
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
-                :disabled="disabledSelect.includes(item.value)"
+                
               >
                 <div style="display: flex; align-items: center">
                   <span class="checkbox__inner"
@@ -607,7 +608,7 @@ img {
 }
 .chartsIcon {
   margin: 20px;
-  width: calc(100% -20px);
+  // width: calc(100% -20px);
   min-height: 300px;
   display: flex;
   justify-content: space-between;

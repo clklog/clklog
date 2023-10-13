@@ -13,12 +13,13 @@
               style="min-width: 280px"
               @change="changeChartValue"
             >
+            <!-- :disabled="disabledSelect.includes(item.value)" -->
               <el-option
                 v-for="item in options"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
-                :disabled="disabledSelect.includes(item.value)"
+               
               >
                 <div style="display: flex; align-items: center">
                   <span class="checkbox__inner"

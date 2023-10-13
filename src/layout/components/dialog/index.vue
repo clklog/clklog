@@ -257,7 +257,8 @@
                               color: #4d4d4d;
                             "
                           >
-                            {{ val.logTime }}
+                            <div>{{ val.logTime }}</div>
+                            <div>{{ val.title }}</div>
                           </div>
                           <div
                             style="
@@ -374,6 +375,7 @@ export default {
         eventSessionId: val.eventSessionId,
       };
       getVisitorSessionUriListApi(params).then((res) => {
+        console.log(res,"res-------");
         if (res.code == 200) {
           this.loading = false;
           this.visitListUrl = res.data.rows;

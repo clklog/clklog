@@ -9,12 +9,19 @@ const state = {
   tagsView: tagsView,
   fixedHeader: fixedHeader,
   sidebarLogo: sidebarLogo,
+  // cologStyle:{
+  //   $pv : "#215cac",
+  //   $uv: "#2c7be5",
+  //   $visitCount : "#619cec",
+  //   $ipCount: "#96bdf2",
+  //   $bounceRate : "#cadef9",
+  // }
   cologStyle:{
-    $pv : "#215cac",
-    $uv: "#2c7be5",
-    $visitCount : "#619cec",
-    $ipCount: "#96bdf2",
-    $bounceRate : "#cadef9",
+    $pv : "#2c7be5",
+    $uv: "#85dec8",
+    $visitCount : "#ffde84",
+    $ipCount: "#5dbaf7",
+    $bounceRate : "#e4b2d8",
   }
 }
 
