@@ -9,6 +9,10 @@ public class GetFlowResponseData    {
 
     @Schema(description = "当前周期的信息")
     private FlowSummary current;
+
+    @Schema(description = "当日预测")
+    private FlowSummary currentPrediction;
+
     @Schema(description = "前一周期的信息")
     private FlowSummary previous;
 
