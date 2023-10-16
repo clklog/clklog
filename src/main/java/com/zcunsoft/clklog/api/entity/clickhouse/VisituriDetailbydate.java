@@ -23,5 +23,8 @@ public class VisituriDetailbydate extends BaseDetailbydate {
     
     @Column
     Integer downPvCount;
+    
+    @Column 
+    String title;
 
 }
