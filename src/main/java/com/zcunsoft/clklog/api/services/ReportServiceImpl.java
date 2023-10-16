@@ -23,6 +23,7 @@ import com.zcunsoft.clklog.api.models.uservisit.*;
 import com.zcunsoft.clklog.api.models.visitor.*;
 import com.zcunsoft.clklog.api.models.visituri.*;
 import com.zcunsoft.clklog.api.utils.TimeUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
@@ -33,6 +34,10 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -56,6 +61,13 @@ public class ReportServiceImpl implements IReportService {
         @Override
         protected DateFormat initialValue() {
             return new SimpleDateFormat("yyyy-MM-dd");
+        }
+    };
+
+    private final ThreadLocal<DateFormat> hFORMAT = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("MM");
         }
     };
 
@@ -98,7 +110,6 @@ public class ReportServiceImpl implements IReportService {
             previousReq.setEndTime(this.yMdFORMAT.get().format(timeFrame.getEndTime()));
             responseData.setPrevious(getFlowByTimeframe(previousReq));
 
-
             TimeFrame samePeriodTimeframe = getSamePeriodTimeframe(getFlowRequest.getStartTime(), getFlowRequest.getTimeType());
             if (samePeriodTimeframe != null) {
                 GetFlowRequest sameReq = new GetFlowRequest();
@@ -107,6 +118,8 @@ public class ReportServiceImpl implements IReportService {
                 sameReq.setEndTime(this.yMdFORMAT.get().format(samePeriodTimeframe.getEndTime()));
                 responseData.setSamePeriod(getFlowByTimeframe(sameReq));
             }
+            responseData.setCurrentPrediction(getTodayFlowPrediction(responseData.getCurrent(), getFlowRequest));
+
             response.setData(responseData);
         } catch (Exception ex) {
             logger.error("getUserStatlist error," + ex.getMessage());
@@ -1294,15 +1307,15 @@ public class ReportServiceImpl implements IReportService {
             visitorSession.setSearchword(visitorDetailbysession.getSearchword());
             List<VisitorSessionDetail> rows = new ArrayList<VisitorSessionDetail>();
             if(StringUtils.isNotBlank(visitorDetailbysession.getClientIp())) {
-            	String[] clientIpAndProviceAndPvs =  visitorDetailbysession.getClientIp().split(",");
-            	for(String clientIpAndProviceAndPv : clientIpAndProviceAndPvs) {
-            		String[] ipAndProviceAndPv = clientIpAndProviceAndPv.split("-");
-            		VisitorSessionDetail detail = new VisitorSessionDetail();
-            		detail.setClientIp(ipAndProviceAndPv[0]);
-            		detail.setProvince(ipAndProviceAndPv[1]);
-            		detail.setPv(ipAndProviceAndPv[2] != null ? Integer.parseInt(ipAndProviceAndPv[2]) : 0);
-            		rows.add(detail);
-            	}
+                String[] clientIpAndProviceAndPvs = visitorDetailbysession.getClientIp().split(",");
+                for(String clientIpAndProviceAndPv : clientIpAndProviceAndPvs) {
+                    String[] ipAndProviceAndPv = clientIpAndProviceAndPv.split("-");
+                    VisitorSessionDetail detail = new VisitorSessionDetail();
+                    detail.setClientIp(ipAndProviceAndPv[0]);
+                    detail.setProvince(ipAndProviceAndPv[1]);
+                    detail.setPv(ipAndProviceAndPv[2] != null ? Integer.parseInt(ipAndProviceAndPv[2]) : 0);
+                    rows.add(detail);
+                }
             }
             visitorSession.setRows(rows);
             visitorSessionListList.add(visitorSession);
@@ -1774,6 +1787,119 @@ public class ReportServiceImpl implements IReportService {
         return flowSummary;
     }
 
+    private FlowSummary getTodayFlowPrediction(FlowSummary current, GetFlowRequest getFlowRequest) throws IOException {
+        FlowSummary flowSummary = null;
+        Timestamp today = new Timestamp(System.currentTimeMillis() - System.currentTimeMillis() % 1000);
+        String todayStr = this.yMdFORMAT.get().format(today);
+        if ("day".equalsIgnoreCase(getFlowRequest.getTimeType())
+                && (todayStr.equalsIgnoreCase(getFlowRequest.getStartTime()) && todayStr.equalsIgnoreCase(getFlowRequest.getEndTime()) || (StringUtils.isBlank(getFlowRequest.getStartTime())
+                && StringUtils.isBlank(getFlowRequest.getEndTime())
+        ))) {
+            // 获取今天之前有多少天数据.
+            MapSqlParameterSource paramMap = new MapSqlParameterSource();
+            paramMap.addValue("stat_date", this.yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis())));
+
+            Integer statDateCount = clickHouseJdbcTemplate.queryForObject("select countDistinct(stat_date) from flow_trend_byhour where stat_date<:stat_date", paramMap,
+                    Integer.class);
+            statDateCount=21;
+            if (statDateCount != null) {
+                if (statDateCount <= 7) {
+                    List<String> statDateList = new ArrayList<>();
+                    for (int i = 1; i <= statDateCount; i++) {
+                        Timestamp ts = new Timestamp(today.getTime() - DateUtils.MILLIS_PER_DAY * i);
+                        statDateList.add(this.yMdFORMAT.get().format(ts));
+                    }
+                    // 所有日期
+                    PredictionAvg predictionAvg = getPredictionAvg(getFlowRequest, statDateList);
+
+                    flowSummary = new FlowSummary();
+                    flowSummary.setStatTime(current.getStatTime());
+                    Float predictionPv = current.getPv() * (1 + predictionAvg.getAvgPvAfter() / predictionAvg.getAvgPvBefore());
+                    flowSummary.setPv(predictionPv.intValue());
+
+                    Float predictionUv = current.getUv() * (1 + predictionAvg.getAvgUvAfter() / predictionAvg.getAvgUvBefore());
+                    flowSummary.setUv(predictionUv.intValue());
+
+                    Float predictionIpCount = current.getIpCount() * (1 + predictionAvg.getAvgIpCountAfter() / predictionAvg.getAvgIpCountBefore());
+                    flowSummary.setIpCount(predictionIpCount.intValue());
+                } else if (statDateCount > 7 && statDateCount <= 28) {
+                    List<String> statDateSameWeekdayList = new ArrayList<>();
+                    List<String> otherStatDateList = new ArrayList<>();
+                    for (int i = 1; i <= statDateCount; i++) {
+
+                        Timestamp ts = new Timestamp(today.getTime() - DateUtils.MILLIS_PER_DAY * i);
+                        if (i % 7 == 0) {
+                            statDateSameWeekdayList.add(this.yMdFORMAT.get().format(ts));
+                        } else {
+                            otherStatDateList.add(this.yMdFORMAT.get().format(ts));
+                        }
+                    }
+                    PredictionAvg predictionAvgForSameWeekday = getPredictionAvg(getFlowRequest, statDateSameWeekdayList);
+                    PredictionAvg predictionAvgForOther = getPredictionAvg(getFlowRequest, otherStatDateList);
+
+                    flowSummary = new FlowSummary();
+                    flowSummary.setStatTime(current.getStatTime());
+                    Float predictionPv = current.getPv() * (1 + predictionAvgForSameWeekday.getAvgPvAfter() / predictionAvgForSameWeekday.getAvgPvBefore() * 0.7f
+                            + predictionAvgForOther.getAvgPvAfter() / predictionAvgForOther.getAvgPvBefore() * 0.3f);
+                    flowSummary.setPv(predictionPv.intValue());
+
+                    Float predictionUv = current.getUv() * (1 + predictionAvgForSameWeekday.getAvgUvAfter() / predictionAvgForSameWeekday.getAvgUvBefore() * 0.7f
+                            + predictionAvgForOther.getAvgUvAfter() / predictionAvgForOther.getAvgUvBefore() * 0.3f);
+                    flowSummary.setUv(predictionUv.intValue());
+
+                    Float predictionIpCount = current.getIpCount() * (1 + predictionAvgForSameWeekday.getAvgIpCountAfter() / predictionAvgForSameWeekday.getAvgIpCountBefore() * 0.7f
+                            + predictionAvgForOther.getAvgIpCountAfter() / predictionAvgForOther.getAvgIpCountBefore() * 0.3f);
+                    flowSummary.setIpCount(predictionIpCount.intValue());
+
+                } else if (statDateCount > 28) {
+                    List<String> statDateList = new ArrayList<>();
+                    int end = statDateCount / 7;
+                    if (end >= 48) {
+                        end = 48;
+                    }
+
+                    for (int i = 1; i <= end; i++) {
+                        Timestamp ts = new Timestamp(today.getTime() - DateUtils.MILLIS_PER_DAY * i * 7);
+                        statDateList.add(this.yMdFORMAT.get().format(ts));
+                    }
+                    PredictionAvg predictionAvg = getPredictionAvg(getFlowRequest, statDateList);
+
+                    flowSummary = new FlowSummary();
+                    flowSummary.setStatTime(current.getStatTime());
+                    Float predictionPv = current.getPv() * (1 + predictionAvg.getAvgPvAfter() / predictionAvg.getAvgPvBefore());
+                    flowSummary.setPv(predictionPv.intValue());
+
+                    Float predictionUv = current.getUv() * (1 + predictionAvg.getAvgUvAfter() / predictionAvg.getAvgUvBefore());
+                    flowSummary.setUv(predictionUv.intValue());
+
+                    Float predictionIpCount = current.getIpCount() * (1 + predictionAvg.getAvgIpCountAfter() / predictionAvg.getAvgIpCountBefore());
+                    flowSummary.setIpCount(predictionIpCount.intValue());
+                }
+            }
+        }
+        return flowSummary;
+    }
+
+    private PredictionAvg getPredictionAvg(GetFlowRequest getFlowRequest, List<String> statDateList) throws IOException {
+        String getListSql = FileUtils.readFileToString(new File(System.getProperty("user.dir") + File.separator + "sql" + File.separator + "trend_prediction_for_in_dates.sql"), Charset.forName("GB2312"));
+
+        MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        paramMap.addValue("country", "all");
+        paramMap.addValue("province", "all");
+        paramMap.addValue("is_first_day", "all");
+        List<String> channelList = transChannelFilter(getFlowRequest.getChannel());
+        paramMap.addValue("lib", channelList);
+        paramMap.addValue("project", clklogApiSetting.getProjectName());
+
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        paramMap.addValue("stat_date", statDateList);
+        paramMap.addValue("stat_hour", this.hFORMAT.get().format(now));
+
+        PredictionAvg predictionAvg = clickHouseJdbcTemplate.queryForObject(getListSql, paramMap, new BeanPropertyRowMapper<PredictionAvg>(PredictionAvg.class));
+
+        return predictionAvg;
+    }
+
     private List<FlowDetail> getFlowTrendByHour(MapSqlParameterSource paramMap, FlowDetail totalFlowDetail, String where) {
         List<FlowDetail> flowDetailList = new ArrayList<>();
 
@@ -2114,9 +2240,9 @@ public class ReportServiceImpl implements IReportService {
         flowSummary.setIpCount(flowSummarybydate.getIpCount());
         flowSummary.setVisitCount(flowSummarybydate.getVisitCount());
         flowSummary.setUv(flowSummarybydate.getUv());
-        flowSummary.setAvgPv(0);
-        flowSummary.setAvgVisitTime(0);
-        flowSummary.setBounceRate(0);
+        flowSummary.setAvgPv(0F);
+        flowSummary.setAvgVisitTime(0F);
+        flowSummary.setBounceRate(0F);
         flowSummary.setChannel(flowSummarybydate.getLib());
         if (flowSummarybydate.getVisitCount() > 0) {
             float avgPv = flowSummarybydate.getPv() * 1.0f / flowSummarybydate.getVisitCount();
@@ -2137,9 +2263,9 @@ public class ReportServiceImpl implements IReportService {
         flowSummary.setIpCount(visitorSummarybydate.getIpCount());
         flowSummary.setVisitCount(visitorSummarybydate.getVisitCount());
         flowSummary.setUv(visitorSummarybydate.getUv());
-        flowSummary.setAvgPv(0);
-        flowSummary.setAvgVisitTime(0);
-        flowSummary.setBounceRate(0);
+        flowSummary.setAvgPv(0F);
+        flowSummary.setAvgVisitTime(0F);
+        flowSummary.setBounceRate(0F);
         flowSummary.setChannel(visitorSummarybydate.getLib());
         if (visitorSummarybydate.getVisitCount() > 0) {
             float avgPv = visitorSummarybydate.getPv() * 1.0f / visitorSummarybydate.getVisitCount();
@@ -2257,6 +2383,13 @@ public class ReportServiceImpl implements IReportService {
     }
 
     private String buildChannelFilter(List<String> channels, MapSqlParameterSource paramMap, String where) {
+        List<String> channelList = transChannelFilter(channels);
+        where += " and t.lib in (:channel)";
+        paramMap.addValue("channel", channelList);
+        return where;
+    }
+
+    private List<String> transChannelFilter(List<String> channels) {
         List<String> channelList = new ArrayList<>();
         if (channels != null && !channels.isEmpty()) {
             for (String channel : channels) {
@@ -2269,9 +2402,7 @@ public class ReportServiceImpl implements IReportService {
         if (channelList.isEmpty()) {
             channelList.add("all");
         }
-        where += " and t.lib in (:channel)";
-        paramMap.addValue("channel", channelList);
-        return where;
+        return channelList;
     }
 
     private String buildChannelByAllFilter(List<String> channels, MapSqlParameterSource paramMap, String where) {

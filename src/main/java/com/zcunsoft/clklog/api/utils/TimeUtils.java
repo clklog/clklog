@@ -65,7 +65,7 @@ public class TimeUtils {
     
     /**
      * 把时间戳转换为：时分秒
-     * @param millisecond
+     * @param second
      * @return
      */
     public static String getTimeString(long second) {

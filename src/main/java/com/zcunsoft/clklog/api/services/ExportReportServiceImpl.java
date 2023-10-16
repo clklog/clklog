@@ -1207,9 +1207,9 @@ public class ExportReportServiceImpl implements IExportReportService {
         flowSummary.setIpCount(flowSummarybydate.getIpCount());
         flowSummary.setVisitCount(flowSummarybydate.getVisitCount());
         flowSummary.setUv(flowSummarybydate.getUv());
-        flowSummary.setAvgPv(0);
-        flowSummary.setAvgVisitTime(0);
-        flowSummary.setBounceRate(0);
+        flowSummary.setAvgPv(0F);
+        flowSummary.setAvgVisitTime(0F);
+        flowSummary.setBounceRate(0F);
         flowSummary.setChannel(flowSummarybydate.getLib());
         if (flowSummarybydate.getVisitCount() > 0) {
             float avgPv = flowSummarybydate.getPv() * 1.0f / flowSummarybydate.getVisitCount();
@@ -1230,9 +1230,9 @@ public class ExportReportServiceImpl implements IExportReportService {
         flowSummary.setIpCount(visitorSummarybydate.getIpCount());
         flowSummary.setVisitCount(visitorSummarybydate.getVisitCount());
         flowSummary.setUv(visitorSummarybydate.getUv());
-        flowSummary.setAvgPv(0);
-        flowSummary.setAvgVisitTime(0);
-        flowSummary.setBounceRate(0);
+        flowSummary.setAvgPv(0F);
+        flowSummary.setAvgVisitTime(0F);
+        flowSummary.setBounceRate(0F);
         flowSummary.setChannel(visitorSummarybydate.getLib());
         if (visitorSummarybydate.getVisitCount() > 0) {
             float avgPv = visitorSummarybydate.getPv() * 1.0f / visitorSummarybydate.getVisitCount();
