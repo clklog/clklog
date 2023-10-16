@@ -35,4 +35,7 @@ public class VisitUriDetail {
     
     @Schema(description = "贡献下游流量")
     private int downPvCount;
+    
+    @Schema(description = "标题")
+    private String title;
 }
