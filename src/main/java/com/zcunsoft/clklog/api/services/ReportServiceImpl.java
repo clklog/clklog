@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -1306,9 +1305,9 @@ public class ReportServiceImpl implements IReportService {
             visitorSession.setSourcesite(visitorDetailbysession.getSourcesite());
             visitorSession.setSearchword(visitorDetailbysession.getSearchword());
             List<VisitorSessionDetail> rows = new ArrayList<VisitorSessionDetail>();
-            if(StringUtils.isNotBlank(visitorDetailbysession.getClientIp())) {
+            if (StringUtils.isNotBlank(visitorDetailbysession.getClientIp())) {
                 String[] clientIpAndProviceAndPvs = visitorDetailbysession.getClientIp().split(",");
-                for(String clientIpAndProviceAndPv : clientIpAndProviceAndPvs) {
+                for (String clientIpAndProviceAndPv : clientIpAndProviceAndPvs) {
                     String[] ipAndProviceAndPv = clientIpAndProviceAndPv.split("-");
                     VisitorSessionDetail detail = new VisitorSessionDetail();
                     detail.setClientIp(ipAndProviceAndPv[0]);
@@ -2530,5 +2529,140 @@ public class ReportServiceImpl implements IReportService {
         } else {
             return isFirstDay;
         }
+    }
+
+    @Override
+    public GetVisitUriPathTreeTotalResponse getVisitUriPathTreeTotal(GetVisitUriDetailRequest getVisitUriDetailRequest) {
+        MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count,sum(down_pv_count) as down_pv_count,sum(exit_count) as exit_count,sum(entry_count) as entry_count from visituri_detail_bydate t";
+        String getListSql = "select t.uri_pattern as uri," + selectSql;
+
+        String where = "";
+        where = buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
+        where = buildStatDateEndFilter(getVisitUriDetailRequest.getEndTime(), paramMap, where);
+        where = buildChannelFilter(getVisitUriDetailRequest.getChannel(), paramMap, where);
+        where = buildProjectNameFilter(getVisitUriDetailRequest.getProjectName(), paramMap, where);
+        where = buildCountryFilter(getVisitUriDetailRequest.getCountry(), paramMap, where);
+        where = buildProvinceFilter(getVisitUriDetailRequest.getProvince(), paramMap, where);
+        where = buildVisitorTypeFilter(getVisitUriDetailRequest.getVisitorType(), paramMap, where);
+
+        if (StringUtils.isNotBlank(where)) {
+            where = where.substring(4);
+            getListSql += " where t.uri <> 'all' and " + where;
+        }
+        getListSql += " group by t.uri_pattern order by t.uri_pattern";
+
+        List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
+
+        List<VisitUriDetail> visitUriDetailList = new ArrayList<>();
+
+        GetVisitUriPathTreeTotalResponse response = new GetVisitUriPathTreeTotalResponse();
+
+        for (VisituriDetailbydate visituriDetailbydate : visitUriDetailbydateList) {
+            FlowDetail flowDetail = assemblyFlowDetail(visituriDetailbydate, visituriDetailbydate);
+            VisitUriDetail visitUriDetail = new VisitUriDetail();
+            visitUriDetail.setAvgVisitTime(flowDetail.getAvgVisitTime());
+            visitUriDetail.setEntryCount(visituriDetailbydate.getEntryCount());
+            visitUriDetail.setExitCount(visituriDetailbydate.getExitCount());
+            if (visituriDetailbydate.getVisitCount() > 0) {
+                float exitRate = visituriDetailbydate.getExitCount() * 1.0f / visituriDetailbydate.getVisitCount();
+                visitUriDetail.setExitRate(Float.parseFloat(decimalFormat.get().format(exitRate)));
+            }
+            visitUriDetail.setIpCount(visituriDetailbydate.getIpCount());
+            visitUriDetail.setPv(visituriDetailbydate.getPv());
+            visitUriDetail.setUri(visituriDetailbydate.getUri());
+            visitUriDetail.setUv(visituriDetailbydate.getUv());
+            visitUriDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
+            visitUriDetailList.add(visitUriDetail);
+        }
+
+        String rootUri = "/";
+        VisitUriTreeStatData rootVisitUriTreeStatData = new VisitUriTreeStatData();
+        rootVisitUriTreeStatData.setUri(rootUri);
+
+        Optional<VisitUriDetail> optionalVisitUriDetail = visitUriDetailList.stream().filter(f -> f.getUri().equalsIgnoreCase(rootUri)).findAny();
+        optionalVisitUriDetail.ifPresent(rootVisitUriTreeStatData::setDetail);
+        List<VisitUriTreeStatData> visitUriTreeStatDataList = genUriTree(visitUriDetailList, rootUri);
+
+        rootVisitUriTreeStatData.setLeafUri(visitUriTreeStatDataList);
+
+        response.setData(rootVisitUriTreeStatData);
+        return response;
+    }
+
+    private List<VisitUriTreeStatData> genUriTree(List<VisitUriDetail> visitUriDetailList, String parentUri) {
+        if (visitUriDetailList.isEmpty()) {
+            return new ArrayList<>();
+        } else {
+            String _parentUri = parentUri;
+            if (!parentUri.endsWith("/")) {
+                _parentUri = parentUri + "/";
+            }
+
+            String final_parentUri = _parentUri;
+            List<VisitUriDetail> subList = visitUriDetailList.stream().filter(f -> f.getUri().startsWith(final_parentUri) && !f.getUri().equalsIgnoreCase(parentUri)).collect(Collectors.toList());
+            List<VisitUriTreeStatData> validLeaf = new ArrayList<>();
+            for (VisitUriDetail visitUriDetail : subList) {
+                if (visitUriDetail.getUri().indexOf("/", final_parentUri.length()) == -1) {
+                    VisitUriTreeStatData visitUriTreeStatData = new VisitUriTreeStatData();
+                    visitUriTreeStatData.setUri(visitUriDetail.getUri());
+                    visitUriTreeStatData.setLeafUri(genUriTree(subList, visitUriDetail.getUri()));
+                    visitUriTreeStatData.setDetail(visitUriDetail);
+                    validLeaf.add(visitUriTreeStatData);
+                }
+            }
+            return validLeaf;
+        }
+    }
+
+    @Override
+    public GetVisitUriListOfUriPathResponse getVisitUriListOfUriPath(GetVisitUriListOfUriPathRequest getVisitUriListOfUriPathRequest) {
+        MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        String getListSql = "select title,uri,pv,ip_count,visit_count,uv,new_uv,visit_time,bounce_count,down_pv_count,exit_count,entry_count from visituri_detail_bydate t";
+
+        String where = "";
+        where = buildStatDateStartFilter(getVisitUriListOfUriPathRequest.getStartTime(), paramMap, where);
+        where = buildStatDateEndFilter(getVisitUriListOfUriPathRequest.getEndTime(), paramMap, where);
+        where = buildChannelFilter(getVisitUriListOfUriPathRequest.getChannel(), paramMap, where);
+        where = buildProjectNameFilter(getVisitUriListOfUriPathRequest.getProjectName(), paramMap, where);
+        where = buildCountryFilter(getVisitUriListOfUriPathRequest.getCountry(), paramMap, where);
+        where = buildProvinceFilter(getVisitUriListOfUriPathRequest.getProvince(), paramMap, where);
+        where = buildVisitorTypeFilter(getVisitUriListOfUriPathRequest.getVisitorType(), paramMap, where);
+
+        where += " and t.uri_pattern=:uri_pattern";
+        paramMap.addValue("uri_pattern", getVisitUriListOfUriPathRequest.getUriPattern());
+
+        if (StringUtils.isNotBlank(where)) {
+            where = where.substring(4);
+            getListSql += " where t.uri <> 'all' and " + where;
+        }
+        getListSql += " order by t.pv desc limit 10";
+
+        List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
+
+        List<VisitUriDetail> visitUriDetailList = new ArrayList<>();
+
+        GetVisitUriListOfUriPathResponse response = new GetVisitUriListOfUriPathResponse();
+
+        for (VisituriDetailbydate visituriDetailbydate : visitUriDetailbydateList) {
+            FlowDetail flowDetail = assemblyFlowDetail(visituriDetailbydate, visituriDetailbydate);
+            VisitUriDetail visitUriDetail = new VisitUriDetail();
+            visitUriDetail.setAvgVisitTime(flowDetail.getAvgVisitTime());
+            visitUriDetail.setEntryCount(visituriDetailbydate.getEntryCount());
+            visitUriDetail.setExitCount(visituriDetailbydate.getExitCount());
+            if (visituriDetailbydate.getVisitCount() > 0) {
+                float exitRate = visituriDetailbydate.getExitCount() * 1.0f / visituriDetailbydate.getVisitCount();
+                visitUriDetail.setExitRate(Float.parseFloat(decimalFormat.get().format(exitRate)));
+            }
+            visitUriDetail.setIpCount(visituriDetailbydate.getIpCount());
+            visitUriDetail.setPv(visituriDetailbydate.getPv());
+            visitUriDetail.setUri(visituriDetailbydate.getUri());
+            visitUriDetail.setUv(visituriDetailbydate.getUv());
+            visitUriDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
+            visitUriDetailList.add(visitUriDetail);
+        }
+
+        response.setData(visitUriDetailList);
+        return response;
     }
 }
