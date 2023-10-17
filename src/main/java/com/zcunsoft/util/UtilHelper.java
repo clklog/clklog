@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // TODO: Auto-generated Javadoc
 
@@ -118,5 +120,33 @@ public final class UtilHelper {
             }
         }
         return parsedUrl.toString();
+    }
+
+    public static String parseUrlPath(String rawUrl) {
+        String parseUrlPath = File.separator;
+        try {
+
+            Pattern pattern = Pattern.compile("(http|https)://(www.)?(\\w+(\\.)?)+/");
+            Matcher hostMatcher = pattern.matcher(rawUrl);
+            if (hostMatcher.find()) {
+                parseUrlPath = hostMatcher.group();
+            }
+            String path = "";
+            int index = rawUrl.lastIndexOf("#");
+            if (index != -1) {
+                int index2 = rawUrl.indexOf("?", index + 1);
+                if (index2 != -1) {
+                    path = rawUrl.substring(index , index2);
+
+                } else {
+                    path = rawUrl.substring(index );
+                }
+            }
+            parseUrlPath += path;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return parseUrlPath;
     }
 }

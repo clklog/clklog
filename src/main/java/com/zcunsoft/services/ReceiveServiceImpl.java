@@ -272,6 +272,16 @@ public class ReceiveServiceImpl implements IReceiveService {
                     objectNode.put("raw_url", rawUrl);
                     String parsedUrl = UtilHelper.parseUrl(rawUrl, constsDataHolder.getHtUrlReg());
                     objectNode.put("$url", parsedUrl);
+
+                    // parse url_path
+                    JsonNode jnUrlPath = objectNode.get("$url_path");
+                    if (jnUrlPath != null && "js".equalsIgnoreCase(objectNode.get("$lib").asText())) {
+                        String rawUrlPath = jnUrlPath.asText();
+                        if ("/".equalsIgnoreCase(rawUrlPath) || StringUtils.isBlank(rawUrlPath)) {
+                            String parsedUrlPath = UtilHelper.parseUrlPath(rawUrl);
+                            objectNode.put("$url_path", parsedUrlPath);
+                        }
+                    }
                 }
             }
         } catch (Exception ex) {

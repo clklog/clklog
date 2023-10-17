@@ -66,4 +66,20 @@ public class AppTest {
         }
         return dynamicTestList;
     }
+
+    @TestFactory
+    Collection<DynamicTest> testParseUrlPath() throws IOException {
+        List<DynamicTest> dynamicTestList = new ArrayList<>();
+
+        File file = new File("src/test/resources/urlpath_test.txt");
+
+        List<String> urlList = Files.readAllLines(file.toPath());
+
+        for (int i = 0; i < urlList.size(); i++) {
+            String[] array = urlList.get(i).split(",", -1);
+            String parsed = UtilHelper.parseUrlPath(array[0]);
+            dynamicTestList.add(dynamicTest("test" + i, () -> Assertions.assertEquals(parsed, array[1], "ok")));
+        }
+        return dynamicTestList;
+    }
 }
