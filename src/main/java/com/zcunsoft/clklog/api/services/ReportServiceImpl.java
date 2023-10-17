@@ -256,7 +256,7 @@ public class ReportServiceImpl implements IReportService {
         where = buildProvinceFilter(getVisitUriDetailRequest.getProvince(), paramMap, where);
         where = buildVisitorTypeFilter(getVisitUriDetailRequest.getVisitorType(), paramMap, where);
         if (StringUtils.isNotBlank(where)) {
-            getVisitUriSql += " where uri = 'all' and " + where.substring(4);
+            getVisitUriSql += " where uri = 'all' and title='all' and uri_path='all' and " + where.substring(4);
         }
 
         VisituriDetailbydate visituriDetailbydate = clickHouseJdbcTemplate.queryForObject(getVisitUriSql, paramMap,
@@ -285,9 +285,9 @@ public class ReportServiceImpl implements IReportService {
             GetVisitUriDetailPageRequest getVisitUriDetailPageRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count,sum(down_pv_count) as down_pv_count,sum(exit_count) as exit_count,sum(entry_count) as entry_count from visituri_detail_bydate t";
-        String getListSql = "select t.uri as uri," + selectSql;
+        String getListSql = "select t.uri as uri,t.uri_path as uri_path,t.title as title," + selectSql;
 //        String getSummarySql = "select " + selectSql;
-        String getCountSql = "select countDistinct(t.uri) from visituri_detail_bydate t";
+        String getCountSql = "select countDistinct(t.uri,t.title,t.uri_path) from visituri_detail_bydate t";
         String where = "";
 
         where = buildChannelFilter(getVisitUriDetailPageRequest.getChannel(), paramMap, where);
@@ -300,11 +300,11 @@ public class ReportServiceImpl implements IReportService {
 
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
-            getListSql += " where t.uri <> 'all' and " + where;
+            getListSql += " where t.uri <> 'all' and t.uri_path <> '' and t.title <> '' and " + where;
 //            getSummarySql += " where t.uri <> 'all' and " + where;
-            getCountSql += " where t.uri <> 'all' and " + where;
+            getCountSql += " where t.uri <> 'all' and t.uri_path <> '' and t.title <> '' and " + where;
         }
-        getListSql += " group by t.uri";
+        getListSql += " group by t.uri,t.title,t.uri_path";
         String sortSql = SortType.getSortSql(SortType.VisitUriDetail, getVisitUriDetailPageRequest.getSortName(), getVisitUriDetailPageRequest.getSortOrder());
         getListSql += sortSql;
         getListSql += " limit " + (getVisitUriDetailPageRequest.getPageNum() - 1) * getVisitUriDetailPageRequest.getPageSize() + "," + getVisitUriDetailPageRequest.getPageSize();
@@ -339,6 +339,8 @@ public class ReportServiceImpl implements IReportService {
             visitUriDetail.setUri(visituriDetailbydate.getUri());
             visitUriDetail.setUv(visituriDetailbydate.getUv());
             visitUriDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
+            visitUriDetail.setTitle(visituriDetailbydate.getTitle());
+            visitUriDetail.setUriPath(visituriDetailbydate.getUriPath());
             visitUriDetailList.add(visitUriDetail);
         }
         responseData.setRows(visitUriDetailList);
@@ -346,6 +348,7 @@ public class ReportServiceImpl implements IReportService {
         response.setData(responseData);
         return response;
     }
+
 
     @Override
     public GetSearchWordResponse getSearchWord(GetSearchWordRequest getSearchWordRequest) {
@@ -505,6 +508,323 @@ public class ReportServiceImpl implements IReportService {
         return response;
     }
 
+    @Override
+    public GetAreaDetailPageResponse getCountryDetailList(GetAreaDetailPageRequest getAreaDetailPageRequest) {
+        MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
+        String getListSql = "select t.country as country," + selectSql;
+        String getSummarySql = "select " + selectSql;
+        String getCountSql = "select countDistinct(country) from area_detail_bydate t";
+        String where = "";
+
+        where = buildChannelFilter(getAreaDetailPageRequest.getChannel(), paramMap, where);
+        where = buildStatDateStartFilter(getAreaDetailPageRequest.getStartTime(), paramMap, where);
+        where = buildStatDateEndFilter(getAreaDetailPageRequest.getEndTime(), paramMap, where);
+        where = buildProjectNameFilter(getAreaDetailPageRequest.getProjectName(), paramMap, where);
+        where = buildVisitorTypeFilter(getAreaDetailPageRequest.getVisitorType(), paramMap, where);
+
+        if (StringUtils.isNotBlank(where)) {
+            where = where.substring(4);
+            getListSql += " where t.country<>'all' and " + where;
+            getSummarySql += " where t.country='all' and " + where;
+            getCountSql += " where t.country<>'all' and " + where;
+        }
+
+        getListSql += " group by t.country ";
+        String sortSql = SortType.getSortSql(SortType.AreaDetail, getAreaDetailPageRequest.getSortName(), getAreaDetailPageRequest.getSortOrder());
+        getListSql += sortSql;
+        getListSql += " limit " + (getAreaDetailPageRequest.getPageNum() - 1) * getAreaDetailPageRequest.getPageSize() + "," + getAreaDetailPageRequest.getPageSize();
+
+        List<AreaDetailbydate> areaDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<AreaDetailbydate>(AreaDetailbydate.class));
+
+        List<AreaDetailbydate> summaryAreaDetailbydate = clickHouseJdbcTemplate.query(getSummarySql, paramMap, new BeanPropertyRowMapper<AreaDetailbydate>(AreaDetailbydate.class));
+
+        Integer total = clickHouseJdbcTemplate.queryForObject(getCountSql, paramMap, Integer.class);
+        AreaDetailbydate totalAreaDetailbydate = null;
+        if (summaryAreaDetailbydate.size() > 0) {
+            totalAreaDetailbydate = summaryAreaDetailbydate.get(0);
+        }
+
+        List<AreaDetail> areaDetailList = new ArrayList<>();
+
+        GetAreaDetailPageResponse response = new GetAreaDetailPageResponse();
+        GetAreaDetailPageResponseData responseData = new GetAreaDetailPageResponseData();
+        for (AreaDetailbydate areaDetailbydate : areaDetailbydateList) {
+            FlowDetail flowDetail = assemblyFlowDetail(areaDetailbydate, totalAreaDetailbydate);
+            AreaDetail areaDetail = new AreaDetail();
+            areaDetail.setAvgPv(flowDetail.getAvgPv());
+            areaDetail.setAvgVisitTime((int) flowDetail.getAvgVisitTime());
+            areaDetail.setNewUvRate(flowDetail.getNewUvRate());
+            areaDetail.setBounceRate(flowDetail.getBounceRate());
+            areaDetail.setIpCount(flowDetail.getIpCount());
+            areaDetail.setNewUv(flowDetail.getNewUv());
+            areaDetail.setCountry(areaDetailbydate.getCountry());
+            areaDetail.setPv(flowDetail.getPv());
+            areaDetail.setPvRate(flowDetail.getPvRate());
+            areaDetail.setUv(flowDetail.getUv());
+            areaDetail.setVisitCount(flowDetail.getVisitCount());
+            areaDetailList.add(areaDetail);
+        }
+        responseData.setRows(areaDetailList);
+        responseData.setTotal(total);
+        response.setData(responseData);
+        return response;
+    }
+
+    
+    private AreaDetailbydate getAreaSummarybydate(GetAreaDetailComparePageRequest getAreaDetailComparePageRequest,String startTime,String endTime) {
+    	MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
+        String getSummarySql = "select " + selectSql;
+        String where = "";
+
+        where = buildChannelFilter(getAreaDetailComparePageRequest.getChannel(), paramMap, where);
+        where = buildStatDateStartFilter(getAreaDetailComparePageRequest.getStartTime(), paramMap, where);
+        where = buildStatDateEndFilter(getAreaDetailComparePageRequest.getEndTime(), paramMap, where);
+        where = buildProjectNameFilter(getAreaDetailComparePageRequest.getProjectName(), paramMap, where);
+        where = buildVisitorTypeFilter(getAreaDetailComparePageRequest.getVisitorType(), paramMap, where);
+
+        if (StringUtils.isNotBlank(where)) {
+            where = where.substring(4);
+            getSummarySql += " where t.province='all' and t.country='all' and " + where;
+        }
+
+        List<AreaDetailbydate> summaryAreaDetailbydate = clickHouseJdbcTemplate.query(getSummarySql, paramMap, new BeanPropertyRowMapper<AreaDetailbydate>(AreaDetailbydate.class));
+
+        AreaDetailbydate totalAreaDetailbydate = null;
+        if (summaryAreaDetailbydate.size() > 0) {
+            totalAreaDetailbydate = summaryAreaDetailbydate.get(0);
+        }
+        return totalAreaDetailbydate;
+    }
+    
+    
+    
+    
+    @Override
+	public GetAreaDetailComparePageResponse getProvinceDetailListByCompare(
+			GetAreaDetailComparePageRequest getAreaDetailComparePageRequest) {
+    	MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        String getAllSql = "select p1.*,p2.* from ";
+        String getAllCountSql = "select countDistinct(p3.country,p3.compare_country,p3.province,p3.compare_province) from ";
+    	String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
+        String compareSelectSql = "sum(pv) as compare_pv,sum(ip_count) as compare_ip_count,sum(visit_count) as compare_visit_count,sum(uv) as compare_uv,sum(new_uv) as compare_new_uv,sum(visit_time) as compare_visit_time,sum(bounce_count) as compare_bounce_count from area_detail_bydate t";
+        String getListSql = "select t.province as province,t.country as country," + selectSql;
+        String getCompareListSql = "select t.province as compare_province,t.country as compare_country," + compareSelectSql;
+        String selectListWhere = "";
+
+        selectListWhere = buildChannelFilter(getAreaDetailComparePageRequest.getChannel(), paramMap, selectListWhere);
+        selectListWhere = buildStatDateStartFilter(getAreaDetailComparePageRequest.getStartTime(), paramMap, selectListWhere);
+        selectListWhere = buildStatDateEndFilter(getAreaDetailComparePageRequest.getEndTime(), paramMap, selectListWhere);
+        selectListWhere = buildProjectNameFilter(getAreaDetailComparePageRequest.getProjectName(), paramMap, selectListWhere);
+        selectListWhere = buildVisitorTypeFilter(getAreaDetailComparePageRequest.getVisitorType(), paramMap, selectListWhere);
+        
+        String compareSelectListWhere = "";
+
+        compareSelectListWhere = buildChannelFilter(getAreaDetailComparePageRequest.getChannel(), paramMap, compareSelectListWhere);
+        compareSelectListWhere = buildCompareStatDateStartFilter(getAreaDetailComparePageRequest.getCompareStartTime(), paramMap, compareSelectListWhere);
+        compareSelectListWhere = buildCompareStatDateEndFilter(getAreaDetailComparePageRequest.getCompareEndTime(), paramMap, compareSelectListWhere);
+        compareSelectListWhere = buildProjectNameFilter(getAreaDetailComparePageRequest.getProjectName(), paramMap, compareSelectListWhere);
+        compareSelectListWhere = buildVisitorTypeFilter(getAreaDetailComparePageRequest.getVisitorType(), paramMap, compareSelectListWhere);
+
+        if (StringUtils.isNotBlank(selectListWhere)) {
+        	selectListWhere = selectListWhere.substring(4);
+        	compareSelectListWhere = compareSelectListWhere.substring(4);
+            getListSql += " where t.province <> 'all' and t.country<>'all' and " + selectListWhere;
+            getCompareListSql += " where t.province <> 'all' and t.country<>'all' and " + compareSelectListWhere;
+        }
+
+        getListSql += " group by t.province,t.country ";
+        getCompareListSql += " group by t.province,t.country ";
+        getAllSql += "(" + getListSql + ") p1 full outer join (" + getCompareListSql + ") p2 on p1.country=p2.compare_country and p1.province=p2.compare_province";
+        
+        getAllCountSql += "(" +getAllSql+") p3";
+        getAllSql += " limit " + (getAreaDetailComparePageRequest.getPageNum() - 1) * getAreaDetailComparePageRequest.getPageSize() + "," + getAreaDetailComparePageRequest.getPageSize();
+        List<AreaDetailbycompare> areaDetailbydateList = clickHouseJdbcTemplate.query(getAllSql, paramMap, new BeanPropertyRowMapper<AreaDetailbycompare>(AreaDetailbycompare.class));
+        Integer total = clickHouseJdbcTemplate.queryForObject(getAllCountSql, paramMap, Integer.class);
+        
+        AreaDetailbydate totalCompareAreaDetailbydate1 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getStartTime(), getAreaDetailComparePageRequest.getEndTime());
+        AreaDetailbydate totalCompareAreaDetailbydate2 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getCompareStartTime(), getAreaDetailComparePageRequest.getCompareEndTime()); 
+        
+    	GetAreaDetailComparePageResponseData responseData = new GetAreaDetailComparePageResponseData();
+    	responseData.setTotal(total);
+    	List<AreaDetailCompare> rows = new ArrayList<AreaDetailCompare>();
+    	for(AreaDetailbycompare areaDetailbydate : areaDetailbydateList) {
+    		AreaDetailCompare areaDetailCompare = new AreaDetailCompare();
+    		if(StringUtils.isEmpty(areaDetailbydate.getProvince())) {
+    			areaDetailCompare.setProvince(StringUtils.equalsIgnoreCase("未知省份", areaDetailbydate.getCompareProvince()) ? Constants.DEFAULT_PROVICE : areaDetailbydate.getCompareProvince());
+    		} else {
+    			areaDetailCompare.setProvince(StringUtils.equalsIgnoreCase("未知省份", areaDetailbydate.getProvince()) ? Constants.DEFAULT_PROVICE : areaDetailbydate.getProvince());
+    		}
+    		areaDetailCompare.setCountry(StringUtils.isEmpty(areaDetailbydate.getCountry()) ? areaDetailbydate.getCompareCountry() : areaDetailbydate.getCountry());
+    		List<AreaDetail> areaDetailList = new ArrayList<AreaDetail>();
+    		
+    		AreaDetailbydate  areaDetailbydate1 = new AreaDetailbydate();
+    		areaDetailbydate1.setBounceCount(areaDetailbydate.getBounceCount());
+    		areaDetailbydate1.setIpCount(areaDetailbydate.getIpCount());
+    		areaDetailbydate1.setNewUv(areaDetailbydate.getNewUv());
+    		areaDetailbydate1.setUv(areaDetailbydate.getUv());
+    		areaDetailbydate1.setPv(areaDetailbydate.getPv());
+    		areaDetailbydate1.setVisitCount(areaDetailbydate.getVisitCount());
+    		areaDetailbydate1.setVisitTime(areaDetailbydate.getVisitTime());
+    		
+    		FlowDetail flowDetail1 = assemblyFlowDetail(areaDetailbydate1, totalCompareAreaDetailbydate1);
+    		//拆分对比数据
+    		AreaDetail compare1 = new AreaDetail();
+    		compare1.setAvgPv(flowDetail1.getAvgPv());
+    		compare1.setAvgVisitTime((int) flowDetail1.getAvgVisitTime());
+    		compare1.setNewUvRate(flowDetail1.getNewUvRate());
+    		compare1.setBounceRate(flowDetail1.getBounceRate());
+    		compare1.setIpCount(flowDetail1.getIpCount());
+    		compare1.setNewUv(flowDetail1.getNewUv());
+    		compare1.setPv(flowDetail1.getPv());
+    		compare1.setPvRate(flowDetail1.getPvRate());
+    		compare1.setUv(flowDetail1.getUv());
+    		compare1.setVisitCount(flowDetail1.getVisitCount());
+    		
+    		AreaDetailbydate  areaDetailbydate2 = new AreaDetailbydate();
+    		areaDetailbydate2.setBounceCount(areaDetailbydate.getCompareBounceCount());
+    		areaDetailbydate2.setIpCount(areaDetailbydate.getCompareIpCount());
+    		areaDetailbydate2.setNewUv(areaDetailbydate.getCompareNewUv());
+    		areaDetailbydate2.setUv(areaDetailbydate.getCompareUv());
+    		areaDetailbydate2.setPv(areaDetailbydate.getComparePv());
+    		areaDetailbydate2.setVisitCount(areaDetailbydate.getCompareVisitCount());
+    		areaDetailbydate2.setVisitTime(areaDetailbydate.getCompareVisitTime());
+    		
+    		FlowDetail flowDetail2 = assemblyFlowDetail(areaDetailbydate2, totalCompareAreaDetailbydate2);
+    		
+    		AreaDetail compare2 = new AreaDetail();
+    		compare2.setAvgPv(flowDetail2.getAvgPv());
+    		compare2.setAvgVisitTime((int) flowDetail2.getAvgVisitTime());
+    		compare2.setNewUvRate(flowDetail2.getNewUvRate());
+    		compare2.setBounceRate(flowDetail2.getBounceRate());
+    		compare2.setIpCount(areaDetailbydate.getCompareIpCount());
+    		compare2.setNewUv(areaDetailbydate.getCompareNewUv());
+    		compare2.setPv(areaDetailbydate.getComparePv());
+    		compare2.setPvRate(flowDetail2.getPvRate());
+    		compare2.setUv(areaDetailbydate.getCompareUv());
+    		compare2.setVisitCount(areaDetailbydate.getCompareVisitCount());
+    		areaDetailList.add(compare1);
+    		areaDetailList.add(compare2);
+    		areaDetailCompare.setRows(areaDetailList);
+    		rows.add(areaDetailCompare);
+    	}
+    	responseData.setRows(rows);
+    	GetAreaDetailComparePageResponse response = new GetAreaDetailComparePageResponse();
+    	response.setData(responseData);
+		return response;
+	}
+
+	@Override
+	public GetAreaDetailComparePageResponse getCountryDetailListByCompare(
+			GetAreaDetailComparePageRequest getAreaDetailComparePageRequest) {
+    	
+    	MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        String getAllSql = "select p1.*,p2.* from ";
+        String getAllCountSql = "select countDistinct(p3.country,p3.compare_country) from ";
+    	String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
+        String compareSelectSql = "sum(pv) as compare_pv,sum(ip_count) as compare_ip_count,sum(visit_count) as compare_visit_count,sum(uv) as compare_uv,sum(new_uv) as compare_new_uv,sum(visit_time) as compare_visit_time,sum(bounce_count) as compare_bounce_count from area_detail_bydate t";
+        String getListSql = "select t.country as country," + selectSql;
+        String getCompareListSql = "select t.country as compare_country," + compareSelectSql;
+        String selectListWhere = "";
+
+        selectListWhere = buildChannelFilter(getAreaDetailComparePageRequest.getChannel(), paramMap, selectListWhere);
+        selectListWhere = buildStatDateStartFilter(getAreaDetailComparePageRequest.getStartTime(), paramMap, selectListWhere);
+        selectListWhere = buildStatDateEndFilter(getAreaDetailComparePageRequest.getEndTime(), paramMap, selectListWhere);
+        selectListWhere = buildProjectNameFilter(getAreaDetailComparePageRequest.getProjectName(), paramMap, selectListWhere);
+        selectListWhere = buildVisitorTypeFilter(getAreaDetailComparePageRequest.getVisitorType(), paramMap, selectListWhere);
+        
+        String compareSelectListWhere = "";
+
+        compareSelectListWhere = buildChannelFilter(getAreaDetailComparePageRequest.getChannel(), paramMap, compareSelectListWhere);
+        compareSelectListWhere = buildCompareStatDateStartFilter(getAreaDetailComparePageRequest.getCompareStartTime(), paramMap, compareSelectListWhere);
+        compareSelectListWhere = buildCompareStatDateEndFilter(getAreaDetailComparePageRequest.getCompareEndTime(), paramMap, compareSelectListWhere);
+        compareSelectListWhere = buildProjectNameFilter(getAreaDetailComparePageRequest.getProjectName(), paramMap, compareSelectListWhere);
+        compareSelectListWhere = buildVisitorTypeFilter(getAreaDetailComparePageRequest.getVisitorType(), paramMap, compareSelectListWhere);
+
+        if (StringUtils.isNotBlank(selectListWhere)) {
+        	selectListWhere = selectListWhere.substring(4);
+        	compareSelectListWhere = compareSelectListWhere.substring(4);
+            getListSql += " where t.province <> 'all' and t.country<>'all' and " + selectListWhere;
+            getCompareListSql += " where t.province <> 'all' and t.country<>'all' and " + compareSelectListWhere;
+        }
+
+        getListSql += " group by t.country ";
+        getCompareListSql += " group by t.country ";
+        getAllSql += "(" + getListSql + ") p1 full outer join (" + getCompareListSql + ") p2 on p1.country=p2.compare_country";
+        
+        getAllCountSql += "(" +getAllSql+") p3";
+        getAllSql += " limit " + (getAreaDetailComparePageRequest.getPageNum() - 1) * getAreaDetailComparePageRequest.getPageSize() + "," + getAreaDetailComparePageRequest.getPageSize();
+        List<AreaDetailbycompare> areaDetailbydateList = clickHouseJdbcTemplate.query(getAllSql, paramMap, new BeanPropertyRowMapper<AreaDetailbycompare>(AreaDetailbycompare.class));
+        Integer total = clickHouseJdbcTemplate.queryForObject(getAllCountSql, paramMap, Integer.class);
+        
+        AreaDetailbydate totalCompareAreaDetailbydate1 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getStartTime(), getAreaDetailComparePageRequest.getEndTime());
+        AreaDetailbydate totalCompareAreaDetailbydate2 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getCompareStartTime(), getAreaDetailComparePageRequest.getCompareEndTime()); 
+        
+    	GetAreaDetailComparePageResponseData responseData = new GetAreaDetailComparePageResponseData();
+    	responseData.setTotal(total);
+    	List<AreaDetailCompare> rows = new ArrayList<AreaDetailCompare>();
+    	for(AreaDetailbycompare areaDetailbydate : areaDetailbydateList) {
+    		AreaDetailCompare areaDetailCompare = new AreaDetailCompare();
+    		areaDetailCompare.setCountry(StringUtils.isEmpty(areaDetailbydate.getCountry()) ? areaDetailbydate.getCompareCountry() : areaDetailbydate.getCountry());
+    		List<AreaDetail> areaDetailList = new ArrayList<AreaDetail>();
+    		
+    		AreaDetailbydate  areaDetailbydate1 = new AreaDetailbydate();
+    		areaDetailbydate1.setBounceCount(areaDetailbydate.getBounceCount());
+    		areaDetailbydate1.setIpCount(areaDetailbydate.getIpCount());
+    		areaDetailbydate1.setNewUv(areaDetailbydate.getNewUv());
+    		areaDetailbydate1.setUv(areaDetailbydate.getUv());
+    		areaDetailbydate1.setPv(areaDetailbydate.getPv());
+    		areaDetailbydate1.setVisitCount(areaDetailbydate.getVisitCount());
+    		areaDetailbydate1.setVisitTime(areaDetailbydate.getVisitTime());;
+    		
+    		FlowDetail flowDetail1 = assemblyFlowDetail(areaDetailbydate1, totalCompareAreaDetailbydate1);
+    		//拆分对比数据
+    		AreaDetail compare1 = new AreaDetail();
+    		compare1.setAvgPv(flowDetail1.getAvgPv());
+    		compare1.setAvgVisitTime((int) flowDetail1.getAvgVisitTime());
+    		compare1.setNewUvRate(flowDetail1.getNewUvRate());
+    		compare1.setBounceRate(flowDetail1.getBounceRate());
+    		compare1.setIpCount(flowDetail1.getIpCount());
+    		compare1.setNewUv(flowDetail1.getNewUv());
+    		compare1.setPv(flowDetail1.getPv());
+    		compare1.setPvRate(flowDetail1.getPvRate());
+    		compare1.setUv(flowDetail1.getUv());
+    		compare1.setVisitCount(flowDetail1.getVisitCount());
+    		
+    		AreaDetailbydate  areaDetailbydate2 = new AreaDetailbydate();
+    		areaDetailbydate2.setBounceCount(areaDetailbydate.getCompareBounceCount());
+    		areaDetailbydate2.setIpCount(areaDetailbydate.getCompareIpCount());
+    		areaDetailbydate2.setNewUv(areaDetailbydate.getCompareNewUv());
+    		areaDetailbydate2.setUv(areaDetailbydate.getCompareUv());
+    		areaDetailbydate2.setPv(areaDetailbydate.getComparePv());
+    		areaDetailbydate2.setVisitCount(areaDetailbydate.getCompareVisitCount());
+    		areaDetailbydate2.setVisitTime(areaDetailbydate.getCompareVisitTime());
+    		
+    		FlowDetail flowDetail2 = assemblyFlowDetail(areaDetailbydate2, totalCompareAreaDetailbydate2);
+    		
+    		AreaDetail compare2 = new AreaDetail();
+    		compare2.setAvgPv(flowDetail2.getAvgPv());
+    		compare2.setAvgVisitTime((int) flowDetail2.getAvgVisitTime());
+    		compare2.setNewUvRate(flowDetail2.getNewUvRate());
+    		compare2.setBounceRate(flowDetail2.getBounceRate());
+    		compare2.setIpCount(areaDetailbydate.getCompareIpCount());
+    		compare2.setNewUv(areaDetailbydate.getCompareNewUv());
+    		compare2.setPv(areaDetailbydate.getComparePv());
+    		compare2.setPvRate(flowDetail2.getPvRate());
+    		compare2.setUv(areaDetailbydate.getCompareUv());
+    		compare2.setVisitCount(areaDetailbydate.getCompareVisitCount());
+    		areaDetailList.add(compare1);
+    		areaDetailList.add(compare2);
+    		areaDetailCompare.setRows(areaDetailList);
+    		rows.add(areaDetailCompare);
+    	}
+    	responseData.setRows(rows);
+    	GetAreaDetailComparePageResponse response = new GetAreaDetailComparePageResponse();
+    	response.setData(responseData);
+		return response;
+	}
+    
     @Override
     public GetAreaDetailTotalResponse getAreaDetailTotal(GetAreaDetailRequest getAreaDetailRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -788,6 +1108,45 @@ public class ReportServiceImpl implements IReportService {
         return response;
     }
 
+    
+
+    @Override
+	public GetFlowTrendDetailCompareResponse getFlowDetailByCompare(
+			GetFlowTrendDetailCompareRequest getFlowTrendDetailCompareRequest) {
+    	
+    	GetFlowTrendDetailRequest getFlowTrendDetailRequest1 = new GetFlowTrendDetailRequest();
+    	BeanUtils.copyProperties(getFlowTrendDetailCompareRequest, getFlowTrendDetailRequest1);
+    	getFlowTrendDetailRequest1.setTimeType("hour");
+    	List<FlowDetail> flowDetailList1 = getFlowDetail(getFlowTrendDetailRequest1).getData();
+    	
+    	
+    	GetFlowTrendDetailRequest getFlowTrendDetailRequest2 = new GetFlowTrendDetailRequest();
+    	BeanUtils.copyProperties(getFlowTrendDetailCompareRequest, getFlowTrendDetailRequest2);
+    	getFlowTrendDetailRequest2.setTimeType("hour");
+    	getFlowTrendDetailRequest2.setStartTime(getFlowTrendDetailCompareRequest.getCompareStartTime());
+    	getFlowTrendDetailRequest2.setEndTime(getFlowTrendDetailCompareRequest.getCompareEndTime());
+    	List<FlowDetail> flowDetailList2 = getFlowDetail(getFlowTrendDetailRequest2).getData();
+    	
+    	List<GetFlowTrendDetailCompareData> getFlowTrendDetailCompareDataList = new ArrayList<GetFlowTrendDetailCompareData>();
+
+    	for(FlowDetail flowDetail1 : flowDetailList1) {
+    		for(FlowDetail flowDetail2 : flowDetailList2) {
+    			if(flowDetail1.getStatTime().equals(flowDetail2.getStatTime())) {
+    				GetFlowTrendDetailCompareData getFlowTrendDetailCompareData = new GetFlowTrendDetailCompareData();
+    		    	getFlowTrendDetailCompareData.setStatTime(flowDetail1.getStatTime());
+    		    	List<FlowDetail> flowDetailList3 = new ArrayList<FlowDetail>();
+    		    	flowDetailList3.add(flowDetail1);
+    		    	flowDetailList3.add(flowDetail2);
+    		    	getFlowTrendDetailCompareData.setDetail(flowDetailList3);
+    		    	getFlowTrendDetailCompareDataList.add(getFlowTrendDetailCompareData);
+    			}
+    		}
+    	}
+    	GetFlowTrendDetailCompareResponse response = new GetFlowTrendDetailCompareResponse();
+    	response.setData(getFlowTrendDetailCompareDataList);;
+		return response;
+	}
+    
     @Override
     public GetSearchWordDetailResponse getSearchWordDetail(GetSearchWordDetailRequest getSearchWordDetailRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -2298,6 +2657,28 @@ public class ReportServiceImpl implements IReportService {
         Timestamp startTime = transformFilterTime(_startTime, true, timeType);
         where += " and t.stat_date>=:starttime";
         paramMap.addValue("starttime", this.yMdFORMAT.get().format(startTime));
+        return where;
+    }
+    
+    private String buildCompareStatDateEndFilter(String _endTime, MapSqlParameterSource paramMap, String where) {
+        return buildCompareStatDateEndFilter(_endTime, paramMap, where, "day");
+    }
+
+    private String buildCompareStatDateEndFilter(String _endTime, MapSqlParameterSource paramMap, String where, String timeType) {
+        Timestamp endTime = transformFilterTime(_endTime, false, timeType);
+        where += " and t.stat_date<=:compareEndtime";
+        paramMap.addValue("compareEndtime", this.yMdFORMAT.get().format(endTime));
+        return where;
+    }
+
+    private String buildCompareStatDateStartFilter(String _startTime, MapSqlParameterSource paramMap, String where) {
+        return buildCompareStatDateStartFilter(_startTime, paramMap, where, "day");
+    }
+
+    private String buildCompareStatDateStartFilter(String _startTime, MapSqlParameterSource paramMap, String where, String timeType) {
+        Timestamp startTime = transformFilterTime(_startTime, true, timeType);
+        where += " and t.stat_date>=:compareStarttime";
+        paramMap.addValue("compareStarttime", this.yMdFORMAT.get().format(startTime));
         return where;
     }
 

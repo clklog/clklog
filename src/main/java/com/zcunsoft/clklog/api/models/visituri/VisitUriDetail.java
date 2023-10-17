@@ -38,4 +38,7 @@ public class VisitUriDetail {
     
     @Schema(description = "标题")
     private String title;
+    
+    @Schema(description = "路径")
+    private String uriPath;
 }

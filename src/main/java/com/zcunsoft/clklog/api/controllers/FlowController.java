@@ -6,6 +6,8 @@ import com.zcunsoft.clklog.api.models.summary.GetFlowTrendRequest;
 import com.zcunsoft.clklog.api.models.summary.GetFlowTrendResponse;
 import com.zcunsoft.clklog.api.models.trend.GetFlowDetailResponse;
 import com.zcunsoft.clklog.api.models.trend.GetFlowTotalResponse;
+import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailCompareRequest;
+import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailCompareResponse;
 import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailRequest;
 import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailResponse;
 import com.zcunsoft.clklog.api.services.IReportService;
@@ -56,5 +58,11 @@ public class FlowController {
     @RequestMapping(path = "/getFlowDetail", method = RequestMethod.POST)
     public GetFlowDetailResponse getFlowDetail(@RequestBody GetFlowTrendDetailRequest getFlowTrendDetailRequest, HttpServletRequest request) {
         return reportService.getFlowDetail(getFlowTrendDetailRequest);
+    }
+    
+    @Operation(summary = "获取流量统计对比数据")
+    @RequestMapping(path = "/getFlowDetailByCompare", method = RequestMethod.POST)
+    public GetFlowTrendDetailCompareResponse getFlowDetailByCompare(@RequestBody GetFlowTrendDetailCompareRequest getFlowTrendDetailCompareRequest, HttpServletRequest request) {
+        return reportService.getFlowDetailByCompare(getFlowTrendDetailCompareRequest);
     }
 }

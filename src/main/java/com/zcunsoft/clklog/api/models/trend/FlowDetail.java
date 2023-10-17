@@ -125,4 +125,12 @@ public class FlowDetail {
 
     @Schema(description = "流失访客")
     private int churn;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Schema(description = "标题")
+	private String title;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Schema(description = "路径")
+	private String uriPath;
 }
