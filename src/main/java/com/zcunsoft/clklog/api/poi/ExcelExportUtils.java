@@ -75,6 +75,8 @@ public class ExcelExportUtils  {
 				add("channel");
 				add("province");
 				add("uri");
+				add("uriPath");
+				add("title");
 				add("pv");
 				add("pvRate");
 				add("visitCount");
@@ -479,6 +481,12 @@ public class ExcelExportUtils  {
     	 }
     	 if(cols.contains("uri")) {
     		 addCellWithStyle(row, detailColIndex++, bodyStyle).setCellValue(flowDetail.getUri());
+    	 }
+    	 if(cols.contains("uriPath")) {
+    		 addCellWithStyle(row, detailColIndex++, bodyStyle).setCellValue(flowDetail.getUriPath());
+    	 }
+    	 if(cols.contains("title")) {
+    		 addCellWithStyle(row, detailColIndex++, bodyStyle).setCellValue(flowDetail.getTitle());
     	 }
     	 if(cols.contains("pv")) {
          	addCellWithStyle(row, detailColIndex++, bodyStyle).setCellValue(flowDetail.getPv());

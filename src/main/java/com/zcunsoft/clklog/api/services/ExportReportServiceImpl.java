@@ -284,7 +284,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         where = buildProvinceFilter(downloadRequest.getProvince(), paramMap, where);
         where = buildVisitorTypeFilter(downloadRequest.getVisitorType(), paramMap, where);
         if (StringUtils.isNotBlank(where)) {
-            getVisitUriSql += " where uri = 'all' and " + where.substring(4);
+            getVisitUriSql += " where uri = 'all' and uri_path='all' and title='all' and " + where.substring(4);
         }
 
         VisituriDetailbydate visituriDetailbydate = clickHouseJdbcTemplate.queryForObject(getVisitUriSql, paramMap,
@@ -303,7 +303,7 @@ public class ExportReportServiceImpl implements IExportReportService {
     public List<FlowDetail> getVisitUriDetailList(DownloadRequest downloadRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count,sum(down_pv_count) as downPvCount,sum(exit_count) as exitCount,sum(entry_count) as entryCount from visituri_detail_bydate t";
-        String getListSql = "select t.uri as uri," + selectSql;
+        String getListSql = "select t.uri as uri,t.uri_path as uri_path,t.title as title " + selectSql;
         String where = "";
 
         where = buildChannelFilter(downloadRequest.getChannel(), paramMap, where);
@@ -316,9 +316,9 @@ public class ExportReportServiceImpl implements IExportReportService {
 
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
-            getListSql += " where t.uri <> 'all' and " + where;
+            getListSql += " where t.uri <> 'all' and t.uri_path <> 'all' and t.title<> 'all' and " + where;
         }
-        getListSql += " group by t.uri"; 
+        getListSql += " group by t.uri,t.uri_path,t.title "; 
         getListSql += " order by pv desc "; 
         List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
 
@@ -334,6 +334,8 @@ public class ExportReportServiceImpl implements IExportReportService {
             }
             flowDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
             flowDetail.setUri(visituriDetailbydate.getUri());
+            flowDetail.setTitle(visituriDetailbydate.getTitle());
+            flowDetail.setUriPath(visituriDetailbydate.getUriPath());
             visitUriDetailList.add(flowDetail);
         }
         return visitUriDetailList;
