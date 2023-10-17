@@ -303,7 +303,7 @@ public class ExportReportServiceImpl implements IExportReportService {
     public List<FlowDetail> getVisitUriDetailList(DownloadRequest downloadRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count,sum(down_pv_count) as downPvCount,sum(exit_count) as exitCount,sum(entry_count) as entryCount from visituri_detail_bydate t";
-        String getListSql = "select t.uri as uri,t.uri_path as uri_path,t.title as title " + selectSql;
+        String getListSql = "select t.uri as uri,t.uri_path as uri_path,t.title as title, " + selectSql;
         String where = "";
 
         where = buildChannelFilter(downloadRequest.getChannel(), paramMap, where);
