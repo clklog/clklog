@@ -26,5 +26,8 @@ public class VisituriDetailbydate extends BaseDetailbydate {
     
     @Column 
     String title;
+    
+    @Column 
+    String uriPath;
 
 }

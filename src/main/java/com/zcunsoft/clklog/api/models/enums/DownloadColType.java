@@ -12,7 +12,8 @@ public enum DownloadColType {
 	Province("地域","province",4000),
 	DistinctId("访客ID","distinctId",4000),
 	Uri("页面URL","uri",4000),
-	
+	UriPath("页面U路径","uriPath",4000),
+	Title("标题","title",4000),
     Pv("浏览量","pv",4000 ),
     PvRate("浏览量占比(%)","pvRate",4000 ),
     VisitCount("访问次数","visitCount",4000 ),

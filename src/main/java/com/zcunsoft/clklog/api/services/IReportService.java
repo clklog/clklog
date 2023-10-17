@@ -1,5 +1,7 @@
 package com.zcunsoft.clklog.api.services;
 
+import com.zcunsoft.clklog.api.models.area.GetAreaDetailComparePageRequest;
+import com.zcunsoft.clklog.api.models.area.GetAreaDetailComparePageResponse;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailPageRequest;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailPageResponse;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailRequest;
@@ -16,6 +18,8 @@ import com.zcunsoft.clklog.api.models.sourcewebsite.*;
 import com.zcunsoft.clklog.api.models.summary.*;
 import com.zcunsoft.clklog.api.models.trend.GetFlowDetailResponse;
 import com.zcunsoft.clklog.api.models.trend.GetFlowTotalResponse;
+import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailCompareRequest;
+import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailCompareResponse;
 import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailRequest;
 import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailResponse;
 import com.zcunsoft.clklog.api.models.uservisit.GetUserPvbydateResponse;
@@ -50,6 +54,12 @@ public interface IReportService {
     GetAreaResponse getArea(GetAreaRequest getAreaRequest);
     
     GetAreaDetailPageResponse getAreaDetailList(GetAreaDetailPageRequest getAreaDetailPageRequest);
+    
+    GetAreaDetailPageResponse getCountryDetailList(GetAreaDetailPageRequest getAreaDetailPageRequest);
+    
+    GetAreaDetailComparePageResponse getCountryDetailListByCompare(GetAreaDetailComparePageRequest getAreaDetailComparePageRequest);
+    
+    GetAreaDetailComparePageResponse getProvinceDetailListByCompare(GetAreaDetailComparePageRequest getAreaDetailComparePageRequest);
     
     GetAreaDetailTotalResponse getAreaDetailTotal(GetAreaDetailRequest getAreaDetailRequest);
 
@@ -107,4 +117,7 @@ public interface IReportService {
     GetVisitUriPathTreeTotalResponse getVisitUriPathTreeTotal(GetVisitUriDetailRequest getVisitUriDetailRequest);
 
     GetVisitUriListOfUriPathResponse getVisitUriListOfUriPath(GetVisitUriListOfUriPathRequest getVisitUriListOfUriPathRequest);
+    
+    GetFlowTrendDetailCompareResponse getFlowDetailByCompare(GetFlowTrendDetailCompareRequest getFlowTrendDetailCompareRequest);
+
 }

@@ -1,5 +1,7 @@
 package com.zcunsoft.clklog.api.controllers;
 
+import com.zcunsoft.clklog.api.models.area.GetAreaDetailComparePageRequest;
+import com.zcunsoft.clklog.api.models.area.GetAreaDetailComparePageResponse;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailPageRequest;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailPageResponse;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailRequest;
@@ -37,6 +39,11 @@ public class AreaController {
         return reportService.getAreaDetailList(getAreaDetailPageRequest);
     }
     
+    @Operation(summary = "分页获取按国家访问统计数据")
+    @RequestMapping(path = "/getCountryDetailList", method = RequestMethod.POST)
+    public GetAreaDetailPageResponse getCountryDetailList(@RequestBody GetAreaDetailPageRequest getAreaDetailPageRequest, HttpServletRequest request) {
+        return reportService.getCountryDetailList(getAreaDetailPageRequest);
+    }
     
     @Operation(summary = "获取地域访问合计数据")
     @RequestMapping(path = "/getAreaDetailTotal", method = RequestMethod.POST)
@@ -48,5 +55,17 @@ public class AreaController {
     @RequestMapping(path = "/getAreaDetailTop10", method = RequestMethod.POST)
     public GetAreaResponse getAreaDetailTop10(@RequestBody GetAreaDetailRequest getAreaDetailRequest, HttpServletRequest request) {
         return reportService.getAreaDetailTop10(getAreaDetailRequest);
+    }
+    
+    @Operation(summary = "分页获取按国家访问统计对比数据")
+    @RequestMapping(path = "/getCountryDetailListByCompare", method = RequestMethod.POST)
+    public GetAreaDetailComparePageResponse getCountryDetailListByCompare(@RequestBody GetAreaDetailComparePageRequest getAreaDetailComparePageRequest, HttpServletRequest request) {
+        return reportService.getCountryDetailListByCompare(getAreaDetailComparePageRequest);
+    }
+    
+    @Operation(summary = "分页获取按省份访问统计对比数据")
+    @RequestMapping(path = "/getProvinceDetailListByCompare", method = RequestMethod.POST)
+    public GetAreaDetailComparePageResponse getProvinceDetailListByCompare(@RequestBody GetAreaDetailComparePageRequest getAreaDetailComparePageRequest, HttpServletRequest request) {
+        return reportService.getProvinceDetailListByCompare(getAreaDetailComparePageRequest);
     }
 }
