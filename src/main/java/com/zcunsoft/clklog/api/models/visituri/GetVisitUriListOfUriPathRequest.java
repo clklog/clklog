@@ -30,8 +30,8 @@ public class GetVisitUriListOfUriPathRequest {
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
     private String projectName;
 
-    @Schema(description = "资源目录", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
-    private String uriPattern;
+    @Schema(description = "路径", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
+    private String uriPath;
 
 
 }

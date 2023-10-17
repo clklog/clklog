@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -2535,7 +2537,7 @@ public class ReportServiceImpl implements IReportService {
     public GetVisitUriPathTreeTotalResponse getVisitUriPathTreeTotal(GetVisitUriDetailRequest getVisitUriDetailRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count,sum(down_pv_count) as down_pv_count,sum(exit_count) as exit_count,sum(entry_count) as entry_count from visituri_detail_bydate t";
-        String getListSql = "select t.uri_pattern as uri," + selectSql;
+        String getListSql = "select t.uri_path as uri," + selectSql;
 
         String where = "";
         where = buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
@@ -2550,17 +2552,18 @@ public class ReportServiceImpl implements IReportService {
             where = where.substring(4);
             getListSql += " where t.uri <> 'all' and " + where;
         }
-        getListSql += " group by t.uri_pattern order by t.uri_pattern";
+        getListSql += " group by t.uri_path order by t.uri_path";
 
         List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
 
-        List<VisitUriDetail> visitUriDetailList = new ArrayList<>();
+        List<VisitUriPathDetail> visitUriDetailList = new ArrayList<>();
 
         GetVisitUriPathTreeTotalResponse response = new GetVisitUriPathTreeTotalResponse();
 
+        Pattern pattern = Pattern.compile("(http|https)://(www.)?(\\w+(\\.)?)+/");
         for (VisituriDetailbydate visituriDetailbydate : visitUriDetailbydateList) {
             FlowDetail flowDetail = assemblyFlowDetail(visituriDetailbydate, visituriDetailbydate);
-            VisitUriDetail visitUriDetail = new VisitUriDetail();
+            VisitUriPathDetail visitUriDetail = new VisitUriPathDetail();
             visitUriDetail.setAvgVisitTime(flowDetail.getAvgVisitTime());
             visitUriDetail.setEntryCount(visituriDetailbydate.getEntryCount());
             visitUriDetail.setExitCount(visituriDetailbydate.getExitCount());
@@ -2573,24 +2576,25 @@ public class ReportServiceImpl implements IReportService {
             visitUriDetail.setUri(visituriDetailbydate.getUri());
             visitUriDetail.setUv(visituriDetailbydate.getUv());
             visitUriDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
+            String host = "";
+            Matcher hostMatcher = pattern.matcher(visitUriDetail.getUri());
+            if (hostMatcher.find()) {
+                host = hostMatcher.group();
+            }
+            visitUriDetail.setHost(host);
             visitUriDetailList.add(visitUriDetail);
         }
+        List<VisitUriTreeStatData> visitUriTreeStatDataList = new ArrayList<>();
+        List<String> hostList = visitUriDetailList.stream().map(m -> m.getHost()).distinct().collect(Collectors.toList());
 
-        String rootUri = "/";
-        VisitUriTreeStatData rootVisitUriTreeStatData = new VisitUriTreeStatData();
-        rootVisitUriTreeStatData.setUri(rootUri);
-
-        Optional<VisitUriDetail> optionalVisitUriDetail = visitUriDetailList.stream().filter(f -> f.getUri().equalsIgnoreCase(rootUri)).findAny();
-        optionalVisitUriDetail.ifPresent(rootVisitUriTreeStatData::setDetail);
-        List<VisitUriTreeStatData> visitUriTreeStatDataList = genUriTree(visitUriDetailList, rootUri);
-
-        rootVisitUriTreeStatData.setLeafUri(visitUriTreeStatDataList);
-
-        response.setData(rootVisitUriTreeStatData);
+        for (String host : hostList) {
+            visitUriTreeStatDataList.addAll(genUriTree(visitUriDetailList, host));
+        }
+        response.setData(visitUriTreeStatDataList);
         return response;
     }
 
-    private List<VisitUriTreeStatData> genUriTree(List<VisitUriDetail> visitUriDetailList, String parentUri) {
+    private List<VisitUriTreeStatData> genUriTree(List<VisitUriPathDetail> visitUriDetailList, String parentUri) {
         if (visitUriDetailList.isEmpty()) {
             return new ArrayList<>();
         } else {
@@ -2600,9 +2604,9 @@ public class ReportServiceImpl implements IReportService {
             }
 
             String final_parentUri = _parentUri;
-            List<VisitUriDetail> subList = visitUriDetailList.stream().filter(f -> f.getUri().startsWith(final_parentUri) && !f.getUri().equalsIgnoreCase(parentUri)).collect(Collectors.toList());
+            List<VisitUriPathDetail> subList = visitUriDetailList.stream().filter(f -> f.getUri().startsWith(final_parentUri) && !f.getUri().equalsIgnoreCase(parentUri)).collect(Collectors.toList());
             List<VisitUriTreeStatData> validLeaf = new ArrayList<>();
-            for (VisitUriDetail visitUriDetail : subList) {
+            for (VisitUriPathDetail visitUriDetail : subList) {
                 if (visitUriDetail.getUri().indexOf("/", final_parentUri.length()) == -1) {
                     VisitUriTreeStatData visitUriTreeStatData = new VisitUriTreeStatData();
                     visitUriTreeStatData.setUri(visitUriDetail.getUri());
@@ -2629,8 +2633,8 @@ public class ReportServiceImpl implements IReportService {
         where = buildProvinceFilter(getVisitUriListOfUriPathRequest.getProvince(), paramMap, where);
         where = buildVisitorTypeFilter(getVisitUriListOfUriPathRequest.getVisitorType(), paramMap, where);
 
-        where += " and t.uri_pattern=:uri_pattern";
-        paramMap.addValue("uri_pattern", getVisitUriListOfUriPathRequest.getUriPattern());
+        where += " and t.uri_path=:uri_path";
+        paramMap.addValue("uri_path", getVisitUriListOfUriPathRequest.getUriPath());
 
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);

@@ -10,5 +10,5 @@ public class VisitUriTreeStatData {
     private String uri;
     private List<VisitUriTreeStatData> leafUri;
 
-    private VisitUriDetail detail;
+    private VisitUriPathDetail detail;
 }
