@@ -26,6 +26,6 @@ public class GetAreaDetailCityRequest extends BaseSort {
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
     private String projectName;
     
-    @Schema(description = "省份", requiredMode = Schema.RequiredMode.REQUIRED, example = "广东省")
+    @Schema(description = "省份", requiredMode = Schema.RequiredMode.REQUIRED, example = "广东")
     private String province;
 }
