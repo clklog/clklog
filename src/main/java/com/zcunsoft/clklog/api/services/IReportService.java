@@ -1,5 +1,7 @@
 package com.zcunsoft.clklog.api.services;
 
+import com.zcunsoft.clklog.api.models.area.GetAreaDetailCityRequest;
+import com.zcunsoft.clklog.api.models.area.GetAreaDetailCityResponse;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailComparePageRequest;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailComparePageResponse;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailPageRequest;
@@ -63,6 +65,8 @@ public interface IReportService {
     GetAreaDetailComparePageResponse getCountryDetailListByCompare(GetAreaDetailComparePageRequest getAreaDetailComparePageRequest);
     
     GetAreaDetailComparePageResponse getProvinceDetailListByCompare(GetAreaDetailComparePageRequest getAreaDetailComparePageRequest);
+    
+    GetAreaDetailCityResponse getAreaDetailCityList(GetAreaDetailCityRequest getAreaDetailCityRequest);
     
     GetAreaDetailTotalResponse getAreaDetailTotal(GetAreaDetailRequest getAreaDetailRequest);
 
