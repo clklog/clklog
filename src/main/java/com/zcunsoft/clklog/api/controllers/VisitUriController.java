@@ -2,10 +2,7 @@ package com.zcunsoft.clklog.api.controllers;
 
 import com.zcunsoft.clklog.api.models.summary.GetVisitUriRequest;
 import com.zcunsoft.clklog.api.models.summary.GetVisitUriResponse;
-import com.zcunsoft.clklog.api.models.visituri.GetVisitUriDetailPageRequest;
-import com.zcunsoft.clklog.api.models.visituri.GetVisitUriDetailPageResponse;
-import com.zcunsoft.clklog.api.models.visituri.GetVisitUriDetailRequest;
-import com.zcunsoft.clklog.api.models.visituri.GetVisitUriTotalResponse;
+import com.zcunsoft.clklog.api.models.visituri.*;
 import com.zcunsoft.clklog.api.services.IReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,5 +40,17 @@ public class VisitUriController {
     @RequestMapping(path = "/getVisitUriDetailList", method = RequestMethod.POST)
     public GetVisitUriDetailPageResponse getVisitUriDetailList(@RequestBody GetVisitUriDetailPageRequest getVisitUriDetailPageRequest, HttpServletRequest request) {
         return reportService.getVisitUriDetailList(getVisitUriDetailPageRequest);
+    }
+
+    @Operation(summary = "获取受访页面访问树形统计数据")
+    @RequestMapping(path = "/getVisitUriPathTreeTotal", method = RequestMethod.POST)
+    public GetVisitUriPathTreeTotalResponse getVisitUriPathTreeTotal(@RequestBody GetVisitUriDetailRequest getVisitUriDetailRequest, HttpServletRequest request) {
+        return reportService.getVisitUriPathTreeTotal(getVisitUriDetailRequest);
+    }
+
+    @Operation(summary = "获取资源路径的Top10页面统计数据")
+    @RequestMapping(path = "/getVisitUriListOfUriPath", method = RequestMethod.POST)
+    public GetVisitUriListOfUriPathResponse getVisitUriListOfUriPath(@RequestBody GetVisitUriListOfUriPathRequest getVisitUriListOfUriPathRequest, HttpServletRequest request) {
+        return reportService.getVisitUriListOfUriPath(getVisitUriListOfUriPathRequest);
     }
 }

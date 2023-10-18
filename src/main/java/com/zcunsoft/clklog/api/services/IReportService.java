@@ -29,10 +29,7 @@ import com.zcunsoft.clklog.api.models.uservisit.GetUserVisitRequest;
 import com.zcunsoft.clklog.api.models.uservisit.GetUserVisitTimebydateResponse;
 import com.zcunsoft.clklog.api.models.uservisit.GetUserVisitbydateResponse;
 import com.zcunsoft.clklog.api.models.visitor.*;
-import com.zcunsoft.clklog.api.models.visituri.GetVisitUriDetailPageRequest;
-import com.zcunsoft.clklog.api.models.visituri.GetVisitUriDetailPageResponse;
-import com.zcunsoft.clklog.api.models.visituri.GetVisitUriDetailRequest;
-import com.zcunsoft.clklog.api.models.visituri.GetVisitUriTotalResponse;
+import com.zcunsoft.clklog.api.models.visituri.*;
 
 import java.sql.Timestamp;
 
@@ -120,6 +117,11 @@ public interface IReportService {
     GetFlowTotalResponse getFlowTotal(GetFlowTrendDetailRequest getFlowTrendDetailRequest);
 
     GetFlowDetailResponse getFlowDetail(GetFlowTrendDetailRequest getFlowTrendDetailRequest);
+
+    GetVisitUriPathTreeTotalResponse getVisitUriPathTreeTotal(GetVisitUriDetailRequest getVisitUriDetailRequest);
+
+    GetVisitUriListOfUriPathResponse getVisitUriListOfUriPath(GetVisitUriListOfUriPathRequest getVisitUriListOfUriPathRequest);
     
     GetFlowTrendDetailCompareResponse getFlowDetailByCompare(GetFlowTrendDetailCompareRequest getFlowTrendDetailCompareRequest);
+
 }
