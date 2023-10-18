@@ -1,5 +1,7 @@
 package com.zcunsoft.clklog.api.controllers;
 
+import com.zcunsoft.clklog.api.models.area.GetAreaDetailCityRequest;
+import com.zcunsoft.clklog.api.models.area.GetAreaDetailCityResponse;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailComparePageRequest;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailComparePageResponse;
 import com.zcunsoft.clklog.api.models.area.GetAreaDetailPageRequest;
@@ -33,14 +35,14 @@ public class AreaController {
         return reportService.getArea(getAreaRequest);
     }
     
-    @Operation(summary = "分页获取地域访问统计数据")
+    @Operation(summary = "分页获取按省访问统计数据")
     @RequestMapping(path = "/getAreaDetailList", method = RequestMethod.POST)
     public GetAreaDetailPageResponse getAreaDetailList(@RequestBody GetAreaDetailPageRequest getAreaDetailPageRequest, HttpServletRequest request) {
         return reportService.getAreaDetailList(getAreaDetailPageRequest);
     }
     
     @Operation(summary = "分页获取按国家访问统计数据")
-    @RequestMapping(path = "/getCountryDetailList", method = RequestMethod.POST)
+    @RequestMapping(path = "/getAreaDetailCountryList", method = RequestMethod.POST)
     public GetAreaDetailPageResponse getCountryDetailList(@RequestBody GetAreaDetailPageRequest getAreaDetailPageRequest, HttpServletRequest request) {
         return reportService.getCountryDetailList(getAreaDetailPageRequest);
     }
@@ -58,14 +60,20 @@ public class AreaController {
     }
     
     @Operation(summary = "分页获取按国家访问统计对比数据")
-    @RequestMapping(path = "/getCountryDetailListByCompare", method = RequestMethod.POST)
+    @RequestMapping(path = "/getAreaDetailCountryListByCompare", method = RequestMethod.POST)
     public GetAreaDetailComparePageResponse getCountryDetailListByCompare(@RequestBody GetAreaDetailComparePageRequest getAreaDetailComparePageRequest, HttpServletRequest request) {
         return reportService.getCountryDetailListByCompare(getAreaDetailComparePageRequest);
     }
     
     @Operation(summary = "分页获取按省份访问统计对比数据")
-    @RequestMapping(path = "/getProvinceDetailListByCompare", method = RequestMethod.POST)
+    @RequestMapping(path = "/getAreaDetailProvinceListByCompare", method = RequestMethod.POST)
     public GetAreaDetailComparePageResponse getProvinceDetailListByCompare(@RequestBody GetAreaDetailComparePageRequest getAreaDetailComparePageRequest, HttpServletRequest request) {
         return reportService.getProvinceDetailListByCompare(getAreaDetailComparePageRequest);
+    }
+    
+    @Operation(summary = "分页获取按省过滤城市统计数据")
+    @RequestMapping(path = "/getAreaDetailCityList", method = RequestMethod.POST)
+    public GetAreaDetailCityResponse getCityDetailListByProvince(@RequestBody GetAreaDetailCityRequest getAreaDetailCityRequest, HttpServletRequest request) {
+        return reportService.getAreaDetailCityList(getAreaDetailCityRequest);
     }
 }

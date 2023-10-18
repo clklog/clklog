@@ -26,6 +26,8 @@ public class VisituriSummarybydate {
     @Column
     String uri;
 
+    @Column
+    String title;
 
     @Column
     Integer pv;

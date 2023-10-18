@@ -51,6 +51,9 @@ public class BaseDetailbydate {
 
     @Column
     String province;
+    
+    @Column
+    String city;
 
     @Column
     String isFirstDay;
