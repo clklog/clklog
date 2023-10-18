@@ -1,7 +1,10 @@
 package com.zcunsoft.clklog.api.models.visituri;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.util.List;
 
 @Schema(description = "受访页面路径详情")
 @Data
@@ -9,7 +12,7 @@ public class VisitUriPathDetail {
     @Schema(description = "域名")
     private String host;
 
-    @Schema(description = "页面")
+    @Schema(description = "页面路径")
     private String uri;
 
     @Schema(description = "浏览量(PV)")
@@ -29,11 +32,19 @@ public class VisitUriPathDetail {
 
     @Schema(description = "入口页次数")
     private int entryCount;
-    
+
     @Schema(description = "平均访问时长")
     private float avgVisitTime;
-    
+
     @Schema(description = "贡献下游流量")
     private int downPvCount;
 
+    @Schema(description = "相对路径")
+    private String path;
+
+    @JsonIgnore
+    private List<String> pathList;
+
+    @JsonIgnore
+    private int pathLength;
 }

@@ -41,10 +41,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -2963,38 +2960,52 @@ public class ReportServiceImpl implements IReportService {
                 host = hostMatcher.group();
             }
             visitUriDetail.setHost(host);
+            visitUriDetail.setPath(visitUriDetail.getUri().substring(host.length()));
+            String[] pathArr = visitUriDetail.getPath().split("/", -1);
+            visitUriDetail.setPathList(new ArrayList<>(Arrays.asList(pathArr)));
+            visitUriDetail.setPathLength(visitUriDetail.getPathList().size());
             visitUriDetailList.add(visitUriDetail);
         }
         List<VisitUriTreeStatData> visitUriTreeStatDataList = new ArrayList<>();
-        List<String> hostList = visitUriDetailList.stream().map(m -> m.getHost()).distinct().collect(Collectors.toList());
+        List<String> hostList = visitUriDetailList.stream().map(VisitUriPathDetail::getHost).distinct().collect(Collectors.toList());
 
         for (String host : hostList) {
-            visitUriTreeStatDataList.addAll(genUriTree(visitUriDetailList, host));
+            visitUriTreeStatDataList.addAll(genUriTree(visitUriDetailList, host, new ArrayList<>()));
         }
         response.setData(visitUriTreeStatDataList);
         return response;
     }
 
-    private List<VisitUriTreeStatData> genUriTree(List<VisitUriPathDetail> visitUriDetailList, String parentUri) {
-        if (visitUriDetailList.isEmpty()) {
+    private List<VisitUriTreeStatData> genUriTree(List<VisitUriPathDetail> visitUriDetailList, String parentUri, List<String> pathList) {
+        if (visitUriDetailList.isEmpty() || (pathList.size() >= 2 && pathList.get(pathList.size() - 1).isEmpty())) {
             return new ArrayList<>();
         } else {
-            String _parentUri = parentUri;
-            if (!parentUri.endsWith("/")) {
-                _parentUri = parentUri + "/";
-            }
+            int pathCount = pathList.size();
+            int maxPathLength = Collections.max(visitUriDetailList.stream().map(VisitUriPathDetail::getPathLength).collect(Collectors.toList()));
+            List<VisitUriPathDetail> subList = new ArrayList<>();
+            do {
+                int finalPathCount = pathCount;
 
-            String final_parentUri = _parentUri;
-            List<VisitUriPathDetail> subList = visitUriDetailList.stream().filter(f -> f.getUri().startsWith(final_parentUri) && !f.getUri().equalsIgnoreCase(parentUri)).collect(Collectors.toList());
+                subList = visitUriDetailList.stream().filter(f -> f.getPathLength() == finalPathCount + 1
+                        && f.getUri().startsWith(parentUri)
+                ).collect(Collectors.toList());
+
+                pathCount++;
+                if (pathCount >= maxPathLength) {
+                    break;
+                }
+            }
+            while (subList.isEmpty());
+
             List<VisitUriTreeStatData> validLeaf = new ArrayList<>();
             for (VisitUriPathDetail visitUriDetail : subList) {
-                if (visitUriDetail.getUri().indexOf("/", final_parentUri.length()) == -1) {
-                    VisitUriTreeStatData visitUriTreeStatData = new VisitUriTreeStatData();
-                    visitUriTreeStatData.setUri(visitUriDetail.getUri());
-                    visitUriTreeStatData.setLeafUri(genUriTree(subList, visitUriDetail.getUri()));
-                    visitUriTreeStatData.setDetail(visitUriDetail);
-                    validLeaf.add(visitUriTreeStatData);
-                }
+                VisitUriTreeStatData visitUriTreeStatData = new VisitUriTreeStatData();
+                visitUriTreeStatData.setUri(visitUriDetail.getUri());
+                visitUriTreeStatData.setPath(visitUriDetail.getPath());
+                visitUriTreeStatData.setSegment(visitUriDetail.getPathList().get(visitUriDetail.getPathList().size() - 1));
+                visitUriTreeStatData.setLeafUri(genUriTree(visitUriDetailList, visitUriDetail.getUri(), visitUriDetail.getPathList()));
+                visitUriTreeStatData.setDetail(visitUriDetail);
+                validLeaf.add(visitUriTreeStatData);
             }
             return validLeaf;
         }

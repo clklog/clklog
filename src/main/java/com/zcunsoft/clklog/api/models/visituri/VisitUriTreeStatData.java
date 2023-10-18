@@ -8,7 +8,8 @@ import java.util.List;
 public class VisitUriTreeStatData {
 
     private String uri;
+    private String path;
+    private String segment;
     private List<VisitUriTreeStatData> leafUri;
-
     private VisitUriPathDetail detail;
 }
