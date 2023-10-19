@@ -293,9 +293,9 @@ public class ReportServiceImpl implements IReportService {
 
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
-            getListSql += " where t.uri <> 'all' and t.uri_path <> '' and t.title <> '' and " + where;
+            getListSql += " where t.uri <> 'all' and t.uri_path <> '' and t.title <> '' and t.pv>0 and " + where;
 //            getSummarySql += " where t.uri <> 'all' and " + where;
-            getCountSql += " where t.uri <> 'all' and t.uri_path <> '' and t.title <> '' and " + where;
+            getCountSql += " where t.uri <> 'all' and t.uri_path <> '' and t.title <> '' and t.pv>0 and " + where;
         }
         getListSql += " group by t.uri,t.title,t.uri_path";
         String sortSql = SortType.getSortSql(SortType.VisitUriDetail, getVisitUriDetailPageRequest.getSortName(), getVisitUriDetailPageRequest.getSortOrder());
