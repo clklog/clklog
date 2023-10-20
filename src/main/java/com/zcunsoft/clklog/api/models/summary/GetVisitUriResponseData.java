@@ -9,6 +9,9 @@ public class GetVisitUriResponseData {
 
     @Schema(description = "受访页面")
     private String uri;
+    
+    @Schema(description = "标题")
+    private String title;
 
     @Schema(description = "浏览量(PV)")
     private int pv;

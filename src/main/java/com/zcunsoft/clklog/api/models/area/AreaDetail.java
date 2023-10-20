@@ -11,6 +11,9 @@ public class AreaDetail{
 
     @Schema(description = "省份")
     private String province;
+    
+    @Schema(description = "城市")
+    private String city;
 
     @Schema(description = "浏览量(PV)")
     private int pv;
