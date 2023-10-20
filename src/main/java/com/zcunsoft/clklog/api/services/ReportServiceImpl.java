@@ -67,7 +67,7 @@ public class ReportServiceImpl implements IReportService {
     private final ThreadLocal<DateFormat> hFORMAT = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
-            return new SimpleDateFormat("MM");
+            return new SimpleDateFormat("HH");
         }
     };
 
@@ -1801,7 +1801,6 @@ public class ReportServiceImpl implements IReportService {
 
             Integer statDateCount = clickHouseJdbcTemplate.queryForObject("select countDistinct(stat_date) from flow_trend_byhour where stat_date<:stat_date", paramMap,
                     Integer.class);
-            statDateCount=21;
             if (statDateCount != null) {
                 if (statDateCount <= 7) {
                     List<String> statDateList = new ArrayList<>();
