@@ -65,7 +65,7 @@ public class ReportServiceImpl implements IReportService {
     private final ThreadLocal<DateFormat> hFORMAT = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
-            return new SimpleDateFormat("MM");
+            return new SimpleDateFormat("HH");
         }
     };
 
@@ -3105,9 +3105,10 @@ public class ReportServiceImpl implements IReportService {
         where += " and t.uri_path=:uri_path";
         paramMap.addValue("uri_path", getVisitUriListOfUriPathRequest.getUriPath());
 
+        where += " and t.pv>0";
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
-            getListSql += " where t.uri <> 'all' and " + where;
+            getListSql += " where " + where + " and t.uri <> 'all'";
         }
         getListSql += " order by t.pv desc limit 10";
 
@@ -3132,6 +3133,7 @@ public class ReportServiceImpl implements IReportService {
             visitUriDetail.setUri(visituriDetailbydate.getUri());
             visitUriDetail.setUv(visituriDetailbydate.getUv());
             visitUriDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
+            visitUriDetail.setTitle(visituriDetailbydate.getTitle());
             visitUriDetailList.add(visitUriDetail);
         }
 
