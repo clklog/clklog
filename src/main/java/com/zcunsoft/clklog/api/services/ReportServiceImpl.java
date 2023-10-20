@@ -65,7 +65,7 @@ public class ReportServiceImpl implements IReportService {
     private final ThreadLocal<DateFormat> hFORMAT = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
-            return new SimpleDateFormat("MM");
+            return new SimpleDateFormat("HH");
         }
     };
 
