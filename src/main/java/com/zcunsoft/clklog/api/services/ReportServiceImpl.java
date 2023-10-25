@@ -3102,7 +3102,7 @@ public class ReportServiceImpl implements IReportService {
     @Override
     public GetVisitUriListOfUriPathResponse getVisitUriListOfUriPath(GetVisitUriListOfUriPathRequest getVisitUriListOfUriPathRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
-        String getListSql = "select title,uri,pv,ip_count,visit_count,uv,new_uv,visit_time,bounce_count,down_pv_count,exit_count,entry_count from visituri_detail_bydate t";
+        String getListSql = "select title,uri,sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count,sum(down_pv_count) as down_pv_count,sum(exit_count) as exit_count,sum(entry_count) as entry_count from visituri_detail_bydate t";
 
         String where = "";
         where = buildStatDateStartFilter(getVisitUriListOfUriPathRequest.getStartTime(), paramMap, where);
@@ -3121,7 +3121,7 @@ public class ReportServiceImpl implements IReportService {
             where = where.substring(4);
             getListSql += " where " + where + " and t.uri <> 'all'";
         }
-        getListSql += " order by t.pv desc limit 10";
+        getListSql += " group by title,uri order by pv desc limit 10";
 
         List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
 
@@ -3145,6 +3145,7 @@ public class ReportServiceImpl implements IReportService {
             visitUriDetail.setUv(visituriDetailbydate.getUv());
             visitUriDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
             visitUriDetail.setTitle(visituriDetailbydate.getTitle());
+            visitUriDetail.setUriPath(visituriDetailbydate.getUriPath());
             visitUriDetailList.add(visitUriDetail);
         }
 
