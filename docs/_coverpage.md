@@ -1,5 +1,5 @@
 <!-- _coverpage.md -->
-# <div class="logo"><img title="" src="/assets/imgs/logo.png" alt="" data-align="center" width="229"></div>
+# <div class="logo"><img title="" src="/assets/imgs/logo1.png" alt="" data-align="center" width="229"></div>
 >
 > ### 记录点击，洞悉用户
 >
