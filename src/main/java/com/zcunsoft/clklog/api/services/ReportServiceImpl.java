@@ -219,17 +219,17 @@ public class ReportServiceImpl implements IReportService {
         GetVisitUriResponse response = new GetVisitUriResponse();
         List<GetVisitUriResponseData> visitUriResponseDataList = new ArrayList<>();
         for (VisituriSummarybydate visituriSummarybydate : uriList) {
-                GetVisitUriResponseData getVisitUriResponseData = new GetVisitUriResponseData();
-                getVisitUriResponseData.setUri(visituriSummarybydate.getUri());
-                getVisitUriResponseData.setPv(visituriSummarybydate.getPv());
-                getVisitUriResponseData.setPercent(0.0f);
-                if (totalVisituriSummarybydate != null && totalVisituriSummarybydate.getPv() > 0) {
-                    float pvRate = visituriSummarybydate.getPv() * 1.0f / totalVisituriSummarybydate.getPv();
-                    getVisitUriResponseData.setPercent(Float.parseFloat(decimalFormat.get().format(pvRate)));
-                }
-                getVisitUriResponseData.setChannel(visituriSummarybydate.getLib());
-                getVisitUriResponseData.setTitle(visituriSummarybydate.getTitle());
-                visitUriResponseDataList.add(getVisitUriResponseData);
+            GetVisitUriResponseData getVisitUriResponseData = new GetVisitUriResponseData();
+            getVisitUriResponseData.setUri(visituriSummarybydate.getUri());
+            getVisitUriResponseData.setPv(visituriSummarybydate.getPv());
+            getVisitUriResponseData.setPercent(0.0f);
+            if (totalVisituriSummarybydate != null && totalVisituriSummarybydate.getPv() > 0) {
+                float pvRate = visituriSummarybydate.getPv() * 1.0f / totalVisituriSummarybydate.getPv();
+                getVisitUriResponseData.setPercent(Float.parseFloat(decimalFormat.get().format(pvRate)));
+            }
+            getVisitUriResponseData.setChannel(visituriSummarybydate.getLib());
+            getVisitUriResponseData.setTitle(visituriSummarybydate.getTitle());
+            visitUriResponseDataList.add(getVisitUriResponseData);
         }
         response.setData(visitUriResponseDataList);
         return response;
@@ -500,15 +500,15 @@ public class ReportServiceImpl implements IReportService {
         return response;
     }
 
-    
-    
+
+
     @Override
-	public GetAreaDetailCityResponse getAreaDetailCityList(GetAreaDetailCityRequest getAreaDetailCityRequest) {
-    	GetAreaDetailCityResponse response = new GetAreaDetailCityResponse();
-	    if(StringUtils.isBlank(getAreaDetailCityRequest.getProvince())) {
-	    	return response;
-	    }
-    	MapSqlParameterSource paramMap = new MapSqlParameterSource();
+    public GetAreaDetailCityResponse getAreaDetailCityList(GetAreaDetailCityRequest getAreaDetailCityRequest) {
+        GetAreaDetailCityResponse response = new GetAreaDetailCityResponse();
+        if(StringUtils.isBlank(getAreaDetailCityRequest.getProvince())) {
+            return response;
+        }
+        MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
         String getListSql = "select t.city as city," + selectSql;
         String getSummarySql = "select " + selectSql;
@@ -526,7 +526,7 @@ public class ReportServiceImpl implements IReportService {
             getSummarySql += " where t.province=:province and t.city='all' and t.country='中国' and " + where;
             paramMap.addValue("province", getAreaDetailCityRequest.getProvince());
         }
-        
+
         getListSql += " group by t.city ";
         String sortSql = SortType.getSortSql(SortType.AreaDetail, getAreaDetailCityRequest.getSortName(), getAreaDetailCityRequest.getSortOrder());
         getListSql += sortSql;
@@ -559,10 +559,10 @@ public class ReportServiceImpl implements IReportService {
             areaDetailList.add(areaDetail);
         }
         response.setData(areaDetailList);
-		return response;
-	}
+        return response;
+    }
 
-	@Override
+    @Override
     public GetAreaDetailPageResponse getCountryDetailList(GetAreaDetailPageRequest getAreaDetailPageRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
@@ -625,9 +625,9 @@ public class ReportServiceImpl implements IReportService {
         return response;
     }
 
-    
+
     private AreaDetailbydate getAreaSummarybydate(GetAreaDetailComparePageRequest getAreaDetailComparePageRequest,String startTime,String endTime,String type) {
-    	MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
         String getSummarySql = "select " + selectSql;
         String where = "";
@@ -641,9 +641,9 @@ public class ReportServiceImpl implements IReportService {
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
             if("country".equals(type)) {
-            	 getSummarySql += " where t.province='all' and t.country='all' and " + where;
+                getSummarySql += " where t.province='all' and t.country='all' and " + where;
             } else {
-            	 getSummarySql += " where t.province='all' and t.country='中国' and " + where;
+                getSummarySql += " where t.province='all' and t.country='中国' and " + where;
             }
         }
 
@@ -655,17 +655,17 @@ public class ReportServiceImpl implements IReportService {
         }
         return totalAreaDetailbydate;
     }
-    
-    
-    
-    
+
+
+
+
     @Override
-	public GetAreaDetailComparePageResponse getProvinceDetailListByCompare(
-			GetAreaDetailComparePageRequest getAreaDetailComparePageRequest) {
-    	MapSqlParameterSource paramMap = new MapSqlParameterSource();
+    public GetAreaDetailComparePageResponse getProvinceDetailListByCompare(
+            GetAreaDetailComparePageRequest getAreaDetailComparePageRequest) {
+        MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String getAllSql = "select p1.*,p2.* from ";
         String getAllCountSql = "select countDistinct(p3.province,p3.compare_province) from ";
-    	String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
+        String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
         String compareSelectSql = "sum(pv) as compare_pv,sum(ip_count) as compare_ip_count,sum(visit_count) as compare_visit_count,sum(uv) as compare_uv,sum(new_uv) as compare_new_uv,sum(visit_time) as compare_visit_time,sum(bounce_count) as compare_bounce_count from area_detail_bydate t";
         String getListSql = "select t.province as province," + selectSql;
         String getCompareListSql = "select t.province as compare_province," + compareSelectSql;
@@ -676,7 +676,7 @@ public class ReportServiceImpl implements IReportService {
         selectListWhere = buildStatDateEndFilter(getAreaDetailComparePageRequest.getEndTime(), paramMap, selectListWhere);
         selectListWhere = buildProjectNameFilter(getAreaDetailComparePageRequest.getProjectName(), paramMap, selectListWhere);
         selectListWhere = buildVisitorTypeFilter(getAreaDetailComparePageRequest.getVisitorType(), paramMap, selectListWhere);
-        
+
         String compareSelectListWhere = "";
 
         compareSelectListWhere = buildChannelFilter(getAreaDetailComparePageRequest.getChannel(), paramMap, compareSelectListWhere);
@@ -686,8 +686,8 @@ public class ReportServiceImpl implements IReportService {
         compareSelectListWhere = buildVisitorTypeFilter(getAreaDetailComparePageRequest.getVisitorType(), paramMap, compareSelectListWhere);
 
         if (StringUtils.isNotBlank(selectListWhere)) {
-        	selectListWhere = selectListWhere.substring(4);
-        	compareSelectListWhere = compareSelectListWhere.substring(4);
+            selectListWhere = selectListWhere.substring(4);
+            compareSelectListWhere = compareSelectListWhere.substring(4);
             getListSql += " where t.province <> 'all' and t.city <> 'all' and t.country='中国' and " + selectListWhere;
             getCompareListSql += " where t.province <> 'all' and t.city <> 'all' and t.country='中国' and " + compareSelectListWhere;
         }
@@ -695,92 +695,92 @@ public class ReportServiceImpl implements IReportService {
         getListSql += " group by t.province ";
         getCompareListSql += " group by t.province ";
         getAllSql += "(" + getListSql + ") p1 full outer join (" + getCompareListSql + ") p2 on p1.province=p2.compare_province";
-        
+
         getAllCountSql += "(" +getAllSql+") p3";
         getAllSql += " limit " + (getAreaDetailComparePageRequest.getPageNum() - 1) * getAreaDetailComparePageRequest.getPageSize() + "," + getAreaDetailComparePageRequest.getPageSize();
         List<AreaDetailbycompare> areaDetailbydateList = clickHouseJdbcTemplate.query(getAllSql, paramMap, new BeanPropertyRowMapper<AreaDetailbycompare>(AreaDetailbycompare.class));
         Integer total = clickHouseJdbcTemplate.queryForObject(getAllCountSql, paramMap, Integer.class);
-        
-        AreaDetailbydate totalCompareAreaDetailbydate1 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getStartTime(), getAreaDetailComparePageRequest.getEndTime(),"province");
-        AreaDetailbydate totalCompareAreaDetailbydate2 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getCompareStartTime(), getAreaDetailComparePageRequest.getCompareEndTime(),"province"); 
-        
-    	GetAreaDetailComparePageResponseData responseData = new GetAreaDetailComparePageResponseData();
-    	responseData.setTotal(total);
-    	List<AreaDetailCompare> rows = new ArrayList<AreaDetailCompare>();
-    	for(AreaDetailbycompare areaDetailbydate : areaDetailbydateList) {
-    		AreaDetailCompare areaDetailCompare = new AreaDetailCompare();
-    		if(StringUtils.isEmpty(areaDetailbydate.getProvince())) {
-    			areaDetailCompare.setProvince(StringUtils.equalsIgnoreCase("未知省份", areaDetailbydate.getCompareProvince()) ? Constants.DEFAULT_PROVICE : areaDetailbydate.getCompareProvince());
-    		} else {
-    			areaDetailCompare.setProvince(StringUtils.equalsIgnoreCase("未知省份", areaDetailbydate.getProvince()) ? Constants.DEFAULT_PROVICE : areaDetailbydate.getProvince());
-    		}
-    		areaDetailCompare.setCountry(StringUtils.isEmpty(areaDetailbydate.getCountry()) ? areaDetailbydate.getCompareCountry() : areaDetailbydate.getCountry());
-    		List<AreaDetail> areaDetailList = new ArrayList<AreaDetail>();
-    		
-    		AreaDetailbydate  areaDetailbydate1 = new AreaDetailbydate();
-    		areaDetailbydate1.setBounceCount(areaDetailbydate.getBounceCount());
-    		areaDetailbydate1.setIpCount(areaDetailbydate.getIpCount());
-    		areaDetailbydate1.setNewUv(areaDetailbydate.getNewUv());
-    		areaDetailbydate1.setUv(areaDetailbydate.getUv());
-    		areaDetailbydate1.setPv(areaDetailbydate.getPv());
-    		areaDetailbydate1.setVisitCount(areaDetailbydate.getVisitCount());
-    		areaDetailbydate1.setVisitTime(areaDetailbydate.getVisitTime());
-    		
-    		FlowDetail flowDetail1 = assemblyFlowDetail(areaDetailbydate1, totalCompareAreaDetailbydate1);
-    		//拆分对比数据
-    		AreaDetail compare1 = new AreaDetail();
-    		compare1.setAvgPv(flowDetail1.getAvgPv());
-    		compare1.setAvgVisitTime((int) flowDetail1.getAvgVisitTime());
-    		compare1.setNewUvRate(flowDetail1.getNewUvRate());
-    		compare1.setBounceRate(flowDetail1.getBounceRate());
-    		compare1.setIpCount(flowDetail1.getIpCount());
-    		compare1.setNewUv(flowDetail1.getNewUv());
-    		compare1.setPv(flowDetail1.getPv());
-    		compare1.setPvRate(flowDetail1.getPvRate());
-    		compare1.setUv(flowDetail1.getUv());
-    		compare1.setVisitCount(flowDetail1.getVisitCount());
-    		
-    		AreaDetailbydate  areaDetailbydate2 = new AreaDetailbydate();
-    		areaDetailbydate2.setBounceCount(areaDetailbydate.getCompareBounceCount());
-    		areaDetailbydate2.setIpCount(areaDetailbydate.getCompareIpCount());
-    		areaDetailbydate2.setNewUv(areaDetailbydate.getCompareNewUv());
-    		areaDetailbydate2.setUv(areaDetailbydate.getCompareUv());
-    		areaDetailbydate2.setPv(areaDetailbydate.getComparePv());
-    		areaDetailbydate2.setVisitCount(areaDetailbydate.getCompareVisitCount());
-    		areaDetailbydate2.setVisitTime(areaDetailbydate.getCompareVisitTime());
-    		
-    		FlowDetail flowDetail2 = assemblyFlowDetail(areaDetailbydate2, totalCompareAreaDetailbydate2);
-    		
-    		AreaDetail compare2 = new AreaDetail();
-    		compare2.setAvgPv(flowDetail2.getAvgPv());
-    		compare2.setAvgVisitTime((int) flowDetail2.getAvgVisitTime());
-    		compare2.setNewUvRate(flowDetail2.getNewUvRate());
-    		compare2.setBounceRate(flowDetail2.getBounceRate());
-    		compare2.setIpCount(areaDetailbydate.getCompareIpCount());
-    		compare2.setNewUv(areaDetailbydate.getCompareNewUv());
-    		compare2.setPv(areaDetailbydate.getComparePv());
-    		compare2.setPvRate(flowDetail2.getPvRate());
-    		compare2.setUv(areaDetailbydate.getCompareUv());
-    		compare2.setVisitCount(areaDetailbydate.getCompareVisitCount());
-    		areaDetailList.add(compare1);
-    		areaDetailList.add(compare2);
-    		areaDetailCompare.setRows(areaDetailList);
-    		rows.add(areaDetailCompare);
-    	}
-    	responseData.setRows(rows);
-    	GetAreaDetailComparePageResponse response = new GetAreaDetailComparePageResponse();
-    	response.setData(responseData);
-		return response;
-	}
 
-	@Override
-	public GetAreaDetailComparePageResponse getCountryDetailListByCompare(
-			GetAreaDetailComparePageRequest getAreaDetailComparePageRequest) {
-    	
-    	MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        AreaDetailbydate totalCompareAreaDetailbydate1 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getStartTime(), getAreaDetailComparePageRequest.getEndTime(),"province");
+        AreaDetailbydate totalCompareAreaDetailbydate2 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getCompareStartTime(), getAreaDetailComparePageRequest.getCompareEndTime(),"province");
+
+        GetAreaDetailComparePageResponseData responseData = new GetAreaDetailComparePageResponseData();
+        responseData.setTotal(total);
+        List<AreaDetailCompare> rows = new ArrayList<AreaDetailCompare>();
+        for(AreaDetailbycompare areaDetailbydate : areaDetailbydateList) {
+            AreaDetailCompare areaDetailCompare = new AreaDetailCompare();
+            if(StringUtils.isEmpty(areaDetailbydate.getProvince())) {
+                areaDetailCompare.setProvince(StringUtils.equalsIgnoreCase("未知省份", areaDetailbydate.getCompareProvince()) ? Constants.DEFAULT_PROVICE : areaDetailbydate.getCompareProvince());
+            } else {
+                areaDetailCompare.setProvince(StringUtils.equalsIgnoreCase("未知省份", areaDetailbydate.getProvince()) ? Constants.DEFAULT_PROVICE : areaDetailbydate.getProvince());
+            }
+            areaDetailCompare.setCountry(StringUtils.isEmpty(areaDetailbydate.getCountry()) ? areaDetailbydate.getCompareCountry() : areaDetailbydate.getCountry());
+            List<AreaDetail> areaDetailList = new ArrayList<AreaDetail>();
+
+            AreaDetailbydate  areaDetailbydate1 = new AreaDetailbydate();
+            areaDetailbydate1.setBounceCount(areaDetailbydate.getBounceCount());
+            areaDetailbydate1.setIpCount(areaDetailbydate.getIpCount());
+            areaDetailbydate1.setNewUv(areaDetailbydate.getNewUv());
+            areaDetailbydate1.setUv(areaDetailbydate.getUv());
+            areaDetailbydate1.setPv(areaDetailbydate.getPv());
+            areaDetailbydate1.setVisitCount(areaDetailbydate.getVisitCount());
+            areaDetailbydate1.setVisitTime(areaDetailbydate.getVisitTime());
+
+            FlowDetail flowDetail1 = assemblyFlowDetail(areaDetailbydate1, totalCompareAreaDetailbydate1);
+            //拆分对比数据
+            AreaDetail compare1 = new AreaDetail();
+            compare1.setAvgPv(flowDetail1.getAvgPv());
+            compare1.setAvgVisitTime((int) flowDetail1.getAvgVisitTime());
+            compare1.setNewUvRate(flowDetail1.getNewUvRate());
+            compare1.setBounceRate(flowDetail1.getBounceRate());
+            compare1.setIpCount(flowDetail1.getIpCount());
+            compare1.setNewUv(flowDetail1.getNewUv());
+            compare1.setPv(flowDetail1.getPv());
+            compare1.setPvRate(flowDetail1.getPvRate());
+            compare1.setUv(flowDetail1.getUv());
+            compare1.setVisitCount(flowDetail1.getVisitCount());
+
+            AreaDetailbydate  areaDetailbydate2 = new AreaDetailbydate();
+            areaDetailbydate2.setBounceCount(areaDetailbydate.getCompareBounceCount());
+            areaDetailbydate2.setIpCount(areaDetailbydate.getCompareIpCount());
+            areaDetailbydate2.setNewUv(areaDetailbydate.getCompareNewUv());
+            areaDetailbydate2.setUv(areaDetailbydate.getCompareUv());
+            areaDetailbydate2.setPv(areaDetailbydate.getComparePv());
+            areaDetailbydate2.setVisitCount(areaDetailbydate.getCompareVisitCount());
+            areaDetailbydate2.setVisitTime(areaDetailbydate.getCompareVisitTime());
+
+            FlowDetail flowDetail2 = assemblyFlowDetail(areaDetailbydate2, totalCompareAreaDetailbydate2);
+
+            AreaDetail compare2 = new AreaDetail();
+            compare2.setAvgPv(flowDetail2.getAvgPv());
+            compare2.setAvgVisitTime((int) flowDetail2.getAvgVisitTime());
+            compare2.setNewUvRate(flowDetail2.getNewUvRate());
+            compare2.setBounceRate(flowDetail2.getBounceRate());
+            compare2.setIpCount(areaDetailbydate.getCompareIpCount());
+            compare2.setNewUv(areaDetailbydate.getCompareNewUv());
+            compare2.setPv(areaDetailbydate.getComparePv());
+            compare2.setPvRate(flowDetail2.getPvRate());
+            compare2.setUv(areaDetailbydate.getCompareUv());
+            compare2.setVisitCount(areaDetailbydate.getCompareVisitCount());
+            areaDetailList.add(compare1);
+            areaDetailList.add(compare2);
+            areaDetailCompare.setRows(areaDetailList);
+            rows.add(areaDetailCompare);
+        }
+        responseData.setRows(rows);
+        GetAreaDetailComparePageResponse response = new GetAreaDetailComparePageResponse();
+        response.setData(responseData);
+        return response;
+    }
+
+    @Override
+    public GetAreaDetailComparePageResponse getCountryDetailListByCompare(
+            GetAreaDetailComparePageRequest getAreaDetailComparePageRequest) {
+
+        MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String getAllSql = "select p1.*,p2.* from ";
         String getAllCountSql = "select countDistinct(p3.country,p3.compare_country) from ";
-    	String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
+        String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
         String compareSelectSql = "sum(pv) as compare_pv,sum(ip_count) as compare_ip_count,sum(visit_count) as compare_visit_count,sum(uv) as compare_uv,sum(new_uv) as compare_new_uv,sum(visit_time) as compare_visit_time,sum(bounce_count) as compare_bounce_count from area_detail_bydate t";
         String getListSql = "select t.country as country," + selectSql;
         String getCompareListSql = "select t.country as compare_country," + compareSelectSql;
@@ -791,7 +791,7 @@ public class ReportServiceImpl implements IReportService {
         selectListWhere = buildStatDateEndFilter(getAreaDetailComparePageRequest.getEndTime(), paramMap, selectListWhere);
         selectListWhere = buildProjectNameFilter(getAreaDetailComparePageRequest.getProjectName(), paramMap, selectListWhere);
         selectListWhere = buildVisitorTypeFilter(getAreaDetailComparePageRequest.getVisitorType(), paramMap, selectListWhere);
-        
+
         String compareSelectListWhere = "";
 
         compareSelectListWhere = buildChannelFilter(getAreaDetailComparePageRequest.getChannel(), paramMap, compareSelectListWhere);
@@ -801,8 +801,8 @@ public class ReportServiceImpl implements IReportService {
         compareSelectListWhere = buildVisitorTypeFilter(getAreaDetailComparePageRequest.getVisitorType(), paramMap, compareSelectListWhere);
 
         if (StringUtils.isNotBlank(selectListWhere)) {
-        	selectListWhere = selectListWhere.substring(4);
-        	compareSelectListWhere = compareSelectListWhere.substring(4);
+            selectListWhere = selectListWhere.substring(4);
+            compareSelectListWhere = compareSelectListWhere.substring(4);
             getListSql += " where t.province <> 'all' and t.country<>'all' and t.city<>'all' and " + selectListWhere;
             getCompareListSql += " where t.province <> 'all' and t.country<>'all' and t.city<>'all' and " + compareSelectListWhere;
         }
@@ -810,79 +810,79 @@ public class ReportServiceImpl implements IReportService {
         getListSql += " group by t.country ";
         getCompareListSql += " group by t.country ";
         getAllSql += "(" + getListSql + ") p1 full outer join (" + getCompareListSql + ") p2 on p1.country=p2.compare_country";
-        
+
         getAllCountSql += "(" +getAllSql+") p3";
         getAllSql += " limit " + (getAreaDetailComparePageRequest.getPageNum() - 1) * getAreaDetailComparePageRequest.getPageSize() + "," + getAreaDetailComparePageRequest.getPageSize();
         List<AreaDetailbycompare> areaDetailbydateList = clickHouseJdbcTemplate.query(getAllSql, paramMap, new BeanPropertyRowMapper<AreaDetailbycompare>(AreaDetailbycompare.class));
         Integer total = clickHouseJdbcTemplate.queryForObject(getAllCountSql, paramMap, Integer.class);
-        
+
         AreaDetailbydate totalCompareAreaDetailbydate1 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getStartTime(), getAreaDetailComparePageRequest.getEndTime(),"country");
-        AreaDetailbydate totalCompareAreaDetailbydate2 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getCompareStartTime(), getAreaDetailComparePageRequest.getCompareEndTime(),"country"); 
-        
-    	GetAreaDetailComparePageResponseData responseData = new GetAreaDetailComparePageResponseData();
-    	responseData.setTotal(total);
-    	List<AreaDetailCompare> rows = new ArrayList<AreaDetailCompare>();
-    	for(AreaDetailbycompare areaDetailbydate : areaDetailbydateList) {
-    		AreaDetailCompare areaDetailCompare = new AreaDetailCompare();
-    		areaDetailCompare.setCountry(StringUtils.isEmpty(areaDetailbydate.getCountry()) ? areaDetailbydate.getCompareCountry() : areaDetailbydate.getCountry());
-    		List<AreaDetail> areaDetailList = new ArrayList<AreaDetail>();
-    		
-    		AreaDetailbydate  areaDetailbydate1 = new AreaDetailbydate();
-    		areaDetailbydate1.setBounceCount(areaDetailbydate.getBounceCount());
-    		areaDetailbydate1.setIpCount(areaDetailbydate.getIpCount());
-    		areaDetailbydate1.setNewUv(areaDetailbydate.getNewUv());
-    		areaDetailbydate1.setUv(areaDetailbydate.getUv());
-    		areaDetailbydate1.setPv(areaDetailbydate.getPv());
-    		areaDetailbydate1.setVisitCount(areaDetailbydate.getVisitCount());
-    		areaDetailbydate1.setVisitTime(areaDetailbydate.getVisitTime());;
-    		
-    		FlowDetail flowDetail1 = assemblyFlowDetail(areaDetailbydate1, totalCompareAreaDetailbydate1);
-    		//拆分对比数据
-    		AreaDetail compare1 = new AreaDetail();
-    		compare1.setAvgPv(flowDetail1.getAvgPv());
-    		compare1.setAvgVisitTime((int) flowDetail1.getAvgVisitTime());
-    		compare1.setNewUvRate(flowDetail1.getNewUvRate());
-    		compare1.setBounceRate(flowDetail1.getBounceRate());
-    		compare1.setIpCount(flowDetail1.getIpCount());
-    		compare1.setNewUv(flowDetail1.getNewUv());
-    		compare1.setPv(flowDetail1.getPv());
-    		compare1.setPvRate(flowDetail1.getPvRate());
-    		compare1.setUv(flowDetail1.getUv());
-    		compare1.setVisitCount(flowDetail1.getVisitCount());
-    		
-    		AreaDetailbydate  areaDetailbydate2 = new AreaDetailbydate();
-    		areaDetailbydate2.setBounceCount(areaDetailbydate.getCompareBounceCount());
-    		areaDetailbydate2.setIpCount(areaDetailbydate.getCompareIpCount());
-    		areaDetailbydate2.setNewUv(areaDetailbydate.getCompareNewUv());
-    		areaDetailbydate2.setUv(areaDetailbydate.getCompareUv());
-    		areaDetailbydate2.setPv(areaDetailbydate.getComparePv());
-    		areaDetailbydate2.setVisitCount(areaDetailbydate.getCompareVisitCount());
-    		areaDetailbydate2.setVisitTime(areaDetailbydate.getCompareVisitTime());
-    		
-    		FlowDetail flowDetail2 = assemblyFlowDetail(areaDetailbydate2, totalCompareAreaDetailbydate2);
-    		
-    		AreaDetail compare2 = new AreaDetail();
-    		compare2.setAvgPv(flowDetail2.getAvgPv());
-    		compare2.setAvgVisitTime((int) flowDetail2.getAvgVisitTime());
-    		compare2.setNewUvRate(flowDetail2.getNewUvRate());
-    		compare2.setBounceRate(flowDetail2.getBounceRate());
-    		compare2.setIpCount(areaDetailbydate.getCompareIpCount());
-    		compare2.setNewUv(areaDetailbydate.getCompareNewUv());
-    		compare2.setPv(areaDetailbydate.getComparePv());
-    		compare2.setPvRate(flowDetail2.getPvRate());
-    		compare2.setUv(areaDetailbydate.getCompareUv());
-    		compare2.setVisitCount(areaDetailbydate.getCompareVisitCount());
-    		areaDetailList.add(compare1);
-    		areaDetailList.add(compare2);
-    		areaDetailCompare.setRows(areaDetailList);
-    		rows.add(areaDetailCompare);
-    	}
-    	responseData.setRows(rows);
-    	GetAreaDetailComparePageResponse response = new GetAreaDetailComparePageResponse();
-    	response.setData(responseData);
-		return response;
-	}
-    
+        AreaDetailbydate totalCompareAreaDetailbydate2 = getAreaSummarybydate(getAreaDetailComparePageRequest, getAreaDetailComparePageRequest.getCompareStartTime(), getAreaDetailComparePageRequest.getCompareEndTime(),"country");
+
+        GetAreaDetailComparePageResponseData responseData = new GetAreaDetailComparePageResponseData();
+        responseData.setTotal(total);
+        List<AreaDetailCompare> rows = new ArrayList<AreaDetailCompare>();
+        for(AreaDetailbycompare areaDetailbydate : areaDetailbydateList) {
+            AreaDetailCompare areaDetailCompare = new AreaDetailCompare();
+            areaDetailCompare.setCountry(StringUtils.isEmpty(areaDetailbydate.getCountry()) ? areaDetailbydate.getCompareCountry() : areaDetailbydate.getCountry());
+            List<AreaDetail> areaDetailList = new ArrayList<AreaDetail>();
+
+            AreaDetailbydate  areaDetailbydate1 = new AreaDetailbydate();
+            areaDetailbydate1.setBounceCount(areaDetailbydate.getBounceCount());
+            areaDetailbydate1.setIpCount(areaDetailbydate.getIpCount());
+            areaDetailbydate1.setNewUv(areaDetailbydate.getNewUv());
+            areaDetailbydate1.setUv(areaDetailbydate.getUv());
+            areaDetailbydate1.setPv(areaDetailbydate.getPv());
+            areaDetailbydate1.setVisitCount(areaDetailbydate.getVisitCount());
+            areaDetailbydate1.setVisitTime(areaDetailbydate.getVisitTime());;
+
+            FlowDetail flowDetail1 = assemblyFlowDetail(areaDetailbydate1, totalCompareAreaDetailbydate1);
+            //拆分对比数据
+            AreaDetail compare1 = new AreaDetail();
+            compare1.setAvgPv(flowDetail1.getAvgPv());
+            compare1.setAvgVisitTime((int) flowDetail1.getAvgVisitTime());
+            compare1.setNewUvRate(flowDetail1.getNewUvRate());
+            compare1.setBounceRate(flowDetail1.getBounceRate());
+            compare1.setIpCount(flowDetail1.getIpCount());
+            compare1.setNewUv(flowDetail1.getNewUv());
+            compare1.setPv(flowDetail1.getPv());
+            compare1.setPvRate(flowDetail1.getPvRate());
+            compare1.setUv(flowDetail1.getUv());
+            compare1.setVisitCount(flowDetail1.getVisitCount());
+
+            AreaDetailbydate  areaDetailbydate2 = new AreaDetailbydate();
+            areaDetailbydate2.setBounceCount(areaDetailbydate.getCompareBounceCount());
+            areaDetailbydate2.setIpCount(areaDetailbydate.getCompareIpCount());
+            areaDetailbydate2.setNewUv(areaDetailbydate.getCompareNewUv());
+            areaDetailbydate2.setUv(areaDetailbydate.getCompareUv());
+            areaDetailbydate2.setPv(areaDetailbydate.getComparePv());
+            areaDetailbydate2.setVisitCount(areaDetailbydate.getCompareVisitCount());
+            areaDetailbydate2.setVisitTime(areaDetailbydate.getCompareVisitTime());
+
+            FlowDetail flowDetail2 = assemblyFlowDetail(areaDetailbydate2, totalCompareAreaDetailbydate2);
+
+            AreaDetail compare2 = new AreaDetail();
+            compare2.setAvgPv(flowDetail2.getAvgPv());
+            compare2.setAvgVisitTime((int) flowDetail2.getAvgVisitTime());
+            compare2.setNewUvRate(flowDetail2.getNewUvRate());
+            compare2.setBounceRate(flowDetail2.getBounceRate());
+            compare2.setIpCount(areaDetailbydate.getCompareIpCount());
+            compare2.setNewUv(areaDetailbydate.getCompareNewUv());
+            compare2.setPv(areaDetailbydate.getComparePv());
+            compare2.setPvRate(flowDetail2.getPvRate());
+            compare2.setUv(areaDetailbydate.getCompareUv());
+            compare2.setVisitCount(areaDetailbydate.getCompareVisitCount());
+            areaDetailList.add(compare1);
+            areaDetailList.add(compare2);
+            areaDetailCompare.setRows(areaDetailList);
+            rows.add(areaDetailCompare);
+        }
+        responseData.setRows(rows);
+        GetAreaDetailComparePageResponse response = new GetAreaDetailComparePageResponse();
+        response.setData(responseData);
+        return response;
+    }
+
     @Override
     public GetAreaDetailTotalResponse getAreaDetailTotal(GetAreaDetailRequest getAreaDetailRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -1166,45 +1166,45 @@ public class ReportServiceImpl implements IReportService {
         return response;
     }
 
-    
+
 
     @Override
-	public GetFlowTrendDetailCompareResponse getFlowDetailByCompare(
-			GetFlowTrendDetailCompareRequest getFlowTrendDetailCompareRequest) {
-    	
-    	GetFlowTrendDetailRequest getFlowTrendDetailRequest1 = new GetFlowTrendDetailRequest();
-    	BeanUtils.copyProperties(getFlowTrendDetailCompareRequest, getFlowTrendDetailRequest1);
-    	getFlowTrendDetailRequest1.setTimeType("hour");
-    	List<FlowDetail> flowDetailList1 = getFlowDetail(getFlowTrendDetailRequest1).getData();
-    	
-    	
-    	GetFlowTrendDetailRequest getFlowTrendDetailRequest2 = new GetFlowTrendDetailRequest();
-    	BeanUtils.copyProperties(getFlowTrendDetailCompareRequest, getFlowTrendDetailRequest2);
-    	getFlowTrendDetailRequest2.setTimeType("hour");
-    	getFlowTrendDetailRequest2.setStartTime(getFlowTrendDetailCompareRequest.getCompareStartTime());
-    	getFlowTrendDetailRequest2.setEndTime(getFlowTrendDetailCompareRequest.getCompareEndTime());
-    	List<FlowDetail> flowDetailList2 = getFlowDetail(getFlowTrendDetailRequest2).getData();
-    	
-    	List<GetFlowTrendDetailCompareData> getFlowTrendDetailCompareDataList = new ArrayList<GetFlowTrendDetailCompareData>();
+    public GetFlowTrendDetailCompareResponse getFlowDetailByCompare(
+            GetFlowTrendDetailCompareRequest getFlowTrendDetailCompareRequest) {
 
-    	for(FlowDetail flowDetail1 : flowDetailList1) {
-    		for(FlowDetail flowDetail2 : flowDetailList2) {
-    			if(flowDetail1.getStatTime().equals(flowDetail2.getStatTime())) {
-    				GetFlowTrendDetailCompareData getFlowTrendDetailCompareData = new GetFlowTrendDetailCompareData();
-    		    	getFlowTrendDetailCompareData.setStatTime(flowDetail1.getStatTime());
-    		    	List<FlowDetail> flowDetailList3 = new ArrayList<FlowDetail>();
-    		    	flowDetailList3.add(flowDetail1);
-    		    	flowDetailList3.add(flowDetail2);
-    		    	getFlowTrendDetailCompareData.setDetail(flowDetailList3);
-    		    	getFlowTrendDetailCompareDataList.add(getFlowTrendDetailCompareData);
-    			}
-    		}
-    	}
-    	GetFlowTrendDetailCompareResponse response = new GetFlowTrendDetailCompareResponse();
-    	response.setData(getFlowTrendDetailCompareDataList);;
-		return response;
-	}
-    
+        GetFlowTrendDetailRequest getFlowTrendDetailRequest1 = new GetFlowTrendDetailRequest();
+        BeanUtils.copyProperties(getFlowTrendDetailCompareRequest, getFlowTrendDetailRequest1);
+        getFlowTrendDetailRequest1.setTimeType("hour");
+        List<FlowDetail> flowDetailList1 = getFlowDetail(getFlowTrendDetailRequest1).getData();
+
+
+        GetFlowTrendDetailRequest getFlowTrendDetailRequest2 = new GetFlowTrendDetailRequest();
+        BeanUtils.copyProperties(getFlowTrendDetailCompareRequest, getFlowTrendDetailRequest2);
+        getFlowTrendDetailRequest2.setTimeType("hour");
+        getFlowTrendDetailRequest2.setStartTime(getFlowTrendDetailCompareRequest.getCompareStartTime());
+        getFlowTrendDetailRequest2.setEndTime(getFlowTrendDetailCompareRequest.getCompareEndTime());
+        List<FlowDetail> flowDetailList2 = getFlowDetail(getFlowTrendDetailRequest2).getData();
+
+        List<GetFlowTrendDetailCompareData> getFlowTrendDetailCompareDataList = new ArrayList<GetFlowTrendDetailCompareData>();
+
+        for(FlowDetail flowDetail1 : flowDetailList1) {
+            for(FlowDetail flowDetail2 : flowDetailList2) {
+                if(flowDetail1.getStatTime().equals(flowDetail2.getStatTime())) {
+                    GetFlowTrendDetailCompareData getFlowTrendDetailCompareData = new GetFlowTrendDetailCompareData();
+                    getFlowTrendDetailCompareData.setStatTime(flowDetail1.getStatTime());
+                    List<FlowDetail> flowDetailList3 = new ArrayList<FlowDetail>();
+                    flowDetailList3.add(flowDetail1);
+                    flowDetailList3.add(flowDetail2);
+                    getFlowTrendDetailCompareData.setDetail(flowDetailList3);
+                    getFlowTrendDetailCompareDataList.add(getFlowTrendDetailCompareData);
+                }
+            }
+        }
+        GetFlowTrendDetailCompareResponse response = new GetFlowTrendDetailCompareResponse();
+        response.setData(getFlowTrendDetailCompareDataList);;
+        return response;
+    }
+
     @Override
     public GetSearchWordDetailResponse getSearchWordDetail(GetSearchWordDetailRequest getSearchWordDetailRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -1744,20 +1744,20 @@ public class ReportServiceImpl implements IReportService {
     }
 
     private VisitorDetailbysession getVisitorSession(String distinctId,String eventSessionId) {
-    	MapSqlParameterSource paramMap = new MapSqlParameterSource();
-    	String getListSql = "select t.distinct_id as distinct_id,t.event_session_id as event_session_id,t.stat_date as stat_date from visitor_detail_bysession t";
-    	VisitorDetailbysession visitorDetailbysession = null;
-    	if (StringUtils.isNotBlank(distinctId) && StringUtils.isNotBlank(eventSessionId)) {
+        MapSqlParameterSource paramMap = new MapSqlParameterSource();
+        String getListSql = "select t.distinct_id as distinct_id,t.event_session_id as event_session_id,t.stat_date as stat_date from visitor_detail_bysession t";
+        VisitorDetailbysession visitorDetailbysession = null;
+        if (StringUtils.isNotBlank(distinctId) && StringUtils.isNotBlank(eventSessionId)) {
             getListSql += " where t.distinct_id = (:distinctId) and t.event_session_id = (:eventSessionId) ";
             getListSql += " order by stat_date asc limit 1";
             paramMap.addValue("distinctId", distinctId);
             paramMap.addValue("eventSessionId", eventSessionId);
-           List<VisitorDetailbysession> visitorDetailbysessionList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorDetailbysession>(VisitorDetailbysession.class));
-           visitorDetailbysession = (visitorDetailbysessionList != null && visitorDetailbysessionList.size()>0) ? visitorDetailbysessionList.get(0) : new VisitorDetailbysession();
+            List<VisitorDetailbysession> visitorDetailbysessionList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorDetailbysession>(VisitorDetailbysession.class));
+            visitorDetailbysession = (visitorDetailbysessionList != null && visitorDetailbysessionList.size()>0) ? visitorDetailbysessionList.get(0) : new VisitorDetailbysession();
         }
-    	return visitorDetailbysession;
+        return visitorDetailbysession;
     }
-    
+
 
     @Override
     public GetVisitorSessionUriListPageResponse getGetVisitorSessionUriList(
@@ -1770,14 +1770,14 @@ public class ReportServiceImpl implements IReportService {
             getListSql += " where t.event in('$pageview','$AppViewScreen','$MPViewScreen') and t.distinct_id = (:distinctId)  and t.event_session_id = (:eventSessionId) ";
             VisitorDetailbysession visitorDetailbysession = getVisitorSession(getVisitorSessionUriListPageRequest.getDistinctId(), getVisitorSessionUriListPageRequest.getEventSessionId());
             if(visitorDetailbysession.getStatDate() != null) {
-            	getListSql += " and t.stat_date>=:statDate";
-            	paramMap.addValue("statDate", this.yMdFORMAT.get().format(visitorDetailbysession.getStatDate()));
+                getListSql += " and t.stat_date>=:statDate";
+                paramMap.addValue("statDate", this.yMdFORMAT.get().format(visitorDetailbysession.getStatDate()));
             }
             getListSql += " order by t.log_time asc limit " + (getVisitorSessionUriListPageRequest.getPageNum() - 1) * getVisitorSessionUriListPageRequest.getPageSize() + "," + getVisitorSessionUriListPageRequest.getPageSize();
             paramMap.addValue("distinctId", getVisitorSessionUriListPageRequest.getDistinctId());
             paramMap.addValue("eventSessionId", getVisitorSessionUriListPageRequest.getEventSessionId());
             logAnalysisbysessionuriList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<LogAnalysisbysessionuri>(LogAnalysisbysessionuri.class));
-        } 
+        }
         List<VisitorSessionUri> visitorSessionUriListList = new ArrayList<>();
         GetVisitorSessionUriListPageResponse response = new GetVisitorSessionUriListPageResponse();
         GetVisitorSessionUriListPageResponseData responseData = new GetVisitorSessionUriListPageResponseData();
@@ -2734,7 +2734,7 @@ public class ReportServiceImpl implements IReportService {
         paramMap.addValue("starttime", this.yMdFORMAT.get().format(startTime));
         return where;
     }
-    
+
     private String buildCompareStatDateEndFilter(String _endTime, MapSqlParameterSource paramMap, String where) {
         return buildCompareStatDateEndFilter(_endTime, paramMap, where, "day");
     }
@@ -3045,7 +3045,7 @@ public class ReportServiceImpl implements IReportService {
         }
         List<VisitUriTreeStatData> visitUriTreeStatDataList = new ArrayList<>();
         List<String> hostList = visitUriDetailList.stream().map(VisitUriPathDetail::getHost).distinct().collect(Collectors.toList());
-
+        hostList = hostList.stream().filter(f -> clklogApiSetting.getProjectHost().contains(f)).collect(Collectors.toList());
         for (String host : hostList) {
             visitUriTreeStatDataList.addAll(genUriTree(visitUriDetailList, host, new ArrayList<>()));
         }
@@ -3080,7 +3080,18 @@ public class ReportServiceImpl implements IReportService {
                 visitUriTreeStatData.setUri(visitUriDetail.getUri());
                 visitUriTreeStatData.setPath(visitUriDetail.getPath());
                 visitUriTreeStatData.setSegment(visitUriDetail.getPathList().get(visitUriDetail.getPathList().size() - 1));
-                visitUriTreeStatData.setLeafUri(genUriTree(visitUriDetailList, visitUriDetail.getUri(), visitUriDetail.getPathList()));
+                List<VisitUriTreeStatData> leafUriStatDataList = genUriTree(visitUriDetailList, visitUriDetail.getUri(), visitUriDetail.getPathList());
+                visitUriTreeStatData.setLeafUri(leafUriStatDataList);
+                for (VisitUriTreeStatData leafUriStat : leafUriStatDataList) {
+                    visitUriDetail.setPv(visitUriDetail.getPv() + leafUriStat.getDetail().getPv());
+                    visitUriDetail.setUv(visitUriDetail.getUv() + leafUriStat.getDetail().getUv());
+                    visitUriDetail.setIpCount(visitUriDetail.getIpCount() + leafUriStat.getDetail().getIpCount());
+                    visitUriDetail.setExitCount(visitUriDetail.getExitCount() + leafUriStat.getDetail().getExitCount());
+                    visitUriDetail.setExitRate(visitUriDetail.getExitRate() + leafUriStat.getDetail().getExitRate());
+                    visitUriDetail.setEntryCount(visitUriDetail.getEntryCount() + leafUriStat.getDetail().getEntryCount());
+                    visitUriDetail.setAvgVisitTime(visitUriDetail.getAvgVisitTime() + leafUriStat.getDetail().getAvgVisitTime());
+                    visitUriDetail.setDownPvCount(visitUriDetail.getDownPvCount() + leafUriStat.getDetail().getDownPvCount());
+                }
                 visitUriTreeStatData.setDetail(visitUriDetail);
                 validLeaf.add(visitUriTreeStatData);
             }

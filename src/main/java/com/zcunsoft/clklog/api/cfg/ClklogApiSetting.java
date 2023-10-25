@@ -14,6 +14,9 @@ public class ClklogApiSetting {
     @Value("${clklogapi.project-name:hqq}")
     private String projectName;
 
+    @Value("#{'${clklogapi.project-host}'.split(',')}")
+    private List<String> projectHost;
+
     public List<String> getAccessControlAllowOrigin() {
         return accessControlAllowOrigin;
     }
@@ -28,5 +31,13 @@ public class ClklogApiSetting {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public List<String> getProjectHost() {
+        return projectHost;
+    }
+
+    public void setProjectHost(List<String> projectHost) {
+        this.projectHost = projectHost;
     }
 }
