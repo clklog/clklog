@@ -279,7 +279,6 @@ public class ReportServiceImpl implements IReportService {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count,sum(down_pv_count) as down_pv_count,sum(exit_count) as exit_count,sum(entry_count) as entry_count from visituri_detail_bydate t";
         String getListSql = "select t.uri as uri,t.uri_path as uri_path,t.title as title," + selectSql;
-//        String getSummarySql = "select " + selectSql;
         String getCountSql = "select countDistinct(t.uri,t.title,t.uri_path) from visituri_detail_bydate t";
         String where = "";
 
@@ -291,10 +290,17 @@ public class ReportServiceImpl implements IReportService {
         where = buildProvinceFilter(getVisitUriDetailPageRequest.getProvince(), paramMap, where);
         where = buildVisitorTypeFilter(getVisitUriDetailPageRequest.getVisitorType(), paramMap, where);
 
+        if (StringUtils.isNotBlank(getVisitUriDetailPageRequest.getUriPath())) {
+            if (getVisitUriDetailPageRequest.isNeedFuzzySearchUriPath()) {
+                where += " and t.uri_path like :uri_path||'%'";
+            } else {
+                where += " and t.uri_path=:uri_path";
+            }
+            paramMap.addValue("uri_path", getVisitUriDetailPageRequest.getUriPath());
+        }
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
             getListSql += " where t.uri <> 'all' and t.uri_path <> '' and t.title <> '' and t.pv>0 and " + where;
-//            getSummarySql += " where t.uri <> 'all' and " + where;
             getCountSql += " where t.uri <> 'all' and t.uri_path <> '' and t.title <> '' and t.pv>0 and " + where;
         }
         getListSql += " group by t.uri,t.title,t.uri_path";
@@ -302,16 +308,9 @@ public class ReportServiceImpl implements IReportService {
         getListSql += sortSql;
         getListSql += " limit " + (getVisitUriDetailPageRequest.getPageNum() - 1) * getVisitUriDetailPageRequest.getPageSize() + "," + getVisitUriDetailPageRequest.getPageSize();
 
-
         List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
 
-//        List<VisituriDetailbydate> summaryVisitUriDetailbydate = clickHouseJdbcTemplate.query(getSummarySql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
-
         Integer total = clickHouseJdbcTemplate.queryForObject(getCountSql, paramMap, Integer.class);
-//        VisituriDetailbydate totalVisitUriDetailbydate = null;
-//        if (summaryVisitUriDetailbydate.size() > 0) {
-//        	totalVisitUriDetailbydate = summaryVisitUriDetailbydate.get(0);
-//        }
 
         List<VisitUriDetail> visitUriDetailList = new ArrayList<>();
 
