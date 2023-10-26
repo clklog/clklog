@@ -37,4 +37,10 @@ public class GetVisitUriDetailPageRequest extends BaseSort {
 
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
     private String projectName;
+
+    @Schema(description = "路径", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
+    private String uriPath;
+
+    @Schema(description = "是否模糊搜索路径", requiredMode = Schema.RequiredMode.REQUIRED, example = "true:模糊搜索、false:精准搜索")
+    private boolean needFuzzySearchUriPath;
 }
