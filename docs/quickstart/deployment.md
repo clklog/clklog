@@ -417,6 +417,7 @@
       sdk_url: 'sensorsdata.js',
       name: 'sensors',
       show_log: true,
+      is_track_single_page: false, 
       // send_type:'beacon',
       server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=gfdsg325432gfsgfds', //clklog_receiver 的接收服务地址
       heatmap: {
@@ -429,8 +430,14 @@
     });
     ```
 
-4. 发布WEB站点到服务器
-5. 访问站点
+- **单页面应用数据采集说明**
+
+  1）如果是单页面应用，标题不变但需要自动采集页面浏览事件，需要将`autotrack.js`中的`is_track_single_page`值设置为`ture`。
+
+  2）如果是单页面应用，标题会随着页面变化，同时也需要采集页面浏览事件，需要将`autotrack.js` 中的`is_track_single_page` 值设置为`false`，同时在页面标题改变结束后执行代码：  `sensors.quick('autoTrackSinglePage');`
+
+1. 发布WEB站点到服务器
+2. 访问站点
 
 ## 10. 统计后台前端展示 clklog-ui
 

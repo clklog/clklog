@@ -76,7 +76,7 @@
   sdk_url: 'assets/plugins/sensorsdata.js',
   name: 'sensors',
   show_log: true,
-  is_track_single_page: true,
+  is_track_single_page: false,
   // send_type:'beacon',
   server_url: 'https://receiver.tracking.zcunsoft.com/api/gp?project=clklog&token=4a793ea028fc327f4f1763b7630e1438', //clklog_receiver 的接收服务地址
   heatmap: {

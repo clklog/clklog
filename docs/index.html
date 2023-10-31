@@ -11,12 +11,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <link rel="stylesheet" href="assets/css/font.css" />
     <link rel="stylesheet" href="assets/css/style@1.0.2.css" />
-  </head>
-  <body>
-    <nav>
-      <a href="www.clklog.com"> </a>
-    </nav>
-    <div id="app"></div>
     <script>
       window.$docsify = {
         name: 'CLKLOG',
@@ -76,11 +70,25 @@
           attention: {
             label: '切记'
           }
-        }
+        },
+        plugins: [
+          function (hook, vm) {
+            hook.doneEach(function () {
+              console.log(document.title)
+              sensors.quick('autoTrackSinglePage')
+            })
+          }
+        ]
       }
     </script>
+  </head>
+  <body>
+    <nav>
+      <a href="www.clklog.com"> </a>
+    </nav>
+    <div id="app"></div>
+
     <!-- Docsify v4 -->
-    <script src="assets/plugins/autotrack@1.js"></script>
     <script src="assets/plugins/docsify@4.js"></script>
     <script src="assets/plugins/search.min.js" rel="stylesheet"></script>
     <script src="assets/plugins/zoom-image.min.js" rel="stylesheet"></script>
@@ -91,5 +99,6 @@
     <script src="assets/plugins/docsify-footer.min.js"></script>
     <script src="assets/plugins/docsify-pagination.min.js"></script>
     <!-- <script src="//unpkg.com/docsify-share/build/index.min.js"></script> -->
+    <script src="assets/plugins/autotrack@2.js"></script>
   </body>
 </html>
