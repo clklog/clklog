@@ -11,7 +11,7 @@ public enum SortType {
 
 	FlowTrendDetail("FlowTrendDetail", "趋势分析", "pv1","desc", new String[]{"hour","day","week","month","pv",  "visitCount", "newUv", "uv", "ipCount","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"}),
 	AreaDetail("AreaDetail", "地域分析", "pv", "desc", new String[]{"pv",  "visitCount", "newUv", "uv",  "ipCount" ,"bounceCount","avgVisitTime","avgPv","bounceRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"}),
-	VisitUriDetail("VisitUriDetail", "受访页面分析", "uri", "asc",new String[]{"pv","uv","ipCount","exitCount", "entryCount","downPvCount","avgVisitTime","exitRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"}),
+	VisitUriDetail("VisitUriDetail", "受访页面分析", "pv", "desc",new String[]{"pv","uv","ipCount","exitCount", "entryCount","downPvCount","avgVisitTime","exitRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate","uri"}),
 	SourceWebSiteDetail("SourceWebSiteDetail", "来源网站分析", "pv","desc", new String[]{"pv", "visitCount","newUv", "uv","ipCount","avgVisitTime","avgPv","bounceRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"}),
 	DeviceDetail("DeviceDetail", "设备分析", "pv","desc", new String[]{"pv", "visitCount","newUv", "uv","ipCount","avgVisitTime","avgPv","bounceRate","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate"}),
 	VisitorList("VisitorList", "用户列表", "latestTime","desc", new String[]{"pv", "visitCount","visitTime", "latestTime","avgPv","pvRate","newUvRate","uvRate","ipCountRate","visitCountRate","visitorType"}),

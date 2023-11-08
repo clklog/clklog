@@ -914,8 +914,8 @@ public class ReportServiceImpl implements IReportService {
     public GetAreaResponse getAreaDetailTop10(GetAreaDetailRequest getAreaDetailRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count from area_detail_bydate t";
-        String getListSql = "select t.province as province,t.country as country,t.city as city," + selectSql;
-        //   String getSummarySql = "select " + selectSql;
+        String getListSql = "select t.province as province,t.country as country," + selectSql;
+        String getSummarySql = "select " + selectSql;
         String where = "";
 
         where = buildChannelFilter(getAreaDetailRequest.getChannel(), paramMap, where);
@@ -926,15 +926,17 @@ public class ReportServiceImpl implements IReportService {
 
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
-            getListSql += " where ((t.province<>'all' and t.country<>'all' and t.city<>'all') or (t.province='all' and t.country='all' and city='all')) and " + where;
+            getListSql += " where t.province<>'all' and t.country<>'all' and t.city<>'all' and " + where;
+            getSummarySql += " where t.province='all' and t.country='all' and city='all' and " + where;
 
         }
-        getListSql += " group by t.province,t.country,t.city order by visit_count desc";
+        getListSql += " group by t.province,t.country order by visit_count desc";
 
         List<AreaDetailbydate> areaDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<AreaDetailbydate>(AreaDetailbydate.class));
 
-        List<AreaDetailbydate> summaryAreaDetailbydate = areaDetailbydateList.stream().filter(f -> f.getCountry().equalsIgnoreCase("all") && f.getProvince().equalsIgnoreCase("all") && f.getCity().equalsIgnoreCase("all")).collect(Collectors.toList());
-
+//        List<AreaDetailbydate> summaryAreaDetailbydate = areaDetailbydateList.stream().filter(f -> f.getCountry().equalsIgnoreCase("all") && f.getProvince().equalsIgnoreCase("all") && f.getCity().equalsIgnoreCase("all")).collect(Collectors.toList());
+        List<AreaDetailbydate> summaryAreaDetailbydate = clickHouseJdbcTemplate.query(getSummarySql, paramMap, new BeanPropertyRowMapper<AreaDetailbydate>(AreaDetailbydate.class));
+        
         AreaDetailbydate totalAreaDetailbydate = null;
         if (summaryAreaDetailbydate.size() > 0) {
             totalAreaDetailbydate = summaryAreaDetailbydate.get(0);
@@ -944,7 +946,7 @@ public class ReportServiceImpl implements IReportService {
 
         GetAreaResponse response = new GetAreaResponse();
         for (AreaDetailbydate areaDetailbydate : areaDetailbydateList) {
-            if (!(areaDetailbydate.getCountry().equalsIgnoreCase("all") && areaDetailbydate.getProvince().equalsIgnoreCase("all") && areaDetailbydate.getCity().equalsIgnoreCase("all"))) {
+//            if (!(areaDetailbydate.getCountry().equalsIgnoreCase("all") && areaDetailbydate.getProvince().equalsIgnoreCase("all") && areaDetailbydate.getCity().equalsIgnoreCase("all"))) {
                 FlowDetail flowDetail = assemblyFlowDetail(areaDetailbydate, totalAreaDetailbydate);
                 GetAreaResponseData areaDetailTop = new GetAreaResponseData();
                 areaDetailTop.setCountry(areaDetailbydate.getCountry());
@@ -956,7 +958,7 @@ public class ReportServiceImpl implements IReportService {
                 areaDetailTop.setUv(flowDetail.getUv());
                 areaDetailTop.setUvRate(flowDetail.getUvRate());
                 areaDetailList.add(areaDetailTop);
-            }
+//            }
         }
 
         response.setData(areaDetailList);
