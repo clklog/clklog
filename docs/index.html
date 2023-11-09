@@ -82,7 +82,6 @@
         plugins: [
           function (hook, vm) {
             hook.doneEach(function () {
-              console.log(document.title)
               sensors.quick('autoTrackSinglePage')
             })
           }
@@ -107,6 +106,6 @@
     <script src="assets/plugins/docsify-footer.min.js"></script>
     <script src="assets/plugins/docsify-pagination.min.js"></script>
     <!-- <script src="//unpkg.com/docsify-share/build/index.min.js"></script> -->
-    <script src="assets/plugins/autotrack@2.js"></script>
+    <script src="assets/plugins/autotrack@2.1.js"></script>
   </body>
 </html>

@@ -71,7 +71,7 @@
     sensors.use('PageLoad')
     sensors.use('SessionEvent')
   })
-  sensors.quick('autoTrackSinglePage')
+  //sensors.quick('autoTrackSinglePage')
 })({
   sdk_url: 'assets/plugins/sensorsdata.js',
   name: 'sensors',
