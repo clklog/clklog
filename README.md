@@ -36,11 +36,11 @@ ClkLog是一款记录用户行为分析和画像的免费可商用开源软件�
 
 官方文档：<a href="https://clklog.com">https://clklog.com</a>
 
-# 开源社区
+<!-- # 开源社区
 
 问题反馈：[https://github.com/clklog/clklog/issues](https://github.com/clklog/clklog/issues)
 
-参与讨论：[https://github.com/orgs/clklog/discussions](https://github.com/orgs/clklog/discussions)
+参与讨论：[https://github.com/orgs/clklog/discussions](https://github.com/orgs/clklog/discussions) -->
 
 # 协议许可
 
