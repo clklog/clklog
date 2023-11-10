@@ -30,4 +30,6 @@ public class VisituriDetailbydate extends BaseDetailbydate {
     @Column 
     String uriPath;
 
+    @Column
+    String host;
 }

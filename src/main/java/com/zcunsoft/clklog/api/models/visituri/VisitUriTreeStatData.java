@@ -10,6 +10,8 @@ import java.util.List;
 public class VisitUriTreeStatData {
     @Schema(description = "页面路径")
     private String uri;
+    @Schema(description = "域名")
+    private String host;
     @Schema(description = "相对路径")
     private String path;
     @Schema(description = "页面路径最后地址段")
