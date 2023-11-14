@@ -2,18 +2,6 @@
   <div class="TrendChart block-main public-hoverItem">
     <div class="block-head"  @click="$router.push('/visitorAnalysis/trend')">
       <div class="block-title">趋势图</div>
-      <!-- collapse-tags -->
-      <!-- <el-cascader
-        v-model="headLege"
-        style="width: 270px; margin-left: 20px"
-        placeholder="指标 | 选项"
-        :options="options"
-        :props="{ multiple: true, checkStrictly: true }"
-        clearable
-        @change="handleCheckPointer"
-      ></el-cascader> -->
-
-      <!-- 调整功能 -->
       <el-select
         class="custom_select"
         v-model="headLege"

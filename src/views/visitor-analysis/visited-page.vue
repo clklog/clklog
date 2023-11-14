@@ -2,17 +2,24 @@
   <div>
     <FilterBar ByArea @setFilterBarParams="setFilterBarParams"></FilterBar>
     <div class="Overview public-hoverItem">
-      <div class="public-firstHead" >流量概览</div>
+      <div class="public-firstHead">流量概览</div>
       <div class="bid-list-page">
         <originView ref="originView" byVisitedPage></originView>
       </div>
     </div>
-    <visitedAnalysis @currentPage="currentPage" ref="visitedAnalysis"></visitedAnalysis>
+    <visitedAnalysis
+      @currentPage="currentPage"
+      ref="visitedAnalysis"
+    ></visitedAnalysis>
   </div>
 </template>
 
 <script>
-import { getVisitUriDetailApi,getVisitUriTotalApi } from "@/api/trackingapi/visituri";
+import {
+  getVisitUriDetailApi,
+  getVisitUriTotalApi,
+  getVisitUriPathTreeTotalApi,
+} from "@/api/trackingapi/visituri";
 import { FilterBar } from "@/layout/components";
 import originView from "@/components/origin-view";
 import visitedAnalysis from "./chart-component/visited-page-analysis";
@@ -35,18 +42,19 @@ export default {
     };
   },
   computed: {
-    project() {
-      return this.$store.getters.project;
+    projectName() {
+      return this.$store.getters.projectName;
     },
     commonParams() {
-      const { project } = this;
-      return Object.assign({ project }, this.filterBarParams);
+      const { projectName } = this;
+      return Object.assign({ projectName }, this.filterBarParams);
     },
   },
   watch: {
     commonParams() {
-      this.getVisitUriDetail();
-      this.getVisitUriTotal()
+      this.getVisitUriDetail(); // 默认数据
+      this.getVisitUriTotal();
+      this.getVisitUriPathTreeTotal();
     },
   },
   methods: {
@@ -67,7 +75,7 @@ export default {
         newvalue.sortOrder = this.sortOrder;
         newvalue.pageNum = this.pageNum;
         newvalue.pageSize = this.pageSize;
-        this.$refs.visitedAnalysis.initCurrentPage()
+        this.$refs.visitedAnalysis.initCurrentPage();
       }
       getVisitUriDetailApi(newvalue).then((res) => {
         if (res.code == 200) {
@@ -76,7 +84,17 @@ export default {
         }
       });
     },
-    getVisitUriTotal(){
+    // 树状结构
+    getVisitUriPathTreeTotal() {
+      getVisitUriPathTreeTotalApi(this.commonParams).then((res) => {
+        if (res.code == 200) {
+          // this.$refs.originView.originEvent(res.data);
+          // this.$refs.visitedAnalysis.treeListvent(res.data);
+          this.$refs.visitedAnalysis.treeListEvent(res.data,this.commonParams);
+        }
+      });
+    },
+    getVisitUriTotal() {
       getVisitUriTotalApi(this.commonParams).then((res) => {
         if (res.code == 200) {
           this.$refs.originView.originEvent(res.data);

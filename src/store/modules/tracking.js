@@ -1,17 +1,17 @@
 const state = {
-  // project: '货清清'
-  project: 'hqq'
+  // projectName: '货清清'
+  projectName: 'hqq'
 }
 
 const mutations = {
-  SET_PROJECT: (state, project) => {
-    state.project = project
+  SET_PROJECT: (state, projectName) => {
+    state.projectName = projectName
   }
 }
 
 const actions = {
-  setProject({ commit }, project) {
-    commit('SET_PROJECT', project)
+  setProject({ commit }, projectName) {
+    commit('SET_PROJECT', projectName)
   }
 }
 

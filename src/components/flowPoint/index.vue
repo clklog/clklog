@@ -99,7 +99,7 @@ export default {
   methods: {
     publicEventDown(val) {
       let params = val;
-      params.project = this.$store.getters.project;
+      params.projectName = this.$store.getters.projectName;
       params.cols = [...this.channelList, ...this.flowQuality];
       let path = this.$route.path;
       // if (path.includes("trendAnalysis")) {

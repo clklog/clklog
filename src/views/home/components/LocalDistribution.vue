@@ -4,7 +4,6 @@
       <div class="block-title" >地域分布</div>
       <div
         class="block-head-icon"
-       
       >
         <img src="@/assets/images/icon.png" alt="" width="10px" />
       </div>

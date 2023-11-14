@@ -216,7 +216,7 @@
                     "
                     @click="toVisitHttp(item, index)"
                   >
-                    {{ item.visitTime }}中的{{ item.pv }}个动作
+                    {{ item.visitTime }}中的{{ item.pv }}个页面
                   </div>
 
                   <div

@@ -1,6 +1,6 @@
 <template>
   <div class="FlowView block-main public-hoverItem">
-    <div class="block-head" style="margin-bottom: 0px;">
+    <div class="block-head" style="margin-bottom: 0px">
       <div class="block-title">流量概览</div>
     </div>
     <div class="bid-list-page">
@@ -38,6 +38,7 @@
           <p v-else>--</p>
         </div>
       </div>
+<!-- 昨日 -->
       <div class="bid-list-record">
         <div class="bid-list-item1 w157">
           <p v-if="timeType == 'day'">昨日</p>
@@ -47,29 +48,192 @@
         </div>
         <div class="bid-list-item w157">
           <p>{{ previous.pv || "--" }}</p>
+          <!-- <img
+            v-if="previous.pv && currentPrediction"
+            class="riseImg"
+            :src="
+              handleCompare(currentPrediction.pv, previous.pv)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          /> -->
         </div>
         <div class="bid-list-item w157">
           <p>{{ previous.visitCount || "--" }}</p>
+          <!-- <img
+            v-if="previous.visitCount && currentPrediction"
+            class="riseImg"
+            :src="
+              handleCompare(currentPrediction.visitCount, previous.visitCount)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          /> -->
         </div>
+
         <div class="bid-list-item w157">
           <p>{{ previous.uv || "--" }}</p>
+          <!-- <img
+            v-if="previous.uv && currentPrediction"
+            class="riseImg"
+            :src="
+              handleCompare(currentPrediction.uv, previous.uv)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          /> -->
         </div>
         <div class="bid-list-item w157">
           <p>{{ previous.ipCount || "--" }}</p>
+          <!-- <img
+            v-if="previous.ipCount && currentPrediction"
+            class="riseImg"
+            :src="
+              handleCompare(currentPrediction.ipCount, previous.ipCount)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          /> -->
         </div>
         <div class="bid-list-item w157">
           <p>{{ averageRulesEvent(previous.avgPv) || "--" }}</p>
+          <!-- <img
+            v-if="previous.avgPv && currentPrediction"
+            class="riseImg"
+            :src="
+              handleCompare(currentPrediction.avgPv, previous.avgPv)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          /> -->
         </div>
         <div class="bid-list-item w157">
           <p>{{ formatTimeFun(previous.avgVisitTime) || "--" }}</p>
+          <!-- <img
+            v-if="previous.avgVisitTime && currentPrediction"
+            class="riseImg"
+            :src="
+              handleCompare(currentPrediction.avgVisitTime, previous.avgVisitTime)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          /> -->
         </div>
         <div class="bid-list-item w157">
-          <p v-if="previous.bounceRate">
-            {{ percentageFun(previous.bounceRate) }}
+          <p>
+            {{ percentageFun(previous.bounceRate) || "--" }}
           </p>
-          <p v-else>--</p>
+          <!-- <img
+            v-if="previous.bounceRate && currentPrediction"
+            class="riseImg"
+            :src="
+              handleCompare(currentPrediction.bounceRate, previous.bounceRate)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          /> -->
         </div>
       </div>
+
+      <!-- 今日预测 -->
+      <div class="bid-list-record" v-if="currentPrediction">
+        <div class="bid-list-item1 w157">
+          <p v-if="timeType == 'day'">今日预测</p>
+        </div>
+        <div class="bid-list-item w157">
+          <p>{{ currentPrediction.pv || "--" }}</p>
+          <img
+            v-if="currentPrediction.pv"
+            class="riseImg"
+            :src="
+              handleCompare(previous.pv, currentPrediction.pv)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          />
+        </div>
+        <div class="bid-list-item w157">
+          <p>{{ currentPrediction.visitCount || "--" }}</p>
+          <img
+            v-if="currentPrediction.visitCount"
+            class="riseImg"
+            :src="
+              handleCompare(previous.visitCount, currentPrediction.visitCount)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          />
+        </div>
+        <div class="bid-list-item w157">
+          <p>{{ currentPrediction.uv || "--" }}</p>
+          <img
+            v-if="currentPrediction.uv"
+            class="riseImg"
+            :src="
+              handleCompare(previous.uv, currentPrediction.uv)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          />
+        </div>
+
+        <div class="bid-list-item w157">
+          <p>{{ currentPrediction.ipCount || "--" }}</p>
+          <img
+            v-if="currentPrediction.ipCount"
+            class="riseImg"
+            :src="
+              handleCompare(previous.ipCount, currentPrediction.ipCount)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          />
+        </div>
+        <div class="bid-list-item w157">
+          <p>{{ averageRulesEvent(currentPrediction.avgPv) || "--" }}</p>
+          <img
+            v-if="currentPrediction.avgPv"
+            class="riseImg"
+            :src="
+              handleCompare(previous.avgPv, currentPrediction.avgPv)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          />
+        </div>
+        <div class="bid-list-item w157">
+          <p>{{ formatTimeFun(currentPrediction.avgVisitTime) || "--" }}</p>
+          <img
+            v-if="currentPrediction.avgVisitTime"
+            class="riseImg"
+            :src="
+              handleCompare(
+                previous.avgVisitTime,
+                currentPrediction.avgVisitTime
+              )
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          />
+        </div>
+        <div class="bid-list-item w157">
+          <p>
+            {{ percentageFun(currentPrediction.bounceRate) || "--" }}
+          </p>
+          <img
+            v-if="currentPrediction.bounceRate"
+            class="riseImg"
+            :src="
+              handleCompare(previous.bounceRate, currentPrediction.bounceRate)
+                ? require('@/assets/images/decline.png')
+                : require('@/assets/images/rise.png')
+            "
+          />
+        </div>
+      </div>
+
+      <div style="width: 100%; border-bottom:1px solid #E7EFF9 ;margin: 2px 0px 13px 0;"></div>
+
       <div class="bid-list-record">
         <div class="bid-list-item1 w157">
           <p v-if="timeType == 'day'">环比（今日与昨日）</p>
@@ -240,7 +404,6 @@
       </div>
       <div class="bid-list-record" style="margin-bottom: 0">
         <div class="bid-list-item1 w157">
-          <!-- <p v-if="timeType == 'day'">同比（今日与上年同期）</p> -->
           <p v-if="timeType == 'day'">同比（今日与上周同期）</p>
           <p v-if="timeType == 'week'">同比（本周与上年同期）</p>
           <p v-if="timeType == 'month'">同比（本月与上年同期）</p>
@@ -417,7 +580,7 @@
 <script>
 import originView from "@/components/origin-view/index";
 import { getFlowApi } from "@/api/trackingapi/flow";
-import { percentage ,averageRules} from "@/utils/percent";
+import { percentage, averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   name: "FlowView",
@@ -447,6 +610,11 @@ export default {
         ? this.flowData.current
         : {};
     },
+    currentPrediction() {
+      return this.flowData && this.flowData.currentPrediction
+        ? this.flowData.currentPrediction
+        : null;
+    },
     samePeriod() {
       return this.flowData && this.flowData.samePeriod
         ? this.flowData.samePeriod
@@ -455,11 +623,17 @@ export default {
   },
   watch: {},
   methods: {
+    handleCompare(x, y) {
+      // if (y) {
+      return x > y ? true : false;
+      // }
+      // return;
+    },
     averageRulesEvent(num) {
       return averageRules(num);
     },
-    formatTimeFun(val){
-      val =  Math.floor(val);
+    formatTimeFun(val) {
+      val = Math.floor(val);
       return formatTime(val);
     },
     percentageFun(val) {

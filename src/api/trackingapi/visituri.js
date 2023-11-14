@@ -25,3 +25,19 @@ export function getVisitUriTotalApi(params) {
     data: params
   })
 }
+// 树状结构
+export function getVisitUriPathTreeTotalApi(params) {
+  return request({
+    url: '/visituri/getVisitUriPathTreeTotal',
+    method: 'post',
+    data: params
+  })
+}
+// 资源路径top10页面统计数据
+export function getVisitUriListOfUriPathApi(params) {
+  return request({
+    url: '/visituri/getVisitUriListOfUriPath',
+    method: 'post',
+    data: params
+  })
+}

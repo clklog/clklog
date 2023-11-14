@@ -12,7 +12,7 @@ const getters = {
   permission_routes: state => state.permission.routes,
   errorLogs: state => state.errorLog.logs,
   // tracking
-  project: state => state.tracking.project,
+  projectName: state => state.tracking.projectName,
   filterBar: state => state.filterBar.checkList
 }
 export default getters

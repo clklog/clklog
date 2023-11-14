@@ -33,7 +33,6 @@
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
-                
               >
                 <div style="display: flex; align-items: center">
                   <span class="checkbox__inner"
@@ -105,7 +104,7 @@
             </el-table-column>
             <el-table-column
               prop="visitCount"
-              label="访客次数"
+              label="访问次数"
               sortable="custom"
             >
               <template slot-scope="scope">
@@ -577,6 +576,16 @@ export default {
 @import "~@/styles/components/custom-select.scss";
 ::v-deep {
   @import "~@/styles/components/el-pagination.scss";
+  .el-table__header {
+    // 使表格兼容safari，不错位,表头宽度较小
+    width: 100%;
+    table-layout: fixed !important;
+  }
+  .el-table__body {
+    width: 100%;
+    // 使表格兼容safari，不错位
+    table-layout: fixed !important;
+  }
 }
 .trafficHead {
   font-size: 16px;

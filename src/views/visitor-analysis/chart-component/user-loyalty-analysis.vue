@@ -71,12 +71,12 @@ export default {
     this.chart = null;
   },
   computed: {
-    project() {
-      return this.$store.getters.project;
+    projectName() {
+      return this.$store.getters.projectName;
     },
     commonParams() {
-      const { project } = this;
-      return Object.assign({ project }, this.filterBarParams);
+      const { projectName } = this;
+      return Object.assign({ projectName }, this.filterBarParams);
     },
   },
   watch: {
