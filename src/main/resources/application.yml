@@ -15,9 +15,12 @@ spring:
   application.name: clklog-api
   datasource:
     clickhouse:
-      jdbc-url: jdbc:clickhouse://localhost:8123/default
+#      jdbc-url: jdbc:clickhouse://localhost:8123/default
+#      username: default
+#      password: 123456
+      jdbc-url: jdbc:clickhouse://clickhouse.tracking.zcunsoft.com:443/clklog?ssl=true
       username: default
-      password: 123456
+      password: 0ItqD/Idxke5L+XX
       driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
       connection-timeout: 20000
       maximum-pool-size: 5
@@ -27,3 +30,4 @@ logging:
 clklogapi:
   access-control-allow-origin: "*"
   project-name: hqq
+  project-host: https://app.huoqingqing.com,https://h5.huoqingqing.com,https://clklog.com,https://www.zcunsoft.com,http://www.zcunsoft.com

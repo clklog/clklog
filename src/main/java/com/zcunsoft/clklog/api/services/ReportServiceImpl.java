@@ -296,7 +296,13 @@ public class ReportServiceImpl implements IReportService {
             } else {
                 where += " and t.uri_path=:uri_path";
             }
-            paramMap.addValue("uri_path", getVisitUriDetailPageRequest.getUriPath());
+
+            String host = extractHost(getVisitUriDetailPageRequest.getUriPath());
+            if (StringUtils.isNotBlank(host)) {
+                paramMap.addValue("host", host);
+                where += " and t.host=:host";
+            }
+            paramMap.addValue("uri_path", getVisitUriDetailPageRequest.getUriPath().substring(host.length()));
         }
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
@@ -2993,7 +2999,7 @@ public class ReportServiceImpl implements IReportService {
     public GetVisitUriPathTreeTotalResponse getVisitUriPathTreeTotal(GetVisitUriDetailRequest getVisitUriDetailRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count,sum(down_pv_count) as down_pv_count,sum(exit_count) as exit_count,sum(entry_count) as entry_count from visituri_detail_bydate t";
-        String getListSql = "select t.uri_path as uri," + selectSql;
+        String getListSql = "select t.uri_path as uri,t.host," + selectSql;
 
         String where = "";
         where = buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
@@ -3008,7 +3014,7 @@ public class ReportServiceImpl implements IReportService {
             where = where.substring(4);
             getListSql += " where t.uri <> 'all' and " + where;
         }
-        getListSql += " group by t.uri_path order by t.uri_path";
+        getListSql += " group by t.uri_path,t.host order by t.uri_path";
 
         List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
 
@@ -3016,7 +3022,6 @@ public class ReportServiceImpl implements IReportService {
 
         GetVisitUriPathTreeTotalResponse response = new GetVisitUriPathTreeTotalResponse();
 
-        Pattern pattern = Pattern.compile("(http|https)://(www.)?(\\w+(\\.)?)+/");
         for (VisituriDetailbydate visituriDetailbydate : visitUriDetailbydateList) {
             FlowDetail flowDetail = assemblyFlowDetail(visituriDetailbydate, visituriDetailbydate);
             VisitUriPathDetail visitUriDetail = new VisitUriPathDetail();
@@ -3032,30 +3037,59 @@ public class ReportServiceImpl implements IReportService {
             visitUriDetail.setUri(visituriDetailbydate.getUri());
             visitUriDetail.setUv(visituriDetailbydate.getUv());
             visitUriDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
-            String host = "";
-            Matcher hostMatcher = pattern.matcher(visitUriDetail.getUri());
-            if (hostMatcher.find()) {
-                host = hostMatcher.group();
-            }
-            visitUriDetail.setHost(host);
-            visitUriDetail.setPath(visitUriDetail.getUri().substring(host.length()));
-            String[] pathArr = visitUriDetail.getPath().split("/", -1);
+            String[] pathArr = visituriDetailbydate.getUri().split("/", -1);
             visitUriDetail.setPathList(new ArrayList<>(Arrays.asList(pathArr)));
             visitUriDetail.setPathLength(visitUriDetail.getPathList().size());
+            visitUriDetail.setHost(visituriDetailbydate.getHost());
             visitUriDetailList.add(visitUriDetail);
         }
         List<VisitUriTreeStatData> visitUriTreeStatDataList = new ArrayList<>();
         List<String> hostList = visitUriDetailList.stream().map(VisitUriPathDetail::getHost).distinct().collect(Collectors.toList());
         hostList = hostList.stream().filter(f -> clklogApiSetting.getProjectHost().contains(f)).collect(Collectors.toList());
         for (String host : hostList) {
-            visitUriTreeStatDataList.addAll(genUriTree(visitUriDetailList, host, new ArrayList<>()));
+            List<VisitUriTreeStatData> hostStatDataList = genUriTree(visitUriDetailList, host, "/", new ArrayList<>());
+
+            boolean needVisutalRoot = false;
+            if (hostStatDataList.size() >= 2) {
+                needVisutalRoot = true;
+            } else if (hostStatDataList.size() == 1) {
+                if (!hostStatDataList.get(0).getPath().equalsIgnoreCase("/")) {
+                    needVisutalRoot = true;
+                }
+            }
+            if (needVisutalRoot) {
+                VisitUriTreeStatData rootStatData = new VisitUriTreeStatData();
+                rootStatData.setPath("/");
+                rootStatData.setUri(host + rootStatData.getPath());
+                rootStatData.setSegment("");
+                rootStatData.setHost(host);
+                rootStatData.setLeafUri(hostStatDataList);
+                VisitUriPathDetail rootDetail = new VisitUriPathDetail();
+                rootDetail.setUri(rootStatData.getUri());
+                rootDetail.setHost(host);
+                for (VisitUriTreeStatData leafUriStat : hostStatDataList) {
+                    rootDetail.setPv(rootDetail.getPv() + leafUriStat.getDetail().getPv());
+                    rootDetail.setUv(rootDetail.getUv() + leafUriStat.getDetail().getUv());
+                    rootDetail.setIpCount(rootDetail.getIpCount() + leafUriStat.getDetail().getIpCount());
+                    rootDetail.setExitCount(rootDetail.getExitCount() + leafUriStat.getDetail().getExitCount());
+                    rootDetail.setExitRate(rootDetail.getExitRate() + leafUriStat.getDetail().getExitRate());
+                    rootDetail.setEntryCount(rootDetail.getEntryCount() + leafUriStat.getDetail().getEntryCount());
+                    rootDetail.setAvgVisitTime(rootDetail.getAvgVisitTime() + leafUriStat.getDetail().getAvgVisitTime());
+                    rootDetail.setDownPvCount(rootDetail.getDownPvCount() + leafUriStat.getDetail().getDownPvCount());
+                }
+
+                rootStatData.setDetail(rootDetail);
+                visitUriTreeStatDataList.add(rootStatData);
+            } else {
+                visitUriTreeStatDataList.addAll(hostStatDataList);
+            }
         }
         response.setData(visitUriTreeStatDataList);
         return response;
     }
 
-    private List<VisitUriTreeStatData> genUriTree(List<VisitUriPathDetail> visitUriDetailList, String parentUri, List<String> pathList) {
-        if (visitUriDetailList.isEmpty() || (pathList.size() >= 2 && pathList.get(pathList.size() - 1).isEmpty())) {
+    private List<VisitUriTreeStatData> genUriTree(List<VisitUriPathDetail> visitUriDetailList, String host, String parentUri, List<String> pathList) {
+        if (visitUriDetailList.isEmpty() || (pathList.size() >= 3 && pathList.get(pathList.size() - 1).isEmpty())) {
             return new ArrayList<>();
         } else {
             int pathCount = pathList.size();
@@ -3065,7 +3099,7 @@ public class ReportServiceImpl implements IReportService {
                 int finalPathCount = pathCount;
 
                 subList = visitUriDetailList.stream().filter(f -> f.getPathLength() == finalPathCount + 1
-                        && f.getUri().startsWith(parentUri)
+                        && f.getUri().startsWith(parentUri) && f.getHost().equalsIgnoreCase(host)
                 ).collect(Collectors.toList());
 
                 pathCount++;
@@ -3078,10 +3112,11 @@ public class ReportServiceImpl implements IReportService {
             List<VisitUriTreeStatData> validLeaf = new ArrayList<>();
             for (VisitUriPathDetail visitUriDetail : subList) {
                 VisitUriTreeStatData visitUriTreeStatData = new VisitUriTreeStatData();
-                visitUriTreeStatData.setUri(visitUriDetail.getUri());
-                visitUriTreeStatData.setPath(visitUriDetail.getPath());
+                visitUriTreeStatData.setPath(visitUriDetail.getUri());
+                visitUriTreeStatData.setHost(host);
+                visitUriTreeStatData.setUri( visitUriTreeStatData.getHost()  + visitUriDetail.getUri());
                 visitUriTreeStatData.setSegment(visitUriDetail.getPathList().get(visitUriDetail.getPathList().size() - 1));
-                List<VisitUriTreeStatData> leafUriStatDataList = genUriTree(visitUriDetailList, visitUriDetail.getUri(), visitUriDetail.getPathList());
+                List<VisitUriTreeStatData> leafUriStatDataList = genUriTree(visitUriDetailList, visitUriDetail.getHost(), visitUriDetail.getUri(), visitUriDetail.getPathList());
                 visitUriTreeStatData.setLeafUri(leafUriStatDataList);
                 for (VisitUriTreeStatData leafUriStat : leafUriStatDataList) {
                     visitUriDetail.setPv(visitUriDetail.getPv() + leafUriStat.getDetail().getPv());
@@ -3113,9 +3148,13 @@ public class ReportServiceImpl implements IReportService {
         where = buildCountryFilter(getVisitUriListOfUriPathRequest.getCountry(), paramMap, where);
         where = buildProvinceFilter(getVisitUriListOfUriPathRequest.getProvince(), paramMap, where);
         where = buildVisitorTypeFilter(getVisitUriListOfUriPathRequest.getVisitorType(), paramMap, where);
-
+        String host = extractHost(getVisitUriListOfUriPathRequest.getUriPath());
+        if (StringUtils.isNotBlank(host)) {
+            paramMap.addValue("host", host);
+            where += " and t.host=:host";
+        }
         where += " and t.uri_path=:uri_path";
-        paramMap.addValue("uri_path", getVisitUriListOfUriPathRequest.getUriPath());
+        paramMap.addValue("uri_path", getVisitUriListOfUriPathRequest.getUriPath().substring(host.length()));
 
         where += " and t.pv>0";
         if (StringUtils.isNotBlank(where)) {
@@ -3152,5 +3191,15 @@ public class ReportServiceImpl implements IReportService {
 
         response.setData(visitUriDetailList);
         return response;
+    }
+
+    private String extractHost(String url) {
+        Pattern pattern = Pattern.compile("(http|https)://(www.)?(\\w+(\\.)?)+");
+        String host = "";
+        Matcher hostMatcher = pattern.matcher(url);
+        if (hostMatcher.find()) {
+            host = hostMatcher.group();
+        }
+        return host;
     }
 }
