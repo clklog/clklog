@@ -197,6 +197,7 @@ public class ExportReportServiceImpl implements IExportReportService {
             flowDetail.setSearchword(searchWordDetailbydate.getSearchword());
             flowDetailList.add(flowDetail);
         }
+	    
         responseData.setRows(flowDetailList);
         responseData.setTotal(0);
         response.setData(responseData);
