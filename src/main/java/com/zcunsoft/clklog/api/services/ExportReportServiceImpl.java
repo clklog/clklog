@@ -197,6 +197,7 @@ public class ExportReportServiceImpl implements IExportReportService {
             flowDetail.setSearchword(searchWordDetailbydate.getSearchword());
             flowDetailList.add(flowDetail);
         }
+	    
         responseData.setRows(flowDetailList);
         responseData.setTotal(0);
         response.setData(responseData);
@@ -313,10 +314,10 @@ public class ExportReportServiceImpl implements IExportReportService {
         where = buildCountryFilter(downloadRequest.getCountry(), paramMap, where);
         where = buildProvinceFilter(downloadRequest.getProvince(), paramMap, where);
         where = buildVisitorTypeFilter(downloadRequest.getVisitorType(), paramMap, where);
-
+        
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
-            getListSql += " where t.uri <> 'all' and t.uri_path <> 'all' and t.title<> 'all' and " + where;
+            getListSql += " where t.uri <> 'all' and t.uri_path <> 'all' and t.title<> 'all' and t.pv>0 and " + where;
         }
         getListSql += " group by t.uri,t.uri_path,t.title "; 
         getListSql += " order by pv desc "; 
