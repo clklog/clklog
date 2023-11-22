@@ -6,6 +6,7 @@ import com.zcunsoft.clklog.analysis.utils.CommonUtils
 import org.apache.flink.api.common.functions.RichMapFunction
 
 import java.text.SimpleDateFormat
+import java.util.Date
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
@@ -97,7 +98,7 @@ class LogRichMapper extends RichMapFunction[String, ListBuffer[LogBean]] {
    */
   def getPropertyFromJson(logBean: LogBean, json: JSONObject) = {
     val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-
+    logBean.create_time = sdf.format(new Date());
     //第一层级
     if (json.containsKey("distinct_id")) logBean.distinct_id = json.getString("distinct_id")
     if (json.containsKey("type")) logBean.typeContext = json.getString("type")

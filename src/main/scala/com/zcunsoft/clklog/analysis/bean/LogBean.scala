@@ -129,5 +129,5 @@ class LogBean extends Serializable {
 
   var raw_url: String =""
 
-
+  var create_time: String = ""
 }

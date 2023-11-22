@@ -160,6 +160,7 @@ class LogAnalysisClickHouseSink extends RichSinkFunction[ListBuffer[LogBean]] {
         pst.setString(102, value.download_channel)
         pst.setString(103, value.event_session_id)
         pst.setString(104, value.raw_url)
+        pst.setString(105, value.create_time)
         pst.addBatch
       }
 
