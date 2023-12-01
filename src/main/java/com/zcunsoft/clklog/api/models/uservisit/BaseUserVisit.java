@@ -12,4 +12,7 @@ public class BaseUserVisit {
 
     @Schema(description = "value")
     private int value;
+    
+    @Schema(description = "占比")
+    private float rate;
 }

@@ -14,6 +14,8 @@ import com.zcunsoft.clklog.api.models.device.GetDeviceDetailPageRequest;
 import com.zcunsoft.clklog.api.models.device.GetDeviceDetailPageResponse;
 import com.zcunsoft.clklog.api.models.device.GetDeviceDetailRequest;
 import com.zcunsoft.clklog.api.models.device.GetDeviceDetailResponse;
+import com.zcunsoft.clklog.api.models.os.GetOsDetailRequest;
+import com.zcunsoft.clklog.api.models.os.GetOsDetailResponse;
 import com.zcunsoft.clklog.api.models.searchword.GetSearchWordDetailRequest;
 import com.zcunsoft.clklog.api.models.searchword.GetSearchWordDetailResponse;
 import com.zcunsoft.clklog.api.models.sourcewebsite.*;
@@ -25,6 +27,7 @@ import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailCompareResponse;
 import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailRequest;
 import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailResponse;
 import com.zcunsoft.clklog.api.models.uservisit.GetUserPvbydateResponse;
+import com.zcunsoft.clklog.api.models.uservisit.GetUserLatestTimebydateResponse;
 import com.zcunsoft.clklog.api.models.uservisit.GetUserVisitRequest;
 import com.zcunsoft.clklog.api.models.uservisit.GetUserVisitTimebydateResponse;
 import com.zcunsoft.clklog.api.models.uservisit.GetUserVisitbydateResponse;
@@ -105,6 +108,8 @@ public interface IReportService {
     GetUserVisitbydateResponse getUserVisit(GetUserVisitRequest getUserVisitRequest);
     
     GetUserPvbydateResponse getUserPv(GetUserVisitRequest getUserVisitRequest);
+    
+    GetUserLatestTimebydateResponse getUserLatestTime(GetUserVisitRequest getUserVisitRequest);
 
     Timestamp getProjectNameStartStatDate();
 
@@ -123,5 +128,14 @@ public interface IReportService {
     GetVisitUriListOfUriPathResponse getVisitUriListOfUriPath(GetVisitUriListOfUriPathRequest getVisitUriListOfUriPathRequest);
     
     GetFlowTrendDetailCompareResponse getFlowDetailByCompare(GetFlowTrendDetailCompareRequest getFlowTrendDetailCompareRequest);
+    
+    GetLogAnalysisListPageResponse getLogAnalysisList(GetLogAnalysisListPageRequest getLogAnalysisListPageRequest);
+    
+    /**
+     * 操作系统分析
+     * @param getOsDetailRequest
+     * @return
+     */
+    GetOsDetailResponse getOsDetail(GetOsDetailRequest getOsDetailRequest);
 
 }
