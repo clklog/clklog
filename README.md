@@ -48,4 +48,14 @@ ClkLog是一款记录用户行为分析和画像的免费可商用开源软件�
 
 - 免费使用：Clklog遵循AGPL V3.0开源许可证, 使用的组织或个人在复制、分发、转发或修改时请遵守相关条款，不得移除ClkLog相关版权标识进行。如有违反，ClkLog将保留对侵权者追究责任的权利。
 
-- 商业使用：请联系邮箱`info@clklog.com`进行细节咨询
+- 商业使用：请联系客服进行细节咨询
+
+# 联系我们
+
+- 客服邮箱：<info@clklog.com>
+
+- 客服手机：16621363853
+
+- 客服微信：opensoft66
+
+- 客服二维码：<img title="" src="/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top">

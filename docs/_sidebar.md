@@ -13,6 +13,6 @@
 - 贡献者指南
   - [贡献者指南](/contributor/guide.md)
 
-- 协议许可
-  - [协议许可](/license.md)
+- [**合作协议**](/license.md)
+
   <!-- - [贡献者协议](/contributor/agreement.md) -->
