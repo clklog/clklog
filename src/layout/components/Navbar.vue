@@ -130,7 +130,7 @@ export default {
       // git上项目写死
       options: [
         {
-          value: "clklogapp",
+          value: "clklog",
           label: "clklog",
         },
       ],

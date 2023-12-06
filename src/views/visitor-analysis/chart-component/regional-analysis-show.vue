@@ -171,9 +171,6 @@ export default {
           aspectScale: 0.75,
           zoom: 1.1,
         },
-        // tooltip: {
-        //   formatter: "{b}:{c}",
-        // },
         tooltip: {
           formatter(params, ticket, callback) {
             let visitCountRate, uv, uvRate;

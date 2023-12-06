@@ -830,6 +830,7 @@ aside a:hover {
 }
 
 .block-main .block-head .block-title {
+  display: flex;
   font-weight: 600;
   font-size: 15px;
   line-height: 33px;
@@ -837,6 +838,7 @@ aside a:hover {
 }
 
 .block-main .block-head .block-head-icon {
+  display: flex;
   box-sizing: content-box;
   margin-left: auto;
   text-align: right;

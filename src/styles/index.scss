@@ -221,16 +221,16 @@ aside {
     margin-bottom: 17px;
     // 首页一级标题字体设置
     .block-title {
-      // width:50%;
+      display: flex;
       font-weight: 600;
       font-size: 15px;
       line-height: 33px;
       color: #4d4d4d;
     }
     .block-head-icon {
+      display: flex;
       box-sizing: content-box;
       margin-left: auto;
-      // width: 50%;
       text-align: right;
       color: #acaaaa;
       font-size: 16px;
