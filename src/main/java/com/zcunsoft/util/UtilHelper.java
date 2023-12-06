@@ -1,5 +1,6 @@
 package com.zcunsoft.util;
 
+import com.sun.jndi.toolkit.url.Uri;
 import com.zcunsoft.model.Rule;
 
 import java.io.*;
@@ -123,30 +124,28 @@ public final class UtilHelper {
     }
 
     public static String parseUrlPath(String rawUrl) {
-        String parseUrlPath = File.separator;
-        try {
+        String path = File.separator;
 
-            Pattern pattern = Pattern.compile("(http|https)://(www.)?(\\w+(\\.)?)+/");
-            Matcher hostMatcher = pattern.matcher(rawUrl);
-            if (hostMatcher.find()) {
-                parseUrlPath = hostMatcher.group();
-            }
-            String path = "";
+        try {
             int index = rawUrl.lastIndexOf("#");
             if (index != -1) {
                 int index2 = rawUrl.indexOf("?", index + 1);
                 if (index2 != -1) {
-                    path = rawUrl.substring(index , index2);
+                    path = rawUrl.substring(index, index2);
 
                 } else {
-                    path = rawUrl.substring(index );
+                    path = rawUrl.substring(index);
                 }
+            } else {
+                Uri uri = new Uri(rawUrl);
+                path = uri.getPath();
             }
-            parseUrlPath += path;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        return parseUrlPath;
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        return path;
     }
 }
