@@ -222,7 +222,7 @@
         enabled: true
         tagsSorter: alpha
       api-docs:
-        path: /clklog_api/v3/api-docs
+        path: /api/v3/api-docs
         enabled: true
       group-configs:
         - group: 'default'
@@ -324,13 +324,13 @@
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             }
 
-    location /clklog_api/ {
+    location /api/ {
                 proxy_pass http://clklog_api_server/; 
                 proxy_set_header Host $host:$server_port; 
             }
 
-    location /clklog_api/v3/ {
-                proxy_pass http://clklog_api_server/clklog_api/v3/; 
+    location /api/v3/ {
+                proxy_pass http://clklog_api_server/api/v3/; 
                 proxy_set_header Host $host:$server_port; 
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -366,7 +366,7 @@
 3. 接口地址
 
     ```
-    http://10.10.222.21/clklog_api/doc.html#/home
+    http://10.10.222.21/api/doc.html#/home
     ```
 
 ## 9. sdk 埋点参考
