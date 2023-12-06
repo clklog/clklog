@@ -112,18 +112,26 @@ export default {
   },
   data() {
     return {
+      // options: [
+      //   {
+      //     value: "hqq",
+      //     label: "货清清",
+      //   },
+      //   {
+      //     value: "clklog",
+      //     label: "clklog官网",
+      //   },
+      //   {
+      //     value: "zcunsoft",
+      //     label: "至存官网",
+      //   },
+      // ],
+
+      // git上项目写死
       options: [
         {
-          value: "hqq",
-          label: "货清清",
-        },
-        {
-          value: "clklog",
-          label: "clklog官网",
-        },
-        {
-          value: "zcunsoft",
-          label: "至存官网",
+          value: "clklogapp",
+          label: "clklog",
         },
       ],
       value: "",
@@ -315,7 +323,7 @@ export default {
 
       .avatar-wrapper {
         margin-top: 5px;
-        left:2px;
+        left: 2px;
         top: -9px;
         position: relative;
 

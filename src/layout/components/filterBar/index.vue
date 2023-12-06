@@ -2,7 +2,7 @@
   <div class="documentation-container">
     <div class="checkContent">
       <div style="display: flex; padding-top: 15px">
-        <div class="check_item public_border_color">
+        <div v-if="ByTime" class="check_item public_border_color">
           <span>时间:</span>
           <el-radio-group
             v-model="timeFlag"
@@ -18,6 +18,7 @@
         </div>
 
         <el-date-picker
+          v-if="ByCalendar"
           class="timnePickCSS"
           style="margin-left: 20px; width: 250px; height: 30px"
           v-model="currentTime"
@@ -158,6 +159,16 @@ export default {
     ByArea: {
       type: Boolean,
       default: false,
+    },
+
+    // 默认展示
+    ByTime: {
+      type: Boolean,
+      default: true,
+    },
+    ByCalendar: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -546,11 +557,6 @@ export default {
 };
 </script>
 <style lang="scss">
-// .sing_special_popover {
-//   .el-popover {
-//     background-color: red !important;
-//   }
-// }
 </style>
 <style lang="scss" scoped>
 ::v-deep {
@@ -586,14 +592,13 @@ export default {
   text-align: center;
 }
 .documentation-container {
-  box-sizing: border-box;
+  // box-sizing: border-box;
   min-height: 103px;
-  padding-bottom: 20px;
   width: 100%;
   .checkContent {
     position: fixed;
     width: 100%;
-    min-height: 103px;
+    min-height: 80px;
     z-index: 500;
     background-color: #fff;
     border-bottom: 1px #eee solid;
@@ -676,6 +681,8 @@ export default {
       margin-right: 9px;
     }
     .channelSecond {
+      height: 57px;
+      box-sizing: border-box;
       width: 100%;
       display: flex;
       padding: 12px 0 15px 0;
