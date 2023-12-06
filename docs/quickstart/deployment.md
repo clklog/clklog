@@ -53,8 +53,14 @@
       kafka:
         bootstrap-servers: localhost:9092
       redis:
+        # 单机配置
         host: localhost
         port: 6379
+        # password: nW2zFwS41tdf
+        # 哨兵配置
+        # sentinel:
+        # master: gct
+        # nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
     receiver: 
       app-list: clklogapp
     ```
@@ -101,18 +107,42 @@
 
 2. 上传程序文件
 
-   拷贝`clklog-processing.jar`包至`/usr/local/services/clklogprocessing`目录
+   拷贝`clklog-processing-1.0.0-jar-with-dependencies.jar`包和 `config.properties`文件至`/usr/local/services/clklogprocessing`目录
 
     ```
     cd /usr/local/services/
     mkdir /usr/local/services/clklogprocessing
-    chmod 500  clklog-processing.jar 
+    chmod 500  clklog-processing-1.0.0-jar-with-dependencies.jar
     ```
 
-3. 启动应用程序
+3. 修改配置项
+
+   ```
+    vim config.properties
+
+    # clickhouse 数据库连接配置
+    clickhouse.host=localhost:8123
+    clickhouse.database=clklog
+    clickhouse.username=default
+    clickhouse.password=123456
+
+    # kafka 连接配置
+    kafka.bootstrap.server=localhost:9092
+    kafka.topic=clklog
+    kafka.group-id=clklog-group
+    
+    # flink 配置
+    flink.data-source-name=KafkaSource
+    flink.checkpoint=file:///usr/local/services/clklogprocessing/checkpoints
+    flink.parallelism=1
+    ```
+
+4. 启动应用程序
 
     ```
-    /usr/local/services/flink-1.14.6/bin/flink run -s file: /usr/local/services/clklogprocessing/checkpoints/41f3b324752da77ed7821033d45d1d2f/chk-2737882  -c com.zcunsoft.clklog.analysis.entry.JieXiJson /usr/local/services/clklogprocessing/clklog-processing.jar
+    cd /usr/local/services/clklogprocessing
+
+    /usr/local/services/flink-1.14.6/bin/flink run -s file: /usr/local/services/clklogprocessing/checkpoints/41f3b324752da77ed7821033d45d1d2f/chk-2737882  -c com.zcunsoft.clklog.analysis.entry.JieXiJson /usr/local/services/clklogprocessing/clklog-processing-1.0.0-jar-with-dependencies.jar
     ```
 
     其中 `-s` 参数为`checkpoint`位置。对于中断后再执行的任务，需要指定该参数，如不指定则从头开始消费`kafka`消息。
@@ -368,7 +398,9 @@
 
 3. 接入代码
 
-    创建文件`autotrack.js`，然后在web网站引用即可，代码如下：
+    创建文件`autotrack.js`，然后在web网站引用即可.
+
+    请注意下方`autotrack.js`代码中关于`server_url` 接收服务地址配置信息的修改，clklog数据采集地址和神策埋点略有不同，clklog数据采集必须传入`project`和`token`参数，详细代码如下：
 
     ```
     (function (para) {
@@ -419,7 +451,7 @@
       show_log: true,
       is_track_single_page: false, 
       // send_type:'beacon',
-      server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=gfdsg325432gfsgfds', //clklog_receiver 的接收服务地址
+      server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=gfdsg325432gfsgfds', //接收地址为clklog_receiver 的接收服务地址，必须传入project和token参数
       heatmap: {
         clickmap: 'default', scroll_notice_map: 'default', collect_tags: {
           div: true,
@@ -436,23 +468,37 @@
 
   2）如果是单页面应用，标题会随着页面变化，同时也需要采集页面浏览事件，需要将`autotrack.js` 中的`is_track_single_page` 值设置为`false`，同时在页面标题改变结束后执行代码：  `sensors.quick('autoTrackSinglePage');`
 
-4. 发布WEB站点到服务器
-5. 访问站点
+1. 发布WEB站点到服务器
+2. 访问站点
 
 ## 10. 统计后台前端展示 clklog-ui
 
-1. 安装依赖
+1. 开发环境编译前端应用程序
+
+    本地前端代码运行步骤参考：
+
+    1）安装依赖
 
     ```
     npm install
     ```
   
-2. 启动服务
+    2）启动服务
 
     ```
     npm run dev
     ```
 
-3. 浏览器访问
+    3）浏览器访问
 
-    当统计后台前端展示页面能够正常显示统计相关数据，说明整个流程正常运行。
+    接入埋点代码后，当统计后台前端展示页面能够正常显示统计相关数据，说明整个流程正常运行。
+
+2. 打包
+
+    ```
+    npm run build
+    ```
+
+3. 部署
+
+   将`dist`目录文件拷贝至web服务器（nginx或者apache或iis）
