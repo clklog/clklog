@@ -28,13 +28,14 @@ spring:
     listener:
       ack-mode: MANUAL_IMMEDIATE
   redis:
+    # 单机配置
     host: localhost
     port: 6379
-    lettuce:
-      pool:
-        max-active: 8
-        max-idle: 8
-        min-idle: 8
+#    password: nW2zFwS41tdf
+     # 哨兵配置
+#    sentinel:
+#      master: gct
+#      nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
 receiver:
   thread-count: 2
-  app-list: hqq
+  app-list: clklogapp
