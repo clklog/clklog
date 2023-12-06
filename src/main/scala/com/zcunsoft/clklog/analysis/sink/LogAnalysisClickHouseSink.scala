@@ -2,6 +2,7 @@ package com.zcunsoft.clklog.analysis.sink
 
 import com.zcunsoft.clklog.analysis.bean.LogBean
 import com.zcunsoft.clklog.analysis.utils.ClickHouseUtil
+import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunction}
 
@@ -14,14 +15,23 @@ class LogAnalysisClickHouseSink extends RichSinkFunction[ListBuffer[LogBean]] {
   var conn: Connection = _
   var sql = ""
 
-  def this(sql: String) = {
+  var parameters: ParameterTool = _
+
+  def this(sql: String, parameters: ParameterTool) = {
     this()
     this.sql = sql
+    this.parameters = parameters;
   }
 
-  override def open(parameters: Configuration): Unit = {
-    super.open(parameters)
-      conn = ClickHouseUtil.getConn("localhost:8123", "clklog", "default", "123456")
+  override def open(configuration: Configuration): Unit = {
+
+    val clickhouseHost = parameters.get("clickhouse.host")
+    val clickhouseDb = parameters.get("clickhouse.database")
+    val clickhouseUsername = parameters.get("clickhouse.username")
+    val clickhousePwd = parameters.get("clickhouse.password")
+
+    super.open(configuration)
+    conn = ClickHouseUtil.getConn(clickhouseHost, clickhouseDb, clickhouseUsername, clickhousePwd)
 
   }
 
