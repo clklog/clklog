@@ -18,14 +18,13 @@
     <link rel="apple-touch-icon" sizes="any" href="assets/imgs/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <link rel="stylesheet" href="assets/css/font.css" />
-    <link rel="stylesheet" href="assets/css/style@1.0.2.css" />
-    <script src="assets/plugins/autotrack@2.1.js"></script>
+    <link rel="stylesheet" href="assets/css/style@1.1.2.css" />
+    <script src="assets/plugins/autotrack@2.2.js"></script>
     <script>
       window.$docsify = {
         name: 'CLKLOG',
         logo: '/assets/imgs/logo1.png',
-        // 仓库地址，点击右上角的Github章鱼猫头像会跳转到此地址
-        repo: 'https://github.com/clklog',
+        // repo: 'https://github.com/clklog',
         auto2top: true,
         loadSidebar: true,
         autoHeader: true,
@@ -45,7 +44,7 @@
         subMaxLevel: 3,
         // 小屏设备下合并导航栏到侧边栏
         mergeNavbar: true,
-        notFoundPage: 'my404.md',
+        notFoundPage: '404.md',
         search: {
           paths: 'auto',
           placeholder: '搜索',
@@ -80,10 +79,31 @@
             label: '切记'
           }
         },
+        // share: {
+        //   reddit: true,
+        //   linkedin: true,
+        //   facebook: true,
+        //   twitter: true,
+        //   whatsapp: true,
+        //   telegram: true
+        // },
         plugins: [
           function (hook, vm) {
             hook.doneEach(function () {
               sensors.quick('autoTrackSinglePage')
+            })
+          },
+          function pageContact(hook, vm) {
+            var contactHtml = [
+              '<ul class="clklog-contact-items">',
+              '<li class="clklog-contact-item phone"><div class="clklog-contact-item-content "><span class="triangle "></span><div class="contentwrap"><p class="text">咨询电话：</p><p class="info">16621363853</p></div></div></li>',
+              '<li class="clklog-contact-item wechat"><div class="clklog-contact-item-content"><span class="triangle "></span><div class="contentwrap"><p><img src="/assets/imgs/contactqrcode.jpg" width="120"/></p><p class="info">微信扫码咨询</p></div></div></li>',
+              '<li class="clklog-contact-item email"><div class="clklog-contact-item-content"><span class="triangle "></span><div class="contentwrap"><p class="text">咨询邮箱：</p><p class="info">info@clklog.com</p></div></div></li>',
+              '</ul>'
+            ].join('')
+            hook.afterEach(function (html) {
+              console.log(contactHtml)
+              return html + contactHtml
             })
           }
         ]
@@ -102,7 +122,6 @@
     <script src="assets/plugins/docsify-copy-code.js" rel="stylesheet"></script>
     <!-- <script src="assets/plugins/countable.js" rel="stylesheet"></script> -->
     <script src="assets/plugins/prismjs@1.22.0/components/prism-java.min.js" rel="stylesheet"></script>
-    <script src="https://unpkg.com/docsify-plugin-flexible-alerts"></script>
     <script src="assets/plugins/docsify-footer.min.js"></script>
     <script src="assets/plugins/docsify-pagination.min.js"></script>
     <!-- <script src="//unpkg.com/docsify-share/build/index.min.js"></script> -->

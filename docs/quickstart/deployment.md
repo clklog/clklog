@@ -449,7 +449,7 @@
       sdk_url: 'sensorsdata.js',
       name: 'sensors',
       show_log: true,
-      is_track_single_page: false, 
+      is_track_single_page: true, 
       // send_type:'beacon',
       server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=gfdsg325432gfsgfds', //接收地址为clklog_receiver 的接收服务地址，必须传入project和token参数
       heatmap: {

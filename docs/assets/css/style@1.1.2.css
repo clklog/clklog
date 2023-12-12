@@ -939,3 +939,103 @@ main .content .copyright {
   right: 0;
   text-align: left;
 }
+
+.markdown-section .clklog-contact-items {
+  position: fixed;
+  right: 5px;
+  top: calc((100vh - 168px) / 2);
+  z-index: 9999;
+  /* background-color: #eaf2fc; */
+  /* border-radius: 56px; */
+  width: 55px;
+  padding-left: 0px;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item {
+  width: 55px;
+  height: 55px;
+  position: relative;
+  margin: 5px 0;
+  list-style: none;
+  background-color: #eaf2fc;
+  border-radius: 36px;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item:hover .clklog-contact-item-content {
+  display: block;
+  position: absolute;
+  left: -150px;
+  top: 5px;
+  z-index: 9999;
+  background-color: #eaf2fc;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.phone:hover .clklog-contact-item-content {
+  left: -138px;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.wechat:hover .clklog-contact-item-content {
+  left: -150px;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.email:hover .clklog-contact-item-content {
+  left: -140px;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item .clklog-contact-item-content .triangle {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #eaf2fc;
+  position: absolute;
+  right: -8px;
+  top: 15px;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item {
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.markdown-section .clklog-contact-items .clklog-contact-item.phone .info {
+  font-size: 20px;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.email .info {
+  font-size: 16px;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.wechat .info {
+  text-align: center;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.phone {
+  background-image: url(../imgs/phone.png);
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.phone:hover {
+  background-image: url(../imgs/phone.png);
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.wechat {
+  background-image: url(../imgs/wechat.png);
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.wechat:hover {
+  background-image: url(../imgs/wechat.png);
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.email {
+  background-image: url(../imgs/email.png);
+}
+.markdown-section .clklog-contact-items .clklog-contact-item.email:hover {
+  background-image: url(../imgs/email.png);
+}
+.markdown-section .clklog-contact-items .clklog-contact-item .clklog-contact-item-content {
+  display: none;
+}
+
+.markdown-section .clklog-contact-items .clklog-contact-item:hover .clklog-contact-item-content {
+  border-radius: 5px;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item:hover .clklog-contact-item-content.wechat p {
+  text-align: center;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item:hover .clklog-contact-item-content p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.markdown-section .clklog-contact-items .clklog-contact-item:hover .clklog-contact-item-content.wechat p {
+}
+.markdown-section .clklog-contact-items .clklog-contact-item:hover .clklog-contact-item-content .contentwrap {
+  padding: 10px;
+}
