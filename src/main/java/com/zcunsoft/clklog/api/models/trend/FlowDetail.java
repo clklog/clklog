@@ -133,4 +133,8 @@ public class FlowDetail {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Schema(description = "路径")
 	private String uriPath;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Schema(description = "操作系统")
+    private String os;
 }

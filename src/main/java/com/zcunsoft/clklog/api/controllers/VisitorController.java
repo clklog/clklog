@@ -69,4 +69,10 @@ public class VisitorController {
     public GetVisitorDetailinfoResponse getVisitorDetailinfo(@RequestBody GetVisitorDetailinfoRequest getVisitorDetailinfoRequest, HttpServletRequest request) {
         return reportService.getVisitorDetailinfo(getVisitorDetailinfoRequest);
     }
+    
+    @Operation(summary = "获取访问日志")
+    @RequestMapping(path = "/getLogAnalysisList", method = RequestMethod.POST)
+    public GetLogAnalysisListPageResponse getLogAnalysisList(@RequestBody GetLogAnalysisListPageRequest getLogAnalysisListPageRequest, HttpServletRequest request) {
+        return reportService.getLogAnalysisList(getLogAnalysisListPageRequest);
+    }
 }

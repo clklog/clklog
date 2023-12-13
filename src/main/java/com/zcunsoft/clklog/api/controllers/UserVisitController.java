@@ -1,6 +1,7 @@
 package com.zcunsoft.clklog.api.controllers;
 
 import com.zcunsoft.clklog.api.models.uservisit.GetUserPvbydateResponse;
+import com.zcunsoft.clklog.api.models.uservisit.GetUserLatestTimebydateResponse;
 import com.zcunsoft.clklog.api.models.uservisit.GetUserVisitRequest;
 import com.zcunsoft.clklog.api.models.uservisit.GetUserVisitTimebydateResponse;
 import com.zcunsoft.clklog.api.models.uservisit.GetUserVisitbydateResponse;
@@ -41,5 +42,9 @@ public class UserVisitController {
     	return reportService.getUserVisitTime(getUserVisitRequest);
     }
 
-    
+    @Operation(summary = "获取上次访问时间区间内的访客数")
+    @RequestMapping(path = "/getUserLatestTime", method = RequestMethod.POST)
+    public GetUserLatestTimebydateResponse getUserLatestTime(@RequestBody GetUserVisitRequest getUserVisitRequest, HttpServletRequest request) {
+    	return reportService.getUserLatestTime(getUserVisitRequest);
+    }
 }
