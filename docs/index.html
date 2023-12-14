@@ -79,14 +79,6 @@
             label: '切记'
           }
         },
-        // share: {
-        //   reddit: true,
-        //   linkedin: true,
-        //   facebook: true,
-        //   twitter: true,
-        //   whatsapp: true,
-        //   telegram: true
-        // },
         plugins: [
           function (hook, vm) {
             hook.doneEach(function () {
@@ -102,7 +94,6 @@
               '</ul>'
             ].join('')
             hook.afterEach(function (html) {
-              console.log(contactHtml)
               return html + contactHtml
             })
           }

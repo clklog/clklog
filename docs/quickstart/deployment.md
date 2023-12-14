@@ -369,15 +369,13 @@
     http://10.10.222.21/api/doc.html#/home
     ```
 
-## 9. sdk 埋点参考
+## 9. sdk 埋点集成
 
-#### Web JS 埋点参考
+#### 1. Web JS 埋点集成参考
 
 1. 下载神策 WEB JS SDK
 
     [下载 sensorsdata.js](https://github.com/sensorsdata/sa-sdk-javascript/blob/v1.25.15/dist/web/sensorsdata.js)
-
-    [下载插件 exposure](https://github.com/sensorsdata/sa-sdk-javascript/blob/v1.25.15/dist/web/plugin/exposure/index.js)
 
     [下载插件 session-event](https://github.com/sensorsdata/sa-sdk-javascript/blob/v1.25.15/dist/web/plugin/session-event/index.js)
 
@@ -389,8 +387,6 @@
       dist
     ├── web
         ├── plugin
-        │   ├── exposure
-        │   │   ├── index.js
         │   ├── session-event
         │   │   ├── index.js
         |── sensorsdata.js
@@ -423,23 +419,12 @@
         y.parentNode.insertBefore(x, y);
         x = d.createElement(s), y = d.getElementsByTagName(s)[0];
         x.async = 1;
-        x.src = 'plugin/exposure/index.js';//引用的exposure插件路径
-        x.setAttribute('charset', 'UTF-8');
-        w[n].para = para;
-        y.parentNode.insertBefore(x, y);
-        x = d.createElement(s), y = d.getElementsByTagName(s)[0];
-        x.async = 1;
         x.src = p;
         x.setAttribute('charset', 'UTF-8');
         w[n].para = para;
         y.parentNode.insertBefore(x, y);
       }
       sensors.quick("isReady", function () {
-        sensors.use('Exposure', {
-          area_rate: 1,
-          stay_duration: 2,
-          repeated: false
-        });
         sensors.use('PageLeave', { heartbeat_interval_time: 5 });
         sensors.use('PageLoad');
         sensors.use('SessionEvent');
@@ -471,6 +456,18 @@
 1. 发布WEB站点到服务器
 2. 访问站点
 
+#### 2. Android SDK埋点集成
+
+  集成方式参考 [神策Android SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/android-7541696.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
+
+#### 3. IOS SDK埋点集成
+
+  集成方式参考 [神策IOS SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/ios-7538614.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
+
+#### 4. 小程序 SDK埋点集成
+
+  集成方式参考 [神策微信小程序 SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/%E9%9B%86%E6%88%90%E6%96%87%E6%A1%A3%EF%BC%88%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89-1573892.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
+
 ## 10. 统计后台前端展示 clklog-ui
 
 1. 开发环境编译前端应用程序
@@ -501,4 +498,4 @@
 
 3. 部署
 
-   将`dist`目录文件拷贝至web服务器（nginx或者apache或iis）
+   将`dist`目录文件拷贝至web服务器（nginx或者apache或iis）。
