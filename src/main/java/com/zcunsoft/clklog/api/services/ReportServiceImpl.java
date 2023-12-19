@@ -2511,6 +2511,14 @@ public class ReportServiceImpl implements IReportService {
 
                     Float predictionIpCount = current.getIpCount() * (1 + predictionAvg.getAvgIpCountAfter() / predictionAvg.getAvgIpCountBefore());
                     flowSummary.setIpCount(predictionIpCount.intValue());
+
+                    Float predictionVisitCount = current.getVisitCount() * (1 + predictionAvg.getAvgVisitCountAfter() / predictionAvg.getAvgVisitCountBefore());
+                    flowSummary.setVisitCount(predictionVisitCount.intValue());
+                    if (predictionVisitCount > 0) {
+                        float avgPv = predictionPv * 1.0f / predictionVisitCount;
+                        flowSummary.setAvgPv(Float.parseFloat(decimalFormat.get().format(avgPv)));
+                    }
+
                 } else if (statDateCount > 7 && statDateCount <= 28) {
                     List<String> statDateSameWeekdayList = new ArrayList<>();
                     List<String> otherStatDateList = new ArrayList<>();
@@ -2540,6 +2548,14 @@ public class ReportServiceImpl implements IReportService {
                             + predictionAvgForOther.getAvgIpCountAfter() / predictionAvgForOther.getAvgIpCountBefore() * 0.3f);
                     flowSummary.setIpCount(predictionIpCount.intValue());
 
+                    Float predictionVisitCount = current.getVisitCount() * (1 + predictionAvgForSameWeekday.getAvgVisitCountAfter() / predictionAvgForSameWeekday.getAvgVisitCountBefore() * 0.7f
+                            + predictionAvgForOther.getAvgVisitCountAfter() / predictionAvgForOther.getAvgVisitCountBefore() * 0.3f);
+                    flowSummary.setVisitCount(predictionVisitCount.intValue());
+                    if (predictionVisitCount > 0) {
+                        float avgPv = predictionPv * 1.0f / predictionVisitCount;
+                        flowSummary.setAvgPv(Float.parseFloat(decimalFormat.get().format(avgPv)));
+                    }
+
                 } else if (statDateCount > 28) {
                     List<String> statDateList = new ArrayList<>();
                     int end = statDateCount / 7;
@@ -2563,6 +2579,13 @@ public class ReportServiceImpl implements IReportService {
 
                     Float predictionIpCount = current.getIpCount() * (1 + predictionAvg.getAvgIpCountAfter() / predictionAvg.getAvgIpCountBefore());
                     flowSummary.setIpCount(predictionIpCount.intValue());
+
+                    Float predictionVisitCount = current.getVisitCount() * (1 + predictionAvg.getAvgVisitCountAfter() / predictionAvg.getAvgVisitCountBefore());
+                    flowSummary.setVisitCount(predictionVisitCount.intValue());
+                    if (predictionVisitCount > 0) {
+                        float avgPv = predictionPv * 1.0f / predictionVisitCount;
+                        flowSummary.setAvgPv(Float.parseFloat(decimalFormat.get().format(avgPv)));
+                    }
                 }
             }
         }

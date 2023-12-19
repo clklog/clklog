@@ -11,9 +11,13 @@ public class PredictionAvg {
 
     private Float avgIpCountBefore;
 
+    private Float avgVisitCountBefore;
+
     private Float avgPvAfter;
 
     private Float avgUvAfter;
 
     private Float avgIpCountAfter;
+
+    private Float avgVisitCountAfter;
 }

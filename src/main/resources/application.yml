@@ -20,7 +20,7 @@ spring:
 #      password: 123456
       jdbc-url: jdbc:clickhouse://clickhouse.tracking.zcunsoft.com:443/clklog?ssl=true
       username: default
-      password: 0ItqD/Idxke5L+XX
+      password: xwJ42Pu9roFaKHkB
       driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
       connection-timeout: 20000
       maximum-pool-size: 5
