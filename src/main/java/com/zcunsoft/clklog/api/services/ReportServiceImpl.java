@@ -2601,8 +2601,11 @@ public class ReportServiceImpl implements IReportService {
         paramMap.addValue("is_first_day", "all");
         List<String> channelList = transChannelFilter(getFlowRequest.getChannel());
         paramMap.addValue("lib", channelList);
-        paramMap.addValue("project", clklogApiSetting.getProjectName());
-
+        String projectName = getFlowRequest.getProjectName();
+        if (StringUtils.isBlank(projectName)) {
+            projectName = clklogApiSetting.getProjectName();
+        }
+        paramMap.addValue("project", projectName);
         Timestamp now = new Timestamp(System.currentTimeMillis());
         paramMap.addValue("stat_date", statDateList);
         paramMap.addValue("stat_hour", this.hFORMAT.get().format(now));

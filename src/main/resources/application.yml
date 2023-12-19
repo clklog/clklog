@@ -15,12 +15,9 @@ spring:
   application.name: clklog-api
   datasource:
     clickhouse:
-#      jdbc-url: jdbc:clickhouse://localhost:8123/default
-#      username: default
-#      password: 123456
-      jdbc-url: jdbc:clickhouse://clickhouse.tracking.zcunsoft.com:443/clklog?ssl=true
+      jdbc-url: jdbc:clickhouse://localhost:8123/default
       username: default
-      password: xwJ42Pu9roFaKHkB
+      password: 123456
       driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
       connection-timeout: 20000
       maximum-pool-size: 5
