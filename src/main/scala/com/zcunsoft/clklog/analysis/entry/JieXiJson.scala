@@ -27,7 +27,7 @@ object JieXiJson {
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(flinkParallelism)
-
+    env.getConfig.setGlobalJobParameters(parameters);
     //checkpoint配置
     env.enableCheckpointing(5000)
     env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
@@ -48,34 +48,9 @@ object JieXiJson {
       .build
     val streamSource = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks[String], flinkDataSourceName) //  接收的是 Source 接口的实现类
 
-
     val value = streamSource.map(new LogRichMapper)
 
-    val sql = "insert into log_analysis (distinct_id,typeContext,event,time,track_id,flush_time,identity_cookie_id,lib,lib_method,lib_version," +
-      "timezone_offset,screen_height,screen_width,viewport_height,viewport_width,referrer,url,url_path,title,latest_referrer," +
-      "latest_search_keyword,latest_traffic_source_type,is_first_day,is_first_time,referrer_host,log_time,stat_date,stat_hour,element_id,place_id," +
-      "ad_id,plan_id,is_ad_click,project_name,client_ip,country,province,city,app_id,app_name," +
-      "app_state,app_version,brand,browser,browser_version,carrier,device_id,element_class_name,element_content,element_name," +
-      "element_position,element_selector,element_target_url,element_type,first_channel_ad_id,first_channel_adgroup_id,first_channel_campaign_id,first_channel_click_id,first_channel_name,latest_landing_page," +
-      "latest_referrer_host,latest_scene,latest_share_method,latest_utm_campaign,latest_utm_content,latest_utm_medium,latest_utm_source,latest_utm_term,latitude,longitude," +
-      "manufacturer,matched_key,matching_key_list,model,network_type,os,os_version,receive_time,screen_name,screen_orientation," +
-      "short_url_key,short_url_target,source_package_name,track_signup_original_id,user_agent,utm_campaign,utm_content,utm_matching_type,utm_medium,utm_source," +
-      "utm_term,viewport_position,wifi,kafka_data_time,project_token,crc,is_compress,event_duration,adv_id,user_key," +
-      "is_logined,download_channel,event_session_id,raw_url,create_time)" +
-      " values " +
-      "(?,?,?,?,?,?,?,?,?,?," +
-      "?,?,?,?,?,?,?,?,?,?," +
-      "?,?,?,?,?,?,?,?,?,?," +
-      "?,?,?,?,?,?,?,?,?,?," +
-      "?,?,?,?,?,?,?,?,?,?," +
-      "?,?,?,?,?,?,?,?,?,?," +
-      "?,?,?,?,?,?,?,?,?,?," +
-      "?,?,?,?,?,?,?,?,?,?," +
-      "?,?,?,?,?,?,?,?,?,?," +
-      "?,?,?,?,?,?,?,?,?,?," +
-      "?,?,?,?,?)" //每一行十个字段
-
-    val clickhouseSink = new LogAnalysisClickHouseSink(sql,parameters)
+    val clickhouseSink = new LogAnalysisClickHouseSink()
     value.addSink(clickhouseSink)
 
     env.execute()
