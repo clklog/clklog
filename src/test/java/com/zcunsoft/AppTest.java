@@ -38,7 +38,7 @@ public class AppTest {
         dynamicTestList.add(dynamicTest("test month frame", () -> Assertions.assertArrayEquals(targetMonthArr, resultMonthArr, "ok")));
 
         //test year
-        long[] yearFrame = TimeUtils.getCurrentYearTimeFrame(new Timestamp(System.currentTimeMillis()));
+        long[] yearFrame = TimeUtils.getCurrentYearTimeFrame(Timestamp.valueOf("2023-06-20 00:00:00"));
         long[] targetYearArr = new long[]{getTimestamp("2023-01-01"), getTimestamp("2023-12-31")};
         long[] resultYearArr = new long[]{yearFrame[0], yearFrame[1]};
         dynamicTestList.add(dynamicTest("test year frame", () -> Assertions.assertArrayEquals(targetYearArr, resultYearArr, "ok")));
