@@ -112,28 +112,28 @@ export default {
   },
   data() {
     return {
-      // options: [
-      //   {
-      //     value: "hqq",
-      //     label: "货清清",
-      //   },
-      //   {
-      //     value: "clklog",
-      //     label: "clklog官网",
-      //   },
-      //   {
-      //     value: "zcunsoft",
-      //     label: "至存官网",
-      //   },
-      // ],
-
-      // git上项目写死
       options: [
         {
-          value: "clklogapp",
-          label: "clklog",
+          value: "hqq",
+          label: "货清清",
+        },
+        {
+          value: "clklog",
+          label: "clklog官网",
+        },
+        {
+          value: "zcunsoft",
+          label: "至存官网",
         },
       ],
+
+      // git上项目写死
+      // options: [
+      //   {
+      //     value: "clklogapp",
+      //     label: "clklog",
+      //   },
+      // ],
       value: "",
       dateTime: "",
       dateWeek: "",
