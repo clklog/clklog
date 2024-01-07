@@ -227,7 +227,7 @@
       group-configs:
         - group: 'default'
           paths-to-match: '/**'
-          packages-to-scan: com.zcunsoft.tracking.api.controllers
+          packages-to-scan: com.zcunsoft.clklog.api.controllers
     server:
       port: 8087
     spring:
@@ -243,9 +243,10 @@
     logging:
       file:
         path: log
-    trackingapi:
+    clklogapi:
       access-control-allow-origin: "*"
       project-name: clklogapp
+      project-host: http(s)://{{hostname}}  //埋点网站域名配置，多个域名以英文逗号分隔
     ```
 
 4. 创建服务

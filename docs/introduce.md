@@ -29,9 +29,9 @@ ClkLog是一款记录用户行为分析和画像的免费可商用开源软件�
 
 - **接收服务 【clklog-receiver】**：接收客服端采集的日志，存入kafka。
 
-- **处理脚本 【clickhouse-script】**：基于Clickhouse集群中的log_analysis表进行多维计算，获得各个维度上的统计报表。使用Cron来进行任务的定时调度。
-
 - **处理服务  【clklog-processing】**： 依托flink，消费kafka数据，存入clickhouse。
+
+- **处理脚本 【clickhouse-script】**：基于Clickhouse集群中的log_analysis表进行多维计算，获得各个维度上的统计报表。使用Cron来进行任务的定时调度。
 
 - **统计接口 【clklog-api】**： 提供多维度数据统计接口。
 
