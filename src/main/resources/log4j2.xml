@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="info" monitorInterval="10">
+
+    <properties>
+        <property name="LOG_HOME">logs</property>
+        <Property name="FILE_NAME" value="handle"/>
+        <property name="LOG_PATTERN" value="%date{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+    </properties>
+
+    <appenders>
+        <RollingFile name="SIZE_BASED_TRIGGERING"
+                     fileName="${LOG_HOME}/${FILE_NAME}.log"
+                     filePattern="${LOG_HOME}/${FILE_NAME}_%d{yyyy-MM-dd-HH-mm-ss}_%i.log" createOnDemand="true">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </appenders>
+
+    <loggers>
+        <root level="all">
+            <AppenderRef ref="SIZE_BASED_TRIGGERING"/>
+        </root>
+    </loggers>
+</configuration>
