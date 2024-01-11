@@ -147,7 +147,7 @@ systemctl start nginx
     ./bin/zkServer.sh status
     ```
 
-    ![](/assets/imgs/zookeepercheck.png)
+    ![](../assets/imgs/zookeepercheck.png)
 
     未启动成功，从`./logs`里查看启动日志
 
@@ -185,7 +185,7 @@ systemctl start nginx
     ./bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --replication-factor 1 --partitions 1 --topic test
     ```
 
-    ![](/assets/imgs/createtop.png)
+    ![](../assets/imgs/createtop.png)
 
     查看`topic`
 
@@ -193,7 +193,7 @@ systemctl start nginx
     ./bin/kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --describe --topic test
     ```
 
-    ![](/assets/imgs/checktopic.png)
+    ![](../assets/imgs/checktopic.png)
 
     不报错正常，如果未启动成功，从`./logs`里查看启动日志
 
@@ -218,6 +218,8 @@ systemctl start nginx
 
 3. 启动
 
+    建议不要使用root启动 , 启动代码参考如下:
+
     ```
     ./bin/start-cluster.sh
     ```
@@ -226,7 +228,7 @@ systemctl start nginx
 
     <http://localhost:8081/>
 
-    ![](/assets/imgs/preview.png)
+    ![](../assets/imgs/preview.png)
 
 ## Clickhouse 23.2.1 安装参考
 

@@ -44,13 +44,7 @@
   if (!w[n]._t) {
     ;(x = d.createElement(s)), (y = d.getElementsByTagName(s)[0])
     x.async = 1
-    x.src = 'assets/plugins/session-event/index.js' //引用的session-event插件路径
-    x.setAttribute('charset', 'UTF-8')
-    w[n].para = para
-    y.parentNode.insertBefore(x, y)
-    ;(x = d.createElement(s)), (y = d.getElementsByTagName(s)[0])
-    x.async = 1
-    x.src = 'assets/plugins/exposure/index.js' //引用的exposure插件路径
+    x.src = 'plugin/session-event/index.js' //引用的session-event插件路径
     x.setAttribute('charset', 'UTF-8')
     w[n].para = para
     y.parentNode.insertBefore(x, y)
@@ -62,23 +56,18 @@
     y.parentNode.insertBefore(x, y)
   }
   sensors.quick('isReady', function () {
-    sensors.use('Exposure', {
-      area_rate: 1,
-      stay_duration: 2,
-      repeated: false
-    })
     sensors.use('PageLeave', { heartbeat_interval_time: 5 })
     sensors.use('PageLoad')
     sensors.use('SessionEvent')
   })
-  //sensors.quick('autoTrackSinglePage')
+  sensors.quick('autoTrackSinglePage')
 })({
-  sdk_url: 'assets/plugins/sensorsdata.js',
+  sdk_url: 'sensorsdata.js',
   name: 'sensors',
   show_log: true,
-  is_track_single_page: false,
+  is_track_single_page: true,
   // send_type:'beacon',
-  server_url: 'https://receiver.tracking.zcunsoft.com/api/gp?project=clklog&token=4a793ea028fc327f4f1763b7630e1438', //clklog_receiver 的接收服务地址
+  server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=gfdsg325432gfsgfds', //请修改接收地址为clklog_receiver 的接收服务地址，必须传入project和token参数
   heatmap: {
     clickmap: 'default',
     scroll_notice_map: 'default',

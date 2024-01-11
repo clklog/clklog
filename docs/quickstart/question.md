@@ -4,7 +4,7 @@
 
     如下图所示，yum install nginx 安装nginx可能会出现没有本地yum源中没有nginx的情况
 
-    ![](assets/imgs/nginxinstallerror.png)
+    ![](../assets/imgs/nginxinstallerror.png)
 
     出现这个的原因是因为本地yum源中没有我们想要的nginx，那么我们就需要创建一个/etc/yum.repos.d/nginx.repo的文件，新增一个yum源。
 
@@ -32,7 +32,7 @@
 
     如下图所示，make install 安装redis可能会出现系统无gcc环境的情况
 
-    ![](assets/imgs/redisinstallerror.png)
+    ![](../assets/imgs/redisinstallerror.png)
 
     解决方案如下：
 
