@@ -5,11 +5,13 @@ on:
   push:
     branches:
       - 'main'
+      - 'demo'
     tags:
       - 'v*'
   pull_request:
     branches:
       - 'main'
+      - 'demo'
   schedule:
     - cron: '0 0 * * *'
 

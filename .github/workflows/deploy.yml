@@ -3,7 +3,7 @@ name: Deploy
 on:
   workflow_run:
     workflows: [Node.js CI]
-    branches: [main]
+    branches: [main,demo]
     types:
       - completed
 
@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo to deploy...
+      - name: Set Docker image tag
+        id: set-tag
+        run: echo "::set-output name=tag::$(if [ $GITHUB_REF == 'refs/heads/main' ]; then echo latest; else echo ${GITHUB_REF#refs/heads/}; fi)"
       - name: Login to Aliyun Docker Registry
         uses: docker/login-action@v2
         with:
@@ -22,5 +25,5 @@ jobs:
       - name: Push image to Aliyun Docker Registry
         run: |
           docker buildx imagetools create \
-            --tag registry.cn-shanghai.aliyuncs.com/zcunsoft/clklog_frontend:latest \
-            zcunsoft/clklog-frontend:latest
+            --tag registry.cn-shanghai.aliyuncs.com/zcunsoft/clklog_frontend:${{ steps.set-tag.outputs.tag }} \
+            zcunsoft/clklog-frontend:${{ steps.set-tag.outputs.tag }}
