@@ -58,3 +58,18 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             HTML_DIR=dist
+      - name: Set Docker image tag
+        id: set-tag
+        run: echo "::set-output name=tag::$(if [ $GITHUB_REF == 'refs/heads/main' ]; then echo latest; else echo ${GITHUB_REF#refs/heads/}; fi)"
+      - name: Login to Aliyun Docker Registry
+        uses: docker/login-action@v2
+        with:
+          # TODO: Use Secrets when Public
+          registry: registry.cn-shanghai.aliyuncs.com
+          username: clklog.githubci@zcunsoft
+          password: R7w!9F6zlqt2
+      - name: Push image to Aliyun Docker Registry
+        run: |
+          docker buildx imagetools create \
+            --tag registry.cn-shanghai.aliyuncs.com/zcunsoft/clklog_frontend:${{ steps.set-tag.outputs.tag }} \
+            zcunsoft/clklog-frontend:${{ steps.set-tag.outputs.tag }}
