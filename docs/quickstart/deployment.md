@@ -62,6 +62,7 @@
         # master: gct
         # nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
     receiver: 
+      # 对应前端埋点代码配置的project名称
       app-list: clklogapp
     ```
 
@@ -374,46 +375,21 @@
 
 #### 1. Web JS 埋点集成参考
 
-1. 下载神策 WEB JS SDK
+1.1. 下载 ClKLOG WEB JS SDK
 
-    [下载 sensorsdata.js](https://github.com/sensorsdata/sa-sdk-javascript/blob/v1.25.15/dist/web/sensorsdata.js)
+  [点击此处下载 CLKLOG WEB JS SDK](/res/clklog.webjs.sdk.zip), 并将下载的`ClKLOG WEB JS SDK`文件包解压至网站根目录。
 
-    [下载插件 session-event.js](https://github.com/sensorsdata/sa-sdk-javascript/blob/v1.25.15/dist/web/plugin/session-event/index.js)
+1.2. 修改`autotrack.js`接收服务配置信息
 
-    [下载插件 autotrack.js](https://clklog.com/assets/scripts/autotrack.js)
+  将`autotrack.js`中的`server_url` 接收服务地址配置信息修改为clklog数据采集地址，并调整参数`project`和`token`的配置。
 
-2. 引用插件
+  其中`project`名称默认为`clklogapp`，如果要修改`project`名称请注意调整`clklog-receiver`服务中`app-list`的相关配置。
 
-    插件引用目录结构参考如下：
+  `autotrack.js`中的`server_url`参考配置如下：
 
-    ```
-    ├── 站点根目录
-        ├── plugin
-        │   ├── session-event
-        │   │   ├── index.js
-        |── sensorsdata.js
-        |── autotrack.js
-    ```
-
-    请注意`autotrack.js`代码中关于`server_url` 接收服务地址配置信息的修改，clklog数据采集地址和神策埋点略有不同，clklog数据采集必须传入`project`和`token`参数，参考配置如下：
-
-    ```
-     {
-      sdk_url: 'sensorsdata.js',
-      name: 'sensors',
-      show_log: true,
-      is_track_single_page: true, 
-      // send_type:'beacon',
-      server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', //接收地址为clklog_receiver 的接收服务地址，必须传入project和token参数
-      heatmap: {
-        clickmap: 'default', scroll_notice_map: 'default', collect_tags: {
-          div: true,
-          img: true
-        }
-      },
-      preset_properties: { latest_referrer_host: true }
-    }
-    ```
+  ```
+    server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', //接收地址为clklog_receiver 的接收服务地址，project和token参数必须传入
+  ```
 
 - **单页面应用数据采集说明**
 
@@ -421,11 +397,11 @@
 
   2）如果是单页面应用，标题会随着页面变化，同时也需要采集页面浏览事件，需要将`autotrack.js` 中的`is_track_single_page` 值设置为`false`，同时在页面标题改变结束后执行代码：  `sensors.quick('autoTrackSinglePage');`
 
-3. 接入埋点跟踪代码
+1.3. 接入埋点跟踪代码
 
-    在web网站引用`autotrack.js`.
+   在web网站引用`autotrack.js`。
 
-4. 测试埋点代码是否接入正常
+1.4. 测试埋点代码是否接入正常
 
    在本地启动网站，打开浏览器访问网站，打开开发者工具，查看控制台, 出现如下提示信息说明埋点代码接入成功。
 
