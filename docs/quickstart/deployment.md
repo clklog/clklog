@@ -377,7 +377,16 @@
 
 1.1. 下载 ClKLOG WEB JS SDK
 
-  [点击此处下载 CLKLOG WEB JS SDK](https://clklog.com/res/clklog.webjs.sdk.zip), 并将下载的`ClKLOG WEB JS SDK`文件包解压至网站根目录。
+  [点击此处下载 CLKLOG WEB JS SDK](https://clklog.com/res/clklog.webjs.sdk.zip), 并将下载的`ClKLOG WEB JS SDK`文件包解压至网站根目录, 目录结构如下：
+
+  ```
+  ├── 网站根目录
+      ├── plugin
+      │   ├── session-event
+      │   │   ├── index.js
+      |── sensorsdata.js
+      |── autotrack.js
+  ```
 
 1.2. 修改`autotrack.js`接收服务配置信息
 
