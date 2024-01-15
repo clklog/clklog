@@ -9,7 +9,7 @@ import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
-import org.apache.flink.runtime.state.filesystem.FsStateBackend;
+import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -43,7 +43,8 @@ public static void main(String[] args) throws Exception {
     // 将检查点的元数据信息定期写入外部系统，如果job失败时，检查点不会被清除
     env.getCheckpointConfig().setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
     //checkpoint路径
-    env.setStateBackend(new FsStateBackend(flinkCheckPoint));
+    env.setStateBackend(new HashMapStateBackend());
+    env.getCheckpointConfig().setCheckpointStorage(flinkCheckPoint);
 
     KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
       .setBootstrapServers(kafkaBootstrapServers)
