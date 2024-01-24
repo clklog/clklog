@@ -17,18 +17,12 @@ public class ClickHouseUtil {
 
   public static Connection getConn(String host, String database, String userName, String password) {
     try {
-
-      String url = "jdbc:clickhouse://" + userName;
-      if (StringUtils.isNotBlank(password)) {
-        url += ":" + password;
-      }
-      url += "@" + host;
-
-      if (StringUtils.isNotBlank(database)) {
-        url += "/" + database;
-      }
+      String url = "jdbc:clickhouse://" + host + "/" + database;
       Driver driver = new ClickHouseDriver();
-      connection = driver.connect(url, new Properties());
+      Properties prop = new Properties();
+      prop.put("user", userName);
+      prop.put("password", password);
+      connection = driver.connect(url, prop);
       logger.info("ck conn got");
     } catch (Exception ex) {
       logger.error("ck conn error ", ex);
