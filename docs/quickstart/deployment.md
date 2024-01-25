@@ -62,7 +62,7 @@
         # master: gct
         # nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
     receiver: 
-      # 对应前端埋点代码配置的project名称
+      # 对应前端埋点代码配置的project名称，多个project以逗号分隔
       app-list: clklogapp
     ```
 
@@ -246,7 +246,7 @@
         path: log
     clklogapi:
       access-control-allow-origin: "*"
-      project-name: clklogapp
+      project-name: clklogapp  //默认前端埋点project默认名称，一般不用修改
       project-host: http(s)://{{hostname}}  //埋点网站域名配置，多个域名以英文逗号分隔
     ```
 
