@@ -1,22 +1,52 @@
 package com.zcunsoft.clklog.analysis.utils;
 
+import com.zcunsoft.clklog.analysis.bean.AppSetting;
 import com.zcunsoft.clklog.analysis.bean.LogBean;
+import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
+import nl.basjes.parse.useragent.AgentField;
+import nl.basjes.parse.useragent.UserAgent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ArrayNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.URI;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class ExtractUtil {
     private static final Logger logger = LoggerFactory.getLogger(ExtractUtil.class);
 
-    public static LogBean extractToLogBean(JsonNode json) {
+
+    private static final ThreadLocal<DateFormat> formatter = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss Z", Locale.ENGLISH);
+        }
+    };
+
+    private static final ThreadLocal<DateFormat> HH = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("HH");
+        }
+    };
+
+    private static final ThreadLocal<DateFormat> HHmm = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("HH:mm");
+        }
+    };
+
+    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, AppSetting> htAppSetting) {
 
         LogBean logBean = null;
         try {
@@ -100,9 +130,7 @@ public class ExtractUtil {
                 }
                 if (properties.has("$url")) {
                     logBean.setUrl(properties.get("$url").asText());
-                }
-                if (properties.has("raw_url")) {
-                    logBean.setRawUrl(properties.get("raw_url").asText());
+                    logBean.setRawUrl(logBean.getUrl());
                 }
                 if (properties.has("$url_path")) {
                     logBean.setUrlPath(properties.get("$url_path").asText());
@@ -313,6 +341,60 @@ public class ExtractUtil {
                 if (properties.has("$event_session_id")) {
                     logBean.setEventSessionId(properties.get("$event_session_id").asText());
                 }
+
+                if (StringUtils.isNotBlank(logBean.getUserAgent())) {
+                    UserAgent userAgent = userAgentAnalyzer.parse(logBean.getUserAgent());
+
+                    String browser = "";
+                    AgentField browserField = userAgent.get(UserAgent.AGENT_NAME);
+                    if (!browserField.isDefaultValue()) {
+                        browser = browserField.getValue();
+                    }
+                    logBean.setBrowser(browser);
+
+                    String browserVersion = "";
+                    AgentField browserVersionField = userAgent.get(UserAgent.AGENT_NAME_VERSION);
+                    if (!browserVersionField.isDefaultValue()) {
+                        browserVersion = browserVersionField.getValue();
+                    }
+                    logBean.setBrowserVersion(browserVersion);
+
+                    String model = "";
+                    AgentField deviceName = userAgent.get(UserAgent.DEVICE_NAME);
+                    if (!deviceName.isDefaultValue()) {
+                        model = deviceName.getValue();
+                    }
+                    logBean.setModel(model);
+
+                    String brand = "";
+                    AgentField deviceBrand = userAgent.get(UserAgent.DEVICE_BRAND);
+                    if (!deviceBrand.isDefaultValue()) {
+                        brand = deviceBrand.getValue();
+                    }
+                    logBean.setBrand(brand);
+                    logBean.setManufacturer(brand);
+
+                    String osName = "";
+                    if (StringUtils.isBlank(logBean.getOs())) {
+                        AgentField os = userAgent.get(UserAgent.OPERATING_SYSTEM_NAME);
+                        if (!os.isDefaultValue()) {
+                            osName = os.getValue();
+                        }
+                    }
+                    logBean.setOs(osName);
+                }
+
+                String jnUrlPath = logBean.getUrlPath();
+                if ("js".equalsIgnoreCase(logBean.getLib())) {
+                    if ("/".equalsIgnoreCase(jnUrlPath) || StringUtils.isBlank(jnUrlPath)) {
+                        String parsedUrlPath = ExtractUtil.parseUrlPath(logBean.getUrl());
+                        logBean.setUrlPath(parsedUrlPath);
+                    }
+                }
+                AppSetting appSetting = getAppSetting(logBean.getProjectName(), htAppSetting);
+                if (appSetting != null) {
+                    logBean.setUrl(ExtractUtil.excludeParamFromUrl(appSetting.getExcludedUrlParams(), logBean.getUrl()));
+                }
             }
         } catch (Exception ex) {
             logBean = null;
@@ -320,7 +402,15 @@ public class ExtractUtil {
         return logBean;
     }
 
-    public static List<LogBean> extractToLogBean(String line) {
+    private static AppSetting getAppSetting(String projectName, HashMap<String, AppSetting> htAppSetting) {
+        AppSetting appSetting = htAppSetting.get("clklog-global");
+        if (htAppSetting.containsKey(projectName)) {
+            appSetting = htAppSetting.get(projectName);
+        }
+        return appSetting;
+    }
+
+    public static List<LogBean> extractToLogBean(String line, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, AppSetting> htAppSetting) {
         List<LogBean> logBeanList = new ArrayList<>();
         try {
             String[] arr = line.split(",", -1);
@@ -333,13 +423,13 @@ public class ExtractUtil {
 
                 String jsonContext = line.substring(arr[0].length() + arr[1].length() + arr[2].length() + arr[3].length() + arr[4].length() + arr[5].length() + 6);
 
-                ObjectMapper objectMapper = new ObjectMapper();
+                ObjectMapperUtil objectMapper = new ObjectMapperUtil();
                 JsonNode json = objectMapper.readTree(jsonContext);
 
                 if (json instanceof ArrayNode) {
                     ArrayNode arrayNode = (ArrayNode) json;
                     for (int i = 0; i < arrayNode.size(); i++) {
-                        LogBean logBean = extractToLogBean(arrayNode.get(i));
+                        LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, htAppSetting);
                         if (logBean != null && filterData(logBean)) {
                             logBean.setKafkaDataTime(arr[0]);
                             logBean.setProjectName(projectName);
@@ -351,7 +441,7 @@ public class ExtractUtil {
                         }
                     }
                 } else {
-                    LogBean logBean = extractToLogBean(json);
+                    LogBean logBean = extractToLogBean(json, userAgentAnalyzer, htAppSetting);
                     if (logBean != null && filterData(logBean)) {
                         logBean.setKafkaDataTime(arr[0]);
                         logBean.setProjectName(projectName);
@@ -386,5 +476,63 @@ public class ExtractUtil {
         }
 
         return isAdd;
+    }
+
+    public static String excludeParamFromUrl(String excludedParams, String rawurl) {
+        if (StringUtils.isNotBlank(excludedParams)) {
+            String[] urlPairArray = rawurl.split("((?=[?#/&])|(?<=[?#/&]))", -1);
+            StringBuilder parsedUrl = new StringBuilder();
+            HashMap<String, String> delimiterMap = new HashMap<>();
+            delimiterMap.put("/", "/");
+            delimiterMap.put("?", "？");
+            delimiterMap.put("&", "&");
+            delimiterMap.put("#", "#");
+
+            String[] paramsList = excludedParams.split("\n");
+            for (String urlPair : urlPairArray) {
+                if (delimiterMap.containsKey(urlPair)) {
+                    parsedUrl.append(urlPair);
+                } else {
+                    String parseUrlPair = urlPair;
+                    for (String params : paramsList) {
+                        if (parseUrlPair.contains(params + "=")) {
+                            parseUrlPair = parseUrlPair.replaceAll("^" + params + "=[\\w\\W]+", params + "=");
+                        } else {
+                            parseUrlPair = parseUrlPair.replaceAll("[\\w\\W]+=" + params + "$", "=" + params);
+                        }
+                    }
+                    parsedUrl.append(parseUrlPair);
+                }
+            }
+            return parsedUrl.toString();
+        } else {
+            return rawurl;
+        }
+    }
+
+    public static String parseUrlPath(String rawUrl) {
+        String path = File.separator;
+
+        try {
+            int index = rawUrl.lastIndexOf("#");
+            if (index != -1) {
+                int index2 = rawUrl.indexOf("?", index + 1);
+                if (index2 != -1) {
+                    path = rawUrl.substring(index, index2);
+
+                } else {
+                    path = rawUrl.substring(index);
+                }
+            } else {
+                URI uri = new URI(rawUrl);
+                path = uri.getPath();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        return path;
     }
 }

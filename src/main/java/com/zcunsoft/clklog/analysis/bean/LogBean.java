@@ -47,9 +47,6 @@ public class LogBean {
     String statDate = "";
     String statHour = "";
     String elementId = "";
-    String placeId = "";
-    String adId = "";
-    String planId = "";
     String appId = "";
     String appName = "";
     String appState = "";

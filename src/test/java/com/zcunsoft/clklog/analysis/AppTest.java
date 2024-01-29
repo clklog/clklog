@@ -1,15 +1,28 @@
 package com.zcunsoft.clklog.analysis;
 
+import com.zcunsoft.clklog.analysis.bean.AppSetting;
 import com.zcunsoft.clklog.analysis.bean.LogBean;
+import com.zcunsoft.clklog.analysis.bean.Region;
 import com.zcunsoft.clklog.analysis.utils.ExtractUtil;
+import com.zcunsoft.clklog.analysis.utils.IPUtil;
+import com.zcunsoft.clklog.analysis.utils.ObjectMapperUtil;
+import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
+import nl.basjes.parse.useragent.UserAgentAnalyzer;
+import org.apache.commons.io.FileUtils;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
@@ -17,8 +30,8 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 public class AppTest {
 
     @TestFactory
-    Collection<DynamicTest> dynamicTestsFromCollection() {
-        String test1 = "1704532084140,clklogapp,123456,null,0,8.8.8.8,{\"identities\":{\"$identity_cookie_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\"},\"distinct_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\",\"lib\":{\"$lib\":\"js\",\"$lib_method\":\"code\",\"$lib_version\":\"1.25.6\"},\"properties\":{\"$timezone_offset\":-480,\"$screen_height\":780,\"$screen_width\":360,\"$viewport_height\":691,\"$viewport_width\":360,\"$lib\":\"js\",\"$lib_version\":\"1.25.6\",\"$latest_traffic_source_type\":\"直接流量\",\"$latest_search_keyword\":\"未取到值_直接打开\",\"$latest_referrer\":\"\",\"$title\":\"你好\",\"$url\":\"https://app.clklogapp.com/?time=&&event=bdstore#/all?tab=0\",\"$url_path\":\"/#/all\",\"$referrer_host\":\"app.clklogapp.com\",\"$referrer\":\"https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/detail/?id=8a7581c78cd2f117018cd3bf5b941c19\",\"$viewport_position\":0,\"event_duration\":2.12,\"$is_first_day\":false,\"$latest_referrer_host\":\"\",\"$event_session_id\":\"18cddfe8ce25c40ecd1936b62f5685773254d28080018cddfe8ce3435\",\"$user_agent\":\"Mozilla/5.0 (Linux; Android 12; ANA-AN00 Build/HUAWEIANA-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/99.0.4844.88 Mobile Safari/537.36 Kuang/2.2.3\",\"$browser\":\"Chrome Webview\",\"$browser_version\":\"Chrome Webview 99.0.4844.88\",\"$model\":\"Huawei ANA-AN00\",\"$brand\":\"Huawei\",\"$manufacturer\":\"Huawei\",\"country\":\"中国\",\"province\":\"北京\",\"city\":\"北京\",\"raw_url\":\"https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/all?tab=0\"},\"anonymous_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\",\"type\":\"track\",\"event\":\"$WebPageLeave\",\"time\":1704532083862,\"_track_id\":473513880,\"_flush_time\":1704532083880}";
+    Collection<DynamicTest> dynamicTestExtractToLogBean() throws IOException {
+        String test1 = "1704532084140,clklogapp,123456,null,0,8.8.8.8,{\"identities\":{\"$identity_cookie_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\"},\"distinct_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\",\"lib\":{\"$lib\":\"js\",\"$lib_method\":\"code\",\"$lib_version\":\"1.25.6\"},\"properties\":{\"$timezone_offset\":-480,\"$screen_height\":780,\"$screen_width\":360,\"$viewport_height\":691,\"$viewport_width\":360,\"$lib\":\"js\",\"$lib_version\":\"1.25.6\",\"$latest_traffic_source_type\":\"直接流量\",\"$latest_search_keyword\":\"未取到值_直接打开\",\"$latest_referrer\":\"\",\"$title\":\"你好\",\"$url\":\"https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/all?tab=0\",\"$url_path\":\"/#/all\",\"$referrer_host\":\"app.clklogapp.com\",\"$referrer\":\"https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/detail/?id=8a7581c78cd2f117018cd3bf5b941c19\",\"$viewport_position\":0,\"event_duration\":2.12,\"$is_first_day\":false,\"$latest_referrer_host\":\"\",\"$event_session_id\":\"18cddfe8ce25c40ecd1936b62f5685773254d28080018cddfe8ce3435\",\"$user_agent\":\"Mozilla/5.0 (Linux; Android 12; ANA-AN00 Build/HUAWEIANA-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/99.0.4844.88 Mobile Safari/537.36 Kuang/2.2.3\"},\"anonymous_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\",\"type\":\"track\",\"event\":\"$WebPageLeave\",\"time\":1704532083862,\"_track_id\":473513880,\"_flush_time\":1704532083880}";
 
         LogBean target1 = new LogBean();
         target1.setKafkaDataTime("1704532084140");
@@ -53,14 +66,12 @@ public class AppTest {
         target1.setLatestTrafficSourceType("直接流量");
         target1.setIsFirstDay("false");
         target1.setReferrerHost("app.clklogapp.com");
-        target1.setCountry("中国");
-        target1.setProvince("北京");
-        target1.setCity("北京");
         target1.setBrand("Huawei");
         target1.setBrowser("Chrome Webview");
         target1.setBrowserVersion("Chrome Webview 99.0.4844.88");
         target1.setManufacturer("Huawei");
         target1.setModel("Huawei ANA-AN00");
+        target1.setOs("Android");
         target1.setUserAgent("Mozilla/5.0 (Linux; Android 12; ANA-AN00 Build/HUAWEIANA-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/99.0.4844.88 Mobile Safari/537.36 Kuang/2.2.3");
         target1.setViewportPosition(0);
         target1.setEventDuration(2.12);
@@ -68,15 +79,23 @@ public class AppTest {
         target1.setEventSessionId("18cddfe8ce25c40ecd1936b62f5685773254d28080018cddfe8ce3435");
         target1.setCreateTime("2024-01-05 17:08:04");
         target1.setRawUrl("https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/all?tab=0");
-        Object[] targetArr = getFiledsInfo(target1).toArray();
+        Object[] actualArr = getFiledsInfo(target1).toArray();
 
         List<DynamicTest> dynamicTestList = new ArrayList<>();
+        AbstractUserAgentAnalyzer userAgentAnalyzer = UserAgentAnalyzer.newBuilder().hideMatcherLoadStats().withCache(10000)
+                .build();
 
-        List<LogBean> logBeanList = ExtractUtil.extractToLogBean(test1);
+        String appSettingContent = FileUtils.readFileToString(new File(System.getProperty("user.dir") + File.separator + "app-setting.json"), Charset.forName("GB2312"));
+
+        TypeReference<HashMap<String, AppSetting>> htAppSettingTypeReference = new TypeReference<HashMap<String, AppSetting>>() {
+        };
+        ObjectMapperUtil mapper = new ObjectMapperUtil();
+        HashMap<String, AppSetting> htAppSetting = mapper.readValue(appSettingContent, htAppSettingTypeReference);
+
+        List<LogBean> logBeanList = ExtractUtil.extractToLogBean(test1, userAgentAnalyzer, htAppSetting);
         logBeanList.get(0).setCreateTime(target1.getCreateTime());
-        Object[] resultArr = getFiledsInfo(logBeanList.get(0)).toArray();
-        dynamicTestList.add(dynamicTest("test1 dynamic test", () -> Assertions.assertArrayEquals(targetArr, resultArr, "ok")));
-
+        Object[] expectedArr = getFiledsInfo(logBeanList.get(0)).toArray();
+        dynamicTestList.add(dynamicTest("test1 extractToLogBean dynamic test", () -> Assertions.assertArrayEquals(actualArr, expectedArr, "ok")));
 
         return dynamicTestList;
     }
@@ -87,6 +106,9 @@ public class AppTest {
             String getter = "get" + firstLetter + fieldName.substring(1);
             Method method = o.getClass().getMethod(getter, new Class[]{});
             Object value = method.invoke(o, new Object[]{});
+            if (value != null) {
+                value = value.toString();
+            }
             return value;
         } catch (Exception e) {
 
@@ -96,11 +118,48 @@ public class AppTest {
 
     private List<Object> getFiledsInfo(Object o) {
         Field[] fields = o.getClass().getDeclaredFields();
-        String[] fieldNames = new String[fields.length];
-        List<Object> list = new ArrayList();
+        List<Object> list = new ArrayList<>();
         for (int i = 0; i < fields.length; i++) {
             list.add(getFieldValueByName(fields[i].getName(), o));
         }
         return list;
+    }
+
+    @TestFactory
+    Collection<DynamicTest> dynamicTestAnalysisRegionFromIp() throws IOException {
+        String testIp = "222.73.108.159";
+
+        IPUtil ipUtil = new IPUtil(System.getProperty("user.dir"));
+        ipUtil.loadIpFile();
+        Region region = ipUtil.analysisRegionFromIp(testIp);
+        Object[] actualArr = getFiledsInfo(region).toArray();
+
+        Region expected = new Region();
+        expected.setClientIp(testIp);
+        expected.setCountry("中国");
+        expected.setProvince("上海");
+        expected.setCity("上海");
+        Object[] expectedArr = getFiledsInfo(expected).toArray();
+
+        List<DynamicTest> dynamicTestList = new ArrayList<>();
+        dynamicTestList.add(dynamicTest("test1 analysisRegionFromIp dynamic test", () -> Assertions.assertArrayEquals(expectedArr, actualArr, "ok")));
+
+        return dynamicTestList;
+    }
+
+    @TestFactory
+    Collection<DynamicTest> dynamicTestParseUrlPath() throws IOException {
+        List<DynamicTest> dynamicTestList = new ArrayList<>();
+
+        File file = new File("src/test/resources/urlpath_test.txt");
+
+        List<String> urlList = Files.readAllLines(file.toPath());
+
+        for (int i = 0; i < urlList.size(); i++) {
+            String[] array = urlList.get(i).split(",", -1);
+            String parsed = ExtractUtil.parseUrlPath(array[0]);
+            dynamicTestList.add(dynamicTest("test" + i, () -> Assertions.assertEquals(array[1], parsed, "ok")));
+        }
+        return dynamicTestList;
     }
 }
