@@ -1,23 +1,28 @@
-import Layout from '@/layout'
-import yhfx from '@/assets/images/yhfx.png'
+import Layout from "@/layout";
 const nestedRouter = {
-  path: '/userBehavior',
+  path: "/userBehavior",
   component: Layout,
-  redirect: '/userBehavior/index',
-  name: 'userBehavior',
+  redirect: "/userBehavior/portrait",
+  name: "userBehavior",
   alwaysShow: true,
   meta: {
-    title: '用户分析',
-    icon: 'userBehavior'
+    title: "用户分析",
+    icon: "userBehavior",
   },
   children: [
     {
-      path: 'index',
-      name: 'index',
-      component: () => import('@/views/user-behavior/index'),
-      meta: { title: '用户分析' }
-    }
-  ]
-}
+      path: "portrait",
+      component: () => import("@/views/user-behavior/index"),
+      name: "portrait",
+      meta: { title: "用户画像" },
+    },
+    {
+      path: "userLoyalty",
+      component: () => import("@/views/visitor-analysis/user-loyalty-analysis"),
+      name: "userLoyalty",
+      meta: { title: "忠诚度分析" },
+    },
+  ],
+};
 
-export default nestedRouter
+export default nestedRouter;

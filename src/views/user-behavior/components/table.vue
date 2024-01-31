@@ -1,53 +1,5 @@
 <template>
   <div>
-    <div class="chartsIcon public-hoverItem">
-      <div class="chartLeft">
-        <div class="trendHead">
-          <div
-            class="public-firstHead"
-            style="margin-top: 20px; margin-right: 13px"
-          >
-            指标分析图
-          </div>
-          <div class="block">
-            <!-- <el-cascader
-              v-model="emptyList"
-              style="width: 170px"
-              placeholder="指标 | 选项"
-              :options="options"
-              :props="{ multiple: true, checkStrictly: true }"
-              clearable
-              collapse-tags
-            /> -->
-            <!-- :disabled="disabledSelect.includes(item.value)" -->
-            <el-select
-              class="custom_select"
-              v-model="pointValue"
-              multiple
-              placeholder="请选择"
-              style="min-width: 280px"
-              @change="changeChartValue"
-            >
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-                <div style="display: flex; align-items: center">
-                  <span class="checkbox__inner"
-                    ><div class="inner-box"></div
-                  ></span>
-                  <span style="">{{ item.label }}</span>
-                </div>
-              </el-option>
-            </el-select>
-          </div>
-        </div>
-        <div class="echart" id="mychart" :style="myChartStyle"></div>
-      </div>
-    </div>
-
     <div class="search_wrappy public-hoverItem">
       <div class="search_table">
         <span class="public-firstHead">用户列表</span>
@@ -69,18 +21,22 @@
               style="cursor: pointer !important"
               prop="distinctId"
               label="访客ID"
-              width="200"
+              width="450"
             >
               <template slot-scope="scope">
                 <div
-                  @click="handleCellClick(scope.row.distinctId)"
                   style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
                     cursor: pointer;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
                   "
+                  @click="handleCellClick(scope.row.distinctId)"
                 >
-                  {{ scope.row.distinctId }}
+                  <div style="overflow: hidden; text-overflow: ellipsis">
+                    {{ scope.row.distinctId }}
+                  </div>
+                  <div class="el-icon-view" style="color: #2c7be5"></div>
                 </div>
               </template>
             </el-table-column>
@@ -102,6 +58,20 @@
                 </div>
               </template>
             </el-table-column>
+            <el-table-column prop="pv" label="浏览量" sortable="custom">
+              <template slot-scope="scope">
+                <div
+                  @click="handleCellClick(scope.row.distinctId)"
+                  style="
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  {{ scope.row.pv }}
+                </div>
+              </template>
+            </el-table-column>
             <el-table-column
               prop="visitCount"
               label="访问次数"
@@ -120,7 +90,12 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="pv" label="浏览量" sortable="custom">
+
+            <el-table-column
+              prop="avgPv"
+              label="平均访问页数"
+              sortable="custom"
+            >
               <template slot-scope="scope">
                 <div
                   @click="handleCellClick(scope.row.distinctId)"
@@ -130,7 +105,7 @@
                     text-overflow: ellipsis;
                   "
                 >
-                  {{ scope.row.pv }}
+                  {{ averageRulesEvent(scope.row.avgPv) }}
                 </div>
               </template>
             </el-table-column>
@@ -152,24 +127,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column
-              prop="avgPv"
-              label="平均访问页数"
-              sortable="custom"
-            >
-              <template slot-scope="scope">
-                <div
-                  @click="handleCellClick(scope.row.distinctId)"
-                  style="
-                    cursor: pointer;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                  "
-                >
-                  {{ averageRulesEvent(scope.row.avgPv) }}
-                </div>
-              </template>
-            </el-table-column>
+
             <el-table-column
               prop="latestTime"
               label="上次访问时间"
@@ -210,9 +168,8 @@
 </template>
 
 <script>
-import echarts from "echarts";
 import dialogs from "@/layout/components/dialog/index";
-import { percent, percentage, averageRules } from "@/utils/percent";
+import { averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   components: {
@@ -260,21 +217,18 @@ export default {
       seriesdata: [],
       userListData: [],
       current: {
-        size: 10,
+        size: 20,
         page: 1,
         sortName: null,
         sortOrder: null,
       },
       total: 0,
-      pageSize: 10,
+      pageSize: 20,
       currentPage: 1,
       cologStyle: this.$store.state.settings.cologStyle,
     };
   },
-  mounted() {
-    this.initEcharts();
-    this.initChartValue(); //是否初始开启三个禁用
-  },
+  mounted() {},
   beforeDestroy() {
     if (!this.chart) {
       return;
@@ -501,65 +455,6 @@ export default {
           seriesdata.splice(i--, 1);
         }
       }
-      this.initEcharts(seriesdata);
-    },
-    initEcharts(val) {
-      const sourceChart = {
-        tooltip: {
-          trigger: "axis",
-          showContent: true,
-          formatter: function (params) {
-            var res = "<div><p>" + params[0].name + "</p></div>";
-            for (var i = 0; i < params.length; i++) {
-              res +=
-                "<p>" + params[i].seriesName + ":" + params[i].value + "</p>";
-            }
-            return res;
-          },
-        },
-        xAxis: {
-          type: "category",
-          boundaryGap: true,
-          data: this.xData,
-          axisLabel: {
-            interval: 0,
-            // rotate: "30",
-          },
-          axisLine: {
-            onZero: false,
-          },
-          axisTick: {
-            show: false,
-            alignWithLabel: true,
-          },
-        },
-        grid: {
-          bottom: "22%",
-        },
-        legend: {
-          data: this.pointValue,
-          top: "0%",
-        },
-        dataZoom: [
-          {
-            type: "inside",
-            startValue: 0,
-            endValue: 4,
-            zoomOnMouseWheel: false, // 关闭滚轮缩放
-            moveOnMouseWheel: true, // 开启滚轮平移
-            moveOnMouseMove: true, // 鼠标移动能触发数据窗口平移
-          },
-        ],
-        yAxis: {
-          // onZero: false,
-        },
-        series: val,
-      };
-      const myChart = echarts.init(document.getElementById("mychart"));
-      myChart.setOption(sourceChart, true);
-      window.addEventListener("resize", () => {
-        myChart.resize();
-      });
     },
     handleSizeChange(val) {
       this.current.size = val;

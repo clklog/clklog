@@ -1,14 +1,16 @@
 <template>
   <div>
+    <!-- title="资源路径Top10" -->
     <el-dialog
-      title="资源路径Top10"
+      title="访问页面分析"
       :visible.sync="dialogTableVisible"
       width="80%"
     >
-      <el-table :data="gridData" border>
-       
+      <el-table :data="gridData" border  class="public-radius">
         <el-table-column label="序号" type="index" width="80" align="center">
-         
+          <template slot-scope="scope">
+            <span v-text="getIndex(scope.$index)"> </span>
+          </template>
         </el-table-column>
         <el-table-column
           label="页面URL"
@@ -21,8 +23,8 @@
           </template>
         </el-table-column>
         <el-table-column label="流量基础指标">
-          <el-table-column prop="pv" label="浏览量(PV)" sortable="custom" />
-          <el-table-column prop="uv" label="访客数(UV)" sortable="custom" />
+          <el-table-column prop="pv" label="浏览量" sortable="custom" />
+          <el-table-column prop="uv" label="访客数" sortable="custom" />
           <el-table-column prop="ipCount" label="IP数" sortable="custom" />
         </el-table-column>
         <el-table-column prop="date" label="流量质量指标">
@@ -46,49 +48,39 @@
             label="平均访问时长"
             sortable="custom"
           >
-          <template slot-scope="scope">
-              {{ formatTimeEvent(scope.row.avgVisitTime) }}
+            <template slot-scope="scope">
+              {{ scope.row.avgVisitTime | formatTime }}
             </template>
           </el-table-column>
           <el-table-column prop="exitRate" label="退出率" sortable="custom">
             <template slot-scope="scope">
-              {{ percentageFun(scope.row.exitRate) }}
+              {{ scope.row.exitRate | percenTable }}
             </template>
           </el-table-column>
         </el-table-column>
       </el-table>
+      <div class="block">
+        <el-pagination
+          next-text="下一页"
+          :current-page.sync="pageNum"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { percentage } from "@/utils/percent";
-import { formatTime } from "@/utils/format";
+import { getVisitUriDetailApi } from "@/api/trackingapi/visituri";
 export default {
   data() {
     return {
-      gridData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-      ],
+      gridData: [],
       dialogTableVisible: false,
       dialogFormVisible: false,
       form: {
@@ -102,20 +94,45 @@ export default {
         desc: "",
       },
       formLabelWidth: "120px",
+      pageNum: 1,
+      total: 0,
+      pageSize: 10,
+      commonParams: {},
     };
   },
   methods: {
-    percentageFun(val) {
-      return percentage(val);
+    getIndex($index) {
+      return (this.pageNum - 1) * this.pageSize + $index + 1;
     },
-    formatTimeEvent(val) {
-      return formatTime(Math.floor(val));
+    handleSizeChange(val) {
+      this.pageNum = 1;
+      this.pageSize = val;
+      this.initApiEvent(this.commonParams);
     },
-    vistedApiEvent(val) {
-      // console.log(val);
-      this.gridData = val;
+    handleCurrentChange(val) {
+      this.pageNum = val;
+      this.initApiEvent(this.commonParams);
+    },
+    vistedApiEvent(params) {
+      this.pageSize = 10;
+      this.pageNum = 1;
+      this.commonParams = params;
+      this.initApiEvent(params);
+    },
+    initApiEvent(params) {
+      params.pageSize = this.pageSize;
+      params.pageNum = this.pageNum;
       this.dialogTableVisible = true;
+      getVisitUriDetailApi(params).then((res) => {
+        if (res.code == 200) {
+          this.gridData = res.data.rows;
+          this.total = res.data.total;
+        }
+      });
     },
+  },
+  beforeDestroy() {
+    this.gridData = [];
   },
 };
 </script>

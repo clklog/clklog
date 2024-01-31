@@ -3,11 +3,11 @@
     <el-dialog
       :visible.sync="centerDialogVisible"
       :modal-append-to-body="false"
-      width="1100px"
+      width="80%"
       top="8vh"
       @close="resetForm()"
     >
-      <div class="el-dialog-div">
+      <div class="el-dialog-div" v-if="!refreshFlag">
         <div class="left-item">
           <div class="visitorInfo commonBackgrond public-hoverItem">
             <div class="setImg">
@@ -16,10 +16,10 @@
             <div class="visitDetail">
               <div class="title common-title">访客信息</div>
               <div style="display: flex">
-                <div class="gap" style="width: 380px">
+                <div class="gap" style="width: 100%">
                   <div style="display: flex">
                     <div
-                      class="lable"
+                      class="lable setFont"
                       style="width: 50%; padding-right: 10px"
                       v-if="userBaseInfo && userBaseInfo.distinctId"
                     >
@@ -75,8 +75,7 @@
               </div>
               <div
                 style="
-                  font-size: 12px;
-                  width: 380px;
+                  width: 100%;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -92,8 +91,7 @@
 
           <div class="total commonBackgrond public-hoverItem">
             <div class="total_lable common-title">总计</div>
-            <div class="total-head">
-              <!-- find1 -->
+            <div class="total-head setFont">
               此用户在{{ userBaseInfo.visitCount }}次的访问中，共访问了{{
                 userBaseInfo.pv
               }}个页面， 访问总耗时为{{
@@ -119,7 +117,7 @@
 
           <div class="device commonBackgrond public-hoverItem">
             <span class="device-label common-title">设备</span>
-            <div class="describe">
+            <div class="describe setFont">
               来自智能手机设备的
               <div class="number">{{ userBaseInfo.visitCount }}</div>
               次访问：{{ userBaseInfo.manufacturer }}
@@ -129,7 +127,7 @@
           <div class="whereFrom commonBackgrond public-hoverItem">
             <span class="device-label common-title"> 位置 </span>
             <div
-              class="describe"
+              class="describe setFont"
               style="
                 display: flex;
                 flex-direction: column;
@@ -137,11 +135,12 @@
                 margin-top: 5px;
               "
             >
-              <div style="display: flex">
+              <div style="display: flex; flex-wrap: wrap">
                 <div
                   style="
                     display: flex;
                     margin-right: 10px;
+                    margin-top: 5px;
                     box-sizing: border-box;
                   "
                   v-for="(item, index) in userBaseInfo.visitorAreaList"
@@ -158,14 +157,6 @@
         </div>
         <div class="right-item commonBackgrond">
           <div class="right-head">
-            <!-- <div class="name">页面访问明细分析</div> -->
-            <!-- <div class="btnEvent">
-              <i
-                class="el-icon-download"
-                style="padding-right: 3px; font-size: 14px"
-              ></i
-              >下载
-            </div> -->
           </div>
           <div class="warry-body">
             <div
@@ -180,9 +171,6 @@
                   </div>
                   <div class="body-right">
                     {{ item.firstTime }} &nbsp;&nbsp;
-                    <!-- 访问时长:{{
-                      item.visitTime
-                    }} -->
                   </div>
                 </div>
                 <div class="line"></div>
@@ -203,7 +191,6 @@
                       <span class="right_single_font"
                         >{{ ipItem.province }}
                       </span>
-                      <!-- <span class="right_single_font">{{ ipItem.pv }}次</span> -->
                     </div>
                   </div>
                   <div
@@ -229,11 +216,11 @@
                     v-if="item.httpList.length > 0"
                   >
                     <div v-for="val in item.httpList[0]">
-                      <div style="display: flex">
+                      <div style="display: flex; box-sizing: border-box">
                         <div
                           style="
-                            width: 50px;
                             box-sizing: border-box;
+                            margin-right: 25px;
                             height: 100%;
                             text-align: start;
                           "
@@ -244,14 +231,14 @@
                               width: 1px;
                               min-height: 30px;
                               border-left: 1px solid #b8b8b8;
-                              margin: 5px 0 5px 6px;
                             "
                           ></div>
                         </div>
                         <div>
                           <div
                             style="
-                              width: 435px;
+                              /* width: calc(100% - 60px); */
+                              box-sizing: border-box;
                               min-height: 15px;
                               line-height: 18px;
                               color: #4d4d4d;
@@ -262,13 +249,13 @@
                           </div>
                           <div
                             style="
-                              width: 435px;
+                              /* width: calc(100% - 60px); */
+                              box-sizing: border-box;
                               min-height: 15px;
                               line-height: 18px;
                               margin-bottom: 10px;
                             "
                           >
-                            <!-- {{ val.uri }} -->
                             <a :href="val.uri" target="_blank">{{ val.uri }}</a>
                           </div>
                         </div>
@@ -305,6 +292,10 @@
           </div>
         </div>
       </div>
+      <div v-else style="height: 700px; text-align: center; margin-top: 400px;cursor: pointer;">
+        用户访问详细画像数据处理中，请稍后。
+        <div>点击刷新</div>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -330,6 +321,7 @@ export default {
       clickIndex: -1,
       visitListUrl: null,
       allVisitListUrl: [],
+      refreshFlag: false, //默认为有id
     };
   },
   methods: {
@@ -337,74 +329,18 @@ export default {
       return formatTime(Math.floor(val));
     },
     getIndex(index) {
-      // return (this.currentPage - 1) * this.pageSize + index + 1
       return this.total - ((this.currentPage - 1) * this.pageSize + index);
     },
+
+    // 触发点击接口事件内容
     toVisitHttp(val, index) {
+      // console.log(val, index, "触发事件1的接口");
       this.visitListUrl = null; //重新赋值
       this.getVisitorSessionUriList(val);
       this.clickIndex = index;
       this.loading = true;
     },
-    // 一级接口
-    getVisitorSessionList() {
-      let params = {
-        distinctId: this.distinctId,
-        pageNum: this.currentPage,
-        pageSize: this.pageSize,
-      };
-      getVisitorSessionListApi(params).then((res) => {
-        if (res.code == 200) {
-          this.total = res.data.total;
-          this.visitorSessionList = res.data.rows;
 
-          this.visitorSessionList.map((item) => {
-            item.httpList = [];
-            item.allHttpList = [];
-            item.visitTime = formatTime(Math.floor(item.visitTime));
-          });
-        }
-      });
-    },
-    // 二级接口 url链接的接口
-    getVisitorSessionUriList(val) {
-      let params = {
-        pageNum: 1,
-        pageSize: val.pv,
-        distinctId: val.distinctId,
-        eventSessionId: val.eventSessionId,
-      };
-      getVisitorSessionUriListApi(params).then((res) => {
-        console.log(res,"res-------");
-        if (res.code == 200) {
-          this.loading = false;
-          this.visitListUrl = res.data.rows;
-          this.visitorSessionList.map((i) => {
-            if (i.eventSessionId == this.visitListUrl[0].eventSessionId) {
-              if (i.httpList.length > 0) {
-                i.httpList = [];
-                i.allHttpList = [];
-                i.httpList.push(
-                  JSON.parse(JSON.stringify(this.visitListUrl.slice(0, 10)))
-                );
-                i.allHttpList.push(
-                  JSON.parse(JSON.stringify(this.visitListUrl))
-                );
-              } else {
-                i.httpList.push(
-                  JSON.parse(JSON.stringify(this.visitListUrl.slice(0, 10)))
-                );
-                i.allHttpList.push(
-                  JSON.parse(JSON.stringify(this.visitListUrl))
-                );
-              }
-            }
-          });
-        } else {
-          this.loading = false;
-        }
-      });
-    },
     tomoreEvent(item, index) {
       if (item.clickMore) {
         if (item.clickMore + 10 > item.pv) {
@@ -442,19 +378,88 @@ export default {
       this.currentPage = 1;
       this.visitListUrl = null;
     },
+
+    // 左侧内容
     getVisitorDetailinfo() {
       let params = { distinctId: this.distinctId };
       getVisitorDetailinfoApi(params).then((res) => {
         if (res.code == 200) {
-          this.userBaseInfo = res.data;
-          this.userBaseInfo.avgPv = Math.floor(this.userBaseInfo.avgPv);
+          if (res.data.distinctId) {
+            this.refreshFlag = false;
+            this.userBaseInfo = res.data;
+            this.userBaseInfo.avgPv = Math.floor(this.userBaseInfo.avgPv);
+          } else {
+            this.refreshFlag = true;
+          }
+        }
+      });
+    },
+    // 右侧内容
+    getVisitorSessionList() {
+      let params = {
+        distinctId: this.distinctId,
+        pageNum: this.currentPage,
+        pageSize: this.pageSize,
+      };
+      getVisitorSessionListApi(params).then((res) => {
+        if (res.code == 200) {
+          this.total = res.data.total;
+          this.visitorSessionList = res.data.rows;
+
+          this.visitorSessionList.map((item) => {
+            item.httpList = [];
+            item.allHttpList = [];
+            item.visitTime = formatTime(Math.floor(item.visitTime));
+          });
+          // 初始加载第一页
+          if (this.visitorSessionList.length > 0) {
+            this.toVisitHttp(this.visitorSessionList[0], 0);
+          }
+        }
+      });
+    },
+    // 点击事件调用接口数据
+    getVisitorSessionUriList(val) {
+      let params = {
+        pageNum: 1,
+        pageSize: val.pv,
+        distinctId: val.distinctId,
+        eventSessionId: val.eventSessionId,
+      };
+      getVisitorSessionUriListApi(params).then((res) => {
+        if (res.code == 200) {
+          this.loading = false;
+          this.visitListUrl = res.data.rows;
+          this.visitorSessionList.map((i) => {
+            if (i.eventSessionId == this.visitListUrl[0].eventSessionId) {
+              if (i.httpList.length > 0) {
+                i.httpList = [];
+                i.allHttpList = [];
+                i.httpList.push(
+                  JSON.parse(JSON.stringify(this.visitListUrl.slice(0, 10)))
+                );
+                i.allHttpList.push(
+                  JSON.parse(JSON.stringify(this.visitListUrl))
+                );
+              } else {
+                i.httpList.push(
+                  JSON.parse(JSON.stringify(this.visitListUrl.slice(0, 10)))
+                );
+                i.allHttpList.push(
+                  JSON.parse(JSON.stringify(this.visitListUrl))
+                );
+              }
+            }
+          });
+        } else {
+          this.loading = false;
         }
       });
     },
   },
 };
 </script>
-<style></style>
+
 <style lang="scss" scoped>
 @import "~@/styles/components/el-pagination.scss";
 ::v-deep {
@@ -465,6 +470,9 @@ export default {
     background-color: #edf2f9;
     padding: 15px 15px;
   }
+}
+.setFont {
+  font-size: 14px;
 }
 .commonBackgrond {
   background-color: #fff;
@@ -478,16 +486,13 @@ export default {
 .el-dialog-div {
   display: flex;
   justify-content: center;
-  // justify-content: space-between;
   .left-item {
-    min-width: 516px;
-    min-height: 450px;
-    max-height: 960px;
-    // padding: 15px 15px;
-    // padding-top: 0;
+    min-height: 900px;
+    width: 50%;
+    padding: 0 20px;
     box-sizing: border-box;
     .visitorInfo {
-      width: 516px;
+      width: 100%;
       overflow: hidden;
       min-height: 100px;
       border-radius: 6px;
@@ -516,7 +521,6 @@ export default {
       }
       .lable {
         display: flex;
-        font-size: 12px;
         line-height: 26px;
         font-weight: 500;
         color: #5a607f;
@@ -530,7 +534,6 @@ export default {
           box-sizing: border-box;
           overflow: hidden;
           text-overflow: ellipsis;
-          font-size: 12px;
           line-height: 26px;
           color: #5a607f;
         }
@@ -538,7 +541,6 @@ export default {
     }
     .total {
       margin-top: 20px;
-      width: 516px;
       min-height: 140px;
       border-radius: 6px;
       padding: 15px;
@@ -563,14 +565,11 @@ export default {
         }
       }
       .total-head {
-        font-size: 12px;
-        line-height: 12px;
         line-height: 20px;
         color: #5a607f;
       }
     }
     .device {
-      width: 516px;
       height: 76px;
       border-radius: 6px;
       padding: 15px;
@@ -579,7 +578,6 @@ export default {
     .describe {
       box-sizing: border-box;
       display: flex;
-      font-size: 12px;
       line-height: 27px;
       color: #5a607f;
       .number {
@@ -592,7 +590,6 @@ export default {
       padding: 15px;
       box-sizing: border-box;
       margin-top: 20px;
-      width: 516px;
       min-height: 50px;
       border-radius: 6px;
       display: flex;
@@ -600,10 +597,10 @@ export default {
     }
   }
   .right-item {
-    min-width: 501px;
-    margin-left: 20px;
-    min-height: 584px;
+    min-height: 900px;
+    width: 50%;
     background-color: #edf2f9;
+    padding-right: 20px;
     .right-head {
       display: flex;
       justify-content: space-between;
@@ -627,14 +624,13 @@ export default {
       }
     }
     .warry-body {
-      min-height: 600px;
-      max-height: 725px;
+      height: 830px;
       overflow-y: auto;
       overflow-x: hidden;
     }
     .right-body {
-      width: 501px;
-      height: 40x;
+      // width: 501px;
+      // height: 40x;
       .right_body-con {
         padding: 5px 15px;
         box-sizing: border-box;

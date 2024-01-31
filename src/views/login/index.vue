@@ -1,100 +1,136 @@
 <template>
   <div class="login-container">
-    <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
-      autocomplete="on"
-      label-position="left"
+    <div style="width: 60vw">
+      <img
+        src="@/assets/images/loginBg.png"
+        style="width: 60vw; height: 100vh; object-fit: contain"
+      />
+    </div>
+    <div
+      style="
+        width: 40vw;
+        background-color: #f7faff;
+        padding: 171px 0;
+        box-sizing: border-box;
+      "
     >
-      <div class="title-container">
-        <h3 class="title">
-          <img class="logo_head" src="@/assets/images/logoFIxed.png" alt="" />
-        </h3>
-      </div>
-
-      <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
-          type="text"
-          tabindex="1"
-          autocomplete="on"
-        />
-      </el-form-item>
-
-      <el-tooltip
-        v-model="capsTooltip"
-        content="Caps lock is On"
-        placement="right"
-        manual
+      <el-form
+        ref="loginForm"
+        :model="loginForm"
+        :rules="loginRules"
+        class="login-form"
+        autocomplete="on"
+        label-position="left"
       >
-        <el-form-item prop="password">
-          <span class="svg-container">
-            <svg-icon icon-class="password" />
-          </span>
-          <el-input
-            :key="passwordType"
-            ref="password"
-            v-model="loginForm.password"
-            :type="passwordType"
-            placeholder="Password"
-            name="password"
-            tabindex="2"
-            autocomplete="on"
-            @keyup.native="checkCapslock"
-            @blur="capsTooltip = false"
-            @keyup.enter.native="handleLogin"
-          />
-          <span class="show-pwd" @click="showPwd">
-            <svg-icon
-              :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
-            />
-          </span>
-        </el-form-item>
-      </el-tooltip>
-
-      <el-button
-        :loading="loading"
-        type="primary"
-        style="width: 100%; margin-bottom: 30px"
-        @click.native.prevent="handleLogin"
-        >Login</el-button
-      >
-
-      <div style="position: relative">
-        <div class="tips">
-          <span>Username : admin</span>
-          <span>Password : any</span>
+        <div class="title-container">
+          <h3 class="title">
+            <img class="logo_head" src="@/assets/images/logo.png" />
+          </h3>
         </div>
-        <div class="tips">
-          <span style="margin-right: 18px">Username : editor</span>
-          <span>Password : any</span>
-        </div>
-
-        <el-button
-          class="thirdparty-button"
-          type="primary"
-          @click="showDialog = true"
+        <div
+          style="
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 21px;
+            color: #4d4d4d;
+            margin-bottom: 8px;
+          "
         >
-          Or connect with
-        </el-button>
-      </div>
-    </el-form>
+          账号
+        </div>
+        <el-form-item prop="username" style="margin-bottom: 25px">
+          <el-input
+            ref="username"
+            v-model="loginForm.username"
+            placeholder="请输入账号"
+            name="username"
+            type="text"
+            tabindex="1"
+            autocomplete="on"
+          />
+        </el-form-item>
+        <div
+          style="
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 21px;
+            color: #4d4d4d;
+            margin-bottom: 8px;
+          "
+        >
+          密码
+        </div>
+        <el-tooltip
+          v-model="capsTooltip"
+          content="Caps lock is On"
+          placement="right"
+          manual
+        >
+          <el-form-item prop="password" style="margin-bottom: 25px">
+            <el-input
+              :key="passwordType"
+              ref="password"
+              v-model="loginForm.password"
+              :type="passwordType"
+              placeholder="请输入密码"
+              name="password"
+              tabindex="2"
+              autocomplete="on"
+              @keyup.native="checkCapslock"
+              @blur="capsTooltip = false"
+              @keyup.enter.native="handleLogin"
+            />
+            <span
+              style="cursor: pointer"
+              :class="
+                passwordType === 'password' ? 'el-icon-lock' : 'el-icon-unlock'
+              "
+              @click="showPwd"
+            >
+              <svg-icon
+                :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
+              />
+            </span>
+          </el-form-item>
+        </el-tooltip>
 
-    <el-dialog title="Or connect with" :visible.sync="showDialog">
-      Can not be simulated on local, so please combine you own business
-      simulation! ! !
-      <br />
-      <br />
-      <br />
-      <social-sign />
+        <div style="display: flex; justify-content: space-between">
+          <el-button
+            :loading="loading"
+            type="primary"
+            style="width: 100%; height: 46px; margin-bottom: 30px"
+            @click.native.prevent="handleLogin"
+            >登录</el-button
+          >
+        </div>
+      </el-form>
+      <div class="loginWarry"></div>
+    </div>
+
+    <el-dialog :visible.sync="dialogVisible" width="400px" center>
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          font-size: 15px;
+          font-weight: 500;
+        "
+      >
+        <div>微信扫描下方二维码</div>
+        <div style="margin: 20px 0">关注公众号获取体验账号</div>
+        <img
+          src="@/assets/images/qrcode.png"
+          style="width: 200px; height: 200px; object-fit: cover"
+        />
+        <el-button
+          :loading="loading"
+          type="primary"
+          style="width: 100px; height: 35px; margin-top: 40px"
+          @click.native.prevent="dialogVisible = false"
+          >确定</el-button
+        >
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -102,21 +138,22 @@
 <script>
 import { validUsername } from "@/utils/validate";
 import SocialSign from "./components/SocialSignin";
+import Cookies from "js-cookie";
 
 export default {
   name: "Login",
   components: { SocialSign },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error("Please enter the correct user name"));
+      if (!value) {
+        callback(new Error("请输入账号"));
       } else {
         callback();
       }
     };
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error("The password can not be less than 6 digits"));
+        callback(new Error("密码不能少于6位"));
       } else {
         callback();
       }
@@ -124,8 +161,9 @@ export default {
     return {
       loginForm: {
         username: "admin",
-        password: "111111",
+        password: "123456",
       },
+      dialogVisible: false,
       loginRules: {
         username: [
           { required: true, trigger: "blur", validator: validateUsername },
@@ -140,6 +178,7 @@ export default {
       showDialog: false,
       redirect: undefined,
       otherQuery: {},
+      validatePassword: this.$store.getters.password,
     };
   },
   watch: {
@@ -155,7 +194,11 @@ export default {
     },
   },
   created() {
-    // window.addEventListener('storage', this.afterQRScan)
+    let userInfo = Cookies.get("userInfo") ?  JSON.parse(Cookies.get("userInfo")): '';
+    if (userInfo) {
+      this.loginForm.username = userInfo.username;
+      this.loginForm.password = userInfo.password;
+    }
   },
   mounted() {
     if (this.loginForm.username === "") {
@@ -164,10 +207,11 @@ export default {
       this.$refs.password.focus();
     }
   },
-  destroyed() {
-    // window.removeEventListener('storage', this.afterQRScan)
-  },
+  destroyed() {},
   methods: {
+    checkLoginEvent() {
+      this.dialogVisible = true;
+    },
     checkCapslock(e) {
       const { key } = e;
       this.capsTooltip = key && key.length === 1 && key >= "A" && key <= "Z";
@@ -186,6 +230,7 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
           this.loading = true;
+          Cookies.set("userInfo", JSON.stringify(this.loginForm));
           this.$store
             .dispatch("user/login", this.loginForm)
             .then(() => {
@@ -212,47 +257,24 @@ export default {
         return acc;
       }, {});
     },
-    // afterQRScan() {
-    //   if (e.key === 'x-admin-oauth-code') {
-    //     const code = getQueryObject(e.newValue)
-    //     const codeMap = {
-    //       wechat: 'code',
-    //       tencent: 'code'
-    //     }
-    //     const type = codeMap[this.auth_type]
-    //     const codeName = code[type]
-    //     if (codeName) {
-    //       this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-    //         this.$router.push({ path: this.redirect || '/' })
-    //       })
-    //     } else {
-    //       alert('第三方登录失败')
-    //     }
-    //   }
-    // }
   },
 };
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
-$bg: #eaf2fc;
+$bg: #fff;
 $light_gray: #7b7a7b;
 $cursor: #7b7a7b;
-
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
   .login-container .el-input input {
     color: #7b7a7b;
   }
 }
-
-/* reset element-ui css */
 .login-container {
+  display: flex;
   .el-input {
     display: inline-block;
-    height: 47px;
+    height: 46px;
     width: 85%;
 
     input {
@@ -260,44 +282,67 @@ $cursor: #7b7a7b;
       border: 0px;
       -webkit-appearance: none;
       border-radius: 0px;
-      padding: 12px 5px 12px 15px;
+      padding: 12px 5px 12px 14px;
       color: $light_gray;
-      height: 47px;
+      height: 46px;
       caret-color: $cursor;
 
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
-      }
+      // &:-webkit-autofill {
+      //   box-shadow: 0 0 0px 1000px $bg inset !important;
+      //   -webkit-text-fill-color: $cursor !important;
+      // }
     }
   }
 
   .el-form-item {
     border: 1px solid #ddeafb;
-    // background: rgba(0, 0, 0, 0.1);
-    background: #f7fafe;
-    border-radius: 5px;
+    background: #fff !important;
+    border-radius: 6px;
     color: #454545;
   }
 }
 </style>
 
 <style lang="scss" scoped>
-$bg: #eaf2fc;
+$bg: #fff;
 $dark_gray: #889aa4;
 $light_gray: #eee;
-
+.el-dialog__body {
+  padding: 0 30px 30px;
+}
+.el-dialog__headerbtn {
+  top: 14px !important;
+}
 .login-container {
   min-height: 100%;
   width: 100%;
-  background-color: #eaf2fc;
+  background-color: $bg;
   overflow: hidden;
+  // 登录注册
+  .loginWarry {
+    width: 85%;
+    padding: 35px 0;
+    margin: 0 auto;
+    text-align: center;
+    .colFont {
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 20px;
+      color: #4d4d4d;
+    }
+    .registration {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 22px;
+      color: #2c7be5;
+      cursor: pointer;
+    }
+  }
 
   .login-form {
     position: relative;
-    width: 520px;
-    max-width: 100%;
-    padding: 160px 35px 0;
+    width: 80%;
+    padding: 103px 35px 0;
     margin: 0 auto;
     overflow: hidden;
   }
@@ -315,10 +360,10 @@ $light_gray: #eee;
   }
 
   .svg-container {
-    padding: 6px 5px 6px 15px;
+    padding: 6px 5px 6px 0px;
     color: $dark_gray;
     vertical-align: middle;
-    width: 30px;
+    // width: 30px;
     display: inline-block;
   }
 
@@ -332,11 +377,17 @@ $light_gray: #eee;
       text-align: center;
       font-weight: bold;
       .logo_head {
-        height: 36px;
+        height: 66px;
+        width: 194px;
+        object-fit: cover;
       }
     }
   }
 
+  .el-icon-view {
+    font-size: 16px;
+    cursor: pointer;
+  }
   .show-pwd {
     position: absolute;
     right: 10px;

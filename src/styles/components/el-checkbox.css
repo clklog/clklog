@@ -24,3 +24,7 @@
 .el-checkbox__inne {
   border-radius: 4px;
 }
+
+.el-checkbox__inner::after {
+  left: 18px;
+}

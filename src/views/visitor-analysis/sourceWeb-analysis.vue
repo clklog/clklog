@@ -73,7 +73,6 @@ export default {
         }
       });
     },
-    // table data
     getSourceSiteDetail(val) {
       let newvalue = copyObj(this.commonParams);
       this.pageNum= 1;
@@ -95,14 +94,11 @@ export default {
       }
       getSourceSiteDetailApi(newvalue).then((res) => {
         if (res.code == 200) {
-          // this.$refs.originView.originEvent(res.data.summary);
           this.$refs.sourceWebTable.getSourceSite(res.data);
         }
       });
     },
-    // echarts
     getSourceWebSiteTop10() {
-      // getSourceWebSiteDetailTop10Api(this.commonParams).then((res) => {
       getSourceWebsiteApi(this.commonParams).then((res) => {
         if (res.code == 200) {
           this.$refs.sourceWebChart.getSourceChart(res.data);

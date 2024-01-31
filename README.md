@@ -59,10 +59,13 @@ npm run dev
 
 ### npm run dev 失败, 需要建立一个 '.env.development'文件,配置代理地址。
 
+```bash
 ENV = 'development'
+
 VUE_APP_BASE_API = '/DEV-API'
+
 VUE_APP_BASE_API_PROXY = '代理地址'
-  
+  ```
 ## 发布
 
 ```bash

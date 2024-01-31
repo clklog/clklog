@@ -8,13 +8,13 @@
         class="checkBoxStyle"
         @change="handelChannelList"
       >
-        <el-checkbox label="pv">浏览量(PV)</el-checkbox>
+        <el-checkbox label="pv">浏览量</el-checkbox>
         <el-checkbox label="pvRate">浏览量占比</el-checkbox>
         <el-checkbox label="visitCount">访问次数</el-checkbox>
         <el-checkbox v-if="byChannel" label="visitCountRate"
           >访问次数占比</el-checkbox
         >
-        <el-checkbox label="uv">访客数(UV)</el-checkbox>
+        <el-checkbox label="uv">访客数</el-checkbox>
         <el-checkbox v-if="byChannel" label="uvRate">访客数占比</el-checkbox>
         <el-checkbox v-if="!byNewOldVisit" label="newUv">新访客数</el-checkbox>
         <el-checkbox v-if="!byNewOldVisit" label="newUvRate">新访客数占比</el-checkbox>
@@ -41,9 +41,6 @@
           >平均访问时长占比</el-checkbox
         >
         <el-checkbox label="avgPv">平均访问页数</el-checkbox>
-        <!-- <el-checkbox v-if="byChannel" label="avgPvRate"
-          >平均访问页数占比</el-checkbox
-        > -->
       </el-checkbox-group>
     </div>
   </div>
@@ -102,21 +99,11 @@ export default {
       params.projectName = this.$store.getters.projectName;
       params.cols = [...this.channelList, ...this.flowQuality];
       let path = this.$route.path;
-      // if (path.includes("trendAnalysis")) {
-      //   exportFlowTrendDetailApi(params).then((res) => {
-      //     let fileName = res.headers["content-disposition"] || "";
-      //     let index1 = fileName.indexOf("filename=");
-      //     let result = fileName.substring(index1);
-      //     result = decodeURIComponent(decodeURI(result.slice(9)));
-      //     // blobDownloads(res.data,result);
-      //   });
-      // }
       console.log(path,"路径");
       switch (path) {
-        case "/visitorAnalysis/trend": {
+        case "/trendAnalysis/trend": {
           let regular = ["statTime"]
           params.cols = [...params.cols, ...regular]; //增加固定列
-          // console.log(params,"下载参数");
           exportFlowTrendDetailApi(params).then((res) => {
             let name = this.sliceTypeFile(res);
             blobDownloads(res.data, name);

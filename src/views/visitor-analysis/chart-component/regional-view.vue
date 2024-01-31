@@ -5,7 +5,7 @@
       <!-- <originView ref="originView" byFlowView></originView> -->
       <div class="bid-list-header">
         <div class="header-name w156">
-          浏览量(PV)
+          浏览量
           <el-popover
             placement="bottom-start"
             width="200"

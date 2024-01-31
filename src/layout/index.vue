@@ -14,13 +14,9 @@
         <settings />
       </right-panel>
     </div>
-    <!-- 浮动logo -->
     <div class="logoConItem">
-      <!-- <img class="logoImg" src="@/assets/images/logoFIxed.png" alt=""> -->
-
-      <!-- <img class="logoImg" src="@/assets/images/logo.png" alt=""> -->
       <div class="logoName">POWERED BY</div>
-      <img class="logoImg" src="@/assets/images/logoFIxed.png" alt="" />
+      <img class="logoImg" @click="openClklog" src="@/assets/images/logoFIxed.png" alt="" />
       
     </div>
   </div>
@@ -63,7 +59,10 @@ export default {
   methods: {
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
-    }
+    },
+    openClklog() {
+      window.open(`https://clklog.com/#/introduce`);
+    },
   }
 }
 </script>
@@ -80,7 +79,7 @@ export default {
     .logoImg{
       height: 16px;
       object-fit: cover;
-     
+      cursor: pointer;
     }
     .logoName{
       padding-right: 5px;

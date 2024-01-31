@@ -14,7 +14,7 @@
         <el-table-column type="index" label="序号" width="80" />
         <el-table-column prop="visitorType" label="访客类型" width="150" />
         <el-table-column prop="date" label="流量基础指标">
-          <el-table-column v-if="pv" prop="pv" label="浏览量(PV)" sortable />
+          <el-table-column v-if="pv" prop="pv" label="浏览量" sortable />
           <el-table-column
             v-if="pvRate"
             prop="pvRate"
@@ -37,7 +37,7 @@
             sortable
           />
 
-          <el-table-column v-if="uv" prop="uv" label="访客数(UV)" sortable />
+          <el-table-column v-if="uv" prop="uv" label="访客数" sortable />
 
           <el-table-column
             v-if="uvRate"

@@ -1,5 +1,4 @@
 const state = {
-  // projectName: '货清清'
   projectName: 'hqq'
 }
 

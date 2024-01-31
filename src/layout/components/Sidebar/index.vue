@@ -5,22 +5,26 @@
       <!-- <el-menu
         :default-active="activeMenu"
         :collapse="isCollapse"
-        :background-color="variables.menuBg"
-        :text-color="variables.menuText"
-        :unique-opened="false"
-        :active-text-color="variables.menuActiveText"
-        :collapse-transition="false"
-        mode="vertical"
-      > -->
-      <el-menu
-        :default-active="activeMenu"
-        :collapse="isCollapse"
         background-color="#fff"
         text-color="#4D4D4D"
         active-text-color="#000000"
         :unique-opened="false"
         :collapse-transition="false"
+        @open="handleOpen"
         mode="vertical"
+      > -->
+      <el-menu
+        background-color="#fff"
+        text-color="#4D4D4D"
+        active-text-color="#000000"
+        :unique-opened="false"
+        :collapse-transition="false"
+        :collapse="isCollapse"
+        mode="vertical"
+        :default-active="activeMenu"
+        :default-openeds="defaultOpen"
+        @open="handleOpen"
+        @close="handleClose"
       >
         <sidebar-item
           v-for="route in permission_routes"
@@ -62,23 +66,36 @@ export default {
       return !this.sidebar.opened;
     },
   },
+  data() {
+    return {
+      defaultOpen: [],
+    };
+  },
+  methods: {
+    handleOpen(key, keyPath) {
+      if (keyPath.length == 1) {
+        this.defaultOpen = [key];
+      }
+    },
+    handleClose(key, keyPath) {},
+  },
 };
 </script>
 <style>
 #app .sidebar-container .el-submenu__title:hover {
- background: linear-gradient(to right, #d5e5fa,#fff ) !important;
+  background: linear-gradient(to right, #d5e5fa, #fff) !important;
 }
 #app .sidebar-container .submenu-title-noDropdown:hover {
- background: linear-gradient(to right, #d5e5fa,#fff ) !important;
+  background: linear-gradient(to right, #d5e5fa, #fff) !important;
 }
 </style>
 <style lang="scss" scoped>
 ::v-deep {
   #app .sidebar-container .el-submenu .el-menu-item.is-active {
-   background: linear-gradient(to right, #d5e5fa,#fff ) !important;
+    background: linear-gradient(to right, #d5e5fa, #fff) !important;
   }
   .el-menu-item.is-active {
-   background: linear-gradient(to right, #d5e5fa,#fff ) !important;
+    background: linear-gradient(to right, #d5e5fa, #fff) !important;
   }
 }
 </style>

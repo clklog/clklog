@@ -16,7 +16,7 @@
           <div class="bid-list-page">
             <div class="bid-list-header">
               <div class="header-text w156">搜索词</div>
-              <div class="header-name w156"><b>浏览量(PV)</b></div>
+              <div class="header-name w156"><b>浏览量</b></div>
               <div class="header-name w156"><b>占比</b></div>
             </div>
 

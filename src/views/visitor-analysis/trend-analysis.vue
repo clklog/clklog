@@ -75,14 +75,13 @@ export default {
       });
     },
     getFlowTrendDetail(noEchart) {
-        console.log(noEchart,"noEchart");
       getFlowDetailApi(this.commonParams).then((res) => {
         if (res.code == 200) {
           if (noEchart) {
-            this.$refs.trendTable.apiDetailList(JSON.parse(JSON.stringify(res.data)),this.commonParams.timeType);
-            this.$refs.indicatorChart.apiDetailList(res.data,)
+            this.$refs.trendTable.apiDetailList(JSON.parse(JSON.stringify(res.data)),this.commonParams.timeType,this.commonParams);
+            this.$refs.indicatorChart.apiDetailList(res.data)
           }else{
-            this.$refs.trendTable.apiDetailList(JSON.parse(JSON.stringify(res.data)),this.commonParams.timeType);
+            this.$refs.trendTable.apiDetailList(JSON.parse(JSON.stringify(res.data)),this.commonParams.timeType,this.commonParams);
           }
         }
       });

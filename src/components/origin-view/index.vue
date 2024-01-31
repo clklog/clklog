@@ -168,7 +168,7 @@
     <div class="bid-list-page" v-if="byAreaAnaly">
         <div class="bid-list-header">
         <div class="header-name w156">
-          浏览量(PV)
+          浏览量
           <div class="parentPosition">
           <el-popover
             placement="bottom-start"
@@ -520,7 +520,7 @@
     <div class="bid-list-page" v-if="byVisitedPage">
         <div class="bid-list-header">
         <div class="header-name w156">
-          浏览量(PV)
+          浏览量
           <div class="parentPosition">
           <el-popover
             placement="bottom-start"

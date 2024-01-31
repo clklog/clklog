@@ -13,7 +13,6 @@
             <el-radio label="previous">昨日</el-radio>
             <el-radio label="week">近7天</el-radio>
             <el-radio label="month">近30天</el-radio>
-            <!-- <el-radio label="year"> 日期范围 </el-radio> -->
           </el-radio-group>
         </div>
 
@@ -272,11 +271,9 @@ export default {
       } else {
         return [];
       }
-      // return [this.channelValue];
+      
     },
-    // area() {
-    //   return [this.areaValue];
-    // },
+    
     province() {
       if (this.areaValue == "全部") {
         return [];
@@ -300,11 +297,10 @@ export default {
     commonParams() {
       let obj = {};
       obj = Object.assign(obj, this.defaultParams);
-      // const { area, timeType } = this;
+     
       const { province, timeType } = this;
       if (this.ByArea) {
-        // obj = Object.assign(obj, { area });
-
+       
         obj = Object.assign(obj, { province });
       }
       if (this.ByData) {
@@ -315,14 +311,12 @@ export default {
   },
   watch: {
     commonParams(val) {
-      // return this.setTopFilterParams(val);
       this.setTopFilterParams(val);
       this.commonData = val;
     },
   },
   methods: {
     btnShowEvent(val) {
-      // console.log(val,"点击事件");
       this.popflag = true;
     },
     canclePopEvent() {
@@ -333,7 +327,7 @@ export default {
       let path = this.$route.path;
       this.commonData.projectName = this.$store.getters.projectName;
       switch (path) {
-        case "/visitorAnalysis/search": {
+        case "/access/search": {
           let cols = [
             "index",
             "searchword",
@@ -356,15 +350,14 @@ export default {
           });
           break;
         }
-        case "/visitorAnalysis/userLoyalty": {
+        case "/userBehavior/userLoyalty": {
           exportVisitorApi(this.commonData).then((res) => {
             let name = this.sliceTypeFile(res);
             blobDownloads(res.data, name);
           });
           break;
         }
-        // case "/behaviorAnalysis/user-behavior-analysis": {
-        case "/behaviorAnalysis/userBehavior": {
+        case "/userBehavior/portrait": {
           let cols = [
             "distinctId",
             "visitorType",
@@ -393,21 +386,10 @@ export default {
     setTopFilterParams(val) {
       this.$emit("setFilterBarParams", val);
     },
-    // 切换省份
+  
     handleCheckProvince(e) {
-      console.log(e, "全部");
-      // if ((e.provinceName = "全部")) {
-      //   this.areaValue = [];
-      // }
       this.areaValue = e.provinceName;
-      // switch (e.provinceName) {
-      //   case "全部":
-      //     this.areaValue = "全部";
-      //     break;
-      //   default:
-      //     this.areaValue = e.provinceName;
-      //     break;
-      // }
+     
     },
     checkDateEvnet(val) {
       this.timeFlag = "";
@@ -490,42 +472,65 @@ export default {
       this.currentTime = [dateTime, dateTime];
       this.initDate(this.currentTime); //默认日期
     },
-
-    // 单选切换时间
+    // 单选切换时间 timeType
     handleChange(val) {
+      localStorage.setItem('timeFlag',this.timeFlag)
+      this.checked = false; //暂定清空日期
+      this.contrastFlag = false;
+      this.checkLabel = "对比时间段";
+      this.contrastValue = "";
+
+      if (this.checked) {
+        this.dateFlag = 1;
+      } else {
+        this.dateFlag = null;
+      }
+      let dateTime = this.toDateNow();
+      let toData =
+        new Date(new Date().toLocaleDateString()).getTime() + 8 * 3600 * 1000;
+      if (val == "day") {
+        this.currentTime = [dateTime, dateTime];
+
+        this.dateTimeCount(1);
+
+        this.timeType = "hour";
+      } else if (val == "previous") {
+        this.timeDifference = toData - 3600 * 24 * 1000;
+        this.timestampToTime(this.timeDifference);
+        this.currentTime = [this.checkDateTime, this.checkDateTime];
+        this.dateTimeCount(1);
+        this.timeType = "hour";
+      } else if (val == "week") {
+        this.timeDifference = toData - 6 * 3600 * 24 * 1000;
+        this.timestampToTime(this.timeDifference);
+        this.currentTime = [this.checkDateTime, dateTime];
+        this.dateTimeCount(6);
+
+        this.timeType = "day";
+      } else {
+        this.timeDifference = toData - 29 * 3600 * 24 * 1000;
+        this.timestampToTime(this.timeDifference);
+        this.currentTime = [this.checkDateTime, dateTime];
+        this.dateTimeCount(29);
+        this.timeType = "week";
+      }
+
+      this.startTime = this.currentTime[0];
+      this.endTime = this.currentTime[1];
+    },
+    toDateNow() {
       var date = new Date();
-      let dateTime =
+      return (
         date.getFullYear() +
         "-" +
         (date.getMonth() + 1 < 10
           ? "0" + (date.getMonth() + 1)
           : date.getMonth() + 1) +
         "-" +
-        date.getDate();
-      let toData =
-        new Date(new Date().toLocaleDateString()).getTime() + 8 * 3600 * 1000;
-      if (val == "day") {
-        this.currentTime = [dateTime, dateTime];
-        this.dateTimeCount(1);
-      } else if (val == "previous") {
-        this.timeDifference = toData - 3600 * 24 * 1000;
-        this.timestampToTime(this.timeDifference);
-        this.currentTime = [this.checkDateTime, this.checkDateTime];
-        this.dateTimeCount(1);
-      } else if (val == "week") {
-        this.timeDifference = toData - 6 * 3600 * 24 * 1000;
-        this.timestampToTime(this.timeDifference);
-        this.currentTime = [this.checkDateTime, dateTime];
-        this.dateTimeCount(6);
-      } else {
-        this.timeDifference = toData - 29 * 3600 * 24 * 1000;
-        this.timestampToTime(this.timeDifference);
-        this.currentTime = [this.checkDateTime, dateTime];
-        this.dateTimeCount(29);
-      }
-      this.startTime = this.currentTime[0];
-      this.endTime = this.currentTime[1];
+        (date.getDate() < 10 ? "0" + date.getDate() : date.getDate())
+      );
     },
+
     // 时间戳转换器
     timestampToTime(timestamp) {
       var date = new Date(timestamp);

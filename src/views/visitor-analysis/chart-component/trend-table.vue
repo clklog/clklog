@@ -20,22 +20,21 @@
         >
           <el-table-column label="日期" prop="statTime" sortable="custom">
             <template slot-scope="scope">
-              {{ scope.row.statTime }}
-              <!-- <span v-if="timeType && timeType == 'hour'">时</span> -->
+              <div style="display: flex;justify-content: center;">
+                {{ scope.row.statTime }}
+                <div v-if="scope.row.statTime">
+                  {{ timeType == "hour" ? "时" : "" }}
+                </div>
+              </div>
             </template>
           </el-table-column>
           <el-table-column prop="date" label="流量基础指标" width="150">
             <el-table-column
               v-if="pv"
               prop="pv"
-              label="浏览量(PV)"
+              label="浏览量"
               sortable="custom"
             />
-            <!-- :sort-method="
-                (a, b) => {
-                  return a.pvRate - b.pvRate;
-                }
-              " -->
             <el-table-column
               v-if="pvRate"
               prop="pvRate"
@@ -55,7 +54,7 @@
             <el-table-column
               v-if="uv"
               prop="uv"
-              label="访客数(UV)"
+              label="访客数"
               sortable="custom"
             />
             <el-table-column
@@ -82,11 +81,6 @@
               sortable="custom"
             />
           </el-table-column>
-          <!-- :sort-method="
-                (a, b) => {
-                  return a.bounceRate - b.bounceRate;
-                }
-              " -->
           <el-table-column prop="date" label="流量质量指标" width="150">
             <el-table-column
               v-if="bounceRate"
@@ -138,6 +132,7 @@
 </template>
 
 <script>
+import { copyObj } from "@/utils/copy";
 import flowPoint from "@/components/flowPoint/index";
 import { percent, percentage, averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
@@ -213,13 +208,11 @@ export default {
         a = a[attr];
         b = b[attr];
         if (a < b) {
-          // console.log("降序");
           return rev * -1;
         }
         if (a > b) {
           return rev * 1;
         }
-        // (a,b)=>{return a - b}
         return 0;
       };
     },
@@ -287,16 +280,32 @@ export default {
         return percentage(val);
       }
     },
-    apiDetailList(val, time) {
+    apiDetailList(val, time, commonParams) {
       this.timeType = time;
       this.currentPage = 1;
-      this.flowTableList = val;
+      let toDateTime = this.$options.filters.formatDateToday();
+      if (
+        time == "hour" &&
+        commonParams.endTime == commonParams.startTime &&
+        commonParams.startTime == toDateTime
+      ) {
+        let currentHout = this.$options.filters.getCurrentHour();
+        let newArray = copyObj(val).reverse();
+        const index = newArray.findIndex(
+          (item) => item.statTime == currentHout
+        );
+        const result = index !== -1 ? newArray.slice(index) : [];
+        this.flowTableList = result;
+      } else {
+        this.flowTableList = val.reverse();
+      }
+
       if (this.current.sortName && this.current.sortName == "statTime") {
         if (this.current.sortOrder == "descending") {
           this.flowTableList = this.flowTableList.reverse();
         }
       }
-      this.total = val.length;
+      this.total = this.flowTableList.length;
       this.ascDscEvent();
     },
     handleSizeChange(val) {

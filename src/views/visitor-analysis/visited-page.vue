@@ -79,7 +79,6 @@ export default {
       }
       getVisitUriDetailApi(newvalue).then((res) => {
         if (res.code == 200) {
-          // this.$refs.originView.originEvent(res.data.total);
           this.$refs.visitedAnalysis.vistedAnalysis(res.data);
         }
       });
@@ -88,8 +87,6 @@ export default {
     getVisitUriPathTreeTotal() {
       getVisitUriPathTreeTotalApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          // this.$refs.originView.originEvent(res.data);
-          // this.$refs.visitedAnalysis.treeListvent(res.data);
           this.$refs.visitedAnalysis.treeListEvent(res.data,this.commonParams);
         }
       });

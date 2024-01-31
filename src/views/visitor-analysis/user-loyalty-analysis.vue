@@ -2,7 +2,7 @@
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams"></FilterBar>
     <div class="userLoyalty public-hoverItem">
-      <div class="public-firstHead loyaltyTitle">用户忠诚度分析</div>
+      <div class="public-firstHead loyaltyTitle">忠诚度分析</div>
       <visitNum ref="visitNum"></visitNum>
       <visitPage ref="visitPage"></visitPage>
       <visitTime ref="visitTime"></visitTime>
@@ -22,7 +22,6 @@ import visitNum from "./chart-component/userLoyalty-echarts/visitNum";
 import visitPage from "./chart-component/userLoyalty-echarts/visitPage";
 import visitTime from "./chart-component/userLoyalty-echarts/visitTime";
 import { copyObj } from "@/utils/copy";
-import { percentage } from "@/utils/percent";
 export default {
   components: {
     FilterBar,

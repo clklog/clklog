@@ -30,7 +30,7 @@
               <el-table-column
                 v-if="pv"
                 prop="pv"
-                label="浏览量(PV)"
+                label="浏览量"
                 sortable="custom"
               />
               <el-table-column
@@ -46,15 +46,15 @@
                 sortable="custom"
               />
               <el-table-column
-                v-if="newUv"
-                prop="newUv"
-                label="新访客数"
+                v-if="uv"
+                prop="uv"
+                label="访客数"
                 sortable="custom"
               />
               <el-table-column
-                v-if="uv"
-                prop="uv"
-                label="访客数(UV)"
+                v-if="newUv"
+                prop="newUv"
+                label="新访客数"
                 sortable="custom"
               />
               <el-table-column

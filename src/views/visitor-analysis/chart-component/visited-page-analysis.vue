@@ -44,8 +44,8 @@
           class="checkBoxStyle"
           @change="handelChannelList"
         >
-          <el-checkbox label="pv">浏览量(PV)</el-checkbox>
-          <el-checkbox label="uv">访客数(UV)</el-checkbox>
+          <el-checkbox label="pv">浏览量</el-checkbox>
+          <el-checkbox label="uv">访客数</el-checkbox>
           <el-checkbox label="ipCount" style="margin-right: 0"
             >IP数</el-checkbox
           >
@@ -70,6 +70,8 @@
       <!-- 树状图 -->
       <div class="public-Table-minHeight" v-show="!showTreeFlag">
         <el-table
+          class="public-radius"
+          :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
           :data="treeList"
           style="width: 100%"
           :row-key="getRowKeys"
@@ -105,6 +107,158 @@
                     object-fit: cover;
                     margin-right: 10px;
                     margin-top: 2px;
+                    box-sizing: border-box;
+                    cursor: pointer;
+                  "
+                />
+              </div>
+
+              <div
+                v-if="scope.row.secondFlag"
+                :style="scope.row.title == '更多' ? 'display:flex; ' : ''"
+              >
+                <div style="margin-left: -12px; display: flex">
+                  <div
+                    v-if="scope.row.title == '更多'"
+                    @click="handleTree(dialogParams, 'dialog')"
+                    class="setMoreCon"
+                  >
+                    <!-- <img
+                      class="loadMoreImg"
+                      src="@/assets/images/showDialog.png"
+                    /> -->
+                    更多受访页面...
+                  </div>
+                  <div v-else>
+                    {{ scope.row.title ? scope.row.title : "" }}
+                  </div>
+                </div>
+                <div
+                  style="margin-left: -12px"
+                  v-if="scope.row.title != '更多'"
+                >
+                  {{ scope.row.segment ? scope.row.segment : "/" }}
+                </div>
+              </div>
+
+              <div v-else>
+                <div style="margin-left: 5px; display: flex">
+                  <!-- <img
+                      class="loadMoreImg"
+                      src="@/assets/images/showDialog.png"
+                    /> -->
+                  <div
+                    v-if="scope.row.title == '更多'"
+                    @click="handleTree(dialogParams, 'dialog')"
+                    class="setMoreCon"
+                  >
+                    更多受访页面...
+                  </div>
+                  <div v-else>
+                    {{ scope.row.title ? scope.row.title : "" }}
+                  </div>
+                </div>
+                <div v-if="scope.row.title != '更多'">
+                  {{ scope.row.segment ? scope.row.segment : "/" }}
+                </div>
+              </div>
+
+              <!-- <img
+                v-if="scope.row.leafUri.length > 0 && !scope.row.firstFlag"
+                style="
+                  position: absolute;
+                  right: 10px;
+                  top: 8px;
+                  cursor: pointer;
+                  width: 17px;
+                "
+                src="@/assets/images/showDialog.png"
+                @click="handleTree(scope.row, 'dialog')"
+              /> -->
+            </template>
+          </el-table-column>
+
+          <el-table-column label="流量基础指标">
+            <el-table-column v-if="pv" prop="detail.pv" label="浏览量" />
+            <el-table-column v-if="uv" prop="detail.uv" label="访客数" />
+            <el-table-column
+              v-if="ipCount"
+              prop="detail.ipCount"
+              label="IP数"
+            />
+          </el-table-column>
+          <el-table-column prop="detail.date" label="流量质量指标">
+            <el-table-column
+              v-if="entryCount"
+              prop="detail.entryCount"
+              label="入口页次数"
+            />
+            <el-table-column
+              v-if="downPvCount"
+              prop="detail.downPvCount"
+              label="贡献下游浏览量"
+            />
+            <el-table-column
+              v-if="exitCount"
+              prop="detail.exitCount"
+              label="退出页次数"
+            />
+            <el-table-column
+              v-if="avgVisitTime"
+              prop="detail.avgVisitTime"
+              label="平均访问时长"
+            >
+              <template slot-scope="{ row }" v-if="row.detail.title != '更多'">
+                {{ row.detail.avgVisitTime | formatTime }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              v-if="exitRate"
+              prop="detail.exitRate"
+              label="退出率"
+            >
+              <template slot-scope="{ row }" v-if="row.detail.title != '更多'">
+                {{ row.detail.exitRate | percenTable }}
+              </template>
+            </el-table-column>
+          </el-table-column>
+        </el-table>
+
+        <!-- <el-table
+          :data="treeList"
+          style="width: 100%"
+          :row-key="getRowKeys"
+          :tree-props="{ children: 'leafUri', hasChildren: 'hasChildren' }"
+          border
+          lazy
+          ref="multipleTable"
+          :expand-row-keys="tableExpands"
+          @expand-change="expandChangeEvent"
+        >
+          <el-table-column
+            label="页面地址"
+            width="400px"
+            :show-overflow-tooltip="true"
+          >
+            <template slot-scope="scope" style="display: flex">
+              <div
+                v-if="
+                  scope.row.leafUri &&
+                  scope.row.leafUri.length == 0 &&
+                  !scope.row.firstFlag
+                "
+                class="tableName"
+                :style="{ 'padding-left': `${scope.row.level * 19}px` }"
+                @click="handleTree(scope.row, '')"
+              >
+                <img
+                  src="@/assets/images/add.png"
+                  style="
+                    width: 12px;
+                    height: 12px;
+                    object-fit: cover;
+                    margin-right: 10px;
+                    margin-top: 2px;
                    
                     box-sizing: border-box;
                     cursor: pointer;
@@ -119,12 +273,6 @@
                 <div style=" margin-left:5px;">{{ scope.row.title ? scope.row.title : "" }}</div>
                 <div>{{ scope.row.segment ? scope.row.segment : "/" }}</div>
               </div>
-             
-              <!-- <div>
-                <div style=" margin-left:-12px;">{{ scope.row.title ? scope.row.title : "" }}</div>
-                <div>{{ scope.row.segment ? scope.row.segment : "/" }}</div>
-              </div> -->
-
 
               <img
                 v-if="scope.row.leafUri.length > 0 && !scope.row.firstFlag"
@@ -141,8 +289,8 @@
             </template>
           </el-table-column>
           <el-table-column label="流量基础指标">
-            <el-table-column v-if="pv" prop="detail.pv" label="浏览量(PV)" />
-            <el-table-column v-if="uv" prop="detail.uv" label="访客数(UV)" />
+            <el-table-column v-if="pv" prop="detail.pv" label="浏览量" />
+            <el-table-column v-if="uv" prop="detail.uv" label="访客数" />
             <el-table-column
               v-if="ipCount"
               prop="detail.ipCount"
@@ -184,7 +332,7 @@
               </template>
             </el-table-column>
           </el-table-column>
-        </el-table>
+        </el-table> -->
       </div>
       <!-- 默认图表 -->
       <div v-show="showTreeFlag">
@@ -222,13 +370,13 @@
               <el-table-column
                 v-if="pv"
                 prop="pv"
-                label="浏览量(PV)"
+                label="浏览量"
                 sortable="custom"
               />
               <el-table-column
                 v-if="uv"
                 prop="uv"
-                label="访客数(UV)"
+                label="访客数"
                 sortable="custom"
               />
               <el-table-column
@@ -293,11 +441,15 @@
 <script>
 import { blobDownloads } from "@/utils/localDownloadUtil.js";
 import { exportVisitUriDetailApi } from "@/api/trackingapi/download";
-import { getVisitUriListOfUriPathApi } from "@/api/trackingapi/visituri";
+import {
+  getVisitUriListOfUriPathApi,
+  getVisitUriDetailApi,
+} from "@/api/trackingapi/visituri";
 import flowPoint from "@/components/flowPoint/index";
 import vistedDialog from "./visted-dialog.vue";
 import { percentage } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
+import { copyObj } from "@/utils/copy";
 export default {
   components: {
     flowPoint,
@@ -330,92 +482,6 @@ export default {
       vistedTableData: [],
       total: 0,
       pageSize: 10,
-      // 测试数组
-      tableData: [
-        {
-          id: 1,
-          date: "https://app.huoqingqing.com/#",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          id: 2,
-          date: "https://app.huoqingqing.com/#",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄",
-        },
-        {
-          id: 3,
-          date: "一级-https://app.huoqingqing.com/#",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄",
-          detail: {
-            date: "一级-https://app.huoqingqing.com/#",
-            name: "王小虎",
-            address: "上海市普陀区金沙江路 1519 弄",
-          },
-
-          children: [
-            {
-              detail: {
-                date: "一级-https://app.huoqingqing.com/#",
-                name: "王小虎",
-                address: "上海市普陀区金沙江路 1519 弄",
-              },
-              id: 31,
-              date: "二级-https://app.huoqingqing.com/#",
-              name: "王小虎",
-              address: "上海市普陀区金沙江路 1519 弄",
-            },
-            {
-              detail: {
-                date: "一级-https://app.huoqingqing.com/#",
-                name: "王小虎",
-                address: "上海市普陀区金沙江路 1519 弄",
-              },
-              id: 32,
-              date: "二级-https://app.huoqingqing.com/#",
-              name: "王小虎",
-              address: "上海市普陀区金沙江路 1519 弄",
-            },
-          ],
-        },
-        {
-          id: 4,
-          date: "https://app.huoqingqing.com/#",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-          detail: {
-            date: "一级-https://app.huoqingqing.com/#",
-            name: "王小虎",
-            address: "上海市普陀区金沙江路 1519 弄",
-          },
-          children: [
-            {
-              detail: {
-                date: "一级-https://app.huoqingqing.com/#",
-                name: "王小虎",
-                address: "上海市普陀区金沙江路 1519 弄",
-              },
-              id: 33,
-              date: "https://app.huoqingqing.com/#",
-              name: "平级状态",
-              address: "平级状态 1519 弄",
-            },
-            {
-              detail: {
-                date: "一级-https://app.huoqingqing.com/#",
-                name: "王小虎",
-                address: "上海市普陀区金沙江路 1519 弄",
-              },
-              id: 34,
-              date: "https://app.huoqingqing.com/#",
-              name: "王小虎",
-              address: "平级状态 1519 弄",
-            },
-          ],
-        },
-      ],
       treeList: [],
       commonParams: {}, //接口参数
       random: 11,
@@ -425,6 +491,9 @@ export default {
       tableExpands: [],
       list: [],
       maps: new Map(),
+      dialogParams: {
+        uri: "",
+      },
     };
   },
   mounted() {
@@ -433,21 +502,18 @@ export default {
     });
   },
   computed: {
-    multipleToPadding(multiple) {
-      // return `${multiple * 10}px`;
-    },
+    multipleToPadding(multiple) {},
   },
   methods: {
     // 二级标题调用接口添加动态数据
     expandChangeEvent(row, expandedRowKeys) {
       this.tableExpands = [];
       if (expandedRowKeys && row.level && !row.loadingApi) {
-        // console.log(row, expandedRowKeys, "234343");
         let level = row.level;
-        this.scopeEventApi(row.uri, "", row.detail.numRandom,true,level);
+        this.scopeEventApi(row.uri, "", row.detail.numRandom, true, level);
       }
     },
-    
+
     percentageFun(val) {
       return percentage(val);
     },
@@ -461,25 +527,50 @@ export default {
     // 层级展开事件
     handleTree(scope, event) {
       if (event == "dialog") {
-        // console.log(scope, "判断一二级内容");
         this.scopeEventApi(scope.uri, event);
       } else {
         this.isExpand = false;
         // 动态添加节点
         this.scopeEventApi(scope.uri, "", scope.detail.numRandom);
       }
+
+      if (event == "dialog") {
+        // 弹框分页事件
+        let params = copyObj(this.commonParams);
+        params.uriPath = scope.uri;
+        this.$refs.vistedDialog.vistedApiEvent(params);
+      } else {
+        this.dialogParams.uri = scope.uri; //赋值uri
+        this.isExpand = false;
+        // 动态添加节点
+        this.scopeEventApi(scope.uri, "", scope.detail.numRandom);
+      }
     },
-    scopeEventApi(uri, event, numRandom,showAdd,level) {
-      // console.log(showAdd);
-      this.commonParams.uriPath = uri;
-      getVisitUriListOfUriPathApi(this.commonParams).then((res) => {
+    scopeEventApi(uri, event, numRandom, showAdd, level) {
+      // this.commonParams.uriPath = uri;
+      // getVisitUriListOfUriPathApi(this.commonParams).then((res) => {
+      let params = copyObj(this.commonParams);
+      params.uriPath = uri;
+      params.pageSize = 10;
+      params.pageNum = 1;
+      getVisitUriDetailApi(params).then((res) => {
         if (res.code == 200) {
+          this.uriListEnd = res.data.rows;
           if (event == "dialog") {
             this.$refs.vistedDialog.vistedApiEvent(res.data);
           } else {
-            this.uriListEnd = res.data;
+            if (res.data.total > 10) {
+              res.data.rows.push({
+                title: "更多",
+                uri: "",
+                id: "more",
+              });
+            }
+
+            // this.uriListEnd = res.data;
+            this.uriListEnd = res.data.rows;
             // 动态添加节点
-            res.data.forEach((item, index) => {
+            res.data.rows.forEach((item, index) => {
               item.segment = item.uri;
               // 去除前缀
               if (item.segment.includes(".com/#")) {
@@ -490,24 +581,21 @@ export default {
               item.numRandom = item.uri + this.generateRandomNumber();
               item.uri = item.uri + index + 1;
               item.leafUri = [];
-              
+
               item.detail = JSON.parse(JSON.stringify(item));
               // 展示img
               if (showAdd) {
                 item.firstFlag = "istrue";
                 item.secondFlag = true;
                 item.level = level;
-              }else{
+              } else {
                 item.firstFlag = "istrue";
               }
-              
-
             });
             this.treeList.forEach((item) => {
-              this.insertChild(item, numRandom, res.data);
+              this.insertChild(item, numRandom, res.data.rows);
             });
             this.treeList = this.treeList;
-            // console.log(this.treeList, "this.treeList-----");
           }
         }
       });
@@ -515,13 +603,11 @@ export default {
     // 动态增加节点
     insertChild(list, id, newChild) {
       list.leafUri.forEach((item) => {
-        // let flag = item.uri == id; //过滤非匹配idz
         let flag = item.detail.numRandom == id; //过滤非匹配idz
         if (flag) {
-          // item.leafUri = JSON.parse(JSON.stringify(newChild));
           item.loadingApi = true;
-          let newArray = JSON.parse(JSON.stringify(newChild))
-          item.leafUri = [...new Set([...item.leafUri, ...newArray])]
+          let newArray = JSON.parse(JSON.stringify(newChild));
+          item.leafUri = [...new Set([...item.leafUri, ...newArray])];
           this.tableExpands = [item.detail.numRandom];
           if (this.uriListEnd.length == 0) {
             item.firstFlag = "istrue";
@@ -731,15 +817,6 @@ export default {
 
 <style lang="scss" scoped>
 ::v-deep {
-  // .el-icon-arrow-right:before {
-  //   // content: '';
-  //   background-image: url("../../../assets/images/reduce.png") !important;
-  //   width: 20px;
-  //   height: 20px;
-  //   background-size: cover;
-  //   background-position: center;
-  //   // background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
-  // }
   .el-table__expand-icon--expanded {
     transform: rotate(0deg);
   }
@@ -792,6 +869,22 @@ export default {
     // 使表格兼容safari，不错位
     table-layout: fixed !important;
   }
+}
+.setMoreCon {
+  margin-left: 5px;
+  display: flex;
+  border: solid;
+  border-radius: 15px;
+  color: #2c7be5;
+  font-size: 12px;
+  padding: 5px;
+  cursor: pointer;
+}
+.loadMoreImg {
+  cursor: pointer;
+  width: 17px;
+  margin-right: 10px;
+  margin-left: -5px;
 }
 .tableName {
   position: absolute;
