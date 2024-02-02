@@ -67,7 +67,7 @@ public class JieXiJson {
         SingleOutputStreamOperator<LogBeanCollection> value = streamSource.map(new LogRichMapper());
 
         int timeWindow = parameters.getInt("flink.time-window", 10);
-        SingleOutputStreamOperator<List<LogBeanCollection>> valueInWindow = value.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(10))).apply(new AllWindowFunction<LogBeanCollection, List<LogBeanCollection>, TimeWindow>() {
+        SingleOutputStreamOperator<List<LogBeanCollection>> valueInWindow = value.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(timeWindow))).apply(new AllWindowFunction<LogBeanCollection, List<LogBeanCollection>, TimeWindow>() {
             @Override
             public void apply(TimeWindow window, Iterable<LogBeanCollection> values, Collector<List<LogBeanCollection>> out) {
                 ArrayList<LogBeanCollection> logBeanCollectionList = Lists.newArrayList(values);
@@ -80,7 +80,7 @@ public class JieXiJson {
         LogAnalysisClickHouseSink clickhouseSink = new LogAnalysisClickHouseSink();
         valueInWindow.addSink(clickhouseSink);
 
-        env.execute("clklog-processing");
+        env.execute(parameters.get("flink.clklog-job-name", "clklog-processing"));
     }
 }
 

@@ -14,39 +14,16 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URI;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 public class ExtractUtil {
     private static final Logger logger = LoggerFactory.getLogger(ExtractUtil.class);
 
 
-    private static final ThreadLocal<DateFormat> formatter = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss Z", Locale.ENGLISH);
-        }
-    };
-
-    private static final ThreadLocal<DateFormat> HH = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("HH");
-        }
-    };
-
-    private static final ThreadLocal<DateFormat> HHmm = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("HH:mm");
-        }
-    };
-
-    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, AppSetting> htAppSetting) {
+    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, AppSetting appSetting) {
 
         LogBean logBean = null;
         try {
@@ -374,14 +351,23 @@ public class ExtractUtil {
                     logBean.setBrand(brand);
                     logBean.setManufacturer(brand);
 
-                    String osName = "";
-                    if (StringUtils.isBlank(logBean.getOs())) {
+                    String osName = logBean.getOs();
+                    if (StringUtils.isBlank(osName)) {
                         AgentField os = userAgent.get(UserAgent.OPERATING_SYSTEM_NAME);
                         if (!os.isDefaultValue()) {
                             osName = os.getValue();
                         }
                     }
                     logBean.setOs(osName);
+
+                    String osVersion = logBean.getOsVersion();
+                    if (StringUtils.isBlank(osVersion)) {
+                        AgentField osVersionField = userAgent.get(UserAgent.OPERATING_SYSTEM_NAME_VERSION);
+                        if (!osVersionField.isDefaultValue()) {
+                            osVersion = osVersionField.getValue();
+                        }
+                    }
+                    logBean.setOsVersion(osVersion);
                 }
 
                 String jnUrlPath = logBean.getUrlPath();
@@ -391,7 +377,7 @@ public class ExtractUtil {
                         logBean.setUrlPath(parsedUrlPath);
                     }
                 }
-                AppSetting appSetting = getAppSetting(logBean.getProjectName(), htAppSetting);
+
                 if (appSetting != null) {
                     logBean.setUrl(ExtractUtil.excludeParamFromUrl(appSetting.getExcludedUrlParams(), logBean.getUrl()));
                 }
@@ -425,11 +411,12 @@ public class ExtractUtil {
 
                 ObjectMapperUtil objectMapper = new ObjectMapperUtil();
                 JsonNode json = objectMapper.readTree(jsonContext);
+                AppSetting appSetting = getAppSetting(projectName, htAppSetting);
 
                 if (json instanceof ArrayNode) {
                     ArrayNode arrayNode = (ArrayNode) json;
                     for (int i = 0; i < arrayNode.size(); i++) {
-                        LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, htAppSetting);
+                        LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, appSetting);
                         if (logBean != null && filterData(logBean)) {
                             logBean.setKafkaDataTime(arr[0]);
                             logBean.setProjectName(projectName);
@@ -441,7 +428,7 @@ public class ExtractUtil {
                         }
                     }
                 } else {
-                    LogBean logBean = extractToLogBean(json, userAgentAnalyzer, htAppSetting);
+                    LogBean logBean = extractToLogBean(json, userAgentAnalyzer, appSetting);
                     if (logBean != null && filterData(logBean)) {
                         logBean.setKafkaDataTime(arr[0]);
                         logBean.setProjectName(projectName);

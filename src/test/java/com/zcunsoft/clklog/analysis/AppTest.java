@@ -72,6 +72,7 @@ public class AppTest {
         target1.setManufacturer("Huawei");
         target1.setModel("Huawei ANA-AN00");
         target1.setOs("Android");
+        target1.setOsVersion("Android 12");
         target1.setUserAgent("Mozilla/5.0 (Linux; Android 12; ANA-AN00 Build/HUAWEIANA-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/99.0.4844.88 Mobile Safari/537.36 Kuang/2.2.3");
         target1.setViewportPosition(0);
         target1.setEventDuration(2.12);
