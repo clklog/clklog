@@ -2,8 +2,9 @@
   
 - 项目说明
   - [项目介绍](/introduce.md)
-  - [版本说明](/changelog.md)
-  - [演示环境](https://demo.clklog.com)
+  - [版本介绍](/version.md)
+  - [功能清单](/funclist.md)
+  - [更新说明](/changelog.md)
 
 - 快速开始
   - [环境配置](/quickstart/preparation.md)

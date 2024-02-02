@@ -18,7 +18,7 @@
     <link rel="apple-touch-icon" sizes="any" href="assets/imgs/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <link rel="stylesheet" href="assets/css/font.css" />
-    <link rel="stylesheet" href="assets/css/style@1.1.2.css" />
+    <link rel="stylesheet" href="assets/css/style@1.1.3.css" />
     <script src="assets/plugins/autotrack@2.3.js"></script>
     <script>
       window.$docsify = {
@@ -79,6 +79,13 @@
             label: '切记'
           }
         },
+        // tabs: {
+        //   persist: true, // default
+        //   sync: true, // default
+        //   theme: 'classic', // default
+        //   tabComments: true, // default
+        //   tabHeadings: true // default
+        // },
         plugins: [
           function (hook, vm) {
             hook.doneEach(function () {
@@ -115,6 +122,7 @@
     <script src="assets/plugins/prismjs@1.22.0/components/prism-java.min.js" rel="stylesheet"></script>
     <script src="assets/plugins/docsify-footer.min.js"></script>
     <script src="assets/plugins/docsify-pagination.min.js"></script>
+    <script src="assets/plugins/docsify-tabs@1.js"></script>
     <!-- <script src="//unpkg.com/docsify-share/build/index.min.js"></script> -->
   </body>
 </html>

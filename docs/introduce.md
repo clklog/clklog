@@ -25,6 +25,21 @@ ClkLog是一款记录用户行为分析和画像的免费可商用开源软件�
 
 - **数据**：Clickhouse
 
+## 系统架构
+
+![](../assets/imgs/all-process.png)
+<!--<!-- tabs:start -->-->
+
+<!-- #### **标准模式**
+
+![](../assets/imgs/all-process.png)
+
+#### **快速模式**
+
+![](../assets/imgs/fast-process.png) -->
+
+<!--<!-- tabs:end -->-->
+
 ## 项目组成
 
 - **接收服务 【clklog-receiver】**：接收客服端采集的日志，存入kafka。
