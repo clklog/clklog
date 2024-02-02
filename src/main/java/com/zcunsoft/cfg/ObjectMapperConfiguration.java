@@ -1,6 +1,6 @@
 package com.zcunsoft.cfg;
 
-import com.zcunsoft.util.ReceiverObjectMapper;
+import com.zcunsoft.util.ObjectMapperUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,10 +10,10 @@ import java.util.TimeZone;
 public class ObjectMapperConfiguration {
 
 	@Bean("objectMapper")
-	public ReceiverObjectMapper getReceiverObjectMapper() {
-		ReceiverObjectMapper receiverObjectMapper = new ReceiverObjectMapper();
-		receiverObjectMapper.setTimeZone(TimeZone.getDefault());
+	public ObjectMapperUtil getReceiverObjectMapper() {
+		ObjectMapperUtil objectMapperUtil = new ObjectMapperUtil();
+		objectMapperUtil.setTimeZone(TimeZone.getDefault());
 
-		return receiverObjectMapper;
+		return objectMapperUtil;
 	}
 }

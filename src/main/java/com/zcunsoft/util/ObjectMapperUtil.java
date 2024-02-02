@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class ReceiverObjectMapper extends ObjectMapper {
+public class ObjectMapperUtil extends ObjectMapper {
 	private static final long serialVersionUID = 1L;
 
-	public ReceiverObjectMapper() {
+	public ObjectMapperUtil() {
 		super();
 		configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 		configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);

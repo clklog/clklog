@@ -84,7 +84,6 @@ public class LogReceiveProcessBoss {
             }
             if (count > 0) {
                 handle(logList);
-                count = 0;
                 logList.clear();
             }
         }

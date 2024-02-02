@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-//import org.apache.commons.codec.binary.StringUtils;
-//
-//import cn.sina.api.commons.util.ApiLogger;
 
 public class GZIPUtils {
 

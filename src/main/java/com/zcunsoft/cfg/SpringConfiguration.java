@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * The Class SpringConfiguration.
  *
- * @author yuhao
+ *
  */
 @Configuration
 public class SpringConfiguration {

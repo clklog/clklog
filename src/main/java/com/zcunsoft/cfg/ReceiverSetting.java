@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * The Class LogCollectorSetting.
  *
- * @author yuhao
+ *
  */
 @Configuration
 public class ReceiverSetting {

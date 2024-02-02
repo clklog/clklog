@@ -2,11 +2,13 @@ package com.zcunsoft.controller;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zcunsoft.cfg.ReceiverSetting;
 import com.zcunsoft.dto.QueryCriteria;
 import com.zcunsoft.handlers.ConstsDataHolder;
 import com.zcunsoft.util.GZIPUtils;
-import com.zcunsoft.util.ReceiverObjectMapper;
+import com.zcunsoft.util.ObjectMapperUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -38,14 +40,14 @@ public class KafkaController {
     private ConstsDataHolder constsDataHolder;
 
     @Resource
-    private ReceiverObjectMapper objectMapper;
+    private ObjectMapperUtil objectMapper;
 
     @Resource
-    private  ReceiverSetting serverSettings;
+    private ReceiverSetting serverSettings;
 
     @RequestMapping(value = "api/gp", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<Object> sendGet(QueryCriteria queryCriteria, HttpServletRequest request) {
-        if(serverSettings.getAppList().contains(queryCriteria.getProject())) {
+        if (serverSettings.getAppList().contains(queryCriteria.getProject())) {
             String bodyString = getBodyString(request);
             String[] bodyStringList = bodyString.split("&");
             if (bodyStringList.length == 1 && !bodyString.equals(""))
@@ -97,13 +99,26 @@ public class KafkaController {
                     } else {
                         dataFinal = new String(byteArrayNEW);
                     }
-                    queryCriteria.setData(dataFinal);
+
                     queryCriteria.setClientIp(ip);
                     String ua = request.getHeader("user-agent");
                     if (ua == null) {
                         ua = request.getHeader("User-Agent");
                     }
                     queryCriteria.setUa(ua);
+
+                    JsonNode json = objectMapper.readTree(dataFinal);
+                    if (json instanceof ArrayNode) {
+                        for (JsonNode jn : json) {
+                            ObjectNode objectNode = ((ObjectNode) jn.get("properties"));
+                            objectNode.put("$user_agent", ua);
+                        }
+                    } else {
+                        ObjectNode objectNode = ((ObjectNode) json.get("properties"));
+                        objectNode.put("$user_agent", ua);
+                    }
+                    dataFinal = objectMapper.writeValueAsString(json);
+                    queryCriteria.setData(dataFinal);
                     constsDataHolder.getLogQueue().put(queryCriteria);
                     logger.info(ip + "," + dataFinal);
                 }
@@ -173,7 +188,7 @@ public class KafkaController {
                     }
                 }
             }
-            if (ipAddress != null && ipAddress.length() > 15) { // "***.***.***.***".length()
+            if (ipAddress != null && ipAddress.length() > 15) {
                 if (ipAddress.indexOf(",") > 0) {
                     ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
                 }
