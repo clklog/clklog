@@ -48,7 +48,7 @@ export const constantRoutes = [
         path: "index",
         component: () => import("@/views/home/index"),
         name: "Documentation",
-        meta: { title: "首页", icon: "homepage", affix: true },
+        meta: { title: "数据概览", icon: "homepage", affix: true },
       },
     ],
   },

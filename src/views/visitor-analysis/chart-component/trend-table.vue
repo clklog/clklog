@@ -154,7 +154,7 @@ export default {
       mergedArr: [],
       currentPage: 1,
       total: 0,
-      pageSize: 10,
+      pageSize: 30,
       timeType: null,
       current: {
         sortName: "",
@@ -289,6 +289,7 @@ export default {
         commonParams.endTime == commonParams.startTime &&
         commonParams.startTime == toDateTime
       ) {
+        
         let currentHout = this.$options.filters.getCurrentHour();
         let newArray = copyObj(val).reverse();
         const index = newArray.findIndex(

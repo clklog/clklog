@@ -6,7 +6,7 @@ const componentsRouter = {
   name: "visitorAnalysis",
   meta: {
     title: "访客分析",
-    icon: "visitorAnaly",
+    icon: "visitor",
   },
   children: [
     {

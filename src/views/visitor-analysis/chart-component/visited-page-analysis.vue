@@ -205,7 +205,7 @@
               </template>
             </el-table-column>
           </el-table-column>
-        </el-table> -->
+        </el-table>
       </div>
       <!-- 默认图表 -->
       <div v-show="showTreeFlag">
