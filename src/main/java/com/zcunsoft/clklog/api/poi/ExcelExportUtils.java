@@ -422,12 +422,14 @@ public class ExcelExportUtils  {
         	}
         	detailColumns[i] = colType.getName();
         	detailColWidths[i] =  colType.getWidth();
-        	if("pv".equals(cols.get(i))) {
-        		detailColumns[i] = "搜索次数";
-        	} 
-        	if("pvRate".equals(cols.get(i))) {
-        		detailColumns[i] = "搜索次数占比(%)";
-        	} 
+        	if("搜索词分析".equals(fileName)) {
+        		if("pv".equals(cols.get(i))) {
+            		detailColumns[i] = "搜索次数";
+            	} 
+            	if("pvRate".equals(cols.get(i))) {
+            		detailColumns[i] = "搜索次数占比(%)";
+            	} 
+        	}
         }
         int detailRowIndex = DETAIL_ROW_INDEX;
         int detailHeadColIndex =DETAIL_COL_INDEX;

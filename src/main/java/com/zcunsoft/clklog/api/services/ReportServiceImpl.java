@@ -1660,8 +1660,8 @@ public class ReportServiceImpl implements IReportService {
 
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
-            getListSql += " where t.distinct_id <> 'all' and " + where;
-            getCountSql += " where t.distinct_id <> 'all' and " + where;
+            getListSql += " where t.distinct_id <> 'all' and t.pv > 0 and t.visit_count > 0 and " + where;
+            getCountSql += " where t.distinct_id <> 'all' and t.pv > 0 and t.visit_count > 0 and " + where;
         }
         getListSql += " group by t.distinct_id,t.is_first_day";
         String sortSql = SortType.getSortSql(SortType.VisitorList, getVisitorListPageRequest.getSortName(), getVisitorListPageRequest.getSortOrder());
