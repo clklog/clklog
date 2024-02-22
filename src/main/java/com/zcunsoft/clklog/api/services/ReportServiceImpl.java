@@ -2492,7 +2492,7 @@ public class ReportServiceImpl implements IReportService {
             Integer statDateCount = clickHouseJdbcTemplate.queryForObject("select countDistinct(stat_date) from flow_trend_byhour where stat_date<:stat_date", paramMap,
                     Integer.class);
             if (statDateCount != null) {
-                if (statDateCount <= 7) {
+                if (statDateCount >0 && statDateCount <= 7) {
                     List<String> statDateList = new ArrayList<>();
                     for (int i = 1; i <= statDateCount; i++) {
                         Timestamp ts = new Timestamp(today.getTime() - DateUtils.MILLIS_PER_DAY * i);
