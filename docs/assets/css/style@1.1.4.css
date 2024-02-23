@@ -426,9 +426,18 @@ body.close .content {
     display: none;
   }
 }
+.func-list-table .func-intro-td {
+  width: 140px;
+}
+.func-list-table .func-desc-td {
+  display: table-cell;
+}
 @media screen and (max-width: 768px) {
   .cover-main .features {
     flex-direction: column;
+  }
+  .func-list-table .func-desc-td {
+    display: none;
   }
 
   .cover-main .feature {
