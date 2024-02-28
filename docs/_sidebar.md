@@ -4,6 +4,7 @@
   - [项目介绍](/introduce.md)
   - [版本介绍](/version.md)
   - [功能清单](/funclist.md)
+  - [指标项说明](/indicator-desc.md)
   - [更新说明](/changelog.md)
 
 - 快速开始

@@ -27,11 +27,13 @@
 
 2. 上传程序文件
 
-    将`clklog_receiver.jar`包和 `application.yml`文件拷贝至`/usr/local/services/`目录：
+    在目录`/usr/local/services/`中创建`clklogreceiver`目录并将文件`clklog_receiver.jar`和`application.yml`拷进去，代码如下：
 
     ```
     cd /usr/local/services/
     mkdir clklogreceiver
+
+    # 为防止出现权限问题导致脚本不能执行，建议上传完脚本以后执行以下代码
     chmod 500 clklog_receiver.jar
     ```
 
@@ -108,11 +110,13 @@
 
 2. 上传程序文件
 
-   拷贝`clklog-processing-1.0.0-jar-with-dependencies.jar`包和 `config.properties`文件至`/usr/local/services/clklogprocessing`目录
+    在目录`/usr/local/services/`中创建`clklogprocessing`目录并将文件`clklog-processing-1.0.0-jar-with-dependencies.jar`包和 `config.properties`拷进去，代码如下：
 
     ```
     cd /usr/local/services/
     mkdir /usr/local/services/clklogprocessing
+   
+    # 为防止出现权限问题导致脚本不能执行，建议上传完脚本以后执行以下代码
     chmod 500  clklog-processing-1.0.0-jar-with-dependencies.jar
     ```
 
@@ -150,7 +154,7 @@
 
 ## 5. 部署计算脚本clklog-script
 
-<!-- > 下载脚本: <a href="https://github.com/clklog/clklog-scripts" target="_blank">[GitHub 下载]</a> -->
+<!-- 下载脚本: <a href="https://github.com/clklog/clklog-scripts" target="_blank">[GitHub 下载]</a> -->
 
 - 计算脚本是基于Clickhouse集群中的`log_analysis`表进行多维计算，获得各个维度上的统计报表。
     使用Cron来进行任务的定时调度。
@@ -177,12 +181,17 @@
 
 1. 修改脚本中的数据库链接配置
 
-    根据clickhouse配置，修改脚本中连接clickhouse的`用户名、密码`配置信息：
+    根据clickhouse配置，修改脚本目录中`clklog-scripts.env`文件的clickhouse的`用户名、密码`配置信息：
 
     ````
-    ck_login="clickhouse-client -u default --password 123456"
-    ck_log_db="clklog."
-    ck_stat_db="clklog."
+    # [Clickhouse]
+    CK_USER_NAME=default
+    CK_USER_PWD=123456
+
+    # [ClkLog]
+    CLKLOG_LOG_DB=clklog
+    CLKLOG_STAT_DB=clklog
+    CLKLOG_SCRIPT_LOG=/usr/local/services/scripts/cklog
     ````
 
 2. 设置调度任务
