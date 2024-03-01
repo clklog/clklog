@@ -47,7 +47,8 @@
         <dependency>
             <groupId>com.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
-            <version>0.3.2-patch11</version>
+            <version>0.4.6</version>
+            <classifier>http</classifier>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
