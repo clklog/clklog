@@ -23,7 +23,8 @@ import * as filters from "./filters"; // global filters
 
 import echarts from "echarts";
 Vue.prototype.$echarts = echarts;
-
+import { sharedText } from '@/components/pointFont/index';
+Vue.prototype.$sharedText = sharedText;
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
