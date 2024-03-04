@@ -1,36 +1,20 @@
 package com.zcunsoft.cfg;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
 
 
-/**
- * The Class LogCollectorSetting.
- *
- *
- */
-@Configuration
+@ConfigurationProperties("receiver")
 public class ReceiverSetting {
 
-
-    @Value(value = "${spring.kafka.producer.topic:clklog}")
-    private String topicName = "clklog";
-
-    @Value(value = "${receiver.thread-count:2}")
     private int threadCount = 2;
 
-    @Value(value = "${receiver.app-list:hqq}")
     private List<String> appList;
 
-    public String getTopicName() {
-        return topicName;
-    }
+    private boolean enableSimpleVersion;
 
-    public void setTopicName(String topicName) {
-        this.topicName = topicName;
-    }
+    private String resourcePath = "";
 
     public int getThreadCount() {
         return threadCount;
@@ -46,5 +30,21 @@ public class ReceiverSetting {
 
     public void setAppList(List<String> appList) {
         this.appList = appList;
+    }
+
+    public String getResourcePath() {
+        return resourcePath;
+    }
+
+    public void setResourcePath(String resourcePath) {
+        this.resourcePath = resourcePath;
+    }
+
+    public boolean isEnableSimpleVersion() {
+        return enableSimpleVersion;
+    }
+
+    public void setEnableSimpleVersion(boolean enableSimpleVersion) {
+        this.enableSimpleVersion = enableSimpleVersion;
     }
 }

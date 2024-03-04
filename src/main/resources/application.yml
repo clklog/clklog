@@ -4,29 +4,37 @@ logging:
   file:
     path: log
 spring:
+  application.name: clklog-receiver
+  redis:
+    # 单机配置
+    host: 10.10.223.104
+    port: 6379
+  # password:
+  # 哨兵配置
+  # sentinel:
+  #  master: gct
+  #  nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 10.10.220.188:9092
     producer: # 生产者
+      client-id: "clklog-producer-group"
       retries: 3 # 设置大于 0 的值，则客户端会将发送失败的记录重新发送
       topic: clklog
-      batch-size: 16384
-      buffer-memory: 33554432
       acks: 0
-      # 指定消息key和消息体的编解码方式
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
       properties:
         linger:
           ms: 1000
-    consumer:
-      group-id: default-group
-      enable-auto-commit: false
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      max-poll-records: 500
     listener:
       ack-mode: MANUAL_IMMEDIATE
+  datasource:
+    clickhouse:
+      jdbc-url: jdbc:clickhouse://10.10.220.188:8123/default
+      username: default
+      password:
 receiver:
   thread-count: 2
   app-list: clklogapp
+  resource-path:
+  enable-simple-version: true

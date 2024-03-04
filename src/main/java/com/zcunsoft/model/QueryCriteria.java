@@ -1,4 +1,4 @@
-package com.zcunsoft.dto;
+package com.zcunsoft.model;
 
 import lombok.Data;
 

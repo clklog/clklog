@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zcunsoft.cfg.ReceiverSetting;
-import com.zcunsoft.dto.QueryCriteria;
 import com.zcunsoft.handlers.ConstsDataHolder;
+import com.zcunsoft.model.QueryCriteria;
 import com.zcunsoft.util.GZIPUtils;
 import com.zcunsoft.util.ObjectMapperUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +34,9 @@ import java.util.regex.Pattern;
 @RestController
 public class KafkaController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LogManager.getLogger(this.getClass());
+
+    private final Logger storeLogger = LogManager.getLogger("com.zcunsoft.store");
 
     @Resource
     private ConstsDataHolder constsDataHolder;
@@ -99,7 +101,7 @@ public class KafkaController {
                     } else {
                         dataFinal = new String(byteArrayNEW);
                     }
-
+                    queryCriteria.setData(dataFinal);
                     queryCriteria.setClientIp(ip);
                     String ua = request.getHeader("user-agent");
                     if (ua == null) {
@@ -120,7 +122,7 @@ public class KafkaController {
                     dataFinal = objectMapper.writeValueAsString(json);
                     queryCriteria.setData(dataFinal);
                     constsDataHolder.getLogQueue().put(queryCriteria);
-                    logger.info(ip + "," + dataFinal);
+                    storeLogger.info(ip + "," + dataFinal);
                 }
             } catch (Exception e) {
                 String logData = queryCriteria.toString();

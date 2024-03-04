@@ -1,11 +1,11 @@
 package com.zcunsoft.daemon;
 
 import com.zcunsoft.cfg.ReceiverSetting;
-import com.zcunsoft.dto.QueryCriteria;
 import com.zcunsoft.handlers.ConstsDataHolder;
+import com.zcunsoft.model.QueryCriteria;
 import com.zcunsoft.services.IReceiveService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -17,7 +17,8 @@ import java.util.concurrent.BlockingQueue;
 
 @Component
 public class LogReceiveProcessBoss {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LogManager.getLogger(this.getClass());
+    ;
 
     @Resource
     private ConstsDataHolder constsDataHolder;
@@ -33,7 +34,7 @@ public class LogReceiveProcessBoss {
     boolean running = false;
 
     @PostConstruct
-    public void start() throws Exception {
+    public void start() {
         threadList = new ArrayList<Thread>();
         if (serverSettings.getThreadCount() > 0) {
             running = true;
@@ -69,28 +70,48 @@ public class LogReceiveProcessBoss {
             count++;
 
             while (running) {
-                log = queueForLog.poll();
-                if (log != null) {
-                    logList.add(log);
-                    count++;
-                } else {
-                    break;
-                }
-                if (count >= 20) {
-                    handle(logList);
-                    count = 0;
-                    logList.clear();
+                try {
+                    log = queueForLog.poll();
+                    if (log != null) {
+                        logList.add(log);
+                        count++;
+                    } else {
+                        break;
+                    }
+                    if (count >= 20) {
+                        handle(logList);
+                        count = 0;
+                        logList.clear();
+                    }
+                } catch (Exception ex) {
+                    logger.error("handle err ", ex);
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                    }
                 }
             }
             if (count > 0) {
-                handle(logList);
-                logList.clear();
+                try {
+                    handle(logList);
+                    logList.clear();
+                } catch (Exception ex) {
+                    logger.error("handle err ", ex);
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                    }
+                }
             }
         }
     }
 
     private void handle(List<QueryCriteria> logList) {
-        ireceiveService.enqueueKafka(logList);
+        if (serverSettings.isEnableSimpleVersion()) {
+            ireceiveService.saveToClickHouse(logList);
+        } else {
+            ireceiveService.enqueueKafka(logList);
+        }
     }
 
 

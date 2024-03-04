@@ -41,7 +41,6 @@ public class GZIPUtils {
             gzip.write(str.getBytes(encoding));
             gzip.close();
         } catch (IOException e) {
-//            ApiLogger.error("gzip compress error.", e);
         }
         return out.toByteArray();
     }
