@@ -1,0 +1,32 @@
+server:
+  port: 8005
+logging:
+  file:
+    path: log
+spring:
+  application.name: clklog-init
+  datasource:
+    clickhouse:
+      jdbc-url: jdbc:clickhouse://localhost:8123/default
+      username: default
+      password:
+init:
+  quartz-enabled: true
+  quartz:
+    area-detail-bydate: '0 */1 * * * ?'
+    visituri_summary_bydate: '0 */1 * * * ?'
+    flow_trend_bydate: '0 */1 * * * ?'
+    flow_trend_byhour: '0 */1 * * * ?'
+    searchword_detail_bydate: '0 */1 * * * ?'
+    channel_detail_bydate: '0 */1 * * * ?'
+    device_detail_bydate: '0 */1 * * * ?'
+    sourcesite_detail_bydate: '0 */1 * * * ?'
+    user_pv_bydate: '0 */1 * * * ?'
+    user_visit_bydate: '0 */1 * * * ?'
+    user_visittime_bydate: '0 */1 * * * ?'
+    visitor_detail_bydate: '0 */1 * * * ?'
+    visitor_life_bydate: '0 */1 * * * ?'
+    visituri_detail_bydate: '0 */1 * * * ?'
+    visitor_detail_byinfo: '0 */1 * * * ?'
+    visitor_detail_bysession: '0 */1 * * * ?'
+    visitor_summary_byvisitor: '0 */1 * * * ?'
