@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS clklog2 ENGINE = Atomic;
+CREATE DATABASE IF NOT EXISTS clklog ENGINE = Atomic;
 
-use clklog2;
+use clklog;
 
 CREATE TABLE IF NOT EXISTS log_analysis
 (
