@@ -1,11 +1,11 @@
-INSERT INTO area_detail_bydate
+INSERT INTO clklog.area_detail_bydate
 SELECT ':cal_date' AS stat_date
      , If(t2.lib = '', 'all', t2.lib) AS lib
      , multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
      , If(t2.is_first_day = '', 'all', t2.is_first_day) AS is_first_day
-     , multiIf(t2.country = '', 'all', t2.country = 'N/A', 'Î´Öª¹ú¼Ò', t2.country) AS country
-     , multiIf(t2.province = '', 'all', t2.province = 'N/A', 'Î´ÖªÊ¡·Ý', t2.province) AS province
-     , multiIf(t2.city = '', 'all', t2.city = 'N/A', 'Î´Öª³ÇÊÐ', t2.city) AS city
+     , multiIf(t2.country = '', 'all', t2.country = 'N/A', 'Î´Öªï¿½ï¿½ï¿½ï¿½', t2.country) AS country
+     , multiIf(t2.province = '', 'all', t2.province = 'N/A', 'Î´ÖªÊ¡ï¿½ï¿½', t2.province) AS province
+     , multiIf(t2.city = '', 'all', t2.city = 'N/A', 'Î´Öªï¿½ï¿½ï¿½ï¿½', t2.city) AS city
      , t2.pv, t4.visitCount, t2.uv, t2.new_uv, t2.ipCount
      , t4.visitTime, t4.bounce, NOW() AS update_time
 FROM (
@@ -33,7 +33,7 @@ FROM (
 			AND event = '$MPViewScreen'
 			AND is_first_day = 'true', distinct_id, NULL) AS new_user
 			, client_ip
-                  FROM log_analysis
+                  FROM clklog.log_analysis
                   WHERE stat_date = ':cal_date'
               ) t1
          GROUP BY lib, project_name, is_first_day, country, province, city WITH CUBE
@@ -50,7 +50,7 @@ FROM (
                   , arraySort(groupUniqArray(stat_date)) AS stat_dates
                   , max(log_time) - min(log_time) AS diff
                   , count(1) AS pv
-             FROM log_analysis
+             FROM clklog.log_analysis
              WHERE stat_date <= ':cal_date'
                AND stat_date >= ':previous_date'
                AND event_session_id <> ''

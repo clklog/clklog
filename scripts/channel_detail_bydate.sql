@@ -1,4 +1,4 @@
-INSERT INTO channel_detail_bydate
+INSERT INTO clklog.channel_detail_bydate
 SELECT ':cal_date' AS stat_date
      , If(t2.lib = '', 'all', t2.lib) AS lib
      , multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
@@ -31,7 +31,7 @@ FROM (
                                      AND event = '$MPViewScreen'
                                      AND is_first_day = 'true', distinct_id, NULL) AS new_user
                        , client_ip
-                  FROM log_analysis
+                  FROM clklog.log_analysis
                   WHERE stat_date = ':cal_date'
                   ) t1
          GROUP BY lib, project_name, is_first_day, country, province WITH CUBE
@@ -47,7 +47,7 @@ FROM (
                   , arraySort(groupUniqArray(stat_date)) AS stat_dates
                   , max(log_time) - min(log_time) AS diff
                   , count(1) AS pv
-             FROM log_analysis
+             FROM clklog.log_analysis
              WHERE stat_date <= ':cal_date'
                AND stat_date >= ':previous_date'
                AND event_session_id <> ''

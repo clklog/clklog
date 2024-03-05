@@ -1,4 +1,4 @@
-INSERT INTO visituri_summary_bydate
+INSERT INTO clklog.visituri_summary_bydate
 SELECT ':cal_date' AS stat_date
      , If(t2.lib = '', 'all', t2.lib) AS lib
      , multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
@@ -16,7 +16,7 @@ FROM (
                                      AND event = '$AppViewScreen', event, lib = 'MiniProgram'
                                      AND event = '$MPViewScreen', event, NULL) AS pv
                        , if(title = '', 'N/A', title) AS title
-                  FROM log_analysis
+                  FROM clklog.log_analysis
                   WHERE stat_date = ':cal_date'
                   ) t1
          GROUP BY lib, project_name, url, title WITH CUBE

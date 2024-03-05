@@ -1,11 +1,11 @@
-INSERT INTO sourcesite_detail_bydate
+INSERT INTO clklog.sourcesite_detail_bydate
 SELECT ':cal_date' AS stat_date
      , If(t2.lib = '', 'all', t2.lib) AS lib
      , multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
      , If(t2.is_first_day = '', 'all', t2.is_first_day) AS is_first_day
      , multiIf(t2.country = '', 'all', t2.country = 'N/A', '', t2.country) AS country
      , multiIf(t2.province = '', 'all', t2.province = 'N/A', '', t2.province) AS province
-     , multiIf(t2.latest_referrer_host = '', 'all', t2.latest_referrer_host = 'N/A', 'Ö±½Ó·ÃÎÊ', t2.latest_referrer_host) AS latest_referrer_host
+     , multiIf(t2.latest_referrer_host = '', 'all', t2.latest_referrer_host = 'N/A', 'Ö±ï¿½Ó·ï¿½ï¿½ï¿½', t2.latest_referrer_host) AS latest_referrer_host
      , t2.pv, t4.visitCount, t2.uv, t2.new_uv, t2.ipCount
      , t4.visitTime, t4.bounce, NOW() AS update_time
 FROM (
@@ -17,7 +17,7 @@ FROM (
                        , if(country = '', 'N/A', country) AS country
                        , if(province = '', 'N/A', province) AS province
                        , if(latest_referrer_host = ''
-                                OR latest_referrer_host = 'urlµÄdomain½âÎöÊ§°Ü', 'N/A', latest_referrer_host) AS latest_referrer_host
+                                OR latest_referrer_host = 'urlï¿½ï¿½domainï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½', 'N/A', latest_referrer_host) AS latest_referrer_host
                        , multiIf(lib = 'js'
                                      AND event = '$pageview', event, lib IN ('iOS', 'Android')
                                      AND event = '$AppViewScreen', event, lib = 'MiniProgram'
@@ -34,9 +34,9 @@ FROM (
                                      AND event = '$MPViewScreen'
                                      AND is_first_day = 'true', distinct_id, NULL) AS new_user
                        , client_ip
-                  FROM log_analysis
+                  FROM clklog.log_analysis
                   WHERE stat_date = ':cal_date'
-                    AND latest_referrer_host NOT IN ('È¡ÖµÒì³£')
+                    AND latest_referrer_host NOT IN ('È¡Öµï¿½ì³£')
                   ) t1
          GROUP BY lib, project_name, is_first_day, country, province, latest_referrer_host WITH CUBE
          ) t2
@@ -49,14 +49,14 @@ FROM (
                   , if(country = '', 'N/A', country) AS country
                   , if(province = '', 'N/A', province) AS province
                   , if(latest_referrer_host = ''
-                           OR latest_referrer_host = 'urlµÄdomain½âÎöÊ§°Ü', 'N/A', latest_referrer_host) AS latest_referrer_host
+                           OR latest_referrer_host = 'urlï¿½ï¿½domainï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½', 'N/A', latest_referrer_host) AS latest_referrer_host
                   , arraySort(groupUniqArray(stat_date)) AS stat_dates
                   , max(log_time) - min(log_time) AS diff
                   , count(1) AS pv
-             FROM log_analysis
+             FROM clklog.log_analysis
              WHERE stat_date <= ':cal_date'
                AND stat_date >= ':previous_date'
-               AND latest_referrer_host NOT IN ('È¡ÖµÒì³£')
+               AND latest_referrer_host NOT IN ('È¡Öµï¿½ì³£')
                AND event_session_id <> ''
              GROUP BY event_session_id, lib, project_name, is_first_day, country, province, latest_referrer_host
              ) t3

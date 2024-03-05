@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS clklog ENGINE = Atomic;
+CREATE DATABASE IF NOT EXISTS clklog2 ENGINE = Atomic;
 
-use clklog;
+use clklog2;
 
-CREATE TABLE IF NOT EXISTS log_analysis
+CREATE TABLE IF NOT EXISTS clklog.log_analysis
 (
     `kafka_data_time` String,
     `project_name` String,

@@ -62,7 +62,7 @@ public class InitServiceImpl implements IInitService {
             }
             logger.info(sql);
             clickHouseJdbcTemplate.execute(sql);
-            clickHouseJdbcTemplate.execute("optimize table " + tableName + " FINAL SETTINGS optimize_skip_merged_partitions=1");
+            clickHouseJdbcTemplate.execute("optimize table clklog." + tableName + " FINAL SETTINGS optimize_skip_merged_partitions=1");
         } catch (Exception ex) {
             logger.error("calScript " + script_name + " error ", ex);
         }

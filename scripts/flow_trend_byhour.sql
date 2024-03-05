@@ -1,4 +1,4 @@
-INSERT INTO flow_trend_byhour
+INSERT INTO clklog.flow_trend_byhour
 SELECT ':cal_date' AS stat_date, t2.stat_hour
      , If(t2.lib = '', 'all', t2.lib) AS lib
      , multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
@@ -31,7 +31,7 @@ FROM (
                        , client_ip
                        , if(country = '', 'N/A', country) AS country
                        , if(province = '', 'N/A', province) AS province
-                  FROM log_analysis
+                  FROM clklog.log_analysis
                   WHERE stat_date = ':cal_date'
                   ) t1
          GROUP BY stat_hour, lib, project_name, is_first_day, country, province WITH CUBE
@@ -48,7 +48,7 @@ FROM (
                   , max(log_time) - min(log_time) AS diff
                   , count(1) AS pv
                   , arraySort(groupUniqArray(stat_hour)) AS stat_hours
-             FROM log_analysis
+             FROM clklog.log_analysis
              WHERE stat_date <= ':cal_date'
                AND stat_date >= ':previous_date'
                AND event_session_id <> ''
