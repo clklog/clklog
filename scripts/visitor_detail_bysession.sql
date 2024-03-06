@@ -14,8 +14,8 @@ FROM (
 		, visit_time AS visit_time
 	FROM (
 		SELECT project_name AS project_name
-			, if(country = '', 'N/A', country) AS country
-			, if(province = '', 'N/A', province) AS province
+			, multiIf(country = '', 'all', country = 'N/A', '未知国家', country) AS country
+			, multiIf(province = '', 'all', province = 'N/A', '未知省份', province) AS province
 			, distinct_id, event_session_id AS event_session_id, min(log_time) AS first_time
 			, max(log_time) AS latest_time
 			, max(log_time) - min(log_time) AS visit_time
