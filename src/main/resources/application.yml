@@ -1,5 +1,5 @@
 server:
-  port: 8005
+  port: 8001
 logging:
   file:
     path: log
