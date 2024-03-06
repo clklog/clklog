@@ -10,7 +10,7 @@ springdoc:
       paths-to-match: '/**'
       packages-to-scan: com.zcunsoft.clklog.api.controllers
 server:
-  port: 8087
+  port: 8003
 spring:
   application.name: clklog-api
   datasource:
@@ -26,5 +26,5 @@ logging:
     path: log
 clklogapi:
   access-control-allow-origin: "*"
-  project-name: hqq
-  project-host: https://app.huoqingqing.com,https://h5.huoqingqing.com,https://clklog.com,https://www.zcunsoft.com,http://www.zcunsoft.com
+  project-name: clklogapp
+  project-host: http://www.zcunsoft.com
