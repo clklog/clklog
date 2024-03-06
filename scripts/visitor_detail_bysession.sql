@@ -9,13 +9,15 @@ SELECT ':cal_date' AS stat_date
 	, t2.distinct_id AS distinct_id, t2.event_session_id AS event_session_id, t2.first_time AS first_time, t2.latest_time AS latest_time, t2.visit_time AS visit_time
 	, t4.pv AS pv, NOW() AS update_time
 FROM (
-	SELECT project_name AS project_name, country AS country, province AS province, client_ip AS client_ip, latest_referrer_host AS latest_referrer_host
-		, latest_search_keyword AS latest_search_keyword, distinct_id AS distinct_id, event_session_id AS event_session_id, first_time AS first_time, latest_time AS latest_time
-		, visit_time AS visit_time
+	SELECT project_name AS project_name
+		, multiIf(country = '', 'all', country = 'N/A', '未知国家', country) AS country
+		, multiIf(province = '', 'all', province = 'N/A', '未知省份', province) AS province
+		, client_ip AS client_ip, latest_referrer_host AS latest_referrer_host, latest_search_keyword AS latest_search_keyword, distinct_id AS distinct_id, event_session_id AS event_session_id
+		, first_time AS first_time, latest_time AS latest_time, visit_time AS visit_time
 	FROM (
 		SELECT project_name AS project_name
-			, multiIf(country = '', 'all', country = 'N/A', '未知国家', country) AS country
-			, multiIf(province = '', 'all', province = 'N/A', '未知省份', province) AS province
+			, if(country = '', 'N/A', country) AS country
+			, if(province = '', 'N/A', province) AS province
 			, distinct_id, event_session_id AS event_session_id, min(log_time) AS first_time
 			, max(log_time) AS latest_time
 			, max(log_time) - min(log_time) AS visit_time
