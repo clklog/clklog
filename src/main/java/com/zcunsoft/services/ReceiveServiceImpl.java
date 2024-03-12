@@ -13,13 +13,13 @@ import com.zcunsoft.model.LogBean;
 import com.zcunsoft.model.QueryCriteria;
 import com.zcunsoft.model.Region;
 import com.zcunsoft.util.ExtractUtil;
+import com.zcunsoft.util.KafkaProducerUtil;
 import com.zcunsoft.util.ObjectMapperUtil;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,13 +27,17 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentMap;
 
 @Service
@@ -63,8 +67,6 @@ public class ReceiveServiceImpl implements IReceiveService {
     };
 
     private final ReceiverSetting serverSettings;
-
-    private KafkaProducer<String, String> kafkaProducer = null;
 
     private final KafkaSetting kafkaSetting;
 
@@ -457,33 +459,22 @@ public class ReceiveServiceImpl implements IReceiveService {
         }
     }
 
+    private KafkaProducer<String, String> kafkaProducer;
+
     @Override
     public void enqueueKafka(List<QueryCriteria> queryCriteriaList) {
+        try {
+            KafkaProducerUtil producerKafka = KafkaProducerUtil.getInstance(kafkaSetting);
 
-        Properties props = new Properties();
-        props.put("bootstrap.servers", kafkaSetting.getBootstrapServers());
-        props.put("retries", kafkaSetting.getProducer().getRetries());
-        props.put("acks", kafkaSetting.getProducer().getAcks());
-        props.put("client.id", kafkaSetting.getProducer().getClientId());
-        props.put("key.serializer", kafkaSetting.getProducer().getKeySerializer());
-        props.put("value.serializer", kafkaSetting.getProducer().getValueSerializer());
-
-        KafkaProducer kafkaProducer = new KafkaProducer<>(props);
-
-        for (QueryCriteria queryCriteria : queryCriteriaList) {
-            String dataFinal = queryCriteria.getData();
-            if (dataFinal != null && !dataFinal.trim().isEmpty()) {
-                String logData = String.valueOf(System.currentTimeMillis()) + ',' + queryCriteria.getProject() + ',' + queryCriteria.getToken() + ',' + queryCriteria.getCrc() + ',' + queryCriteria.getGzip() + ',' + queryCriteria.getClientIp() + ',' + dataFinal;
-                ProducerRecord record = new ProducerRecord(kafkaSetting.getProducer().getTopic(), logData);
-
-                kafkaProducer.send(record, (recordMetadata, e) -> {
-                    if (e == null) {
-                        logger.error("enqueue kafka error ", e);
-                    }
-                });
-                kafkaProducer.flush();
-                kafkaProducer.close();
+            for (QueryCriteria queryCriteria : queryCriteriaList) {
+                String dataFinal = queryCriteria.getData();
+                if (dataFinal != null && !dataFinal.trim().isEmpty()) {
+                    String logData = String.valueOf(System.currentTimeMillis()) + ',' + queryCriteria.getProject() + ',' + queryCriteria.getToken() + ',' + queryCriteria.getCrc() + ',' + queryCriteria.getGzip() + ',' + queryCriteria.getClientIp() + ',' + dataFinal;
+                    producerKafka.sendMessgae(kafkaSetting.getProducer().getTopic(), logData);
+                }
             }
+        } catch (Exception ex) {
+            logger.error("enqueueKafka error", ex);
         }
     }
 
@@ -492,6 +483,17 @@ public class ReceiveServiceImpl implements IReceiveService {
             return System.getProperty("user.dir");
         } else {
             return serverSettings.getResourcePath();
+        }
+    }
+
+    @PreDestroy
+    private void shutdown() {
+        try {
+            if (kafkaProducer != null) {
+                kafkaProducer.close();
+            }
+        } catch (Exception ex) {
+            logger.error("shutdown error ", ex);
         }
     }
 }
