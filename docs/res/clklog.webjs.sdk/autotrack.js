@@ -42,18 +42,30 @@
     w[n][ifs[i]] = w[n].call(null, ifs[i])
   }
   if (!w[n]._t) {
-    ;(x = d.createElement(s)), (y = d.getElementsByTagName(s)[0])
-    x.async = 1
-    x.src = 'plugins/session-event/index.js' //引用的session-event插件路径
-    x.setAttribute('charset', 'UTF-8')
     w[n].para = para
-    y.parentNode.insertBefore(x, y)
-    ;(x = d.createElement(s)), (y = d.getElementsByTagName(s)[0])
-    x.async = 1
-    x.src = p
-    x.setAttribute('charset', 'UTF-8')
-    w[n].para = para
-    y.parentNode.insertBefore(x, y)
+
+    var scriptURLs = [
+      'plugins/session-event/index.js', //引用的session-event插件路径
+      p
+    ]
+
+    function loadScript(index) {
+      if (index >= scriptURLs.length) {
+        return false
+      }
+
+      var x = d.createElement(s)
+      y = d.getElementsByTagName(s)[0]
+      x.async = 1
+      x.src = scriptURLs[index]
+      x.setAttribute('charset', 'UTF-8')
+      x.onload = function () {
+        loadScript(index + 1)
+      }
+      y.parentNode.insertBefore(x, y)
+    }
+
+    loadScript(0)
   }
   sensors.quick('isReady', function () {
     sensors.use('PageLeave', { heartbeat_interval_time: 5 })
@@ -66,7 +78,7 @@
   name: 'sensors',
   show_log: true,
   is_track_single_page: true,
-  // send_type:'beacon',
+  send_type: 'beacon',
   server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', //请修改接收地址为clklog_receiver 的接收服务地址，必须传入project和token参数
   heatmap: {
     clickmap: 'default',

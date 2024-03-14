@@ -358,11 +358,11 @@ body.sticky .sidebar-toggle {
 .markdown-section th {
   border: 1px solid #ddd;
   font-weight: bold;
-  padding: 6px 13px;
+  padding: 10px 13px;
 }
 .markdown-section td {
   border: 1px solid #ddd;
-  padding: 6px 13px;
+  padding: 10px 13px;
 }
 .markdown-section tr {
   border-top: 1px solid #ccc;

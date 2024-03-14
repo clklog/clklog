@@ -386,7 +386,7 @@
 
 1.1. 下载 ClKLOG WEB JS SDK
 
-  [点击此处下载 CLKLOG WEB JS SDK](https://clklog.com/res/clklog.webjs.sdk.zip?v=1), 并将下载的`ClKLOG WEB JS SDK`文件包解压至网站根目录, 目录结构如下：
+  [点击此处下载 CLKLOG WEB JS SDK](https://clklog.com/res/clklog.webjs.sdk.v2.zip), 并将下载的`ClKLOG WEB JS SDK`文件包解压至网站根目录, 目录结构如下：
 
   ```
   ├── 网站根目录

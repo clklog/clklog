@@ -18,8 +18,8 @@
     <link rel="apple-touch-icon" sizes="any" href="assets/imgs/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <link rel="stylesheet" href="assets/css/font.css" />
-    <link rel="stylesheet" href="assets/css/style@1.1.4.css" />
-    <script src="assets/plugins/autotrack@2.3.js"></script>
+    <link rel="stylesheet" href="assets/css/style@1.1.5.css" />
+    <script src="assets/plugins/autotrack@2.4.js"></script>
     <script>
       window.$docsify = {
         name: 'CLKLOG',
@@ -132,6 +132,19 @@
         var s = document.getElementsByTagName('script')[0]
         s.parentNode.insertBefore(hm, s)
       })()
+      _hmt.push([
+        '_requirePlugin',
+        'UrlChangeTracker',
+        {
+          shouldTrackUrlChange: function (newPath, oldPath) {
+            //query string相同的url不发送pv日志
+            newPath = newPath.split('?')[0]
+            oldPath = oldPath.split('?')[0]
+            return newPath != oldPath
+            //return newPath && oldPath
+          }
+        }
+      ])
     </script>
   </body>
 </html>
