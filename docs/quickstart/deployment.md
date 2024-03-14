@@ -27,7 +27,7 @@
 
 2. 上传程序文件
 
-    在目录`/usr/local/services/`中创建`clklogreceiver`目录并将文件`clklog_receiver.jar`和`application.yml`拷进去，代码如下：
+    在目录`/usr/local/services/`中创建`clklogreceiver`目录并将文件包`clklog_receiver.jar`、配置文件`application.yml`以及源码中的`iplib`文件夹和`app-setting.json`文件拷贝进去，代码如下：
 
     ```
     cd /usr/local/services/
@@ -42,30 +42,26 @@
     根据前面安装的组件配置，修改`application.yml`中`redis`、`kafka`相关配置，代码如下：
 
     ```
-    server: 
-      tomcat: 
-        #日志配配置
-        accesslog: 
-          #目录
-          directory: /usr/local/services/receiverlogs      
-    logging:
-      file:
-        path: log
     spring:
       kafka:
+        # bootstrap-servers的值根据kafka配置文件里的listeners的值进行配置。
         bootstrap-servers: localhost:9092
       redis:
         # 单机配置
         host: localhost
         port: 6379
-        # password: nW2zFwS41tdf
+        # password: 
         # 哨兵配置
         # sentinel:
         # master: gct
         # nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
     receiver: 
-      # 对应前端埋点代码配置的project名称，多个project以逗号分隔
+      # 对应前端埋点代码配置的project名称，多个project以逗号分隔。
       app-list: clklogapp
+      # resource-path 默认为空，如果资源及配置文件(iplib,app-setting.json)不与jar同目录，则修改为它们的父路径，否则无需配置。
+      resource-path:  
+      # enable-simple-version 默认为false, 表示日志存入kafka，由flink处理后存入clickhouse；当值为true时，表示日志直接存入clickhouse，无需安装kafka和flink。配置修改后需重启clklog-receiver服务。
+      enable-simple-version: false
     ```
 
 4. 创建服务
@@ -110,7 +106,7 @@
 
 2. 上传程序文件
 
-    在目录`/usr/local/services/`中创建`clklogprocessing`目录并将文件`clklog-processing-1.0.0-jar-with-dependencies.jar`包和 `config.properties`拷进去，代码如下：
+    在目录`/usr/local/services/`中创建`clklogprocessing`目录并将文件包`clklog-processing-1.0.0-jar-with-dependencies.jar`、 配置文件`config.properties`以及源码中的`iplib`文件夹和`app-setting.json`文件拷贝拷进去，代码如下：
 
     ```
     cd /usr/local/services/
@@ -140,6 +136,14 @@
     flink.data-source-name=KafkaSource
     flink.checkpoint=file:///usr/local/services/clklogprocessing/checkpoints
     flink.parallelism=1
+    
+    # processing-file-location 默认为空，如果资源及配置文件(iplib,app-setting.json)不与jar同目录，则修改为它们的父路径，否则无需配置
+    processing-file-location=
+    
+    # redis 配置
+    redis.host=localhost
+    redis.port=6379
+    redis.password=
     ```
 
 4. 启动应用程序
