@@ -100,7 +100,7 @@
 
    - flink后台地址： <http://10.10.223.104/flink/#/overview>
 
-4. 下载[clklog-processing](https://foruda.gitee.com/attach_file/1710484438225938791/clklog-processing-1.1.0-jar-with-dependencies.jar?token=28c5af83845a4baf041855a3f3527c09&ts=1710484443&attname=clklog-processing-1.1.0-jar-with-dependencies.jar)
+4. 下载[clklog-processing](https://gitee.com/clklog/clklog-processing/releases)
 
 5. 提交 job
 
