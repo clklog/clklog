@@ -83,7 +83,8 @@
     scroll_notice_map: 'default',
     collect_tags: {
       div: true,
-      img: true
+      img: true,
+      a: true
     }
   },
   preset_properties: { latest_referrer_host: true }
