@@ -10,6 +10,7 @@
 - 快速开始
   - [环境配置](/quickstart/preparation.md)
   - [应用部署](/quickstart/deployment.md)
+  - [Docker安装](/quickstart/docker-installation.md)
   - [常见问题](/quickstart/question.md)
 
 - 贡献者指南

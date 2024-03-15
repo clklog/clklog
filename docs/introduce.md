@@ -27,18 +27,17 @@ ClkLog是一款记录用户行为分析和画像的免费可商用开源软件�
 
 ## 系统架构
 
-![](../assets/imgs/all-process.png)
-<!--<!-- tabs:start -->-->
+<!-- tabs:start -->
 
-<!-- #### **标准模式**
+#### **标准模式**
 
 ![](../assets/imgs/all-process.png)
 
 #### **快速模式**
 
-![](../assets/imgs/fast-process.png) -->
+![](../assets/imgs/fast-process.png)
 
-<!--<!-- tabs:end -->-->
+<!-- tabs:end -->
 
 ## 项目组成
 
