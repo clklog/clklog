@@ -19,7 +19,6 @@ import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,7 +26,6 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -459,8 +457,6 @@ public class ReceiveServiceImpl implements IReceiveService {
         }
     }
 
-    private KafkaProducer<String, String> kafkaProducer;
-
     @Override
     public void enqueueKafka(List<QueryCriteria> queryCriteriaList) {
         try {
@@ -483,17 +479,6 @@ public class ReceiveServiceImpl implements IReceiveService {
             return System.getProperty("user.dir");
         } else {
             return serverSettings.getResourcePath();
-        }
-    }
-
-    @PreDestroy
-    private void shutdown() {
-        try {
-            if (kafkaProducer != null) {
-                kafkaProducer.close();
-            }
-        } catch (Exception ex) {
-            logger.error("shutdown error ", ex);
         }
     }
 }
