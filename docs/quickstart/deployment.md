@@ -257,8 +257,10 @@
         path: log
     clklogapi:
       access-control-allow-origin: "*"
-      project-name: clklogapp  //默认前端埋点project默认名称，一般不用修改
-      project-host: http(s)://{{hostname}}  //埋点网站域名配置，多个域名以英文逗号分隔
+      # 默认前端埋点project默认名称，一般不用修改
+      project-name: clklogapp  
+      # 埋点网站域名配置，多个域名以英文逗号分隔
+      project-host: http(s)://{{hostname}}  
     ```
 
 4. 创建服务
@@ -408,7 +410,8 @@
   `autotrack.js`中的`server_url`参考配置如下：
 
   ```
-    server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', //接收地址为clklog_receiver 的接收服务地址，project和token参数必须传入
+    //接收地址为clklog_receiver 的接收服务地址，project和token参数必须传入，token是每个project对应的随机字符串，请自行随机生成。
+    server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', 
   ```
 
 - **单页面应用数据采集说明**

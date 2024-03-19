@@ -1,11 +1,11 @@
   
 ## 镜像准备
 
-1. ClkLog Docker-Compose配置下载：
+1. ClkLog Docker Compose配置下载：
 
     <a href="https://clklog.com/res/docker/clklog-docker-compose.tar.gz" target="_blank" rel="noopener" id="docker-compose-tar">下载clklog-docker-compose.tar.gz</a>
 
-2. 拷贝镜像至linux 服务器 （假设ip为10.10.222.21）,并解压镜像文件，参考代码如下：
+2. 拷贝镜像至linux服务器（假设服务器ip为10.10.222.21）,并解压镜像文件，参考代码如下：
 
     ```
     tar -zxvf clklog-docker-compose.tar.gz
@@ -16,13 +16,18 @@
 
     ```
     #[Clickhouse]
-    CK_USER_NAME=default
-    CK_USER_PWD=clklogpwd
+    # clickhouse用户名
+    CK_USER_NAME=default 
+    # clickhouse密码
+    CK_USER_PWD=clklogpwd 
 
     #[ClkLog]
-    CLKLOG_LOG_DB=clklog
-    PROJECT_NAME=clklogapp
-    PROJECT_HOST=http://10.10.222.21
+    # clkog数据库名称
+    CLKLOG_LOG_DB=clklog    
+    # 默认前端埋点project默认名称，一般不用修改
+    PROJECT_NAME=clklogapp 
+    # 埋点网站域名配置，多个域名以英文逗号分隔
+    PROJECT_HOST=http(s)://{{hostname}} 
     ```
 
 4. 执行`clklog_init`脚本，代码如下：
@@ -34,7 +39,7 @@
 
 ## 镜像介绍
 
-   Clklog Docker-Compose包含标准模式和快速模式两种。
+   Clklog Docker Compose包含标准模式和快速模式两种。
 
    标准模式：采集日志数据先存入kafka，经由flink处理后再存入clickhouse。
 
@@ -53,13 +58,13 @@
    在`clklog-docker-compose`目录下执行以下命令：
 
     ```
-    docker-compose -f docker-compose-clklog-simple.yml up -d
+    docker compose -f docker-compose-clklog-simple.yml up -d
     ```
 
 2. 查看容器状态
 
     ```
-    docker ps -a
+    docker compose -f docker-compose-clklog-simple.yml ps -a
     ```
 
     ![image](../assets/imgs/simple_container.png)  
@@ -79,13 +84,13 @@
    在`clklog-docker-compose`目录下执行以下命令：
 
     ```
-    docker-compose -f docker-compose-clklog-full.yml up -d
+    docker compose -f docker-compose-clklog-full.yml up -d
     ```
 
 2. 查看容器状态
 
     ```
-    docker ps -a
+    docker compose -f docker-compose-clklog-full.yml ps -a
     ```
 
     ![image](../assets/imgs/full_container.png)  
@@ -98,7 +103,7 @@
 
    - 埋点数据接收地址： <http://10.10.222.21/receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a>
 
-   - flink后台地址： <http://10.10.223.104/flink/#/overview>
+   - flink后台地址： <http://10.10.222.21/flink/#/overview>
 
 4. 下载[clklog-processing](https://gitee.com/clklog/clklog-processing/releases)
 
@@ -120,19 +125,19 @@
 
 ### 快速模式切换标准模式
 
-- 1. 停止并删除容器. docker-compose -f docker-compose-clklog-simple.yml down
-- 2. 运行 docker-compose -f docker-compose-clklog-full.yml up -d
-- 3. 后续步骤参考标准模式安装步骤
+- 1. 停止并删除容器:`docker compose -f docker-compose-clklog-simple.yml down`。
+- 2. 启动服务：`docker compose -f docker-compose-clklog-full.yml up -d`。
+- 3. 后续步骤参考标准模式安装步骤。
 
 ### 标准模式切换快速模式
 
 #### 方式1
 
-- 1. docker-compose-clklog-full.yml中设置RECEIVER_ENABLE_SIMPLE_VERSION为true.
-- 2. 注释docker-compose-clklog-full.yml中kafka,zookeeper,flink(jobmanager,taskmanager),停止对应容器.
-- 3. 停止并删除 clklog-receiver容器，再docker-compose -f docker-compose-clklog-full.yml up -d
+- 1. 将`docker-compose-clklog-full.yml`中设置`RECEIVER_ENABLE_SIMPLE_VERSION`为`true`。
+- 2. 注释`docker-compose-clklog-full.yml`文件中`kafka`,`zookeeper`,`flink(jobmanager,taskmanager)`的相关配置,并停止对应容器。
+- 3. 停止并删除`clklog-receiver`容器，再执行命令：`docker compose -f docker-compose-clklog-full.yml up -d`。
 
 #### 方式2
 
-- 1. 停止并删除容器. docker-compose -f docker-compose-clklog-full.yml down
-- 2. 运行 docker-compose -f docker-compose-clklog-simple.yml up -d
+- 1. 停止并删除容器:`docker compose -f docker-compose-clklog-full.yml down`。
+- 2. 启动服务： `docker compose -f docker-compose-clklog-simple.yml up -d`。
