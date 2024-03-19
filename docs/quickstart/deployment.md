@@ -394,7 +394,7 @@
 
   ```
   ├── 网站根目录
-      ├── plugin
+      ├── plugins
       │   ├── session-event
       │   │   ├── index.js
       |── sensorsdata.js
