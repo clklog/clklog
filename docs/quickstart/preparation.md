@@ -1,6 +1,4 @@
 
-# 环境配置
-
 ## 环境准备
 <!-- - Ubuntu SMP -->
 - CentOS 7
@@ -14,7 +12,7 @@
 - nodejs >= 8.9
 - npm >=3.0.0
 
-# 初始化步骤参考
+## 初始化步骤参考
 
 创建安装目录
 
@@ -22,7 +20,7 @@
 mkdir /usr/local/services
 ```
 
-## Java 1.8 安装参考
+### Java 1.8 安装参考
 
 下载 jdk-8u211-linux-x64.rpm
 
@@ -30,7 +28,7 @@ mkdir /usr/local/services
 rpm -ivh jdk-8u211-linux-x64.rpm
 ```
 
-## nginx 安装参考
+### nginx 安装参考
 
 ```
 yum install nginx
@@ -39,7 +37,7 @@ systemctl start nginx
 
 - ###### [nginx安装注意事项](question.md#nginx安装注意事项)
 
-## Redis 3.2.4 安装参考
+### Redis 3.2.4 安装参考
 
 1. 从 Redis 官网下载安装包
 
@@ -107,7 +105,7 @@ systemctl start nginx
 
 <br>
 
-## Zookeeper 3.7.1 安装参考
+### Zookeeper 3.7.1 安装参考
 
 1. 从  Zookeeper  官网下载安装包
 
@@ -153,7 +151,7 @@ systemctl start nginx
 
 <br>
 
-## Kafka 2.12-3.3.1 安装参考
+### Kafka 2.12-3.3.1 安装参考
 
 1. 从 Kafka 官网下载安装包
 
@@ -197,7 +195,7 @@ systemctl start nginx
 
     不报错正常，如果未启动成功，从`./logs`里查看启动日志
 
-## Flink 1.14.6 安装参考
+### Flink 1.14.6 安装参考
 
 1. 从 Flink官网下载安装包
 
@@ -230,7 +228,7 @@ systemctl start nginx
 
     ![](../assets/imgs/preview.png)
 
-## Clickhouse 23.2.1 安装参考
+### Clickhouse 23.2.1 安装参考
 
 1. 安装clickhouse
 
