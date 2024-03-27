@@ -1,7 +1,7 @@
 <!-- _sidebar.md -->
   
-- 项目说明
-  - [项目介绍](/introduce.md)
+- 产品说明
+  - [产品介绍](/introduce.md)
   - [版本介绍](/version.md)
   - [功能清单](/funclist.md)
   - [指标项说明](/indicator-desc.md)

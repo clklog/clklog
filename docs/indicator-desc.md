@@ -1,9 +1,9 @@
 <table >
 <tr>
     <th nowrap="nowrap">分类</th>
-    <th nowrap="nowrap" >指标项名称</th>
-    <th>指标项说明</th>
-    <th>指标项计算方法/备注</th>
+    <th align="left" nowrap="nowrap" >指标项名称</th>
+    <th align="left">指标项说明</th>
+    <th align="left">指标项计算方法/备注</th>
 </tr>
 <tr>
     <td rowspan="7">
