@@ -8,21 +8,18 @@ import java.util.List;
 @ConfigurationProperties("clklogapi")
 public class ClklogApiSetting {
 
-    @Value("#{'${clklogapi.access-control-allow-origin}'.split(',')}")
-    private List<String> accessControlAllowOrigin;
+    private String[] accessControlAllowOriginPatterns;
 
-    @Value("${clklogapi.project-name:hqq}")
     private String projectName;
 
-    @Value("#{'${clklogapi.project-host}'.split(',')}")
     private List<String> projectHost;
 
-    public List<String> getAccessControlAllowOrigin() {
-        return accessControlAllowOrigin;
+    public String[] getAccessControlAllowOriginPatterns() {
+        return accessControlAllowOriginPatterns;
     }
 
-    public void setAccessControlAllowOrigin(List<String> accessControlAllowOrigin) {
-        this.accessControlAllowOrigin = accessControlAllowOrigin;
+    public void setAccessControlAllowOriginPatterns(String[] accessControlAllowOriginPatterns) {
+        this.accessControlAllowOriginPatterns = accessControlAllowOriginPatterns;
     }
 
     public String getProjectName() {

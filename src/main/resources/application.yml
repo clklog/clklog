@@ -25,6 +25,6 @@ logging:
   file:
     path: log
 clklogapi:
-  access-control-allow-origin: "*"
+  access-control-allow-origin-patterns: "*"
   project-name: clklogapp
   project-host: http://www.zcunsoft.com
