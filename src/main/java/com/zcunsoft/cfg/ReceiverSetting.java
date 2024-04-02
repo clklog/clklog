@@ -16,6 +16,8 @@ public class ReceiverSetting {
 
     private String resourcePath = "";
 
+    private String[] accessControlAllowOriginPatterns;
+
     public int getThreadCount() {
         return threadCount;
     }
@@ -46,5 +48,13 @@ public class ReceiverSetting {
 
     public void setEnableSimpleVersion(boolean enableSimpleVersion) {
         this.enableSimpleVersion = enableSimpleVersion;
+    }
+
+    public String[] getAccessControlAllowOriginPatterns() {
+        return accessControlAllowOriginPatterns;
+    }
+
+    public void setAccessControlAllowOriginPatterns(String[] accessControlAllowOriginPatterns) {
+        this.accessControlAllowOriginPatterns = accessControlAllowOriginPatterns;
     }
 }

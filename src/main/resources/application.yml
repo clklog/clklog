@@ -38,3 +38,5 @@ receiver:
   app-list: clklogapp
   resource-path:
   enable-simple-version: true
+  access-control-allow-origin-patterns: "*"
+
