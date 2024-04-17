@@ -64,7 +64,7 @@ body {
   -webkit-font-smoothing: antialiased;
   color: #34495e;
   font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0;
   margin: 0;
   overflow-x: hidden;
@@ -267,6 +267,9 @@ main.hidden {
 .sidebar ul li a {
   border-bottom: none;
   display: block;
+}
+.sidebar > ul > li > a {
+  font-size: 15px;
 }
 .sidebar ul li ul {
   padding-left: 20px;

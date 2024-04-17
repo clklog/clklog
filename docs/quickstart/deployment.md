@@ -386,7 +386,7 @@
 
 ## 9. sdk 埋点集成
 
-#### 1. Web JS 埋点集成参考
+### 1. Web JS 埋点集成参考
 
 1.1. 下载 ClKLOG WEB JS SDK
 
@@ -432,15 +432,15 @@
 
 - **locahost或ip访问时可忽略控制台中的 “[web-sdk-log]: getHostname传入的url参数不合法！” 提示**
 
-#### 2. Android SDK埋点集成
+### 2. Android SDK埋点集成
 
   集成方式参考 [神策Android SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/android-7541696.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
 
-#### 3. IOS SDK埋点集成
+### 3. IOS SDK埋点集成
 
   集成方式参考 [神策IOS SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/ios-7538614.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
 
-#### 4. 小程序 SDK埋点集成
+### 4. 小程序 SDK埋点集成
 
   集成方式参考 [神策微信小程序 SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/%E9%9B%86%E6%88%90%E6%96%87%E6%A1%A3%EF%BC%88%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89-1573892.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
 
