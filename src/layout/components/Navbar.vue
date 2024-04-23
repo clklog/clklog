@@ -78,19 +78,10 @@ export default {
   },
   data() {
     return {
-      //clklog-demo
       options: [
         {
-          value: "hqq",
-          label: "货清清",
-        },
-        {
-          value: "clklog",
-          label: "clklog官网",
-        },
-        {
-          value: "zcunsoft",
-          label: "至存官网",
+          value: "clklogapp",
+          label: "clklog",
         },
       ],
       value: "",
