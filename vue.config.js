@@ -47,7 +47,7 @@ module.exports = {
       },
       // 配置api接口基础路径
       "/DEV-API": {
-        target: " ", // 配置api接口基础路径
+        target: "/api", // 配置api接口基础路径
         changeOrigin: true, // 是否支持跨域
         pathRewrite: {
           "^/DEV-API": "", // 重写路径：去掉路径中开头的 '/api'
