@@ -13,7 +13,7 @@
       <div class="visitor">
         <!-- content -->
         <div class="bid-list-page">
-          <div class="bid-list-header" style="padding-bottom: 6px;">
+          <div class="bid-list-header" style="padding-bottom: 6px">
             <div class="header-name w157"></div>
             <div class="header-name w157">老访客</div>
             <div class="header-name w157">新访客</div>
@@ -176,14 +176,14 @@ export default {
         }
       });
     },
-    newVisitorCompare(old, p) {
+    oldVisitorCompare(old, p) {
       if (old && p) {
         this.newVistorPercent = ((old / (old + p)) * 100).toFixed(2) + "%";
         return this.newVistorPercent;
       }
       return "--", (this.newVistorPercent = "");
     },
-    oldVisitorCompare(xin, s) {
+    newVisitorCompare(xin, s) {
       if (xin && s) {
         this.oldVistorPercent = ((xin / (xin + s)) * 100).toFixed(2) + "%";
         return this.oldVistorPercent;

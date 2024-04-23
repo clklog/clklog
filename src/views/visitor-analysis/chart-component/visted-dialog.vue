@@ -1,12 +1,16 @@
 <template>
   <div>
-    <!-- title="资源路径Top10" -->
     <el-dialog
       title="访问页面分析"
       :visible.sync="dialogTableVisible"
       width="80%"
     >
-      <el-table :data="gridData" border  class="public-radius">
+      <el-table
+        :data="gridData"
+        border
+        class="public-radius"
+        @sort-change="sortChange($event)"
+      >
         <el-table-column label="序号" type="index" width="80" align="center">
           <template slot-scope="scope">
             <span v-text="getIndex(scope.$index)"> </span>
@@ -94,13 +98,32 @@ export default {
         desc: "",
       },
       formLabelWidth: "120px",
-      pageNum: 1,
       total: 0,
       pageSize: 10,
+      pageNum: 1,
+      sortName :null,
+      sortOrder:null,
       commonParams: {},
     };
   },
   methods: {
+    sortChange(e) {
+      if (e.order && e.order == "ascending") {
+        // 降序
+        this.sortName = e.prop;
+        this.sortOrder = "asc";
+        this.initApiEvent(this.commonParams);
+      } else if (e.order && e.order == "descending") {
+        // 升序
+        this.sortName = e.prop;
+        this.sortOrder = "desc";
+        this.initApiEvent(this.commonParams);
+      } else {
+        this.sortName = null;
+        this.sortOrder = null;
+        this.initApiEvent(this.commonParams);
+      }
+    },
     getIndex($index) {
       return (this.pageNum - 1) * this.pageSize + $index + 1;
     },
@@ -122,6 +145,8 @@ export default {
     initApiEvent(params) {
       params.pageSize = this.pageSize;
       params.pageNum = this.pageNum;
+      params.sortName = this.sortName;
+      params.sortOrder = this.sortOrder;
       this.dialogTableVisible = true;
       getVisitUriDetailApi(params).then((res) => {
         if (res.code == 200) {

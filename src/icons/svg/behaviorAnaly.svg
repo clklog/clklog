@@ -16,6 +16,7 @@
       .cls-4 {
         clip-path: url(#clip-path);
       }
+ 
     </style>
     <clipPath id="clip-path">
       <rect id="矩形_31" data-name="矩形 31" class="cls-1" width="4.487" height="4.487"/>

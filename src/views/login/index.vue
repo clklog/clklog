@@ -138,6 +138,7 @@
 <script>
 import { validUsername } from "@/utils/validate";
 import SocialSign from "./components/SocialSignin";
+import { profileApi, subscribeApi } from "@/api/trackingapi/subscribe.js";
 import Cookies from "js-cookie";
 
 export default {
@@ -179,6 +180,8 @@ export default {
       redirect: undefined,
       otherQuery: {},
       validatePassword: this.$store.getters.password,
+      clientId: "",
+      subscribed: "",
     };
   },
   watch: {
@@ -194,7 +197,11 @@ export default {
     },
   },
   created() {
-    let userInfo = Cookies.get("userInfo") ?  JSON.parse(Cookies.get("userInfo")): '';
+    this.$bus.$on("$loginOpen", (res) => {
+      console.log(res, "loginOpen");
+      this.initClklog(res);
+    });
+    let userInfo = JSON.parse(Cookies.get("userInfo"));
     if (userInfo) {
       this.loginForm.username = userInfo.username;
       this.loginForm.password = userInfo.password;
@@ -207,8 +214,10 @@ export default {
       this.$refs.password.focus();
     }
   },
-  destroyed() {},
   methods: {
+    openShow(val) {
+      this.initClklog("sub");
+    },
     checkLoginEvent() {
       this.dialogVisible = true;
     },
@@ -240,12 +249,30 @@ export default {
               });
               this.loading = false;
             })
+            .then(() => {
+              this.initClklog();
+            })
             .catch(() => {
               this.loading = false;
             });
         } else {
           console.log("error submit!!");
           return false;
+        }
+      });
+    },
+    initClklog(flag) {
+      profileApi().then((res) => {
+        if (res.code == 200) {
+          this.clientId = res.data;
+          // res.data.subscribed = false;
+          if (!res.data.subscribed) {
+            setTimeout(() => {
+              this.$nextTick(() => {
+                this.$bus.$emit("$letter", res.data);
+              });
+            }, 500);
+          }
         }
       });
     },
@@ -286,11 +313,6 @@ $cursor: #7b7a7b;
       color: $light_gray;
       height: 46px;
       caret-color: $cursor;
-
-      // &:-webkit-autofill {
-      //   box-shadow: 0 0 0px 1000px $bg inset !important;
-      //   -webkit-text-fill-color: $cursor !important;
-      // }
     }
   }
 

@@ -2,7 +2,6 @@
 require("babel-polyfill");
 const path = require("path");
 const defaultSettings = require("./src/settings.js");
-
 function resolve(dir) {
   return path.join(__dirname, dir);
 }
@@ -39,8 +38,16 @@ module.exports = {
       errors: true,
     },
     proxy: {
+      "/DEV-APISUB": {
+        target: "https://support.clklog.com/public",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/DEV-APISUB": "",
+        },
+      },
+      // 配置api接口基础路径
       "/DEV-API": {
-        target: process.env.VUE_APP_BASE_API_PROXY, // api接口基础路径
+        target: " ", // 配置api接口基础路径
         changeOrigin: true, // 是否支持跨域
         pathRewrite: {
           "^/DEV-API": "", // 重写路径：去掉路径中开头的 '/api'

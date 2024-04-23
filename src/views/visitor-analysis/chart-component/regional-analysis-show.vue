@@ -99,8 +99,8 @@ export default {
   mounted() {},
   methods: {
     getAreaProvince(val) {
+      this.clearList();
       let maxValue = [];
-      // this.apiProvinceList = val.rows;
       this.apiProvinceList = val;
       for (let i = 0; i < this.provinceList.length; i++) {
         for (let j = 0; j < this.apiProvinceList.length; j++) {
@@ -120,12 +120,6 @@ export default {
           item.value = 0;
         });
       }
-      // this.apiProvinceList.map((item) => {
-      //   item.visitCountRate = percentage(item.visitCountRate);
-      //   if (item.province == "未知省份") {
-      //     // item.province = item.country + "-" + item.province;
-      //   }
-      // });
       for (let i = 0; i < this.apiProvinceList.length; i++) {
         this.apiProvinceList[i].visitCountRate = percentage(
           this.apiProvinceList[i].visitCountRate
@@ -152,6 +146,11 @@ export default {
       }
       this.apiProvinceList = this.apiProvinceList.splice(0, 10);
       this.showScatterInGeo();
+    },
+    clearList() {
+      this.provinceList.map((item) => {
+        item.value = 0;
+      });
     },
     randomData() {
       return Math.round(Math.random() * 500);

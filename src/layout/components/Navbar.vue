@@ -3,8 +3,23 @@
     <div class="burying_point">
       <div style="display: flex; align-items: center">
         <div class="logoFlag">
-          <img class="imgLogo" src="@/assets/images/logo.png" alt="" />
+          <img
+            class="imgLogo"
+            src="@/assets/images/logo.png"
+            @click="$router.push('/')"
+          />
+          <div
+            style="
+              margin-left: 20px;
+              font-size: 12px;
+              color: rgba(76, 81, 86, 0.657);
+              margin-top: 6px;
+            "
+          >
+            社区版
+          </div>
         </div>
+       
         <el-select
           v-model="value"
           placeholder="请选择"
@@ -35,6 +50,9 @@
             <i class="el-icon-caret-bottom" />
           </div>
           <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item @click.native="subscription()">
+              <span style="display: block">订阅</span>
+            </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
               <span style="display: block">退出</span>
             </el-dropdown-item>
@@ -60,11 +78,19 @@ export default {
   },
   data() {
     return {
-      // github
+      //clklog-demo
       options: [
         {
-          value: "clklogapp",
-          label: "clklog",
+          value: "hqq",
+          label: "货清清",
+        },
+        {
+          value: "clklog",
+          label: "clklog官网",
+        },
+        {
+          value: "zcunsoft",
+          label: "至存官网",
         },
       ],
       value: "",
@@ -73,15 +99,15 @@ export default {
     };
   },
   created() {
-    this.value = this.options[0].value;
-    this.handleChangeProject(this.options[0].value);
-    this.initDate();
     const _this = this;
     document.addEventListener("visibilitychange", function () {
       if (!document.hidden) {
         _this.initDate();
       }
     });
+    this.value = this.options[0].value;
+    this.handleChangeProject(this.options[0].value);
+    this.initDate();
   },
   computed: {
     ...mapGetters(["sidebar", "avatar", "device", "projectName"]),
@@ -108,6 +134,14 @@ export default {
     async logout() {
       await this.$store.dispatch("user/logout");
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
+    },
+    subscription() {
+      console.log("触发了订阅");
+
+      this.$nextTick(() => {
+        this.$bus.$emit("$subscription", "sub");
+      });
+    
     },
     clickImg() {},
     handleChangeProject(val) {
@@ -155,6 +189,8 @@ export default {
       }
     }
     .logoFlag {
+      display: flex;
+      align-items: center;
       margin-right: 70px;
       font-size: 15px;
       font-weight: bold;
@@ -162,6 +198,7 @@ export default {
       color: #4d4d4d;
       padding-top: 2px;
       .imgLogo {
+        cursor: pointer;
         height: 44px;
       }
     }

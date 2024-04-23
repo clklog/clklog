@@ -93,13 +93,6 @@ export default {
       }
       this.$refs.regionalTable.getDetailList(newvalue);
     },
-    // getAreaDetailTop10() {
-    //   getAreaDetailTop10Api(this.commonParams).then((res) => {
-    //     if (res.code == 200) {
-    //       // this.$refs.regionalShow.getAreaProvince(res.data);
-    //     }
-    //   });
-    // },
     // map地图
     getArea() {
       getAreaApi(this.commonParams).then((res) => {

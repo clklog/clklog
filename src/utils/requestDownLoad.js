@@ -3,21 +3,24 @@ import { MessageBox, Message } from "element-ui";
 import store from "@/store";
 import { getToken } from "@/utils/auth";
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API ? process.env.VUE_APP_BASE_API : "/api", // url = base url + request url
+  baseURL: '',
   timeout: 5000, // request timeout
 });
 service.interceptors.request.use(
   (config) => {
-    if (store.getters.token) {
-      config.headers["X-Token"] = getToken();
-    }
+    // if (store.getters.token) {
+    //   config.headers["X-Token"] = getToken();
+    // }
     const isMock = config.url.includes("/vue-element-admin/user");
     if ((config.method === "post" || config.method === "put") && !isMock) {
       if (!config.headers["Content-Type"]) {
         config.headers["Content-Type"] = "application/json;";
-        // config.headers["Content-Type"] = "multipart/form-data;";
       }
-      config.data = JSON.stringify(config.data);
+      if (process.env.NODE_ENV == "development") {
+        config.url = "/DEV-API" + config.url;
+      } else {
+        config.url = window.globalConfig.BASE_API + config.url;
+      }
     }
     return config;
   },

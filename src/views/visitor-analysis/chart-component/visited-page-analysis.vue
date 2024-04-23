@@ -123,7 +123,10 @@
                     @click="handleTree(dialogParams, 'dialog')"
                     class="setMoreCon"
                   >
-                  
+                    <!-- <img
+                      class="loadMoreImg"
+                      src="@/assets/images/showDialog.png"
+                    /> -->
                     更多受访页面...
                   </div>
                   <div v-else>
@@ -140,7 +143,10 @@
 
               <div v-else>
                 <div style="margin-left: 5px; display: flex">
-                  
+                  <!-- <img
+                      class="loadMoreImg"
+                      src="@/assets/images/showDialog.png"
+                    /> -->
                   <div
                     v-if="scope.row.title == '更多'"
                     @click="handleTree(dialogParams, 'dialog')"
@@ -157,7 +163,18 @@
                 </div>
               </div>
 
-             
+              <!-- <img
+                v-if="scope.row.leafUri.length > 0 && !scope.row.firstFlag"
+                style="
+                  position: absolute;
+                  right: 10px;
+                  top: 8px;
+                  cursor: pointer;
+                  width: 17px;
+                "
+                src="@/assets/images/showDialog.png"
+                @click="handleTree(scope.row, 'dialog')"
+              /> -->
             </template>
           </el-table-column>
 
@@ -206,6 +223,116 @@
             </el-table-column>
           </el-table-column>
         </el-table>
+
+        <!-- <el-table
+          :data="treeList"
+          style="width: 100%"
+          :row-key="getRowKeys"
+          :tree-props="{ children: 'leafUri', hasChildren: 'hasChildren' }"
+          border
+          lazy
+          ref="multipleTable"
+          :expand-row-keys="tableExpands"
+          @expand-change="expandChangeEvent"
+        >
+          <el-table-column
+            label="页面地址"
+            width="400px"
+            :show-overflow-tooltip="true"
+          >
+            <template slot-scope="scope" style="display: flex">
+              <div
+                v-if="
+                  scope.row.leafUri &&
+                  scope.row.leafUri.length == 0 &&
+                  !scope.row.firstFlag
+                "
+                class="tableName"
+                :style="{ 'padding-left': `${scope.row.level * 19}px` }"
+                @click="handleTree(scope.row, '')"
+              >
+                <img
+                  src="@/assets/images/add.png"
+                  style="
+                    width: 12px;
+                    height: 12px;
+                    object-fit: cover;
+                    margin-right: 10px;
+                    margin-top: 2px;
+                   
+                    box-sizing: border-box;
+                    cursor: pointer;
+                  "
+                />
+              </div>
+              <div v-if=" scope.row.secondFlag">
+                <div style=" margin-left:-12px;">{{ scope.row.title ? scope.row.title : "" }}</div>
+                <div style=" margin-left:-12px;" >{{ scope.row.segment ? scope.row.segment : "/" }}</div>
+              </div>
+              <div v-else>
+                <div style=" margin-left:5px;">{{ scope.row.title ? scope.row.title : "" }}</div>
+                <div>{{ scope.row.segment ? scope.row.segment : "/" }}</div>
+              </div>
+
+              <img
+                v-if="scope.row.leafUri.length > 0 && !scope.row.firstFlag"
+                style="
+                  position: absolute;
+                  right: 10px;
+                  top: 8px;
+                  cursor: pointer;
+                  width: 17px;
+                "
+                src="@/assets/images/showDialog.png"
+                @click="handleTree(scope.row, 'dialog')"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column label="流量基础指标">
+            <el-table-column v-if="pv" prop="detail.pv" label="浏览量" />
+            <el-table-column v-if="uv" prop="detail.uv" label="访客数" />
+            <el-table-column
+              v-if="ipCount"
+              prop="detail.ipCount"
+              label="IP数"
+            />
+          </el-table-column>
+          <el-table-column prop="detail.date" label="流量质量指标">
+            <el-table-column
+              v-if="entryCount"
+              prop="detail.entryCount"
+              label="入口页次数"
+            />
+            <el-table-column
+              v-if="downPvCount"
+              prop="detail.downPvCount"
+              label="贡献下游浏览量"
+            />
+            <el-table-column
+              v-if="exitCount"
+              prop="detail.exitCount"
+              label="退出页次数"
+            />
+            <el-table-column
+              v-if="avgVisitTime"
+              prop="detail.avgVisitTime"
+              label="平均访问时长"
+            >
+              <template slot-scope="scope">
+                {{ formatTimeEvent(scope.row.detail.avgVisitTime) }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              v-if="exitRate"
+              prop="detail.exitRate"
+              label="退出率"
+            >
+              <template slot-scope="scope">
+                {{ percentageFun(scope.row.detail.exitRate) }}
+              </template>
+            </el-table-column>
+          </el-table-column>
+        </el-table> -->
       </div>
       <!-- 默认图表 -->
       <div v-show="showTreeFlag">
@@ -405,7 +532,7 @@ export default {
         params.uriPath = scope.uri;
         this.$refs.vistedDialog.vistedApiEvent(params);
       } else {
-        this.dialogParams.uri = scope.uri; //赋值uri
+        this.dialogParams.uri = scope.uri; 
         this.isExpand = false;
         // 动态添加节点
         this.scopeEventApi(scope.uri, "", scope.detail.numRandom);
@@ -429,6 +556,8 @@ export default {
                 id: "more",
               });
             }
+
+            // this.uriListEnd = res.data;
             this.uriListEnd = res.data.rows;
             // 动态添加节点
             res.data.rows.forEach((item, index) => {
@@ -560,12 +689,13 @@ export default {
       });
 
       this.treeList = val;
-     
+      // console.log(this.treeList,"treeList");
+      // 测试数据
       this.treeList.forEach((item) => {
         item.detail.numRandom = item.detail.uri + this.generateRandomNumber();
         this.insertRandom(item.leafUri);
       });
-      
+      // console.log(this.treeList, "增加随机数");
     },
     // 动态添加节点
     insertRandom(list, level = 1) {
@@ -670,7 +800,7 @@ export default {
   },
   beforeDestroy() {
     // 绑在$bus上的 都要主动销毁，因为App.vue销毁之后，$bus还在，在上面注册的事件都还在占空间，所以销毁时得一起$off掉
-    this.$bus.$off(["publicEventDown"]);
+    this.$bus.$off(["publicEventDown"]); // 同时关闭多个用数组形式放进去
   },
 };
 </script>

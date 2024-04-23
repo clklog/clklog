@@ -78,6 +78,12 @@ export default {
       timeTypeFlag: "",
     };
   },
+  created(){
+    console.log(this.$route.path );
+    if (this.$route.path == '/pro/clklog') {
+      window.open(`https://clklog.com/#/introduce`);
+    }
+  },
   computed: {
     projectName() {
       return this.$store.getters.projectName;
@@ -85,8 +91,6 @@ export default {
     commonParams() {
       const { projectName } = this;
       return Object.assign({ projectName }, this.topFilterParams);
-      // const  projectName = this.projectName;
-      // return Object.assign({ projectName }, this.topFilterParams);
     },
   },
   watch: {
@@ -123,12 +127,10 @@ export default {
   display: flex;
   justify-content: space-between;
   .left {
-    // box-sizing: border-box;
     width: 50%;
     margin-right: 10px;
   }
   .right {
-    // box-sizing: border-box;
     width: 50%;
     margin-left: 10px;
   }

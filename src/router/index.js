@@ -61,10 +61,11 @@ export const constantRoutes = [
         path: "trend",
         component: () => import("@/views/visitor-analysis/trend-analysis"),
         name: "trend",
-        meta: { title: "趋势分析", icon: "trend", affix: true },
+        meta: { title: "趋势分析", icon: "trend", affix: true, },
       },
     ],
   },
+ 
 ];
 
 export const asyncRoutes = [

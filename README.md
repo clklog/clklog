@@ -56,24 +56,25 @@ npm install --registry=https://registry.npm.taobao.org
 # 启动服务
 npm run dev
 ```
-
-### npm run dev 失败, 需要建立一个 '.env.development'文件,配置代理地址。
+## 本地环境跨域服务代理
 
 ```bash
-ENV = 'development'
+1、vue.config.js 文件中 /DEV-API 配置 
+   target='代理地址'
 
-VUE_APP_BASE_API = '/DEV-API'
-
-VUE_APP_BASE_API_PROXY = '代理地址'
-  ```
+```
 ## 发布
 
 ```bash
-# 构建测试环境
-npm run build:stage
-
 # 构建生产环境
-npm run build:prod
+
+方式一、public/config.js 文件中配置 
+       BASE_API: "api接口基础路径"
+       npm run build
+
+方式二、npm run build 
+       dist/config.js
+       BASE_API: "api接口基础路径"
 ```
 
 ## 其它
@@ -93,7 +94,7 @@ npm run lint -- --fix
 
 ## Online Demo
 
-[在线 Demo](https://demo.clklog.com)
+[在线 Demo](https://demo.clklog.com/)
 
 ## Donate
 ```

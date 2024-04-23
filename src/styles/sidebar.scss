@@ -73,7 +73,6 @@
       width: 100% !important;
     }
 
-    // menu hover
     .submenu-title-noDropdown,
     .el-submenu__title {
       &:hover {
@@ -89,11 +88,10 @@
     & .el-submenu .el-menu-item {
       min-width: $sideBarWidth !important;
       background-color: $subMenuBg !important;
+      // background-color: #fff !important;
 
       &:hover {
-        // background: $subMenuHover !important;
         background: linear-gradient(to right, #d5e5fa,#fff ) !important;
-        // background: linear-gradient(269deg, rgba(61,100,230,0) 0%, rgba(61,100,230,0.16) 100%) !important;
       }
     }
   }
@@ -207,7 +205,6 @@
   .nest-menu .el-submenu>.el-submenu__title,
   .el-menu-item {
     &:hover {
-      // you can use $subMenuHover
       background-color: $menuHover !important;
     }
   }

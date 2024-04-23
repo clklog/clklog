@@ -31,6 +31,90 @@ html {
 #app {
   height: 100%;
 }
+// 共用自定义样式
+.zc_explain_tip {
+  // text-indent: 2em;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 25px;
+  color: #4d4d4d;
+  letter-spacing: 1px;
+}
+.zc_btn{
+  height: 32px;
+  line-height: 7px;
+  color: #fff !important;
+  font-size: 13px;
+  background-color: #2c7be5 !important;
+}
+.zc_btn_default {
+  height: 30px;
+  line-height: 7px;
+  font-size: 13px;
+  color: #2c7be5;
+  border: 1px solid #2c7be5;
+}
+
+// 原生table自定义样式
+.customTable {
+  .tdStyle {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    .setPadding {
+      margin-left: 14px;
+    }
+  }
+  // tr:nth-child(2n+3){
+  //   // background-color: #f7fafe;
+  // 	} //不同行换色
+  table {
+    border-radius: 6px;
+    border-color: rgba(247, 247, 247, 0.39);
+  }
+  table th {
+    font-weight: 500;
+    color: #4d4d4d;
+  }
+
+  td:nth-child(1) {
+    background-color: #f7fafe;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 25px;
+    color: #4d4d4d;
+  }
+  table tr {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 25px;
+    color: #4d4d4d;
+  }
+  table th {
+    height: 40px;
+    text-align: center;
+  }
+  table td {
+    color: #4d4d4d;
+    height: 40px;
+    text-align: center;
+  }
+
+  table tr:first-child th:first-child {
+    border-top-left-radius: 6px;
+  }
+  table tr:first-child th:last-child {
+    border-top-right-radius: 6px;
+  }
+  table tr:last-child td:first-child {
+    border-bottom-left-radius: 6px;
+  }
+  table tr:last-child td:last-child {
+    border-bottom-right-radius: 6px;
+  }
+}
+// ---end----
 
 *,
 *:before,
