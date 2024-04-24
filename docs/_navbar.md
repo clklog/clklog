@@ -2,6 +2,7 @@
 
 * [主页](/#/)
 * [版本介绍](/version.md)
+* [功能清单](/funclist.md)
 * [演示环境](https://demo.clklog.com)
   * [社区版](https://demo.clklog.com)
   * [商业版](https://pro.clklog.com)

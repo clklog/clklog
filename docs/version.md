@@ -1,3 +1,3 @@
 <!-- # 版本说明 -->
 
-![](../assets/imgs/version2.png)
+![](../assets/imgs/version3.png)
