@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- top="2vh" -->
     <el-dialog
       :visible.sync="DialogVisible"
       :modal-append-to-body="false"
@@ -19,21 +20,25 @@
             position: relative;
             line-height: 40px;
             margin-bottom: 20px;
+            font-size: 18px;
           "
         >
           <div class="cancleBtn" @click="closeDialog()">X</div>
-          感谢对ClkLog的关注与支持！
+          感谢您对ClkLog的关注与支持！
         </div>
-        <div style="letter-spacing: 5px">
+        <div style="text-align: center">
           为了给您提供更好的服务与支持，请填写以下表单。
         </div>
       </div>
 
-      <div class="setSpace" style="min-height: 700px">
+      <div style="min-height: 700px;margin-top: 25px;">
         <div>
-          <div class="letter_h1">是否接收ClkLog后续更新提醒：</div>
-          <div style="margin-top: 20px">
-            <el-radio v-model="ruleForm.receiveNotification" :label="true"
+          <div class="letter_h1">是否愿意接收ClkLog后续更新提醒:</div>
+          <div style="margin-top: 20px; text-align: left">
+            <el-radio
+              v-model="ruleForm.receiveNotification"
+              style="margin-right: 50px"
+              :label="true"
               >接收</el-radio
             >
             <el-radio v-model="ruleForm.receiveNotification" :label="false"
@@ -41,35 +46,50 @@
             >
           </div>
         </div>
+
         <!-- info -->
-        <div class="letter_h1 setSpace">联系人信息：</div>
+        <!-- <div class="letter_h1 setSpace">联系人信息:</div> -->
         <el-form
           :model="ruleForm"
           :rules="rules"
           ref="ruleForm"
-          label-width="140px"
+          label-width="120px"
           class="demo-ruleForm"
         >
-          <el-form-item label="公司名称：" prop="orgnizationName">
+          <!-- <div class="letter_h1">是否愿意接收ClkLog后续更新提醒:</div>
+          <el-form-item>
+            <div>
+              <el-radio
+                v-model="ruleForm.receiveNotification"
+                style="margin-right: 50px"
+                :label="true"
+                >接收</el-radio
+              >
+              <el-radio v-model="ruleForm.receiveNotification" :label="false"
+                >不接收</el-radio
+              >
+            </div>
+          </el-form-item> -->
+
+          <div class="letter_h1 setSpace">联系人信息:</div>
+          <el-form-item label="公司名称:" prop="orgnizationName">
             <el-input
               v-model="ruleForm.orgnizationName"
               placeholder=""
             ></el-input>
           </el-form-item>
-          <el-form-item label="联系人：" prop="contact">
+          <el-form-item label="联系人:" prop="contact">
             <el-input v-model="ruleForm.contact" placeholder=""></el-input>
           </el-form-item>
-          <el-form-item label="联系邮箱：" prop="email">
+          <el-form-item label="联系邮箱:" prop="email">
             <el-input v-model="ruleForm.email" placeholder=""></el-input>
           </el-form-item>
-          <el-form-item label="联系电话：" prop="phone">
+          <el-form-item label="联系电话:" prop="phone">
             <el-input v-model="ruleForm.phone" placeholder=""></el-input>
           </el-form-item>
           <!-- 说明 -->
-          <div>
-            <span class="letter_h1 setSpace">
-              ClkLog在您的项目中的使用场景：
-            </span>
+          <div class="setSpace">
+            <span class="letter_h1"> ClkLog在您的项目中的使用场景: </span>
             <div class="letter_h2 indent">
               以下信息仅用于我们了解ClkLog在您的项目中的使用场景，
               在后续产品迭代升级时考虑相关行业的特殊性，以提供更好的服务。
@@ -77,7 +97,7 @@
           </div>
 
           <el-form-item
-            label="埋点项目类型："
+            label="埋点项目类型:"
             prop="projectType"
             style="margin-top: 20px"
           >
@@ -96,34 +116,57 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="埋点项目说明：">
+          <el-form-item label="埋点项目说明:" style="margin-left: 8px;">
             <el-input
               type="textarea"
               maxlength="1000"
               show-word-limit
               v-model="ruleForm.remark"
               placeholder=""
-              rows="7"
+              rows="4"
             ></el-input>
           </el-form-item>
-        </el-form>
 
-        <div
+          <!-- <el-form-item>
+            <div
+              style="display: flex; justify-content: center; height: 35px;"
+            >
+              <el-button class="zc_btn" @click="confirm">确认</el-button>
+              <el-button
+                class="zc_btn_default"
+                @click="skipBtn"
+                style="margin-left: 50px"
+                >跳过</el-button
+              >
+            </div>
+          </el-form-item> -->
+        </el-form>
+        <div style="display: flex; justify-content: center; height: 35px">
+          <el-button class="zc_btn" @click="confirm">确认</el-button>
+          <el-button
+            class="zc_btn_default"
+            @click="skipBtn"
+            style="margin-left: 50px"
+            >跳过</el-button
+          >
+        </div>
+
+        <!-- <div
           style="
             display: flex;
-            justify-content: flex-start;
+            justify-content:center;
             height: 50px;
-            margin: 50px 0;
+            margin: 0 140px;
           "
         >
           <el-button class="zc_btn" @click="confirm">确认</el-button>
           <el-button
             class="zc_btn_default"
             @click="skipBtn"
-            style="margin-left: 180px"
+            style="margin-left: 50px"
             >跳过</el-button
           >
-        </div>
+        </div> -->
       </div>
       <!-- 确认事件 -->
     </el-dialog>
@@ -287,7 +330,7 @@ export default {
           subscribeApi(this.ruleForm).then((res) => {
             if (res.code == 200) {
               this.$message.success("提交成功！");
-                this.acitiveEvent(this.ruleForm);
+              this.acitiveEvent(this.ruleForm);
               this.DialogVisible = false;
             }
           });
@@ -319,7 +362,7 @@ export default {
 <style lang="scss" scoped>
 ::v-deep {
   .el-dialog__body {
-    padding: 0 120px 10px 120px;
+    padding: 30px 120px;
     box-sizing: border-box;
   }
   .el-dialog__title {
@@ -332,11 +375,15 @@ export default {
     font-size: 15px;
     font-weight: 400;
     line-height: 36px;
+    text-align: left;
     color: #4d4d4d;
   }
   .el-form-item {
     margin: 20px 0;
   }
+}
+.setSpace {
+  margin-top: 40px;
 }
 .custom_warry {
   .letter_h1 {
@@ -344,14 +391,12 @@ export default {
     font-weight: 600;
     line-height: 25px;
     color: #4d4d4d;
-    letter-spacing: 2px;
   }
   .letter_h2 {
     font-size: 14px;
     font-weight: 400;
-    line-height: 30px;
+    line-height: 22px;
     color: #4d4d4d;
-    letter-spacing: 2px;
   }
   .skip {
     cursor: pointer;
@@ -362,19 +407,16 @@ export default {
   .indent {
     text-indent: 2em;
     margin-top: 10px;
-    letter-spacing: 1px;
   }
-  .setSpace {
-    margin-top: 20px;
-  }
+
   .custom-header {
     font-size: 15px;
     .cancleBtn {
       position: absolute;
       right: -90px;
-      top: -15px;
+      top: -42px;
       color: #99aab3;
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 400;
       width: 30px;
       cursor: pointer;

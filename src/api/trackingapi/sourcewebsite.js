@@ -2,7 +2,7 @@ import request from '@/utils/request'
 // 头部
 export function getSourceWebSiteTotalApi(params) {
   return request({
-    url: 'sourcewebsite/getSourceWebSiteTotal',
+    url: '/sourcewebsite/getSourceWebSiteTotal',
     method: 'post',
     data: params
   })
@@ -20,7 +20,7 @@ export function getSourceWebsiteApi(params) {
 // 分页获取来源网站详情 详情 
 export function getSourceSiteDetailApi(params) {
   return request({
-    url: 'sourcewebsite/getSourceWebSiteDetail',
+    url: '/sourcewebsite/getSourceWebSiteDetail',
     method: 'post',
     data: params
   })
@@ -29,7 +29,7 @@ export function getSourceSiteDetailApi(params) {
 // 获取Top10来源网站详情
 export function getSourceWebSiteDetailTop10Api(params) {
   return request({
-    url: 'sourcewebsite/getSourceWebSiteDetailTop10',
+    url: '/sourcewebsite/getSourceWebSiteDetailTop10',
     method: 'post',
     data: params
   })
