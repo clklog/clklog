@@ -19,7 +19,7 @@
             社区版
           </div>
         </div>
-       
+
         <el-select
           v-model="value"
           placeholder="请选择"
@@ -78,12 +78,7 @@ export default {
   },
   data() {
     return {
-      options: [
-        {
-          value: "clklogapp",
-          label: "clklog",
-        },
-      ],
+      options: window.globalConfig.projectList,
       value: "",
       dateTime: "",
       dateWeek: "",
@@ -132,7 +127,6 @@ export default {
       this.$nextTick(() => {
         this.$bus.$emit("$subscription", "sub");
       });
-    
     },
     clickImg() {},
     handleChangeProject(val) {
