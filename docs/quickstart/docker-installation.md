@@ -3,7 +3,7 @@
 
 1. ClkLog Docker Compose配置下载：
 
-    <a href="https://clklog.com/res/docker/clklog-docker-compose.tar.gz?r=240423" target="_blank" rel="noopener" id="docker-compose-tar">下载clklog-docker-compose.tar.gz</a>
+    <a href="https://clklog.com/res/docker/clklog-docker-compose.tar.gz?r=240429" target="_blank" rel="noopener" id="docker-compose-tar">下载clklog-docker-compose.tar.gz</a>
 
 2. 拷贝镜像至linux服务器（假设服务器ip为10.10.222.21）,并解压镜像文件，参考代码如下：
 
