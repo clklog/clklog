@@ -43,11 +43,11 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 
 ## 项目组成
 
-- **接收服务 【clklog-receiver】**：接收客服端采集的日志，存入kafka。
+- **接收服务 【clklog-receiver】**：接收客服端采集的日志数据并存入kafka。
 
-- **处理服务  【clklog-processing】**： 依托flink，消费kafka数据，存入clickhouse。
+- **处理服务  【clklog-processing】**： 依托flink，消费kafka数据并存入clickhouse。
 
-- **处理脚本 【clickhouse-script】**：基于Clickhouse集群中的log_analysis表进行多维计算，获得各个维度上的统计报表。使用Cron来进行任务的定时调度。
+- **处理脚本 【clklog-scripts】**：基于Clickhouse集群中的log_analysis表进行多维计算，获得各个维度上的统计报表。使用Cron来进行任务的定时调度。
 
 - **统计接口 【clklog-api】**： 提供多维度数据统计接口。
 

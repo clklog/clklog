@@ -5,9 +5,6 @@
 
 ## 2.数据库初始化
 
-<!-- > 下载源码：
-<a href="https://github.com/clklog/clklog-scripts" target="_blank">[GitHub 下载]</a> -->
-
 1. 在clickhouse里创建数据库`clklog`
 
     ```
@@ -17,9 +14,6 @@
 2. 根据 `scripts` 下的`sql脚本.txt`文件创建表
 
 ## 3.部署接收服务 clklog-receiver
-
-<!-- > 下载源码：
-<a href="https://github.com/clklog/clklog-receiver" target="_blank">[GitHub 下载]</a> -->
 
 1. 编译应用程序
 
@@ -97,9 +91,6 @@
 
 ## 4.部署处理服务 clklog-processing
 
-<!-- > 下载源码：
-<a href="https://github.com/clklog/clklog-processing" target="_blank">[GitHub 下载]</a> -->
-
 1. 编译应用程序
 
 2. 上传程序文件
@@ -156,8 +147,6 @@
 
 ## 5. 部署计算脚本clklog-script
 
-<!-- 下载脚本: <a href="https://github.com/clklog/clklog-scripts" target="_blank">[GitHub 下载]</a> -->
-
 - 计算脚本是基于Clickhouse集群中的`log_analysis`表进行多维计算，获得各个维度上的统计报表。
     使用Cron来进行任务的定时调度。
 
@@ -208,9 +197,6 @@
 <br>
 
 ## 6. 部署统计接口 clklog-api
-
-<!-- > 下载源码：
-<a href="https://github.com/clklog/clklog-api" target="_blank">[GitHub 下载]</a> -->
 
 1. 编译应用程序
 

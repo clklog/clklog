@@ -35,7 +35,7 @@ yum install nginx
 systemctl start nginx
 ```
 
-- ###### [nginx安装注意事项](question.md#nginx安装注意事项)
+- ###### [nginx安装注意事项](quickstart/question.md#nginx安装注意事项)
 
 ### Redis 3.2.4 安装参考
 
@@ -69,7 +69,7 @@ systemctl start nginx
 
     默认情况下，Redis 会被安装在`/usr/local/bin`目录下
 
-- ###### [redis安装注意事项](question.md#redis安装注意事项)
+- ###### [redis安装注意事项](quickstart/question.md#redis安装注意事项)
 
 5. 修改配置
 

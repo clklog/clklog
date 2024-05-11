@@ -28,4 +28,4 @@
 
 我已充分阅读此协议，并同意签署贡献者许可协议。
 
-<a href="contributor/clklogagreement.doc" target="_blank" download="">[协议下载]</a>
+<a href="contributor/clklogagreement.doc" target="clklogagreement" download="">[协议下载]</a>

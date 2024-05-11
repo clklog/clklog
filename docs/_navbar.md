@@ -8,6 +8,8 @@
   * [商业版](https://pro.clklog.com)
 
 * [API文档](https://demo.clklog.com/api/doc.html#/home)
-* 源码下载
-  * [<img src="/assets/imgs/export.png" height="10"/> GitHub](https://github.com/clklog)
-  * [<img src="/assets/imgs/export.png" height="10"/> Gitee](https://gitee.com/clklog)
+* [源码下载](#)
+  * <a href="https://github.com/clklog"  target="_clkloggithub"><img src="/assets/imgs/export.png" height="10"/> GitHub</a>
+  * <a href="https://gitee.com/clklog"  target="_clkloggitee"><img src="/assets/imgs/export.png" height="10"/> Gitee</a>
+  
+* <a href="https://docs.clklog.com"  target="_clklogdocs">文档中心</a>
