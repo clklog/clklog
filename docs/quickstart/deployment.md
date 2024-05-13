@@ -145,10 +145,10 @@
 
     其中 `-s` 参数为`checkpoint`位置。对于中断后再执行的任务，需要指定该参数，如不指定则从头开始消费`kafka`消息。
 
-## 5. 部署计算脚本clklog-script
+## 5. 部署计算脚本clklog-scripts
 
-- 计算脚本是基于Clickhouse集群中的`log_analysis`表进行多维计算，获得各个维度上的统计报表。
-    使用Cron来进行任务的定时调度。
+- 计算脚本是基于Clickhouse集群中`log_analysis`表进行多维计算，获得各个维度上的统计报表。
+  使用Cron来进行任务的定时调度。
 
 1. 创建脚本及日志存放目录
 

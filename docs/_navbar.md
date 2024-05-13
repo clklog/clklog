@@ -12,4 +12,4 @@
   * <a href="https://github.com/clklog"  target="_clkloggithub"><img src="/assets/imgs/export.png" height="10"/> GitHub</a>
   * <a href="https://gitee.com/clklog"  target="_clkloggitee"><img src="/assets/imgs/export.png" height="10"/> Gitee</a>
   
-* <a href="https://docs.clklog.com"  target="_clklogdocs">文档中心</a>
+<!-- * <a href="https://docs.clklog.com"  target="_clklogdocs">文档中心</a> -->
