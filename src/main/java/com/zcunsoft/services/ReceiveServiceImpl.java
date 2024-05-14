@@ -105,7 +105,7 @@ public class ReceiveServiceImpl implements IReceiveService {
                 rec = analysisIp(false, clientIp);
             }
 
-            if (rec != null && rec.getStatus().equalsIgnoreCase("OK")) {
+            if (rec != null && "OK".equalsIgnoreCase(rec.getStatus())) {
                 String country = rec.getCountryShort().toLowerCase(Locale.ROOT);
                 String province = rec.getRegion().toLowerCase(Locale.ROOT);
                 String city = rec.getCity().toLowerCase(Locale.ROOT);
