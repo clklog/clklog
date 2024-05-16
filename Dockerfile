@@ -7,5 +7,5 @@ ENTRYPOINT ["entrypoint.sh"]
 EXPOSE 8002
 COPY docker-entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY ./iplib/* /iplib/
-COPY ./app-setting.json /
+COPY ./project-setting.json /
 COPY ${JAR_FILE} app.jar
