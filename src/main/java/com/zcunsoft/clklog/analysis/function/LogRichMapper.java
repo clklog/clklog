@@ -1,6 +1,6 @@
 package com.zcunsoft.clklog.analysis.function;
 
-import com.zcunsoft.clklog.analysis.bean.AppSetting;
+import com.zcunsoft.clklog.analysis.bean.ProjectSetting;
 import com.zcunsoft.clklog.analysis.bean.LogBean;
 import com.zcunsoft.clklog.analysis.bean.LogBeanCollection;
 import com.zcunsoft.clklog.analysis.bean.Region;
@@ -36,11 +36,11 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
 
     private IPUtil ipUtil;
 
-    private HashMap<String, AppSetting> htAppSetting;
+    private HashMap<String, ProjectSetting> htProjectSetting;
 
     @Override
     public LogBeanCollection map(String line) {
-        List<LogBean> logBeanList = ExtractUtil.extractToLogBean(line, userAgentAnalyzer, htAppSetting);
+        List<LogBean> logBeanList = ExtractUtil.extractToLogBean(line, userAgentAnalyzer, htProjectSetting);
         if (!logBeanList.isEmpty()) {
             List<String> clientIpList = logBeanList.stream().map(LogBean::getClientIp).distinct().collect(Collectors.toList());
             List<String> ipInfoList = jedis.hmget("ClientIpRegionHash", clientIpList.toArray(new String[0]));
@@ -97,10 +97,10 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
                 .build();
 
 
-        String appSettingContent = FileUtils.readFileToString(new File(parameters.get("processing-file-location") + File.separator + "app-setting.json"), Charset.forName("GB2312"));
-        TypeReference<HashMap<String, AppSetting>> htAppSettingTypeReference = new TypeReference<HashMap<String, AppSetting>>() {
+        String projectSettingContent = FileUtils.readFileToString(new File(parameters.get("processing-file-location") + File.separator + "app-setting.json"), Charset.forName("GB2312"));
+        TypeReference<HashMap<String, ProjectSetting>> htProjectSettingTypeReference = new TypeReference<HashMap<String, ProjectSetting>>() {
         };
         ObjectMapperUtil mapper = new ObjectMapperUtil();
-        htAppSetting = mapper.readValue(appSettingContent, htAppSettingTypeReference);
+        htProjectSetting = mapper.readValue(projectSettingContent, htProjectSettingTypeReference);
     }
 }

@@ -1,6 +1,6 @@
 package com.zcunsoft.clklog.analysis;
 
-import com.zcunsoft.clklog.analysis.bean.AppSetting;
+import com.zcunsoft.clklog.analysis.bean.ProjectSetting;
 import com.zcunsoft.clklog.analysis.bean.LogBean;
 import com.zcunsoft.clklog.analysis.bean.Region;
 import com.zcunsoft.clklog.analysis.utils.ExtractUtil;
@@ -86,14 +86,14 @@ public class AppTest {
         AbstractUserAgentAnalyzer userAgentAnalyzer = UserAgentAnalyzer.newBuilder().hideMatcherLoadStats().withCache(10000)
                 .build();
 
-        String appSettingContent = FileUtils.readFileToString(new File(System.getProperty("user.dir") + File.separator + "app-setting.json"), Charset.forName("GB2312"));
+        String projectSettingContent = FileUtils.readFileToString(new File(System.getProperty("user.dir") + File.separator + "project-setting.json"), Charset.forName("GB2312"));
 
-        TypeReference<HashMap<String, AppSetting>> htAppSettingTypeReference = new TypeReference<HashMap<String, AppSetting>>() {
+        TypeReference<HashMap<String, ProjectSetting>> htProjectSettingTypeReference = new TypeReference<HashMap<String, ProjectSetting>>() {
         };
         ObjectMapperUtil mapper = new ObjectMapperUtil();
-        HashMap<String, AppSetting> htAppSetting = mapper.readValue(appSettingContent, htAppSettingTypeReference);
+        HashMap<String, ProjectSetting> htProjectSetting = mapper.readValue(projectSettingContent, htProjectSettingTypeReference);
 
-        List<LogBean> logBeanList = ExtractUtil.extractToLogBean(test1, userAgentAnalyzer, htAppSetting);
+        List<LogBean> logBeanList = ExtractUtil.extractToLogBean(test1, userAgentAnalyzer, htProjectSetting);
         logBeanList.get(0).setCreateTime(target1.getCreateTime());
         Object[] expectedArr = getFiledsInfo(logBeanList.get(0)).toArray();
         dynamicTestList.add(dynamicTest("test1 extractToLogBean dynamic test", () -> Assertions.assertArrayEquals(actualArr, expectedArr, "ok")));
