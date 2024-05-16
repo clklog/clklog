@@ -32,7 +32,7 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
             "latest_referrer_host,latest_scene,latest_share_method,latest_utm_campaign,latest_utm_content,latest_utm_medium,latest_utm_source,latest_utm_term,latitude,longitude," +
             "manufacturer,matched_key,matching_key_list,model,network_type,os,os_version,receive_time,screen_name,screen_orientation," +
             "short_url_key,short_url_target,source_package_name,track_signup_original_id,user_agent,utm_campaign,utm_content,utm_matching_type,utm_medium,utm_source," +
-            "utm_term,viewport_position,wifi,kafka_data_time,project_token,crc,is_compress,event_duration,adv_id,user_key," +
+            "utm_term,viewport_position,wifi,kafka_data_time,project_token,crc,is_compress,event_duration,user_key," +
             "is_logined,download_channel,event_session_id,raw_url,create_time)" +
             " values " +
             "(?,?,?,?,?,?,?,?,?,?," +
@@ -44,7 +44,7 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
             "?,?,?,?,?,?,?,?,?,?," +
             "?,?,?,?,?,?,?,?,?,?," +
             "?,?,?,?,?,?,?,?,?,?," +
-            "?,?,?,?,?,?,?,?,?,?," +
+            "?,?,?,?,?,?,?,?,?," +
             "?,?,?,?,?)"; //每一行十个字段
 
 
@@ -187,13 +187,12 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
                 pst.setString(92, value.getCrc());
                 pst.setString(93, value.getIsCompress());
                 pst.setDouble(94, value.getEventDuration());
-                pst.setString(95, "");
-                pst.setString(96, value.getUserKey());
-                pst.setInt(97, value.getIsLogined());
-                pst.setString(98, value.getDownloadChannel());
-                pst.setString(99, value.getEventSessionId());
-                pst.setString(100, value.getRawUrl());
-                pst.setString(101, value.getCreateTime());
+                pst.setString(95, value.getUserKey());
+                pst.setInt(96, value.getIsLogined());
+                pst.setString(97, value.getDownloadChannel());
+                pst.setString(98, value.getEventSessionId());
+                pst.setString(99, value.getRawUrl());
+                pst.setString(100, value.getCreateTime());
                 pst.addBatch();
             }
         }
