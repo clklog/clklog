@@ -49,7 +49,7 @@
         # nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
     receiver: 
       # 对应前端埋点代码配置的project名称，多个project以逗号分隔。
-      app-list: clklogapp
+      project-list: clklogapp
       # resource-path 默认为空，如果资源及配置文件(iplib,app-setting.json)不与jar同目录，则修改为它们的父路径，否则无需配置。
       resource-path:  
       # enable-simple-version 默认为false, 表示日志存入kafka，由flink处理后存入clickhouse；当值为true时，表示日志直接存入clickhouse，无需安装kafka和flink。配置修改后需重启clklog-receiver服务。
@@ -391,7 +391,7 @@
 
   将`autotrack.js`中的`server_url` 接收服务地址配置信息修改为clklog数据采集地址，并调整参数`project`和`token`的配置。
 
-  其中`project`名称默认为`clklogapp`，如果要修改`project`名称请注意调整`clklog-receiver`服务中`app-list`的相关配置。
+  其中`project`名称默认为`clklogapp`，如果要修改`project`名称请注意调整`clklog-receiver`服务中`project-list`的相关配置。
 
   `autotrack.js`中的`server_url`参考配置如下：
 

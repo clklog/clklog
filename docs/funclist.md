@@ -196,12 +196,12 @@
     <tr>
         <td> 16 </td>
         <td> <span class="pro-func">系统设置 </span>    </td>
-        <td> <span class="pro-func">应用管理<br/><br/>应用数据采集相关统计参数配置<br/><br/> 全局数据采集相关统计参数配置 </span> </td>
+        <td> <span class="pro-func">项目管理<br/><br/>项目数据采集相关统计参数配置<br/><br/> 全局数据采集相关统计参数配置 </span> </td>
         <td class="func-desc-td">
             <br />
-            <span class="pro-func">Ø  应用注册、应用数据采集相关统计参数配置 </span> <br /><br />
-            <span class="pro-func">Ø  应用数据采集相关统计参数配置，相关参数包含：排查的全局IP地址、用户代理、URL参数、站内搜索关键词等</span>  <br /><br />
-            <span class="pro-func">Ø  全局应用数据采集相关统计参数配置，相关参数包含：排查的全局IP地址、用户代理、URL参数、站内搜索关键词等</span><br /><br />
+            <span class="pro-func">Ø  项目新增、项目数据采集相关统计参数配置 </span> <br /><br />
+            <span class="pro-func">Ø  项目数据采集相关统计参数配置，相关参数包含：排查的全局IP地址、用户代理、URL参数、站内搜索关键词等</span>  <br /><br />
+            <span class="pro-func">Ø  全局项目数据采集相关统计参数配置，相关参数包含：排查的全局IP地址、用户代理、URL参数、站内搜索关键词等</span><br /><br />
         </td>
     </tr>
     <tr>
