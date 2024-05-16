@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS clklog ENGINE = Atomic;
 
 use clklog;
 
-CREATE TABLE IF NOT EXISTS clklog.log_analysis
+CREATE TABLE IF NOT EXISTS log_analysis
 (
     `kafka_data_time` String,
     `project_name` String,
@@ -39,10 +39,6 @@ CREATE TABLE IF NOT EXISTS clklog.log_analysis
     `is_first_time` String,
     `referrer_host` String,
     `element_id` String,
-    `place_id` String,
-    `ad_id` String,
-    `plan_id` String,
-    `is_ad_click` Int8,
     `country` String,
     `province` String,
     `city` String,
@@ -103,13 +99,11 @@ CREATE TABLE IF NOT EXISTS clklog.log_analysis
     `wifi` String,
     `event_duration` Float64 DEFAULT 0,
     `download_channel` String,
-    `adv_id` String,
     `user_key` String DEFAULT '',
     `is_logined` Int8 DEFAULT 0,
     `event_session_id` String,
     `create_time` DateTime,
-    `raw_url` String,
-    `internal_search_keyword` String
+    `raw_url` String
 )
 ENGINE = MergeTree
 PARTITION BY stat_date
