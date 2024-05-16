@@ -381,10 +381,6 @@ public class ExtractUtil {
 
                 if (projectSetting != null) {
                     logBean.setUrl(ExtractUtil.excludeParamFromUrl(projectSetting.getExcludedUrlParams(), logBean.getUrl()));
-
-                    if (StringUtils.isNotBlank(projectSetting.getSearchwordKey())) {
-                        logBean.setInternalSearchKeyword(getSearchwordFromUrl(projectSetting.getSearchwordKey(), logBean.getRawUrl()));
-                    }
                 }
             }
         } catch (Exception ex) {
