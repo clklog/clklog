@@ -97,7 +97,7 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
                 .build();
 
 
-        String projectSettingContent = FileUtils.readFileToString(new File(parameters.get("processing-file-location") + File.separator + "app-setting.json"), Charset.forName("GB2312"));
+        String projectSettingContent = FileUtils.readFileToString(new File(parameters.get("processing-file-location") + File.separator + "project-setting.json"), Charset.forName("GB2312"));
         TypeReference<HashMap<String, ProjectSetting>> htProjectSettingTypeReference = new TypeReference<HashMap<String, ProjectSetting>>() {
         };
         ObjectMapperUtil mapper = new ObjectMapperUtil();
