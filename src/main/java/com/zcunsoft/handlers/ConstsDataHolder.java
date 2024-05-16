@@ -1,6 +1,6 @@
 package com.zcunsoft.handlers;
 
-import com.zcunsoft.model.AppSetting;
+import com.zcunsoft.model.ProjectSetting;
 import com.zcunsoft.model.QueryCriteria;
 import lombok.Data;
 
@@ -23,5 +23,5 @@ public class ConstsDataHolder {
 	private final BlockingQueue<QueryCriteria> logQueue = new LinkedBlockingQueue<>();
 
 
-	private final ConcurrentMap<String, AppSetting> htAppSetting = new ConcurrentHashMap<String, AppSetting>();
+	private final ConcurrentMap<String, ProjectSetting> htProjectSetting = new ConcurrentHashMap<String, ProjectSetting>();
 }

@@ -21,5 +21,5 @@ public interface IReceiveService {
 
     void loadCountry();
 
-    void loadAppSetting();
+    void loadProjectSetting();
 }

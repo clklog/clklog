@@ -3,7 +3,7 @@ package com.zcunsoft.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.zcunsoft.model.AppSetting;
+import com.zcunsoft.model.ProjectSetting;
 import com.zcunsoft.model.LogBean;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import nl.basjes.parse.useragent.AgentField;
@@ -24,7 +24,7 @@ import java.util.List;
 public class ExtractUtil {
     private static final Logger logger = LogManager.getLogger(ExtractUtil.class);
 
-    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, AppSetting appSetting) {
+    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, ProjectSetting projectSetting) {
 
         LogBean logBean = null;
         try {
@@ -379,11 +379,11 @@ public class ExtractUtil {
                     }
                 }
 
-                if (appSetting != null) {
-                    logBean.setUrl(ExtractUtil.excludeParamFromUrl(appSetting.getExcludedUrlParams(), logBean.getUrl()));
+                if (projectSetting != null) {
+                    logBean.setUrl(ExtractUtil.excludeParamFromUrl(projectSetting.getExcludedUrlParams(), logBean.getUrl()));
 
-                    if (StringUtils.isNotBlank(appSetting.getSearchwordKey())) {
-                        logBean.setInternalSearchKeyword(getSearchwordFromUrl(appSetting.getSearchwordKey(), logBean.getRawUrl()));
+                    if (StringUtils.isNotBlank(projectSetting.getSearchwordKey())) {
+                        logBean.setInternalSearchKeyword(getSearchwordFromUrl(projectSetting.getSearchwordKey(), logBean.getRawUrl()));
                     }
                 }
             }
@@ -393,15 +393,15 @@ public class ExtractUtil {
         return logBean;
     }
 
-    public static AppSetting getAppSetting(String projectName, HashMap<String, AppSetting> htAppSetting) {
-        AppSetting appSetting = htAppSetting.get("clklog-global");
-        if (htAppSetting.containsKey(projectName)) {
-            appSetting = htAppSetting.get(projectName);
+    public static ProjectSetting getProjectSetting(String projectName, HashMap<String, ProjectSetting> htProjectSetting) {
+        ProjectSetting projectSetting = htProjectSetting.get("clklog-global");
+        if (htProjectSetting.containsKey(projectName)) {
+            projectSetting = htProjectSetting.get(projectName);
         }
-        return appSetting;
+        return projectSetting;
     }
 
-    public static List<LogBean> extractToLogBean(String line, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, AppSetting> htAppSetting) {
+    public static List<LogBean> extractToLogBean(String line, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, ProjectSetting> htProjectSetting) {
         List<LogBean> logBeanList = new ArrayList<>();
         try {
             String[] arr = line.split(",", -1);
@@ -416,12 +416,12 @@ public class ExtractUtil {
 
                 ObjectMapperUtil objectMapper = new ObjectMapperUtil();
                 JsonNode json = objectMapper.readTree(jsonContext);
-                AppSetting appSetting = getAppSetting(arr[1], htAppSetting);
+                ProjectSetting projectSetting = getProjectSetting(arr[1], htProjectSetting);
                 if (json instanceof ArrayNode) {
                     ArrayNode arrayNode = (ArrayNode) json;
                     for (int i = 0; i < arrayNode.size(); i++) {
-                        LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, appSetting);
-                        if (filterData(logBean, appSetting)) {
+                        LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, projectSetting);
+                        if (filterData(logBean, projectSetting)) {
                             logBean.setKafkaDataTime(arr[0]);
                             logBean.setProjectName(projectName);
                             logBean.setProjectToken(arr[2]);
@@ -432,8 +432,8 @@ public class ExtractUtil {
                         }
                     }
                 } else {
-                    LogBean logBean = extractToLogBean(json, userAgentAnalyzer, appSetting);
-                    if (filterData(logBean, appSetting)) {
+                    LogBean logBean = extractToLogBean(json, userAgentAnalyzer, projectSetting);
+                    if (filterData(logBean, projectSetting)) {
                         logBean.setKafkaDataTime(arr[0]);
                         logBean.setProjectName(projectName);
                         logBean.setProjectToken(arr[2]);
@@ -450,7 +450,7 @@ public class ExtractUtil {
         return logBeanList;
     }
 
-    private static boolean filterData(LogBean logBean, AppSetting appSetting) {
+    private static boolean filterData(LogBean logBean, ProjectSetting projectSetting) {
         boolean isAdd = logBean != null;
 
         if (isAdd) {

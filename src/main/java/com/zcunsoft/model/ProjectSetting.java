@@ -3,7 +3,7 @@ package com.zcunsoft.model;
 import lombok.Data;
 
 @Data
-public class AppSetting {
+public class ProjectSetting {
     private String excludedUrlParams;
 
     private String searchwordKey;

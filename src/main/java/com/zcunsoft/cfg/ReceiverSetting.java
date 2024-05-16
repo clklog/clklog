@@ -10,7 +10,7 @@ public class ReceiverSetting {
 
     private int threadCount = 2;
 
-    private List<String> appList;
+    private List<String> projectList;
 
     private boolean enableSimpleVersion;
 
@@ -26,12 +26,12 @@ public class ReceiverSetting {
         this.threadCount = threadCount;
     }
 
-    public List<String> getAppList() {
-        return appList;
+    public List<String> getProjectList() {
+        return projectList;
     }
 
-    public void setAppList(List<String> appList) {
-        this.appList = appList;
+    public void setProjectList(List<String> projectList) {
+        this.projectList = projectList;
     }
 
     public String getResourcePath() {

@@ -49,7 +49,7 @@ public class KafkaController {
 
     @RequestMapping(value = "api/gp", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<Object> sendGet(QueryCriteria queryCriteria, HttpServletRequest request) {
-        if (serverSettings.getAppList().contains(queryCriteria.getProject())) {
+        if (serverSettings.getProjectList().contains(queryCriteria.getProject())) {
             String bodyString = getBodyString(request);
             String[] bodyStringList = bodyString.split("&");
             if (bodyStringList.length == 1 && !bodyString.equals(""))

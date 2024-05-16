@@ -8,7 +8,7 @@ import com.ip2location.IPResult;
 import com.zcunsoft.cfg.KafkaSetting;
 import com.zcunsoft.cfg.ReceiverSetting;
 import com.zcunsoft.handlers.ConstsDataHolder;
-import com.zcunsoft.model.AppSetting;
+import com.zcunsoft.model.ProjectSetting;
 import com.zcunsoft.model.LogBean;
 import com.zcunsoft.model.QueryCriteria;
 import com.zcunsoft.model.Region;
@@ -61,7 +61,7 @@ public class ReceiveServiceImpl implements IReceiveService {
 
     private final JdbcTemplate clickHouseJdbcTemplate;
 
-    private final TypeReference<HashMap<String, AppSetting>> htAppSettingTypeReference = new TypeReference<HashMap<String, AppSetting>>() {
+    private final TypeReference<HashMap<String, ProjectSetting>> htProjectSettingTypeReference = new TypeReference<HashMap<String, ProjectSetting>>() {
     };
 
     private final ReceiverSetting serverSettings;
@@ -189,15 +189,15 @@ public class ReceiveServiceImpl implements IReceiveService {
         try {
             JsonNode array = objectMapper.readTree(queryCriteria.getData());
 
-            AppSetting appSetting = constsDataHolder.getHtAppSetting().get("clklog-global");
-            if (constsDataHolder.getHtAppSetting().containsKey(queryCriteria.getProject())) {
-                appSetting = constsDataHolder.getHtAppSetting().get(queryCriteria.getProject());
+            ProjectSetting projectSetting = constsDataHolder.getHtProjectSetting().get("clklog-global");
+            if (constsDataHolder.getHtProjectSetting().containsKey(queryCriteria.getProject())) {
+                projectSetting = constsDataHolder.getHtProjectSetting().get(queryCriteria.getProject());
             }
             if (array.isArray()) {
                 for (JsonNode jn : array) {
                     ObjectNode objectNode = ((ObjectNode) jn.get("properties"));
                     objectNode.put("$user_agent", ua);
-                    LogBean logBean = ExtractUtil.extractToLogBean(jn, userAgentAnalyzer, appSetting);
+                    LogBean logBean = ExtractUtil.extractToLogBean(jn, userAgentAnalyzer, projectSetting);
                     logBean.setKafkaDataTime(String.valueOf(System.currentTimeMillis() / 1000));
                     logBean.setProjectName(queryCriteria.getProject());
                     logBean.setProjectToken(queryCriteria.getToken());
@@ -213,7 +213,7 @@ public class ReceiveServiceImpl implements IReceiveService {
             } else {
                 ObjectNode objectNode = ((ObjectNode) array.get("properties"));
                 objectNode.put("$user_agent", ua);
-                LogBean logBean = ExtractUtil.extractToLogBean(array, userAgentAnalyzer, appSetting);
+                LogBean logBean = ExtractUtil.extractToLogBean(array, userAgentAnalyzer, projectSetting);
                 logBean.setKafkaDataTime(String.valueOf(System.currentTimeMillis() / 1000));
                 logBean.setProjectName(queryCriteria.getProject());
                 logBean.setProjectToken(queryCriteria.getToken());
@@ -444,16 +444,16 @@ public class ReceiveServiceImpl implements IReceiveService {
     }
 
     @Override
-    public void loadAppSetting() {
+    public void loadProjectSetting() {
         try {
-            String appSettingContent = FileUtils.readFileToString(new File(getResourcePath() + File.separator +
-                    "app-setting.json"), Charset.forName("GB2312"));
+            String projectSettingContent = FileUtils.readFileToString(new File(getResourcePath() + File.separator +
+                    "project-setting.json"), Charset.forName("GB2312"));
 
-            HashMap<String, AppSetting> appSettingHashMap = objectMapper.readValue(appSettingContent,
-                    htAppSettingTypeReference);
-            constsDataHolder.getHtAppSetting().putAll(appSettingHashMap);
+            HashMap<String, ProjectSetting> projectSettingHashMap = objectMapper.readValue(projectSettingContent,
+                    htProjectSettingTypeReference);
+            constsDataHolder.getHtProjectSetting().putAll(projectSettingHashMap);
         } catch (Exception ex) {
-            logger.error("load AppSetting err", ex);
+            logger.error("load ProjectSetting err", ex);
         }
     }
 

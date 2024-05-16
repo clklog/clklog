@@ -40,7 +40,7 @@ public class LoadConstProcessBoss {
             ireceiveService.loadCountry();
             ireceiveService.loadProvince();
             ireceiveService.loadCity();
-            ireceiveService.loadAppSetting();
+            ireceiveService.loadProjectSetting();
             Thread.sleep(60000);
         } catch (InterruptedException e) {
             logger.error("", e);
