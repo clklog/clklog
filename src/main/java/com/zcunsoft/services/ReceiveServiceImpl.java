@@ -176,7 +176,7 @@ public class ReceiveServiceImpl implements IReceiveService {
             }
             //    loc.Close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("analysisIp error ", e);
         }
         return rec;
     }
