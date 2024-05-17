@@ -67,7 +67,7 @@ public class IPUtil implements Serializable {
                 rec = locIpV6.IPQuery(clientIp);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("analysisIp error ", e);
         }
         return rec;
     }
