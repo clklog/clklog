@@ -1,16 +1,17 @@
 
 ## 环境准备
 <!-- - Ubuntu SMP -->
-- CentOS 7
+- Linux服务器（本文档以ubuntu为例）
 - JDK 1.8
 - Nginx 1.18
 - Redis 3.2.4
-- Zookeeper 3.7.1
+- Zookeeper 3.7.2
 - Kafka 2.12-3.3.1
 - Flink 1.14.6
 - Clickhouse 23.2.1
 - nodejs >= 8.9
 - npm >=3.0.0
+- mysql
 
 ## 初始化步骤参考
 
@@ -22,20 +23,35 @@ mkdir /usr/local/services
 
 ### Java 1.8 安装参考
 
-下载 jdk-8u211-linux-x64.rpm
+1. 安装Java
+    通过apt-get安装jdk8
 
-```
-rpm -ivh jdk-8u211-linux-x64.rpm
-```
+    ```
+    sudo apt-get install openjdk-8-jdk
+    ```
+
+    或下载 jdk-8u211-linux-x64.rpm
+
+    ```
+    rpm -ivh jdk-8u211-linux-x64.rpm
+    ```
+
+2. 验证java版本
+
+    ```
+    java -version
+    ```
 
 ### nginx 安装参考
 
 ```
-yum install nginx
+
+sudo apt-get install nginx
 systemctl start nginx
+
 ```
 
-- ###### [nginx安装注意事项](quickstart/question.md#nginx安装注意事项)
+- #### [nginx安装注意事项](quickstart/question.md#nginx安装注意事项)
 
 ### Redis 3.2.4 安装参考
 
@@ -55,13 +71,22 @@ systemctl start nginx
     cd redis-3.2.4
     ```
 
-3. 编译
+3. 安装make与gcc
 
     ```
-    make
+    sudo apt-get install make gcc
     ```
 
-4. 安装
+4. 编译依赖后make
+
+    ```
+    cd ./dev
+    sudo make hiredis jemalloc linenoise lua geohash-int
+    cd ../
+    sudo make
+    ```
+
+5. 安装Redis
 
     ```
     make install
@@ -69,7 +94,7 @@ systemctl start nginx
 
     默认情况下，Redis 会被安装在`/usr/local/bin`目录下
 
-- ###### [redis安装注意事项](quickstart/question.md#redis安装注意事项)
+- #### [redis安装注意事项](quickstart/question.md#redis安装注意事项)
 
 5. 修改配置
 
@@ -105,12 +130,12 @@ systemctl start nginx
 
 <br>
 
-### Zookeeper 3.7.1 安装参考
+### Zookeeper 3.7.2 安装参考
 
 1. 从  Zookeeper  官网下载安装包
 
     ```
-    wget --no-check-certificate https://dlcdn.apache.org/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1-bin.tar.gz
+    wget --no-check-certificate https://dlcdn.apache.org/zookeeper/zookeeper-3.7.2/apache-zookeeper-3.7.2-bin.tar.gz
     ```
 
 2. 解压
@@ -119,13 +144,13 @@ systemctl start nginx
 
     ```
     cd /usr/local/services/
-    tar -zxvf apache-zookeeper-3.7.1-bin.tar.gz
-    cd apache-zookeeper-3.7.1-bin
+    tar -zxvf apache-zookeeper-3.7.2-bin.tar.gz
+    cd apache-zookeeper-3.7.2-bin
     ```
 
 3. 修改配置
 
-    拷贝配置文件，并增加配置项
+    根据配置模板拷贝配置文件，增加配置项
 
     ```
     cp ./conf/zoo_sample.cfg ./conf/zoo.cfg
@@ -172,7 +197,7 @@ systemctl start nginx
 3. 启动
 
     ```
-    ./bin/kafka-server-start.sh  -daemon config/server.properties
+    ./bin/kafka-server-start.sh  -daemon config/server.properties
     ```
 
 4. 检查
@@ -181,14 +206,16 @@ systemctl start nginx
 
     ```
     ./bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --replication-factor 1 --partitions 1 --topic test
-    ```
+     ```
 
     ![](../assets/imgs/createtop.png)
 
     查看`topic`
 
     ```
+
     ./bin/kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --describe --topic test
+
     ```
 
     ![](../assets/imgs/checktopic.png)
@@ -231,13 +258,7 @@ systemctl start nginx
 ### Clickhouse 23.2.1 安装参考
 
 1. 安装clickhouse
-
-    ```
-    yum install -y yum-utils
-    rpm --import https://repo.yandex.ru/clickhouse/CLICKHOUSE-KEY.GPG
-    yum-config-manager --add-repo https://repo.yandex.ru/clickhouse/rpm/stable/x86_64
-    yum install clickhouse-server clickhouse-client
-    ```
+   安装参考：<https://clickhouse.com/docs/en/install>
 
 2. 修改用户验证信息
 
@@ -258,3 +279,20 @@ systemctl start nginx
     ```
     clickhouse-client -u default --password 123456
     ```
+
+### MySql 安装参考
+
+1. 安装mysql
+
+```
+
+apt install mysql-server
+
+```
+
+2. 修改密码
+
+```
+
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password';
+```

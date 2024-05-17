@@ -18,7 +18,7 @@ ClkLog支持多个项目的数据采集，各个项目采集的数据从数据�
 ClkLog 基础统计分析功能基于访问页面相关事件（如：$pageview,
 $WebStay, $WebPageLoad, $WebPageLeave），从访问用户的访问渠道、访问设备、访问地域、访客类型、访问来源等维度对用户的访问量、访问次数、访问时长、访问页面深度等数据进行展示与分析，可满足基础的用户访问统计和用户画像功能。此类相关的基础数据分析的集成只需要通过神策SDK进行代码全埋点，配置埋点数据采集接收地址为ClkLog接收服务地址即可。
 
-全埋点集成方式参考：<a href="/#/quickstart/deployment.md#_9-sdk-埋点集成" target="clklogwebjssdkintegration">ClkLog 埋点集成</a>
+全埋点集成方式参考：<a href="/#/quickstart/deployment.md#_11-sdk-埋点集成" target="clklogwebjssdkintegration">ClkLog 埋点集成</a>
 
 ### 2.3.简易用户关联集成
 

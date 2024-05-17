@@ -25,7 +25,7 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 
 - **前端**：vue、vue-element-admin、element-ui 、echarts
 
-- **数据**：Clickhouse
+- **数据**：Clickhouse、MySql
 
 ## 系统架构
 
@@ -50,6 +50,8 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 - **处理脚本 【clklog-scripts】**：基于Clickhouse集群中的log_analysis表进行多维计算，获得各个维度上的统计报表。使用Cron来进行任务的定时调度。
 
 - **统计接口 【clklog-api】**： 提供多维度数据统计接口。
+  
+- **统计接口 【clklog-manage】**： 管理接口，包括多项目管理、元数据管理等。
 
 - **统计展示 【clklog-ui】**：基于 vue-element-admin 实现的统计分析数据界面展示。
 
