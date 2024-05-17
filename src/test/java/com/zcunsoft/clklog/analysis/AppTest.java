@@ -149,6 +149,28 @@ public class AppTest {
     }
 
     @TestFactory
+    Collection<DynamicTest> dynamicTestAnalysisRegionFromIp_V6() throws IOException {
+        String testIp = "2408:8411:5471:ac55:c4f2:1eff:fe98:bec7";
+
+        IPUtil ipUtil = new IPUtil(System.getProperty("user.dir"));
+        ipUtil.loadIpFile();
+        Region region = ipUtil.analysisRegionFromIp(testIp);
+        Object[] actualArr = getFiledsInfo(region).toArray();
+
+        Region expected = new Region();
+        expected.setClientIp(testIp);
+        expected.setCountry("中国");
+        expected.setProvince("上海");
+        expected.setCity("上海");
+        Object[] expectedArr = getFiledsInfo(expected).toArray();
+
+        List<DynamicTest> dynamicTestList = new ArrayList<>();
+        dynamicTestList.add(dynamicTest("test1 analysisRegionFromIp dynamic test", () -> Assertions.assertArrayEquals(expectedArr, actualArr, "ok")));
+
+        return dynamicTestList;
+    }
+
+    @TestFactory
     Collection<DynamicTest> dynamicTestParseUrlPath() throws IOException {
         List<DynamicTest> dynamicTestList = new ArrayList<>();
 
