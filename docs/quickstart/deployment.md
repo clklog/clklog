@@ -537,7 +537,7 @@
 
     将 `scripts`目录下的 `定时脚本.txt`文件,内容复制过去`.wq`保存。
 
-    备注：脚本的日志在`/usr/local/services/scripts/clklog/`l
+    备注：脚本的日志在`/usr/local/services/scripts/clklog/`
 <br>
 
 ## 10. 部署环境验证
