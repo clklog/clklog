@@ -324,6 +324,11 @@ export default {
       refreshFlag: false, //默认为有id
     };
   },
+  computed: {
+    projectName() {
+      return this.$store.getters.projectName;
+    },
+  },
   methods: {
     formatTimeData(val) {
       return formatTime(Math.floor(val));
@@ -400,6 +405,7 @@ export default {
         distinctId: this.distinctId,
         pageNum: this.currentPage,
         pageSize: this.pageSize,
+        projectName:this.projectName,
       };
       getVisitorSessionListApi(params).then((res) => {
         if (res.code == 200) {
