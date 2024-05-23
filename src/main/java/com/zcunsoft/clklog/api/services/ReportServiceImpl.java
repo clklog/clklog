@@ -1703,109 +1703,142 @@ public class ReportServiceImpl implements IReportService {
     @Override
     public GetVisitorSessionListPageResponse getGetVisitorSessionList(
             GetVisitorSessionListPageRequest getVisitorSessionListPageRequest) {
-        MapSqlParameterSource paramMap = new MapSqlParameterSource();
-        String getListSql = "select t.distinct_id as distinct_id,t.event_session_id as event_session_id,sourcesite as sourcesite,searchword as searchword,arrayStringConcat(groupUniqArray(concat(toString(t.client_ip),'-',toString(t.province),'-',toString(t.pv))),',') as client_ip,min(first_time) as first_time,sum(visit_time) as visit_time,sum(pv) as pv from visitor_detail_bysession t";
-        String getCountSql = "select count(1)  from (select t.distinct_id as distinct_id,t.event_session_id,sourcesite as sourcesite,searchword as searchword from visitor_detail_bysession t";
-        List<VisitorDetailbysession> visitorDetailbysessionList = new ArrayList<VisitorDetailbysession>();
-        Integer total = 0;
-        if (StringUtils.isNotBlank(getVisitorSessionListPageRequest.getDistinctId())) {
-            getListSql += " where t.distinct_id = (:distinctId) ";
-            getListSql += " group by t.event_session_id,t.distinct_id,t.sourcesite,t.searchword ";
-            getCountSql += " where t.distinct_id = (:distinctId) ";
-            getCountSql += " group by t.event_session_id,t.distinct_id,t.sourcesite,t.searchword) ";
-            getListSql += " order by first_time desc limit " + (getVisitorSessionListPageRequest.getPageNum() - 1) * getVisitorSessionListPageRequest.getPageSize() + "," + getVisitorSessionListPageRequest.getPageSize();
-            paramMap.addValue("distinctId", getVisitorSessionListPageRequest.getDistinctId());
-            visitorDetailbysessionList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorDetailbysession>(VisitorDetailbysession.class));
-            total = clickHouseJdbcTemplate.queryForObject(getCountSql, paramMap, Integer.class);
-        }
-        List<VisitorSession> visitorSessionListList = new ArrayList<>();
-        GetVisitorSessionListPageResponse response = new GetVisitorSessionListPageResponse();
-        GetVisitorSessionListPageResponseData responseData = new GetVisitorSessionListPageResponseData();
-        for (VisitorDetailbysession visitorDetailbysession : visitorDetailbysessionList) {
-            VisitorSession visitorSession = new VisitorSession();
-            visitorSession.setDistinctId(visitorDetailbysession.getDistinctId());
+    	MapSqlParameterSource paramMap = new MapSqlParameterSource();
+		String getListSql = "select t.distinct_id as distinct_id,t.event_session_id as event_session_id,sourcesite as sourcesite,searchword as searchword,arrayStringConcat(groupUniqArray(concat(toString(t.client_ip),'-',toString(t.province),'-',toString(t.pv))),',') as client_ip,min(first_time) as first_time,sum(visit_time) as visit_time,sum(t.pv) as pv from visitor_detail_bysession t";
+		String getCountSql = "select count(1)  from (select t.distinct_id as distinct_id,t.event_session_id,sourcesite as sourcesite,searchword as searchword from visitor_detail_bysession t";
+		List<VisitorDetailbysession> visitorDetailbysessionList = new ArrayList<VisitorDetailbysession>();
+		Integer total = 0;
+		StringBuilder whereBuilder = new StringBuilder();
+		if (StringUtils.isNotBlank(getVisitorSessionListPageRequest.getDistinctId())) {
+			whereBuilder.append(" t.distinct_id = (:distinctId) and ");
+			paramMap.addValue("distinctId", getVisitorSessionListPageRequest.getDistinctId());
+		}
+		if (StringUtils.isNotBlank(getVisitorSessionListPageRequest.getProjectName())) {
+			whereBuilder.append(" t.project_name = (:projectName) and ");
+			paramMap.addValue("projectName", getVisitorSessionListPageRequest.getProjectName());
+		}
+		if (whereBuilder.length() > 0) {
+			String whereClause = whereBuilder.insert(0, " where")
+					.delete(whereBuilder.length() - 5, whereBuilder.length() - 1).toString();
+			getListSql += whereClause;
+			getListSql += " group by t.event_session_id,t.distinct_id,t.sourcesite,t.searchword having pv > 0 ";
+			getCountSql += whereClause;
+			getCountSql += " group by t.event_session_id,t.distinct_id,t.sourcesite,t.searchword having pv > 0) ";
+			getListSql += " order by first_time desc limit "
+					+ (getVisitorSessionListPageRequest.getPageNum() - 1)
+							* getVisitorSessionListPageRequest.getPageSize()
+					+ "," + getVisitorSessionListPageRequest.getPageSize();
+			visitorDetailbysessionList = clickHouseJdbcTemplate.query(getListSql, paramMap,
+					new BeanPropertyRowMapper<VisitorDetailbysession>(VisitorDetailbysession.class));
+			total = clickHouseJdbcTemplate.queryForObject(getCountSql, paramMap, Integer.class);
+		}
+		List<VisitorSession> visitorSessionListList = new ArrayList<>();
+		GetVisitorSessionListPageResponse response = new GetVisitorSessionListPageResponse();
+		GetVisitorSessionListPageResponseData responseData = new GetVisitorSessionListPageResponseData();
+		for (VisitorDetailbysession visitorDetailbysession : visitorDetailbysessionList) {
+			VisitorSession visitorSession = new VisitorSession();
+			visitorSession.setDistinctId(visitorDetailbysession.getDistinctId());
 //            visitorSession.setClientIp(visitorDetailbysession.getClientIp());
-            visitorSession.setFirstTime(visitorDetailbysession.getFirstTime());
-            visitorSession.setVisitTime(visitorDetailbysession.getVisitTime());
-            visitorSession.setEventSessionId(visitorDetailbysession.getEventSessionId());
-            visitorSession.setPv(visitorDetailbysession.getPv());
+			visitorSession.setFirstTime(visitorDetailbysession.getFirstTime());
+			visitorSession.setVisitTime(visitorDetailbysession.getVisitTime());
+			visitorSession.setEventSessionId(visitorDetailbysession.getEventSessionId());
+			visitorSession.setPv(visitorDetailbysession.getPv());
 //            visitorSession.setProvince(visitorDetailbysession.getProvince());
-            visitorSession.setSourcesite(visitorDetailbysession.getSourcesite());
-            visitorSession.setSearchword(visitorDetailbysession.getSearchword());
-            List<VisitorSessionDetail> rows = new ArrayList<VisitorSessionDetail>();
-            if (StringUtils.isNotBlank(visitorDetailbysession.getClientIp())) {
-                String[] clientIpAndProviceAndPvs = visitorDetailbysession.getClientIp().split(",");
-                for (String clientIpAndProviceAndPv : clientIpAndProviceAndPvs) {
-                    String[] ipAndProviceAndPv = clientIpAndProviceAndPv.split("-");
-                    VisitorSessionDetail detail = new VisitorSessionDetail();
-                    detail.setClientIp(ipAndProviceAndPv[0]);
-                    detail.setProvince(ipAndProviceAndPv[1]);
-                    detail.setPv(ipAndProviceAndPv[2] != null ? Integer.parseInt(ipAndProviceAndPv[2]) : 0);
-                    rows.add(detail);
-                }
-            }
-            visitorSession.setRows(rows);
-            visitorSessionListList.add(visitorSession);
-        }
-        responseData.setRows(visitorSessionListList);
-        responseData.setTotal(total);
-        response.setData(responseData);
-        return response;
+			visitorSession.setSourcesite(visitorDetailbysession.getSourcesite());
+			visitorSession.setSearchword(visitorDetailbysession.getSearchword());
+			List<VisitorSessionDetail> rows = new ArrayList<VisitorSessionDetail>();
+			if (StringUtils.isNotBlank(visitorDetailbysession.getClientIp())) {
+				String[] clientIpAndProviceAndPvs = visitorDetailbysession.getClientIp().split(",");
+				for (String clientIpAndProviceAndPv : clientIpAndProviceAndPvs) {
+					String[] ipAndProviceAndPv = clientIpAndProviceAndPv.split("-");
+					VisitorSessionDetail detail = new VisitorSessionDetail();
+					detail.setClientIp(ipAndProviceAndPv[0]);
+					detail.setProvince(ipAndProviceAndPv[1]);
+					detail.setPv(ipAndProviceAndPv[2] != null ? Integer.parseInt(ipAndProviceAndPv[2]) : 0);
+					rows.add(detail);
+				}
+			}
+			visitorSession.setRows(rows);
+			visitorSessionListList.add(visitorSession);
+		}
+		responseData.setRows(visitorSessionListList);
+		responseData.setTotal(total);
+		response.setData(responseData);
+		return response;
     }
 
-    private VisitorDetailbysession getVisitorSession(String distinctId,String eventSessionId) {
-        MapSqlParameterSource paramMap = new MapSqlParameterSource();
-        String getListSql = "select t.distinct_id as distinct_id,t.event_session_id as event_session_id,t.stat_date as stat_date from visitor_detail_bysession t";
-        VisitorDetailbysession visitorDetailbysession = null;
-        if (StringUtils.isNotBlank(distinctId) && StringUtils.isNotBlank(eventSessionId)) {
-            getListSql += " where t.distinct_id = (:distinctId) and t.event_session_id = (:eventSessionId) ";
-            getListSql += " order by stat_date asc limit 1";
-            paramMap.addValue("distinctId", distinctId);
-            paramMap.addValue("eventSessionId", eventSessionId);
-            List<VisitorDetailbysession> visitorDetailbysessionList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorDetailbysession>(VisitorDetailbysession.class));
-            visitorDetailbysession = (visitorDetailbysessionList != null && visitorDetailbysessionList.size()>0) ? visitorDetailbysessionList.get(0) : new VisitorDetailbysession();
-        }
-        return visitorDetailbysession;
-    }
-
+	private VisitorDetailbysession getVisitorSession(String distinctId, String eventSessionId, String projectName) {
+		MapSqlParameterSource paramMap = new MapSqlParameterSource();
+		String getListSql = "select t.distinct_id as distinct_id,t.event_session_id as event_session_id,t.stat_date as stat_date from visitor_detail_bysession t";
+		VisitorDetailbysession visitorDetailbysession = null;
+		if (StringUtils.isNotBlank(distinctId) && StringUtils.isNotBlank(eventSessionId)) {
+			getListSql += " where t.distinct_id = (:distinctId) and t.event_session_id = (:eventSessionId) ";
+			if (StringUtils.isNotBlank(projectName)) {
+				getListSql += "and t.project_name = :projectName";
+				paramMap.addValue("projectName", projectName);
+			}
+			getListSql += " order by stat_date asc limit 1";
+			paramMap.addValue("distinctId", distinctId);
+			paramMap.addValue("eventSessionId", eventSessionId);
+			List<VisitorDetailbysession> visitorDetailbysessionList = clickHouseJdbcTemplate.query(getListSql, paramMap,
+					new BeanPropertyRowMapper<VisitorDetailbysession>(VisitorDetailbysession.class));
+			visitorDetailbysession = (visitorDetailbysessionList != null && visitorDetailbysessionList.size() > 0)
+					? visitorDetailbysessionList.get(0)
+					: new VisitorDetailbysession();
+		}
+		return visitorDetailbysession;
+	}
 
     @Override
     public GetVisitorSessionUriListPageResponse getGetVisitorSessionUriList(
             GetVisitorSessionUriListPageRequest getVisitorSessionUriListPageRequest) {
-        MapSqlParameterSource paramMap = new MapSqlParameterSource();
-        String getListSql = "select t.distinct_id as distinct_id,t.raw_url as uri,t.event_session_id as event_session_id,t.log_time as log_time,t.title as title from log_analysis t ";
-        List<LogAnalysisbydate> logAnalysisbydateList = new ArrayList<LogAnalysisbydate>();
-        Integer total = 0;
-        if (StringUtils.isNotBlank(getVisitorSessionUriListPageRequest.getDistinctId()) && StringUtils.isNotBlank(getVisitorSessionUriListPageRequest.getEventSessionId())) {
-            getListSql += " where t.event in('$pageview','$AppViewScreen','$MPViewScreen') and t.distinct_id = (:distinctId)  and t.event_session_id = (:eventSessionId) ";
-            VisitorDetailbysession visitorDetailbysession = getVisitorSession(getVisitorSessionUriListPageRequest.getDistinctId(), getVisitorSessionUriListPageRequest.getEventSessionId());
-            if(visitorDetailbysession.getStatDate() != null) {
-                getListSql += " and t.stat_date>=:statDate";
-                paramMap.addValue("statDate", this.yMdFORMAT.get().format(visitorDetailbysession.getStatDate()));
-            }
-            getListSql += " order by t.log_time asc limit " + (getVisitorSessionUriListPageRequest.getPageNum() - 1) * getVisitorSessionUriListPageRequest.getPageSize() + "," + getVisitorSessionUriListPageRequest.getPageSize();
-            paramMap.addValue("distinctId", getVisitorSessionUriListPageRequest.getDistinctId());
-            paramMap.addValue("eventSessionId", getVisitorSessionUriListPageRequest.getEventSessionId());
-            logAnalysisbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<LogAnalysisbydate>(LogAnalysisbydate.class));
-        }
-        List<VisitorSessionUri> visitorSessionUriListList = new ArrayList<>();
-        GetVisitorSessionUriListPageResponse response = new GetVisitorSessionUriListPageResponse();
-        GetVisitorSessionUriListPageResponseData responseData = new GetVisitorSessionUriListPageResponseData();
-        for (LogAnalysisbydate logAnalysisbydate : logAnalysisbydateList) {
-            VisitorSessionUri visitorSessionUri = new VisitorSessionUri();
-            visitorSessionUri.setDistinctId(logAnalysisbydate.getDistinctId());
-            visitorSessionUri.setUri(logAnalysisbydate.getUri());
-            visitorSessionUri.setTitle(logAnalysisbydate.getTitle());
-            visitorSessionUri.setEventSessionId(logAnalysisbydate.getEventSessionId());
-            visitorSessionUri.setLogTime(logAnalysisbydate.getLogTime());
-            visitorSessionUriListList.add(visitorSessionUri);
-        }
-        responseData.setRows(visitorSessionUriListList);
-        responseData.setTotal(total);
-        response.setData(responseData);
-        return response;
+    	MapSqlParameterSource paramMap = new MapSqlParameterSource();
+		String getListSql = "select t.distinct_id as distinct_id,t.raw_url as uri,t.event_session_id as event_session_id,t.log_time as log_time,t.title as title from log_analysis t ";
+		List<LogAnalysisbydate> logAnalysisbydateList = new ArrayList<LogAnalysisbydate>();
+		Integer total = 0;
+		if (StringUtils.isNotBlank(getVisitorSessionUriListPageRequest.getDistinctId())
+				&& StringUtils.isNotBlank(getVisitorSessionUriListPageRequest.getEventSessionId())) {
+			StringBuilder whereBuilder = new StringBuilder(
+					" where t.event in('$pageview','$AppViewScreen','$MPViewScreen') and t.distinct_id = (:distinctId)  and t.event_session_id = (:eventSessionId) ");
+			paramMap.addValue("distinctId", getVisitorSessionUriListPageRequest.getDistinctId());
+			paramMap.addValue("eventSessionId", getVisitorSessionUriListPageRequest.getEventSessionId());
+			if (StringUtils.isNotBlank(getVisitorSessionUriListPageRequest.getProjectName())) {
+				whereBuilder.append(" and t.project_name = (:projectName) ");
+				paramMap.addValue("projectName", getVisitorSessionUriListPageRequest.getProjectName());
+			}
+			getListSql += whereBuilder.toString();
+			VisitorDetailbysession visitorDetailbysession = getVisitorSession(
+					getVisitorSessionUriListPageRequest.getDistinctId(),
+					getVisitorSessionUriListPageRequest.getEventSessionId(),
+					getVisitorSessionUriListPageRequest.getProjectName());
+			if (visitorDetailbysession.getStatDate() != null) {
+				getListSql += " and t.stat_date>=:statDate";
+				paramMap.addValue("statDate", this.yMdFORMAT.get().format(visitorDetailbysession.getStatDate()));
+			}
+			getListSql += " order by t.log_time asc limit "
+					+ (getVisitorSessionUriListPageRequest.getPageNum() - 1)
+							* getVisitorSessionUriListPageRequest.getPageSize()
+					+ "," + getVisitorSessionUriListPageRequest.getPageSize();
+			logAnalysisbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap,
+					new BeanPropertyRowMapper<LogAnalysisbydate>(LogAnalysisbydate.class));
+		}
+		List<VisitorSessionUri> visitorSessionUriListList = new ArrayList<>();
+		GetVisitorSessionUriListPageResponse response = new GetVisitorSessionUriListPageResponse();
+		GetVisitorSessionUriListPageResponseData responseData = new GetVisitorSessionUriListPageResponseData();
+		for (LogAnalysisbydate logAnalysisbydate : logAnalysisbydateList) {
+			VisitorSessionUri visitorSessionUri = new VisitorSessionUri();
+			visitorSessionUri.setDistinctId(logAnalysisbydate.getDistinctId());
+			visitorSessionUri.setUri(logAnalysisbydate.getUri());
+			visitorSessionUri.setTitle(logAnalysisbydate.getTitle());
+			visitorSessionUri.setEventSessionId(logAnalysisbydate.getEventSessionId());
+			visitorSessionUri.setLogTime(logAnalysisbydate.getLogTime());
+			visitorSessionUriListList.add(visitorSessionUri);
+		}
+		responseData.setRows(visitorSessionUriListList);
+		responseData.setTotal(total);
+		response.setData(responseData);
+		return response;
     }
-
     
     @Override
 	public GetLogAnalysisListPageResponse getLogAnalysisList(GetLogAnalysisListPageRequest getLogAnalysisListPageRequest) {
