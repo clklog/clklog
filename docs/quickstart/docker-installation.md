@@ -3,7 +3,7 @@
 
 1. ClkLog Docker Compose配置下载：
 
-    <a href="https://clklog.com/res/docker/clklog-docker-compose.tar.gz?r=24040516" target="_blank" rel="noopener" id="docker-compose-tar">下载clklog-docker-compose.tar.gz</a>
+    <a href="https://clklog.com/res/docker/clklog-docker-compose.tar.gz?r=24040529" target="_blank" rel="noopener" id="docker-compose-tar">下载clklog-docker-compose.tar.gz</a>
 
 2. 拷贝镜像至linux服务器（假设服务器ip为10.10.222.21）,并解压镜像文件，参考代码如下：
 
@@ -103,11 +103,13 @@
 
    - 埋点数据接收地址： <http://10.10.222.21/receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a>
 
-   - flink后台地址： <http://10.10.222.21/flink/#/overview>
+   - flink后台地址： <http://10.10.222.21/flink/#/overview>，在flink后台查看job状态是否正常运行
 
-4. 下载[clklog-processing](https://gitee.com/clklog/clklog-processing/releases)
+   ![image](../assets/imgs/flink-status.png)  
 
-5. 提交 job
+<!-- 4. 下载[clklog-processing](https://gitee.com/clklog/clklog-processing/releases) -->
+
+<!-- 5. 提交 job
 
    在flink后台提交`clklog-processing`的jar包：
 
@@ -115,7 +117,7 @@
 
    在flink后台查看job状态
 
-   ![image](../assets/imgs/flink-status.png)  
+   ![image](../assets/imgs/flink-status.png)   -->
 
 ## 埋点代码接入
 
