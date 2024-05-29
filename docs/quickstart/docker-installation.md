@@ -93,7 +93,7 @@
     docker compose -f docker-compose-clklog-full.yml ps -a
     ```
 
-    ![image](../assets/imgs/full_container.png)  
+    ![image](../assets/imgs/full_container_status.png)  
 
 3. 验证镜像是否安装成功
 
