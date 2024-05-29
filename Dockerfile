@@ -1,8 +1,13 @@
-FROM openjdk:8
+FROM flink:1.16-java8
 
-VOLUME /tmp
 ARG JAR_FILE
-ENV JAVA_OPTS=
-ENTRYPOINT ["entrypoint.sh"]
-COPY docker-entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY ${JAR_FILE} app.jar
+
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+COPY iplib/*.txt /opt/flink/usrlib/iplib/
+COPY project-setting.json /opt/flink/usrlib/project-setting.json
+COPY ${JAR_FILE} /opt/flink/usrlib/clklog-processing-with-dependencies.jar
+#RUN chmod +x /opt/flink/usrlib/clklog-processing-with-dependencies.jar
+#add default iplib
+#COPY iplib /opt/flink/usrlib/iplib
