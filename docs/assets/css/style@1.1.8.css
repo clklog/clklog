@@ -1077,3 +1077,7 @@ main .content .copyright {
   --docsifytabs-border-color: #ededed;
   --docsifytabs-tab-highlight-color: #0074d9;
 }
+
+#docs-entry {
+  display: none;
+}
