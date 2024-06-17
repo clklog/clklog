@@ -11,7 +11,15 @@
   clickhouse-client --host localhost --user default --queries-file PATH_TO_SQL_FILE
   ```
 
-2. 在kafka中创建队列clklog
+2. 根据 `scripts` 下的`mysql_clklog.sql`文件创建mysql实例schema和表
+
+- **(社区版无此脚本，略过此步骤)**
+
+  ```
+  mysql -u root -p < PATH_TO_SQL_FILE
+  ```
+
+3. 在kafka中创建队列clklog
 
   ```
   /usr/local/services/kafka_2.12-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --replication-factor 1 --partitions 6 --topic clklog
@@ -42,6 +50,9 @@
             server localhost:8081;
     }
 
+    upstream clklog_manage_server{
+    server localhost:8091;
+      }
 
     server {
         listen 80;
@@ -61,6 +72,20 @@
                 proxy_set_header Host $host:$server_port;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+    # 社区版无此配置
+    location /api/manage/ {
+                proxy_pass http://clklog_manage_server/;
+                proxy_set_header Host $host:$server_port;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+    # 社区版无此配置
+    location /api/manage/v3/ {
+                proxy_pass http://clklog_manage_server/manage/v3/;
+                proxy_set_header Host $host:$server_port;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             }
 
     location /api/ {
@@ -89,7 +114,103 @@
     systemctl restart nginx
     ```
 
-## 4. 部署统计接口 clklog-api
+## 4.部署管理接口 clklog-manage
+
+**（社区版无此接口服务，社区版用户直接跳过此步骤）**
+
+1. 编译应用程序
+2. 上传程序文件
+拷贝`clklog-manage-1.0.0.jar`包和`application.yml`文件至`/usr/local/services/clklog-manage`目录：
+
+  ```
+  cd /usr/local/services
+  mkdir /usr/local/services/clklog-manage
+  chmod 500 clklog-manage-1.0.0.jar
+  ```
+
+3. 修改配置文件
+根据前面安装的组件配置，修改`application.yml`中的相关配置，代码如下：
+
+  ```
+  springdoc:
+    swagger-ui:
+      enabled: true
+      tagsSorter: alpha
+    api-docs:
+      path: /v3/api-docs
+      enabled: true
+    group-configs:
+      - group: 'default'
+        paths-to-match: '/**'
+        packages-to-scan: com.zcunsoft.clklog.manage.controllers
+  server:
+    port: 8091
+  spring:
+    application.name: clklog-manage
+  # mysql 配置
+    datasource:
+      mysql:
+        jdbc-url: jdbc:mysql://localhost:3306/clklog?characterEncoding=UTF-8&useTimezone=true&serverTimezone=GMT%2B8
+        username: root
+        password: 123456
+        driver-class-name: com.mysql.cj.jdbc.Driver
+  # clickhouse配置
+      clickhouse: 
+        jdbc-url: jdbc:clickhouse://localhost:8123/default
+        username: default
+        password: 
+        driver-class-name: com.clickhouse.jdbc.ClickHouseDriver 
+        connection-timeout: 20000
+        maximum-pool-size: 5
+    jpa:
+      show-sql: false
+  #    generate-ddl: true
+        
+  logging:
+    level:
+      "com.clickhouse.jdbc.internal.ClickHouseConnectionImpl": ERROR
+    file:
+      path: log
+  clklog-manage:
+    access-control-allow-origin-patterns: "*"
+  #Receiver接收日志的存放的根目录
+    log-store-path: 
+  ```
+
+4. 创建服务
+
+  ```
+  vim /etc/systemd/system/clklog-manage.service
+  ```
+
+  内容如下：
+
+  ```
+  [Unit]
+  Description=clklog-manage
+  After=syslog.target
+
+  [Service]
+  ExecStart=/usr/local/services/clklog-manage/clklog-manage-1.0.0.jar
+  SuccessExitStatus=143
+
+  [Install]
+  WantedBy=multi-user.target
+  ```
+
+5. 更新服务
+
+    ```
+    systemctl daemon-reload
+    ```
+
+6. 启动应用程序
+
+    ```
+    systemctl start clklog-manage
+    ```
+
+## 5. 部署统计接口 clklog-api
 
 1. 编译应用程序
 
@@ -177,7 +298,7 @@
 
 <br>
 
-## 5. 统计后台前端展示 clklog-ui
+## 6. 统计后台前端展示 clklog-ui
 
 1. 开发环境编译前端应用程序
 
@@ -195,17 +316,18 @@
     # 本地环境接口服务代理配置修改
     # 修改vue.config.js 文件中的代理配置 
     '/DEV-API'的'target'为clklog-api接口的代理地址 'http://YOUR_DOMAIN/api'
-    
+    '/DEV-API-MANAGE'的'target'为clklog-manage接口的代理地址'http://YOUR_DOMAIN/api/manage' //社区版无该配置
 
     # 生产环境接口服务代理配置修改
     # 方式一、先修改public/config.js 文件中配置，再发布
         BASE_API: "http://YOUR_DOMAIN/api" //clklog-api的接口的代理地址
-        
+        BASE_API_MANAGE: "http://YOUR_DOMAIN/api/manage" //clklog-manage-api接口的代理地址(社区版无该配置)
         npm run build
     # 方式二、发布后修改代理配置
         npm run build 
         dist/config.js
         BASE_API: "http://YOUR_DOMAIN/api" //clklog-api的接口的代理地址
+        BASE_API_MANAGE: "http://YOUR_DOMAIN/api/manage" //clklog-manage-api接口的代理地址(社区版无该配置)
     ```
 
     3）启动服务
@@ -232,7 +354,7 @@
    此时您可访问http://YOUR_DOMAIN/ ，验证部署成果。
    预置账号密码为 admin/clklog。
 
-## 6.部署接收服务 clklog-receiver
+## 7.部署接收服务 clklog-receiver
 
 1. 编译应用程序
 
@@ -274,7 +396,8 @@
       # enable-simple-version 默认为false, 表示日志存入kafka，由flink处理后存入clickhouse；当值为true时，表示日志直接存入clickhouse，无需安装kafka和flink。配置修改后需重启clklog-receiver服务。
       enable-simple-version: false
       access-control-allow-origin-patterns: "*"
-     
+      # 数据管理接口地址(社区版无此配置)
+      manage-api-uri: http://YOUR_DOMAIN/api/manage
     ```
 
 4. 创建服务
@@ -310,7 +433,7 @@
     systemctl start clklogreceiver
     ```
 
-## 7.部署处理服务 clklog-processing
+## 8.部署处理服务 clklog-processing
 
 1. 编译应用程序
 
@@ -366,7 +489,7 @@
 
     其中 `-s` 参数为`checkpoint`位置。对于中断后再执行的任务，需要指定该参数，如不指定则从头开始消费`kafka`消息。
 
-## 8. 部署计算脚本clklog-scripts
+## 9. 部署计算脚本clklog-scripts
 
 - 计算脚本是基于Clickhouse集群中`log_analysis`表进行多维计算，获得各个维度上的统计报表。
   使用Cron来进行任务的定时调度。
@@ -417,7 +540,7 @@
     备注：脚本的日志在`/usr/local/services/scripts/clklog/`
 <br>
 
-## 9. 部署环境验证
+## 10. 部署环境验证
 
 1. Flink后台地址
 
@@ -437,6 +560,8 @@
     统计接口说明地址
     http://YOUR_DOMAIN/api/doc.html#/home
 
+    管理接口说明地址（社区版无此配置）
+    http://YOUR_DOMAIN/api/manage/doc.html#/home
 
     ```
 

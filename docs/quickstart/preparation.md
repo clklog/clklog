@@ -11,7 +11,7 @@
 - Clickhouse 23.2.1
 - nodejs >= 8.9
 - npm >=3.0.0
-- mysql
+<!-- - mysql -->
 
 ## 初始化步骤参考
 
@@ -80,7 +80,7 @@ systemctl start nginx
 4. 编译依赖后make
 
     ```
-    cd ./dev
+    cd ./deps
     sudo make hiredis jemalloc linenoise lua geohash-int
     cd ../
     sudo make
@@ -279,7 +279,7 @@ systemctl start nginx
     ```
     clickhouse-client -u default --password 123456
     ```
-
+<!-- 
 ### MySql 安装参考
 
 1. 安装mysql
@@ -294,5 +294,5 @@ apt install mysql-server
 
 ```
 
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password';
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password'; -->
 ```
