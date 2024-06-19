@@ -3,14 +3,14 @@
 
 <table class="func-list-table">
     <tr>
-        <th> 序号        </th>
+        <!-- <th> 序号        </th> -->
         <th> 功能模块        </th>
         <th> 子模块        </th>
         <th class="func-intro-td">功能简介        </th>
         <th class="func-desc-td">核心功能（<span class="pro-func">蓝色部分为商业版功能</span>）        </th>
     </tr>
     <tr>
-        <td>1</td>
+        <!-- <td>1</td> -->
         <td>数据概览</td>
         <td> </td>
         <td>按时间段、访问渠道查询、展示、分析网站各项指标数据。      </td>
@@ -24,7 +24,7 @@
         </td>
     </tr>
     <tr>
-        <td> 2 </td>
+        <!-- <td> 2 </td> -->
         <td> <span class="pro-func">实时访问</span> </td>
         <td> <span class="pro-func"> </span> </td>
         <td> <span class="pro-func">实时展示网站访问情况，可按访问渠道和访客类型进行查询展示</span> </td>
@@ -36,7 +36,7 @@
         </td>
     </tr>
     <tr>
-        <td> 3 </td>
+        <!-- <td> 3 </td> -->
         <td> 趋势分析 </td>
         <td>   </td>
         <td> 从时间段、访问渠道、访客类型维度，按时、按日、按周、按月查询展示各项流量指标数据变化趋势及数据详情 </td>
@@ -48,7 +48,7 @@
         </td>
     </tr>
     <tr>
-        <td> 4 </td>
+        <!-- <td> 4 </td> -->
         <td rowspan="5"> 访客分析 </td>
         <td> 新老访客 </td>
         <td> 从时间段、访问渠道维度，对新访客和老访客各项访问流量指标数据进行统计分析 </td>
@@ -62,7 +62,7 @@
         </td>
     </tr>
     <tr>
-        <td> 5 </td>
+        <!-- <td> 5 </td> -->
         <td> 地域分析</td>
         <td> 从时间段、访问渠道、访客类型维度，按省份及国家对网站各项访问流量指标数据进行统计分析 </td>
         <td class="func-desc-td">
@@ -75,7 +75,7 @@
         </td>
     </tr>
     <tr>
-        <td> 6 </td>
+        <!-- <td> 6 </td> -->
         <td> 来源网站</td>
         <td> 从时间段、访问渠道、访客类型维度，按访问来源网站对网站各项访问流量指标数据局进行统计分析 </td>
         <td class="func-desc-td">
@@ -87,7 +87,7 @@
         </td>
     </tr>
     <tr>
-        <td> 7 </td>
+        <!-- <td> 7 </td> -->
         <td> 渠道分析 </td>
         <td> 从时间段、地域、访客类型维度，对站外搜索词的各项访问指标数据进行统计分析 </td>
         <td class="func-desc-td">
@@ -99,7 +99,7 @@
         </td>
     </tr>
     <tr>
-        <td> 8 </td>
+        <!-- <td> 8 </td> -->
         <td> 设备分析 </td>
         <td> 从时间段、地域、渠道、访客类型维度，对用户的访问设备和操作系统的各项访问指标数据进行统计分析 </td>
         <td class="func-desc-td">
@@ -112,7 +112,7 @@
         </td>
     </tr>
      <tr>
-        <td> 9</td>
+        <!-- <td> 9</td> -->
         <td rowspan="3"> 访问分析 </td>
         <td> 受访页面</td>
         <td> 从时间段、访问渠道、访客类型、地域维度，按受访页面对网站访问的各项访问流量指标数据进行统计分析 </td>
@@ -128,7 +128,7 @@
         </td>
     </tr>
     <tr>
-        <td> 10 </td>
+        <!-- <td> 10 </td> -->
         <td> 站内搜索 </td>
         <td> 从时间段、访问渠道、访客类型、地域维度，对站内搜索词的各项访问流量指标数据进行统计分析 </td>
         <td class="func-desc-td">
@@ -137,7 +137,7 @@
         </td>
     </tr>
   <tr>
-        <td> 11 </td>
+        <!-- <td> 11 </td> -->
         <td> 站外搜索 </td>
         <td><span class="pro-func"> 从时间段、访问渠道、访客类型、地域维度，对站外搜索词的各项访问流量指标数据进行统计分析</span> </td>
         <td class="func-desc-td">
@@ -146,7 +146,7 @@
         </td>
     </tr>
     <tr>
-        <td> 12</td>
+        <!-- <td> 12</td> -->
         <td rowspan="5"> 用户分析 </td>
         <td> 用户画像 </td>
         <td> 从时间段、地域、渠道、访客类型维度，对访问用户的各项访问指标数据进行统计分析 </td>
@@ -157,7 +157,7 @@
         </td>
     </tr>
     <tr>
-        <td> 13</td>
+        <!-- <td> 13</td> -->
         <td> <span class="pro-func">活跃用户分析</span> </td>
         <td> <span class="pro-func">按日、按周、按月，统计分析各个渠道及地域的活跃用户数据 </span> </td>
         <td class="func-desc-td">
@@ -168,7 +168,7 @@
         </td>
     </tr>
     <tr>
-        <td> 14</td>
+        <!-- <td> 14</td> -->
         <td> <span class="pro-func">用户忠诚度分析</span>      </td>
         <td> <span class="pro-func">从时间段、地域、渠道、访客类型维度，对访问用户的忠诚度相关指标数据进行统计分析  </span>  </td>
         <td class="func-desc-td">
@@ -182,7 +182,7 @@
         </td>
     </tr>
     <tr>
-        <td> 15 </td>
+        <!-- <td> 15 </td> -->
         <td> <span class="pro-func">流失/留存用户分析 </span>  </td>
         <td> <span class="pro-func">按日、按周、按月，统计分析各个渠道及地域的留存用户、流失用户数据 </span>   </td>
         <td class="func-desc-td">
@@ -198,7 +198,7 @@
         </td>
     </tr>
     <tr>
-        <td> 16</td>
+        <!-- <td> 16</td> -->
         <td> <span class="pro-func">回流/沉默用户分析</span> </td>
         <td> <span class="pro-func">按日、按周、按月，统计分析各个渠道及地域的回流、沉默用户数据 </span> </td>
         <td class="func-desc-td">
@@ -208,7 +208,7 @@
         </td>
     </tr>
     <tr>
-        <td> 17 </td>
+        <!-- <td> 17 </td> -->
         <td rowspan="3"> <span class="pro-func">系统设置 </span></td>
         <td> <span class="pro-func">项目管理 </span>    </td>
         <td> <span class="pro-func">项目新增、项目数据采集相关统计参数配置</span> </td>
@@ -219,7 +219,7 @@
         </td>
     </tr>
    <tr>
-        <td> 18 </td>
+        <!-- <td> 18 </td> -->
         <td> <span class="pro-func">全局设置 </span></td>
         <td> <span class="pro-func">全局项目数据采集相关统计参数配置</span> </td>
         <td class="func-desc-td">
@@ -228,7 +228,7 @@
         </td>
     </tr>
     <tr>
-        <td> 19 </td>
+        <!-- <td> 19 </td> -->
         <td><span class="pro-func">日志汇总 </span></td>
         <td><span class="pro-func">采集日志总量汇总</span> </td>
         <td class="func-desc-td">
@@ -237,7 +237,7 @@
         </td>
     </tr>
     <tr>
-        <td > <span class="pro-func">20</span>  </td>
+        <!-- <td > <span class="pro-func">20</span>  </td> -->
         <td rowspan="5"> <span class="pro-func">事件分析 </span>  </td>
         <td> <span class="pro-func">元数据管理 </span>  </td>
         <td> <span class="pro-func">定义业务系统自定义事件以及神策预置事件埋点的事件及属性（事件、用户、公共）的相关的元数据。</span>  </td>
@@ -253,7 +253,7 @@
         </td>
     </tr>
     <tr>
-        <td > <span class="pro-func">21</span>  </td>
+        <!-- <td > <span class="pro-func">21</span>  </td> -->
         <td> <span class="pro-func">日志查询 </span>  </td>
         <td> <span class="pro-func">查看埋点数据采集详细日志记录。</span>  </td>
         <td class="func-desc-td">
@@ -265,7 +265,7 @@
         </td>
     </tr>
     <tr>
-        <td > <span class="pro-func">22</span>  </td>
+        <!-- <td > <span class="pro-func">22</span>  </td> -->
         <td> <span class="pro-func">数据统计 </span>  </td>
         <td> <span class="pro-func">埋点事件的出发次数、用户触发情况以及详细。</span>  </td>
         <td class="func-desc-td">
@@ -279,7 +279,7 @@
         </td>
     </tr>
     <tr>
-        <td> <span class="pro-func">23</span>  </td>
+        <!-- <td> <span class="pro-func">23</span>  </td> -->
         <td> <span class="pro-func">我的书签 </span>  </td>
         <td> <span class="pro-func">我的书签管理 </span>  </td>
         <td class="func-desc-td">
@@ -291,7 +291,7 @@
         </td>
     </tr>
  <tr>
-        <td> <span class="pro-func">24</span>  </td>
+        <!-- <td> <span class="pro-func">24</span>  </td> -->
         <td> <span class="pro-func">自定义分析 </span>  </td>
         <td> <span class="pro-func">可自主选择事件指标、查询维度、各种筛选条件,对埋点数据进行个性化数据分析  </span>  </td>
         <td class="func-desc-td">
@@ -304,7 +304,7 @@
         </td>
     </tr>
      <tr>
-        <td> <span class="pro-func">25</span>  </td>
+        <!-- <td> <span class="pro-func">25</span>  </td> -->
         <td> <span class="pro-func">权限管理 </span>  </td>
         <td> <span class="pro-func">菜单管理<br> 角色管理<br>账号管理<br></span>  </td>
         <td> <span class="pro-func"> 系统菜单、角色、账号权限管理</span>  </td>
