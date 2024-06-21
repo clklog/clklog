@@ -13,7 +13,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -534,7 +536,7 @@ public class ExtractUtil {
         delimiterMap.put("#", "#");
 
         String searchword = "";
-        List<String> searchKeyList = new ArrayList(Arrays.asList(searchwordKey.split("\n")));
+        List<String> searchKeyList = new ArrayList(Arrays.asList(searchwordKey.split(",")));
 
         for (String urlPair : urlPairArray) {
             if (!delimiterMap.containsKey(urlPair)) {
@@ -546,6 +548,11 @@ public class ExtractUtil {
                         searchword = kv[0];
                     }
                     if (!searchword.isEmpty()) {
+                        try {
+                            searchword = URLDecoder.decode(searchword,"UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
                         break;
                     }
                 }
