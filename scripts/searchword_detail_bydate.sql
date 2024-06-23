@@ -1,4 +1,4 @@
-INSERT INTO clklog.searchword_detail_bydate
+INSERT INTO ${CLKLOG_LOG_DB}.searchword_detail_bydate
 SELECT ':cal_date' AS stat_date
 	, If(t2.lib = '', 'all', t2.lib) AS lib
 	, multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
@@ -33,9 +33,9 @@ FROM (
 			AND event = '$MPViewScreen'
 			AND is_first_day = 'true', distinct_id, NULL) AS new_user
 			, client_ip
-		FROM clklog.log_analysis
+		FROM ${CLKLOG_LOG_DB}.log_analysis
 		WHERE stat_date = ':cal_date'
-			AND latest_search_keyword NOT IN ('ȡֵ�쳣', 'δȡ��ֵ_ֱ�Ӵ�', 'δȡ��ֵ', 'url��domain����ʧ��', '')
+			AND latest_search_keyword NOT IN ('取值异常', '未取到值_直接打开', '未取到值', 'url的domain解析失败', '')
 	) t1
 	GROUP BY lib, project_name, is_first_day, country, province, latest_search_keyword WITH CUBE
 ) t2
@@ -51,10 +51,10 @@ FROM (
 				, arraySort(groupUniqArray(stat_date)) AS stat_dates
 				, max(log_time) - min(log_time) AS diff
 				, count(1) AS pv
-			FROM clklog.log_analysis
+			FROM ${CLKLOG_LOG_DB}.log_analysis
 			WHERE stat_date <= ':cal_date'
 				AND stat_date >= ':previous_date'
-				AND latest_search_keyword NOT IN ('ȡֵ�쳣', 'δȡ��ֵ_ֱ�Ӵ�', 'δȡ��ֵ', 'url��domain����ʧ��', '')
+				AND latest_search_keyword NOT IN ('取值异常', '未取到值_直接打开', '未取到值', 'url的domain解析失败', '')
 				AND event_session_id <> ''
 			GROUP BY event_session_id, lib, project_name, is_first_day, country, province, latest_search_keyword
 		) t3

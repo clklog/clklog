@@ -1,8 +1,8 @@
 package com.zcunsoft.daemons;
 
 import com.zcunsoft.services.IInitService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -11,8 +11,7 @@ import javax.annotation.Resource;
 
 @Component
 public class InitProcessBoss {
-    private final Logger logger = LogManager.getLogger(this.getClass());
-    ;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
     private IInitService initService;

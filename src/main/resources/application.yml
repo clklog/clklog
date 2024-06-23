@@ -11,9 +11,10 @@ spring:
       username: default
       password:
 init:
+  log-db: clklog
   quartz-enabled: true
   quartz:
-    area-detail-bydate: '0 */1 * * * ?'
+    area_detail_bydate: '0 */1 * * * ?'
     visituri_summary_bydate: '0 */1 * * * ?'
     flow_trend_bydate: '0 */1 * * * ?'
     flow_trend_byhour: '0 */1 * * * ?'

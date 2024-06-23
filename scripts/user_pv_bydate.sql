@@ -1,4 +1,4 @@
-INSERT INTO clklog.user_pv_bydate
+INSERT INTO ${CLKLOG_LOG_DB}.user_pv_bydate
 SELECT ':cal_date' AS stat_date
 	, If(t3.lib = '', 'all', t3.lib) AS lib
 	, multiIf(t3.project_name = '', 'all', t3.project_name = 'N/A', '', t3.project_name) AS project_name
@@ -39,7 +39,7 @@ FROM (
 					AND event = '$pageview', event, lib IN ('iOS', 'Android')
 					AND event = '$AppViewScreen', event, lib = 'MiniProgram'
 					AND event = '$MPViewScreen', event, NULL) AS pv
-			FROM clklog.log_analysis
+			FROM ${CLKLOG_LOG_DB}.log_analysis
 			WHERE stat_date = ':cal_date'
 		) t1
 		GROUP BY lib, project_name, is_first_day, country, province, distinct_id

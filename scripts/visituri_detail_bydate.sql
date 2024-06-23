@@ -1,4 +1,4 @@
-INSERT INTO clklog.visituri_detail_bydate
+INSERT INTO ${CLKLOG_LOG_DB}.visituri_detail_bydate
 SELECT ':cal_date' AS stat_date
 	, If(t2.lib = '', 'all', t2.lib) AS lib
 	, multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
@@ -22,7 +22,7 @@ FROM (
 			, if(country = '', 'N/A', country) AS country
 			, if(province = '', 'N/A', province) AS province
 			, if(url = ''
-				OR url = 'urlµƒdomainΩ‚Œˆ ß∞‹', 'N/A', url) AS url
+				OR url = 'urlÁöÑdomainËß£ÊûêÂ§±Ë¥•', 'N/A', url) AS url
 			, multiIf(lib = 'js'
 				AND event = '$pageview', event, lib IN ('iOS', 'Android')
 				AND event = '$AppViewScreen', event, lib = 'MiniProgram'
@@ -41,7 +41,7 @@ FROM (
 			, client_ip
 			, if(title = '', 'N/A', title) AS title
 			, if(url_path = '', 'N/A', url_path) AS url_path
-		FROM clklog.log_analysis
+		FROM ${CLKLOG_LOG_DB}.log_analysis
 		WHERE stat_date = ':cal_date'
 	) t1
 	GROUP BY lib, project_name, is_first_day, country, province, urlAndPathAndTitle WITH CUBE
@@ -56,13 +56,13 @@ FROM (
 				, if(country = '', 'N/A', country) AS country
 				, if(province = '', 'N/A', province) AS province
 				, if(url = ''
-					OR url = 'urlµƒdomainΩ‚Œˆ ß∞‹', 'N/A', url) AS url
+					OR url = 'urlÁöÑdomainËß£ÊûêÂ§±Ë¥•', 'N/A', url) AS url
 				, arraySort(groupUniqArray(stat_date)) AS stat_dates
 				, max(log_time) - min(log_time) AS diff
 				, count(1) AS pv
 				, if(title = '', 'N/A', title) AS title
 				, if(url_path = '', 'N/A', url_path) AS url_path
-			FROM clklog.log_analysis
+			FROM ${CLKLOG_LOG_DB}.log_analysis
 			WHERE stat_date <= ':cal_date'
 				AND stat_date >= ':previous_date'
 				AND event_session_id <> ''
@@ -86,20 +86,20 @@ FROM (
 			SELECT t_e_c2.lib AS lib, t_e_c2.project_name AS project_name, t_e_c2.is_first_day AS is_first_day, t_e_c2.country AS country, t_e_c2.province AS province
 				, t_e_c1.event_session_id AS event_session_id
 				, if(t_e_c1.url = ''
-					OR url = 'urlµƒdomainΩ‚Œˆ ß∞‹', 'N/A', url) AS url
+					OR url = 'urlÁöÑdomainËß£ÊûêÂ§±Ë¥•', 'N/A', url) AS url
 				, if(t_e_c1.title = '', 'N/A', title) AS title
 				, if(t_e_c1.url_path = '', 'N/A', url_path) AS url_path
 				, if(t_e_c1.log_time = t_e_c2.maxTime, event_session_id, NULL) AS exit_session
 				, if(t_e_c1.log_time > t_e_c2.minTime
 					AND t_e_c1.log_time <= t_e_c2.maxTime, event_session_id, NULL) AS down_pv_session
 				, if(t_e_c1.log_time = t_e_c2.minTime, event_session_id, NULL) AS entry_session
-			FROM clklog.log_analysis t_e_c1, (
+			FROM ${CLKLOG_LOG_DB}.log_analysis t_e_c1, (
 					SELECT lib, project_name, is_first_day
 						, if(country = '', 'N/A', country) AS country
 						, if(province = '', 'N/A', province) AS province
 						, event_session_id AS teventSessionId, arraySort(groupUniqArray(stat_date)) AS stat_dates
 						, min(log_time) AS minTime, max(log_time) AS maxTime
-					FROM clklog.log_analysis
+					FROM ${CLKLOG_LOG_DB}.log_analysis
 					WHERE stat_date <= ':cal_date'
 						AND stat_date >= ':previous_date'
 						AND event_session_id <> ''

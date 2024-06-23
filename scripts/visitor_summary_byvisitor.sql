@@ -1,10 +1,10 @@
-INSERT INTO clklog.visitor_summary_byvisitor
+INSERT INTO ${CLKLOG_LOG_DB}.visitor_summary_byvisitor
 SELECT ':cal_date' AS stat_date
 	, If(t2.lib = '', 'all', t2.lib) AS lib
 	, multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
 	, If(t2.is_first_day = '', 'all', t2.is_first_day) AS is_first_day
-	, multiIf(t2.country = '', 'all', t2.country = 'N/A', '未知国家', t2.country) AS country
-	, multiIf(t2.province = '', 'all', t2.province = 'N/A', '未知省份', t2.province) AS province
+	, multiIf(t2.country = '', 'all', t2.country = 'N/A', '鏈煡鍥藉', t2.country) AS country
+	, multiIf(t2.province = '', 'all', t2.province = 'N/A', '鏈煡鐪佷唤', t2.province) AS province
 	, distinct_id AS distinct_id, t2.pv, t4.visitCount, t2.uv, t2.new_uv
 	, t2.ipCount, t4.visitTime, t4.bounce, t2.latest_time AS latest_time, NOW() AS update_time
 FROM (
@@ -33,7 +33,7 @@ FROM (
 			AND event = '$MPViewScreen'
 			AND is_first_day = 'true', distinct_id, NULL) AS new_user
 			, client_ip, log_time
-		FROM clklog.log_analysis
+		FROM ${CLKLOG_LOG_DB}.log_analysis
 		WHERE stat_date = ':cal_date'
 	) t1
 	GROUP BY lib, project_name, is_first_day, country, province, distinct_id
@@ -49,7 +49,7 @@ FROM (
 				, distinct_id AS distinct_id, arraySort(groupUniqArray(stat_date)) AS stat_dates
 				, max(log_time) - min(log_time) AS diff
 				, count(1) AS pv
-			FROM clklog.log_analysis
+			FROM ${CLKLOG_LOG_DB}.log_analysis
 			WHERE stat_date <= ':cal_date'
 				AND stat_date >= ':previous_date'
 				AND event_session_id <> ''

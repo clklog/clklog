@@ -3,10 +3,11 @@ package com.zcunsoft.services;
 
 import com.zcunsoft.cfg.InitSetting;
 import com.zcunsoft.handlers.ConstsDataHolder;
+import com.zcunsoft.util.IOUtil;
 import com.zcunsoft.util.ObjectMapperUtil;
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class InitServiceImpl implements IInitService {
 
     private final ConstsDataHolder constsDataHolder;
 
-    private final Logger logger = LogManager.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final ObjectMapperUtil objectMapper;
 
@@ -51,22 +52,24 @@ public class InitServiceImpl implements IInitService {
     public void calScript(String script_name) {
         try {
             String tableName = script_name.replaceAll("-", "_");
-            String sql = FileUtils.readFileToString(new File(getResourcePath() + File.separator + "scripts" + File.separator
-                    + tableName + ".sql"), Charset.forName("GB2312"));
-            sql = sql.replaceAll(":cal_date", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis())));
-            sql = sql.replaceAll(":previous_date", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000 * 7)));
-            if (script_name.equalsIgnoreCase("visitor_life_bydate")) {
-                sql = sql.replaceAll(":before_date_1", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000)));
-                sql = sql.replaceAll(":before_date_2", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000 * 2)));
-                sql = sql.replaceAll(":before_date_3", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000 * 3)));
+            String sql = IOUtil.readFile(getResourcePath() + File.separator + "scripts" + File.separator
+                    + tableName + ".sql");
+            sql = sql.replace("${CLKLOG_LOG_DB}", setting.getLogDb());
+            if (!sql.isEmpty()) {
+                sql = sql.replaceAll(":cal_date", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis())));
+                sql = sql.replaceAll(":previous_date", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000 * 7)));
+                if (script_name.equalsIgnoreCase("visitor_life_bydate")) {
+                    sql = sql.replaceAll(":before_date_1", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000)));
+                    sql = sql.replaceAll(":before_date_2", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000 * 2)));
+                    sql = sql.replaceAll(":before_date_3", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000 * 3)));
+                }
+                logger.info(sql);
+                clickHouseJdbcTemplate.execute(sql);
+                clickHouseJdbcTemplate.execute("optimize table clklog." + tableName + " FINAL SETTINGS optimize_skip_merged_partitions=1");
             }
-            logger.info(sql);
-            clickHouseJdbcTemplate.execute(sql);
-            clickHouseJdbcTemplate.execute("optimize table clklog." + tableName + " FINAL SETTINGS optimize_skip_merged_partitions=1");
         } catch (Exception ex) {
             logger.error("calScript " + script_name + " error ", ex);
         }
-
     }
 
     @Override
@@ -77,6 +80,7 @@ public class InitServiceImpl implements IInitService {
 
             String sql = FileUtils.readFileToString(new File(getResourcePath() + File.separator + "scripts" + File.separator
                     + "init.sql"), Charset.forName("GB2312"));
+            sql = sql.replace("${CLKLOG_LOG_DB}", setting.getLogDb());
             clickHouseJdbcTemplate.execute(sql);
             isOk = true;
         } catch (Exception ex) {

@@ -1,4 +1,4 @@
-INSERT INTO clklog.visitor_life_bydate
+INSERT INTO ${CLKLOG_LOG_DB}.visitor_life_bydate
 SELECT ':cal_date' AS stat_date
      , if(lib = '', 'all', lib) AS lib
      , multiIf(project_name = '', 'all', project_name = 'N/A', '', project_name) AS project_name
@@ -36,7 +36,7 @@ FROM (
                                              AND is_first_day = 'true', true, false)) AS is_first_day
                                 , groupUniqArray(formatDateTime(stat_date, '%Y-%m-%d')) AS date_arr
                                 , count(1) AS users
-                           FROM clklog.log_analysis
+                           FROM ${CLKLOG_LOG_DB}.log_analysis
                            WHERE stat_date >= ':before_date_3'
                              AND stat_date <= ':cal_date'
                              AND ((lib = 'js'

@@ -1,4 +1,4 @@
-INSERT INTO clklog.user_visittime_bydate
+INSERT INTO ${CLKLOG_LOG_DB}.user_visittime_bydate
 SELECT ':cal_date' AS stat_date
 	, If(t3.lib = '', 'all', t3.lib) AS lib
 	, multiIf(t3.project_name = '', 'all', t3.project_name = 'N/A', '', t3.project_name) AS project_name
@@ -39,7 +39,7 @@ FROM (
 			SELECT distinct_id, lib, project_name, is_first_day, country
 				, province, arraySort(groupUniqArray(stat_date)) AS stat_dates
 				, max(log_time) - min(log_time) AS diff
-			FROM clklog.log_analysis
+			FROM ${CLKLOG_LOG_DB}.log_analysis
 			WHERE stat_date <= ':cal_date'
 				AND stat_date >= ':previous_date'
 				AND event_session_id <> ''

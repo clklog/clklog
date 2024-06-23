@@ -8,6 +8,8 @@ import java.util.HashMap;
 @ConfigurationProperties("init")
 public class InitSetting {
 
+    private String logDb = "clklog";
+
     private String resourcePath = "";
 
     private boolean quartzEnabled = true;
@@ -36,5 +38,13 @@ public class InitSetting {
 
     public void setQuartz(HashMap<String, String> quartz) {
         this.quartz = quartz;
+    }
+
+    public String getLogDb() {
+        return logDb;
+    }
+
+    public void setLogDb(String logDb) {
+        this.logDb = logDb;
     }
 }
