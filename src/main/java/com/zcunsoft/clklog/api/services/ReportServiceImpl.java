@@ -945,7 +945,7 @@ public class ReportServiceImpl implements IReportService {
 
 //        List<AreaDetailbydate> summaryAreaDetailbydate = areaDetailbydateList.stream().filter(f -> f.getCountry().equalsIgnoreCase("all") && f.getProvince().equalsIgnoreCase("all") && f.getCity().equalsIgnoreCase("all")).collect(Collectors.toList());
         List<AreaDetailbydate> summaryAreaDetailbydate = clickHouseJdbcTemplate.query(getSummarySql, paramMap, new BeanPropertyRowMapper<AreaDetailbydate>(AreaDetailbydate.class));
-        
+
         AreaDetailbydate totalAreaDetailbydate = null;
         if (summaryAreaDetailbydate.size() > 0) {
             totalAreaDetailbydate = summaryAreaDetailbydate.get(0);
@@ -1839,7 +1839,7 @@ public class ReportServiceImpl implements IReportService {
 		response.setData(responseData);
 		return response;
     }
-    
+
     @Override
 	public GetLogAnalysisListPageResponse getLogAnalysisList(GetLogAnalysisListPageRequest getLogAnalysisListPageRequest) {
     	 MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -1874,11 +1874,11 @@ public class ReportServiceImpl implements IReportService {
              getCountSql += " where t.event in('$pageview','$AppViewScreen','$MPViewScreen') " + where;
          }
          getListSql += " order by t.log_time asc limit " + (getLogAnalysisListPageRequest.getPageNum() - 1) * getLogAnalysisListPageRequest.getPageSize() + "," + getLogAnalysisListPageRequest.getPageSize();
-         
-         
+
+
          List<LogAnalysisbydate>  logAnalysisbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<LogAnalysisbydate>(LogAnalysisbydate.class));
          Integer total = clickHouseJdbcTemplate.queryForObject(getCountSql, paramMap, Integer.class);
-         
+
          List<LogAnalysis> logAnalysisList = new ArrayList<>();
          GetLogAnalysisListPageResponse response = new GetLogAnalysisListPageResponse();
          GetLogAnalysisListPageResponseData responseData = new GetLogAnalysisListPageResponseData();
@@ -1983,12 +1983,12 @@ public class ReportServiceImpl implements IReportService {
         int total = 0;
         if (userVisitbydateList.size() > 0) {
             UserVisitbydate userVisitbydate = userVisitbydateList.get(0);
-            
+
             total = userVisitbydate.getV1Uv() + userVisitbydate.getV2Uv() + userVisitbydate.getV3Uv() + userVisitbydate.getV4Uv() + userVisitbydate.getV5Uv() + userVisitbydate.getV6Uv()
             + userVisitbydate.getV7Uv() + userVisitbydate.getV8Uv() + userVisitbydate.getV9Uv() + userVisitbydate.getV10Uv() + userVisitbydate.getV11_15Uv() + userVisitbydate.getV16_50Uv()
             + userVisitbydate.getV51_100Uv() + userVisitbydate.getV101_200Uv() + userVisitbydate.getV201_300Uv() + userVisitbydate.getV300Uv();
-            
-            
+
+
             baseUserVisit = new BaseUserVisit();
             baseUserVisit.setKey("1次");
             baseUserVisit.setValue(userVisitbydate.getV1Uv());
@@ -2114,11 +2114,11 @@ public class ReportServiceImpl implements IReportService {
         int total = 0;
         if (userPvbydateList.size() > 0) {
             UserPvbydate userPvbydate = userPvbydateList.get(0);
-            
+
             total = userPvbydate.getPv1Uv()+userPvbydate.getPv2_5Uv()+userPvbydate.getPv6_10Uv()+userPvbydate.getPv11_20Uv()+userPvbydate.getPv21_30Uv()
             +userPvbydate.getPv31_40Uv()+userPvbydate.getPv41_50Uv()+userPvbydate.getPv51_100Uv()+userPvbydate.getPv101Uv();
-            
-            
+
+
             baseUserVisit = new BaseUserVisit();
             baseUserVisit.setKey("1页");
             baseUserVisit.setValue(userPvbydate.getPv1Uv());
@@ -2176,7 +2176,7 @@ public class ReportServiceImpl implements IReportService {
         response.setData(baseUserVisitList);
         return response;
     }
-    
+
     private float getRate(int total,int value) {
     	return total > 0 ? value * 1.0f / total : 0.0f;
     }
@@ -2209,7 +2209,7 @@ public class ReportServiceImpl implements IReportService {
             total = userVisittimebydate.getVt0_10Uv() + userVisittimebydate.getVt10_30Uv() + userVisittimebydate.getVt30_60Uv() + userVisittimebydate.getVt60_120Uv() + userVisittimebydate.getVt120_180Uv()
             + userVisittimebydate.getVt180_240Uv() + userVisittimebydate.getVt240_300Uv() + userVisittimebydate.getVt300_600Uv() + userVisittimebydate.getVt600_1800Uv() + userVisittimebydate.getVt1800_3600Uv()
             + userVisittimebydate.getVt3600Uv();
-            
+
             baseUserVisit = new BaseUserVisit();
             baseUserVisit.setKey("0-10秒");
             baseUserVisit.setValue(userVisittimebydate.getVt0_10Uv());
@@ -2279,8 +2279,8 @@ public class ReportServiceImpl implements IReportService {
         response.setData(baseUserVisitList);
         return response;
     }
-    
-    
+
+
 
     @Override
 	public GetUserLatestTimebydateResponse getUserLatestTime(GetUserVisitRequest getUserVisitRequest) {
@@ -2311,11 +2311,11 @@ public class ReportServiceImpl implements IReportService {
         int total = 0;
         if (userLatesttimebydateList.size() > 0) {
         	UserLatesttimebydate userLatesttimebydate = userLatesttimebydateList.get(0);
-            
+
             total = userLatesttimebydate.getLt0Uv()+userLatesttimebydate.getLt1Uv()+userLatesttimebydate.getLt2Uv()+userLatesttimebydate.getLt3_7Uv()+userLatesttimebydate.getLt8_15Uv()
             +userLatesttimebydate.getLt16_30Uv()+userLatesttimebydate.getLt31_90Uv()+userLatesttimebydate.getLt90Uv();
-            
-            
+
+
             baseUserVisit = new BaseUserVisit();
             baseUserVisit.setKey("1天内");
             baseUserVisit.setValue(userLatesttimebydate.getLt0Uv());
@@ -2423,8 +2423,8 @@ public class ReportServiceImpl implements IReportService {
         response.setData(responseData);
         return response;
     }
-	
-	
+
+
 
     @Override
 	public GetOsDetailResponse getOsDetail(GetOsDetailRequest getOsDetailRequest) {
@@ -3354,6 +3354,10 @@ public class ReportServiceImpl implements IReportService {
         List<VisitUriTreeStatData> visitUriTreeStatDataList = new ArrayList<>();
         List<String> hostList = visitUriDetailList.stream().map(VisitUriPathDetail::getHost).distinct().collect(Collectors.toList());
         hostList = hostList.stream().filter(f -> clklogApiSetting.getProjectHost().contains(f)).collect(Collectors.toList());
+        if (clklogApiSetting.getProjectHost() != null && !clklogApiSetting.getProjectHost().isEmpty()) {
+            hostList = hostList.stream().filter(clklogApiSetting.getProjectHost()::contains)
+                    .collect(Collectors.toList());
+        }
         for (String host : hostList) {
             List<VisitUriTreeStatData> hostStatDataList = genUriTree(visitUriDetailList, host, "/", new ArrayList<>());
 
