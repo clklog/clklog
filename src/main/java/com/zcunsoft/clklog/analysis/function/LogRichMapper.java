@@ -8,6 +8,7 @@ import com.zcunsoft.clklog.analysis.utils.ExtractUtil;
 import com.zcunsoft.clklog.analysis.utils.IPUtil;
 import com.zcunsoft.clklog.analysis.utils.ObjectMapperUtil;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
+import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -93,7 +94,12 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
         ipUtil = new IPUtil(parameters.get("processing-file-location"));
         ipUtil.loadIpFile();
 
-        userAgentAnalyzer = UserAgentAnalyzer.newBuilder().hideMatcherLoadStats().withCache(10000)
+        userAgentAnalyzer = UserAgentAnalyzer.newBuilder().withField(UserAgent.AGENT_NAME)
+                .withField(UserAgent.AGENT_NAME_VERSION)
+                .withField(UserAgent.DEVICE_NAME)
+                .withField(UserAgent.DEVICE_BRAND)
+                .withField(UserAgent.OPERATING_SYSTEM_NAME)
+                .withField(UserAgent.OPERATING_SYSTEM_NAME_VERSION).hideMatcherLoadStats().withCache(10000)
                 .build();
 
 

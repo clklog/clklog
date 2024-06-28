@@ -7,6 +7,7 @@ import com.zcunsoft.clklog.analysis.utils.ExtractUtil;
 import com.zcunsoft.clklog.analysis.utils.IPUtil;
 import com.zcunsoft.clklog.analysis.utils.ObjectMapperUtil;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
+import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.type.TypeReference;
@@ -83,7 +84,12 @@ public class AppTest {
         Object[] actualArr = getFiledsInfo(target1).toArray();
 
         List<DynamicTest> dynamicTestList = new ArrayList<>();
-        AbstractUserAgentAnalyzer userAgentAnalyzer = UserAgentAnalyzer.newBuilder().hideMatcherLoadStats().withCache(10000)
+        AbstractUserAgentAnalyzer userAgentAnalyzer = UserAgentAnalyzer.newBuilder().withField(UserAgent.AGENT_NAME)
+                .withField(UserAgent.AGENT_NAME_VERSION)
+                .withField(UserAgent.DEVICE_NAME)
+                .withField(UserAgent.DEVICE_BRAND)
+                .withField(UserAgent.OPERATING_SYSTEM_NAME)
+                .withField(UserAgent.OPERATING_SYSTEM_NAME_VERSION).hideMatcherLoadStats().withCache(10000)
                 .build();
 
         String projectSettingContent = FileUtils.readFileToString(new File(System.getProperty("user.dir") + File.separator + "project-setting.json"), Charset.forName("GB2312"));
