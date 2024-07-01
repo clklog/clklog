@@ -339,11 +339,11 @@
 
     # kafka 连接配置
     kafka.bootstrap.server=localhost:9092
-    kafka.topic=clklog
-    kafka.group-id=clklog-group
+    kafka.clklog-topic=clklog
+    kafka.clklog-group-id=clklog-group
     
     # flink 配置
-    flink.data-source-name=KafkaSource
+    flink.clklog-data-source-name=ClklogKafkaSource
     flink.checkpoint=file:///usr/local/services/clklogprocessing/checkpoints
     flink.parallelism=1
     
@@ -436,8 +436,6 @@
     ```
     统计接口说明地址
     http://YOUR_DOMAIN/api/doc.html#/home
-
-
     ```
 
 4. 前端地址
