@@ -10,7 +10,7 @@
     <appenders>
         <RollingFile name="SIZE_BASED_TRIGGERING"
                      fileName="${LOG_HOME}/${FILE_NAME}.log"
-                     filePattern="${LOG_HOME}/${FILE_NAME}_%d{yyyy-MM-dd-HH-mm-ss}_%i.log" createOnDemand="true">
+                     filePattern="${LOG_HOME}/${FILE_NAME}_%d{yyyy-MM-dd}_%i.log" createOnDemand="true">
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
@@ -18,11 +18,15 @@
             </Policies>
             <DefaultRolloverStrategy max="5"/>
         </RollingFile>
+        <Console name="Console" target="SYSTEM_OUT">
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
     </appenders>
-
     <loggers>
-        <root level="all">
+        <root level="info">
             <AppenderRef ref="SIZE_BASED_TRIGGERING"/>
+            <AppenderRef ref="Console"/>
         </root>
     </loggers>
 </configuration>
