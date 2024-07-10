@@ -1,9 +1,11 @@
 
-## 1.准备 linux 服务器
+## 社区版
+
+### 1.准备 linux 服务器
 
 以下配置以 `YOUR_DOMAIN` 指代您使用的域名或ip。
 
-## 2.数据库初始化
+### 2.数据库初始化
 
 1. 根据 `scripts` 下的`sql脚本.txt`文件创建clickhouse实例schema和表
 
@@ -19,7 +21,7 @@
 
 <br>
 
-## 3.nginx 路由配置参考
+### 3.nginx 路由配置参考
 
 1. 创建配置文件，设置路由
 
@@ -89,7 +91,7 @@
     systemctl restart nginx
     ```
 
-## 4. 部署统计接口 clklog-api
+### 4. 部署统计接口 clklog-api
 
 1. 编译应用程序
 
@@ -177,7 +179,7 @@
 
 <br>
 
-## 5. 统计后台前端展示 clklog-ui
+### 5. 统计后台前端展示 clklog-ui
 
 1. 开发环境编译前端应用程序
 
@@ -232,7 +234,7 @@
    此时您可访问http://YOUR_DOMAIN/ ，验证部署成果。
    预置账号密码为 admin/clklog。
 
-## 6.部署接收服务 clklog-receiver
+### 6.部署接收服务 clklog-receiver
 
 1. 编译应用程序
 
@@ -310,7 +312,7 @@
     systemctl start clklogreceiver
     ```
 
-## 7.部署处理服务 clklog-processing
+### 7.部署处理服务 clklog-processing
 
 1. 编译应用程序
 
@@ -366,7 +368,7 @@
 
     其中 `-s` 参数为`checkpoint`位置。对于中断后再执行的任务，需要指定该参数，如不指定则从头开始消费`kafka`消息。
 
-## 8. 部署计算脚本clklog-scripts
+### 8. 部署计算脚本clklog-scripts
 
 - 计算脚本是基于Clickhouse集群中`log_analysis`表进行多维计算，获得各个维度上的统计报表。
   使用Cron来进行任务的定时调度。
@@ -417,7 +419,7 @@
     备注：脚本的日志在`/usr/local/services/scripts/clklog/`
 <br>
 
-## 9. 部署环境验证
+### 9. 部署环境验证
 
 1. Flink后台地址
 
@@ -445,13 +447,13 @@
     http://YOUR_DOMAIN/
     ```
 
-## 11. sdk 埋点集成
+### 11. sdk 埋点集成
 
-### 1. Web JS 埋点集成参考
+#### 1. Web JS 埋点集成参考
 
 1.1. 下载 ClKLOG WEB JS SDK
 
-  <a href="https://clklog.com/res/clklog.webjs.sdk.v2.zip" target="_blank" rel="noopener" id="webjssdkdownload">点击此处下载 CLKLOG WEB JS SDK</a>, 并将下载的`ClKLOG WEB JS SDK`文件包解压至网站根目录, 目录结构如下：
+  <a href="https://clklog.com/res/clklog.webjs.sdk.v2.zip" target="_blank" rel="noopener" id="webjssdkdownload">点击此处下载 CLKLOG WEB JS SDK</a>, 并将下载的`ClKLOG WEB JS SDK`文件包解压至网站根目录, 参考目录结构如下：
 
   ```
   ├── 网站根目录
@@ -491,16 +493,20 @@
 
   ![](../assets/imgs/autotrack.png)
 
-- **locahost或ip访问时可忽略控制台中的 “[web-sdk-log]: getHostname传入的url参数不合法！” 提示**
+- **备注：locahost或ip访问时可忽略控制台中的 “[web-sdk-log]: getHostname传入的url参数不合法！” 提示**
 
-### 2. Android SDK埋点集成
+#### 2. Android SDK埋点集成
 
   集成方式参考 [神策Android SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/android-7541696.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
 
-### 3. IOS SDK埋点集成
+#### 3. IOS SDK埋点集成
 
   集成方式参考 [神策IOS SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/ios-7538614.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
 
-### 4. 小程序 SDK埋点集成
+#### 4. 小程序 SDK埋点集成
 
   集成方式参考 [神策微信小程序 SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/%E9%9B%86%E6%88%90%E6%96%87%E6%A1%A3%EF%BC%88%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89-1573892.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
+
+## 商业版
+
+   购买商业版后，提供详细安装部署说明文档。

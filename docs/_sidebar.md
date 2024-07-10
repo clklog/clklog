@@ -10,7 +10,10 @@
 - [**集成说明**](/quickstart/integration.md)
 
 - 安装说明
-  - [Docker安装](/quickstart/docker-installation.md)
+  - Docker安装
+    - [安装介绍](/installation/introduce.md)
+    - [快速模式安装](/installation/quickmode.md)
+    - [标准模式安装](/installation/standard.md)
   - 步骤安装
     - [环境准备](/quickstart/preparation.md)
     - [应用部署](/quickstart/deployment.md)

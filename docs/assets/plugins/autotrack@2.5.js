@@ -74,10 +74,10 @@
 })({
   sdk_url: 'assets/plugins/sensorsdata.js',
   name: 'sensors',
-  show_log: true,
+  show_log: false,
   is_track_single_page: false,
   send_type: 'beacon',
-  server_url: 'https://receiver.tracking.zcunsoft.com/api/gp?project=clklog&token=4a793ea028fc327f4f1763b7630e1438',
+  server_url: 'https://receiver.tracking.zcunsoft.com/api/gp?project=clklog&token=eb6d762e-bf72-40d9-8e4d-f9e3dfc7c408',
   heatmap: {
     clickmap: 'default',
     scroll_notice_map: 'default',
