@@ -58,7 +58,7 @@
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             }
 
-    location /clklog_receiver/ {
+    location /receiver/ {
                 proxy_pass http://clklog_receiver_server/;
                 proxy_set_header Host $host:$server_port;
                 proxy_set_header X-Real-IP $remote_addr;
@@ -97,12 +97,12 @@
 
 2. 上传程序文件
 
-   拷贝`clklog-api-1.0.0.jar`包和`application.yml`文件至`/usr/local/services/clklogapi`目录：
+   拷贝`clklog-api.jar`包和`application.yml`文件至`/usr/local/services/clklog-api`目录：
 
     ```
     cd /usr/local/services
-    mkdir /usr/local/services/clklogapi
-    chmod 500 clklog-api-1.0.0.jar
+    mkdir /usr/local/services/clklog-api
+    chmod 500 clklog-api.jar
     ```
 
 3. 修改配置文件
@@ -136,7 +136,7 @@
     logging:
       file:
         path: log
-    clklogapi:
+    clklog-api:
       access-control-allow-origin: "*"
       # 默认前端埋点project默认名称，一般不用修改
       project-name: clklogapp    
@@ -147,7 +147,7 @@
 4. 创建服务
 
     ```
-    vim /etc/systemd/system/clklogapi.service
+    vim /etc/systemd/system/clklog-api.service
     ```
 
     内容如下：
@@ -158,7 +158,7 @@
     After=syslog.target
 
     [Service]
-    ExecStart=/usr/local/services/clklogapi/clklog-api-1.0.0.jar
+    ExecStart=/usr/local/services/clklog-api/clklog-api.jar
     SuccessExitStatus=143
 
     [Install]
@@ -174,7 +174,7 @@
 5. 启动应用程序
 
     ```
-    systemctl start clklogapi
+    systemctl start clklog-api
     ```
 
 <br>
@@ -240,14 +240,14 @@
 
 2. 上传程序文件
 
-    在目录`/usr/local/services/`中创建`clklogreceiver`目录并将文件包`clklog_receiver.jar`、配置文件`application.yml`以及源码中的`iplib`文件夹和`app-setting.json`文件拷贝进去，代码如下：
+    在目录`/usr/local/services/`中创建`clklog-receiver`目录并将文件包`clklog-receiver.jar`、配置文件`application.yml`以及源码中的`iplib`文件夹和`app-setting.json`文件拷贝进去，代码如下：
 
     ```
     cd /usr/local/services/
-    mkdir clklogreceiver
+    mkdir clklog-receiver
 
     # 为防止出现权限问题导致脚本不能执行，建议上传完脚本以后执行以下代码
-    chmod 500 clklog_receiver.jar
+    chmod 500 clklog-receiver.jar
     ```
 
 3. 修改配置文件
@@ -282,18 +282,18 @@
 4. 创建服务
 
     ```
-    vim /etc/systemd/system/clklogreceiver.service
+    vim /etc/systemd/system/clklog-receiver.service
     ```
 
     内容如下：
 
     ```
     [Unit]
-    Description=clklogreceiver
+    Description=clklog-receiver
     After=syslog.target
 
     [Service]
-    ExecStart=/usr/local/services/clklogreceiver/clklog_receiver-1.0.0.jar
+    ExecStart=/usr/local/services/clklog-receiver/clklog-receiver.jar
     SuccessExitStatus=143
 
     [Install]
@@ -309,7 +309,7 @@
 5. 启动应用程序
 
     ```
-    systemctl start clklogreceiver
+    systemctl start clklog-receiver
     ```
 
 ### 7.部署处理服务 clklog-processing
@@ -318,14 +318,14 @@
 
 2. 上传程序文件
 
-    在目录`/usr/local/services/`中创建`clklogprocessing`目录并将文件包`clklog-processing-1.0.0-jar-with-dependencies.jar`、 配置文件`config.properties`以及源码中的`iplib`文件夹和`project-setting.json`文件拷贝拷进去，代码如下：
+    在目录`/usr/local/services/`中创建`clklog-processing`目录并将文件包`clklog-processing-jar-with-dependencies.jar`、 配置文件`config.properties`以及源码中的`iplib`文件夹和`project-setting.json`文件拷贝拷进去，代码如下：
 
     ```
     cd /usr/local/services/
-    mkdir /usr/local/services/clklogprocessing
+    mkdir /usr/local/services/clklog-processing
    
     # 为防止出现权限问题导致脚本不能执行，建议上传完脚本以后执行以下代码
-    chmod 500  clklog-processing-1.0.0-jar-with-dependencies.jar
+    chmod 500  clklog-processing-jar-with-dependencies.jar
     ```
 
 3. 修改配置项
@@ -346,7 +346,7 @@
     
     # flink 配置
     flink.clklog-data-source-name=ClklogKafkaSource
-    flink.checkpoint=file:///usr/local/services/clklogprocessing/checkpoints
+    flink.checkpoint=file:///usr/local/services/clklog-processing/checkpoints
     flink.parallelism=1
     
     # processing-file-location 默认为空，如果资源及配置文件(iplib,app-setting.json)不与jar同目录，则修改为它们的父路径，否则无需配置
@@ -361,9 +361,9 @@
 4. 启动应用程序
 
     ```
-    cd /usr/local/services/clklogprocessing
+    cd /usr/local/services/clklog-processing
 
-   /usr/local/services/flink-1.14.6/bin/flink run [-s file: /usr/local/services/clklogprocessing/checkpoints/41f3b324752da77ed7821033d45d1d2f/chk-2737882] -c com.zcunsoft.clklog.analysis.entry.JieXiJson /usr/local/services/clklogprocessing/clklog-processing-1.0.0-jar-with-dependencies.jar
+   /usr/local/services/flink-1.14.6/bin/flink run [-s file: /usr/local/services/clklog-processing/checkpoints/41f3b324752da77ed7821033d45d1d2f/chk-2737882] -c com.zcunsoft.clklog.analysis.entry.JieXiJson /usr/local/services/clklog-processing/clklog-processing-jar-with-dependencies.jar
     ```
 
     其中 `-s` 参数为`checkpoint`位置。对于中断后再执行的任务，需要指定该参数，如不指定则从头开始消费`kafka`消息。
@@ -430,7 +430,7 @@
 2. 日志接收地址
 
     ```
-    http://YOUR_DOMAIN/clklog_receiver/api/gp
+    http://YOUR_DOMAIN/receiver/api/gp
     ```
 
 3. 接口地址
@@ -473,8 +473,8 @@
   `autotrack.js`中的`server_url`参考配置如下：
 
   ```
-    //接收地址为clklog_receiver 的接收服务地址，project和token参数必须传入，token是每个project对应的随机字符串，请自行随机生成。
-    server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', 
+    //接收地址为clklog-receiver 的接收服务地址，project和token参数必须传入，token是每个project对应的随机字符串，请自行随机生成。
+    server_url: 'http://10.10.222.21/receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', 
   ```
 
 - **单页面应用数据采集说明**
@@ -497,15 +497,15 @@
 
 #### 2. Android SDK埋点集成
 
-  集成方式参考 [神策Android SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/android-7541696.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
+  集成方式参考 [神策Android SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/android-7541696.html) , 集成时将数据接收地址更换成clklog-receiver的接收服务地址。
 
 #### 3. IOS SDK埋点集成
 
-  集成方式参考 [神策IOS SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/ios-7538614.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
+  集成方式参考 [神策IOS SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/ios-7538614.html) , 集成时将数据接收地址更换成clklog-receiver的接收服务地址。
 
 #### 4. 小程序 SDK埋点集成
 
-  集成方式参考 [神策微信小程序 SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/%E9%9B%86%E6%88%90%E6%96%87%E6%A1%A3%EF%BC%88%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89-1573892.html) , 集成时将数据接收地址更换成clklog_receiver的接收服务地址。
+  集成方式参考 [神策微信小程序 SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/%E9%9B%86%E6%88%90%E6%96%87%E6%A1%A3%EF%BC%88%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89-1573892.html) , 集成时将数据接收地址更换成clklog-receiver的接收服务地址。
 
 ## 商业版
 
