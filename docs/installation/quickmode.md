@@ -3,6 +3,16 @@
 
  准备一台linux服务器，建议操作系统版本为：ubuntu, 安装docker、docker-compose。
 
+ 服务器最低配置要求：
+
+- 处理器：双核2.5GHz或更高
+
+- 内存：8GB RAM或更高
+
+- 存储空间：50GB可用硬盘空间
+
+- 网络：可靠的网络连接，带宽至少为10Mbps
+
 ## 准备
 
 1. 下载 ClkLog Docker Compose配置文件，参考代码如下

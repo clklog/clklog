@@ -20,10 +20,11 @@
     - [常见问题](/quickstart/question.md)
 - 贡献者指南
   - [贡献者指南](/contributor/guide.md)
+  - [贡献者协议](/contributor/agreement.md)
 
 - [**合作协议**](/license.md)
+
 <!-- - 系列产品
   - AccessLog
     - [产品介绍](/accesslog/introduce.md)
-    - [安装说明](/accesslog/installation.md) -->
-  <!-- - [贡献者协议](/contributor/agreement.md) -->
+    - [部署说明](/accesslog/deployment.md) -->
