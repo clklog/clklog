@@ -45,7 +45,7 @@
     w[n].para = para
 
     var scriptURLs = [
-      'assets/plugins/session-event/index.js', //引用的session-event插件路径
+      '/assets/plugins/session-event/index.js', //引用的session-event插件路径
       p
     ]
 
@@ -72,7 +72,7 @@
   })
   //sensors.quick('autoTrackSinglePage')
 })({
-  sdk_url: 'assets/plugins/sensorsdata.js',
+  sdk_url: '/assets/plugins/sensorsdata.js',
   name: 'sensors',
   show_log: false,
   is_track_single_page: false,

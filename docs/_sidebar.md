@@ -11,6 +11,7 @@
 
 - 安装说明
   - Docker安装
+    - [环境准备](/installation/preperation.md)
     - [安装介绍](/installation/introduce.md)
     - [快速模式安装](/installation/quickmode.md)
     - [标准模式安装](/installation/standard.md)
@@ -21,10 +22,10 @@
 - 贡献者指南
   - [贡献者指南](/contributor/guide.md)
   - [贡献者协议](/contributor/agreement.md)
-
 - [**合作协议**](/license.md)
 
-<!-- - 系列产品
+<!-- 
+- 系列产品
   - AccessLog
     - [产品介绍](/accesslog/introduce.md)
-    - [部署说明](/accesslog/deployment.md) -->
+    - [应用部署](/accesslog/deployment.md) -->

@@ -5,7 +5,7 @@ AccessLog 是ClkLog下的一款针对服务器日志的采集和数据分析的�
 
 AccessLog 的核心是系统日志的采集与清洗、系统日志数据的分析与展示。
 
-AccessLog 主要是通过采集工具（推荐：vector或filebeat）对服务器（如nginx、iis）日志进行采集，通过相关服务对采集数据进行处理，然后在可视化的日志查询分析界面对服务器日志进行查询分析。确保在系统运行期间，运维人员能够尽早知道系统出现的问题并介入处理解决问题。
+AccessLog 主要是通过采集工具（推荐：vector或filebeat）对服务器（如nginx、iis）日志进行采集，通过相关服务对采集数据进行处理，然后在可视化的日志查询分析界面对服务器日志进行查询分析。
 
 ## 核心功能
 
@@ -13,7 +13,7 @@ AccessLog 主要是通过采集工具（推荐：vector或filebeat）对服务�
 
 - **数据处理**: 对采集日志数据进行处理
 
-- **可视化查询分析**: 通过可视化查询页面对日志进行多维度数据分
+- **可视化查询分析**: 通过可视化查询页面对日志进行多维度数据分析
 
 ## 技术栈选择
 
@@ -22,6 +22,30 @@ AccessLog 主要是通过采集工具（推荐：vector或filebeat）对服务�
 - **前端**：vue、vue-element-admin、element-ui 、echarts
 
 - **数据**：Clickhouse
+
+## 系统架构
+
+<!-- tabs:start -->
+
+#### **标准模式**
+
+![](../assets/imgs/accesslog/all-process.png)
+
+#### **快速模式**
+
+![](../assets/imgs/accesslog/fast-process.png)
+
+<!-- tabs:end -->
+
+## 项目组成
+
+- **处理服务  【accesslog-processing-sample】**： 直接将数据写入clickhouse。
+
+- **处理服务  【accesslog-processing】**： 依托flink，消费kafka数据并存入clickhouse。
+
+- **统计接口 【accesslog-api】**： 提供多维度数据统计接口。
+
+- **统计展示 【accesslog-ui】**：基于 vue-element-admin 实现的统计分析数据界面展示。
 
 ## 示意图
 

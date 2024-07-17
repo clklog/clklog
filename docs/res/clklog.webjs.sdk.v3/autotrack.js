@@ -45,7 +45,7 @@
     w[n].para = para
 
     var scriptURLs = [
-      'plugins/session-event/index.js', //引用的session-event插件路径
+      '/plugins/session-event/index.js', //引用的session-event插件路径
       p
     ]
 
@@ -74,12 +74,12 @@
   })
   sensors.quick('autoTrackSinglePage')
 })({
-  sdk_url: 'sensorsdata.js',
+  sdk_url: '/sensorsdata.js',
   name: 'sensors',
   show_log: true,
   is_track_single_page: true,
   send_type: 'beacon',
-  server_url: 'http://10.10.222.21/clklog_receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', //请修改接收地址为clklog_receiver 的接收服务地址，必须传入project和token参数
+  server_url: 'http://10.10.222.21/receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', //请修改接收地址为clklog_receiver 的接收服务地址，必须传入project和token参数
   heatmap: {
     clickmap: 'default',
     scroll_notice_map: 'default',

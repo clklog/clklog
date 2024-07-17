@@ -453,10 +453,10 @@
 
 1.1. 下载 ClKLOG WEB JS SDK
 
-  <a href="https://clklog.com/res/clklog.webjs.sdk.v2.zip" target="_blank" rel="noopener" id="webjssdkdownload">点击此处下载 CLKLOG WEB JS SDK</a>, 并将下载的`ClKLOG WEB JS SDK`文件包解压至网站根目录, 参考目录结构如下：
+  <a href="https://clklog.com/res/clklog.webjs.sdk.v3.zip" target="_blank" rel="noopener" id="webjssdkdownload">点击此处下载 CLKLOG WEB JS SDK</a>, 并将下载的`ClKLOG WEB JS SDK`文件包解压至网站目录, 参考目录结构如下：
 
   ```
-  ├── 网站根目录
+  ├── 网站根目录    //SDK所在位置可根据实际应用情况进行调整   
       ├── plugins
       │   ├── session-event
       │   │   ├── index.js
@@ -464,18 +464,18 @@
       |── autotrack.js
   ```
 
-1.2. 修改`autotrack.js`接收服务配置信息
+1.2. 修改`autotrack.js`中的配置信息
 
-  将`autotrack.js`中的`server_url` 接收服务地址配置信息修改为clklog数据采集地址，并调整参数`project`和`token`的配置。
+- 1）确认`autotrack.js`中`sensorsdata.js`和`plugins/session-event/index.js`在实际项目中的引用路径。
 
-  其中`project`名称默认为`clklogapp`，如果要修改`project`名称请注意调整`clklog-receiver`服务中`project-list`的相关配置。
+- 2）将`autotrack.js`中的`server_url` 接收服务地址配置信息修改为clklog数据采集地址，并调整参数`project`和`token`的配置。其中`project`名称默认为`clklogapp`，如果要修改`project`名称请注意调整`clklog-receiver`服务中`project-list`的相关配置。
 
-  `autotrack.js`中的`server_url`参考配置如下：
+    `autotrack.js`中的`server_url`参考配置如下：
 
-  ```
-    //接收地址为clklog-receiver 的接收服务地址，project和token参数必须传入，token是每个project对应的随机字符串，请自行随机生成。
-    server_url: 'http://10.10.222.21/receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', 
-  ```
+    ```
+      //接收地址为clklog-receiver 的接收服务地址，project和token参数必须传入，token是每个project对应的随机字符串，请自行随机生成。
+      server_url: 'http://10.10.222.21/receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a', 
+    ```
 
 - **单页面应用数据采集说明**
 
@@ -485,7 +485,11 @@
 
 1.3. 接入埋点跟踪代码
 
-   在web网站引用`autotrack.js`。
+  在web网站页面引用`autotrack.js`,参考代码如下。
+
+   ```
+    <script src="/autotrack.js"></script> 
+   ```
 
 1.4. 测试埋点代码是否接入正常
 

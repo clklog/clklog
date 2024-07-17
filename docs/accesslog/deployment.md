@@ -65,7 +65,7 @@ SETTINGS index_granularity = 8192
 
  ```
 
-### 2.采集nginx的access日志
+### 2.日志采集配置
 
 使用vector或filebeat或其它采集工具采集nginx的access日志，写入kafka,topic为accesslog。
 
