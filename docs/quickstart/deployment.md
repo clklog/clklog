@@ -456,11 +456,11 @@
   <a href="https://clklog.com/res/clklog.webjs.sdk.v3.zip" target="_blank" rel="noopener" id="webjssdkdownload">点击此处下载 CLKLOG WEB JS SDK</a>, 并将下载的`ClKLOG WEB JS SDK`文件包解压至网站目录, 参考目录结构如下：
 
   ```
-  ├── 网站根目录    //SDK所在位置可根据实际应用情况进行调整   
+  ├── 网站根目录    //SDK引用位置可根据实际应用情况进行调整   
       ├── plugins
       │   ├── session-event
       │   │   ├── index.js
-      |── sensorsdata.js
+      |── sensorsdata.js   
       |── autotrack.js
   ```
 
