@@ -1,6 +1,6 @@
 ## 准备
 
-[参考快速模式安装准备](/installation/quickmode.md#准备)
+[参考快速模式安装准备](/docker_installation/quickmode.md#准备)
 
 ## 启动
 
@@ -32,17 +32,14 @@
 
    ![image](../assets/imgs/flink-status.png)  
 
-<!-- 4. 下载[clklog-processing](https://gitee.com/clklog/clklog-processing/releases) -->
+## 埋点代码接入
 
-<!-- 5. 提交 job
+   埋点代码接入方式参考：[sdk-埋点集成参考](/integration/reference.md)
 
-   在flink后台提交`clklog-processing`的jar包：
+## 验证埋点接入是否成功
 
-   ![image](../assets/imgs/submitjob.png)  
-
-   在flink后台查看job状态
-
-   ![image](../assets/imgs/flink-status.png)   -->
+- 埋点代码接入成功后，等待1分钟，返回前端 <http://YOUR_IP/> ，刷新数据概览页面，如下图所示，当页面上的浏览概览相关数据值开始有数据说明埋点接入成功。
+   ![image](../assets/imgs/clklogindex.png)  
 
 ## 模式切换
 

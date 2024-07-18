@@ -74,7 +74,7 @@
 
 ## 埋点代码接入
 
-   埋点代码接入方式参考：[sdk-埋点集成](/quickstart/deployment.md#_11-sdk-埋点集成)
+   埋点代码接入方式参考：[sdk-埋点集成参考](/integration/reference.md)
 
 ## 验证埋点接入是否成功
 

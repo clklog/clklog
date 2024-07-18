@@ -1,6 +1,4 @@
 
-# 源码地址
-  
 ## 环境准备
 
 - Linux服务器（本文档以ubuntu为例）
@@ -12,7 +10,7 @@
 - Clickhouse 23.2.1
 - Flink 1.16.3 （可选）
   
-[环境初始化步骤参考](../quickstart/preparation.md#初始化步骤参考)
+[环境初始化步骤参考](../installation/preparation.md#初始化步骤参考)
 
 ## 部署步骤
 

@@ -7,25 +7,26 @@
   - [指标项说明](/indicator-desc.md)
   - [更新说明](/changelog.md)
 
-- [**集成说明**](/quickstart/integration.md)
-
 - 安装说明
   - Docker安装
-    - [环境准备](/installation/preperation.md)
-    - [安装介绍](/installation/introduce.md)
-    - [快速模式安装](/installation/quickmode.md)
-    - [标准模式安装](/installation/standard.md)
+    - [环境准备](/docker_installation/preperation.md)
+    - [安装介绍](/docker_installation/introduce.md)
+    - [快速模式安装](/docker_installation/quickmode.md)
+    - [标准模式安装](/docker_installation/standard.md)
   - 步骤安装
-    - [环境准备](/quickstart/preparation.md)
-    - [应用部署](/quickstart/deployment.md)
-    - [常见问题](/quickstart/question.md)
+    - [环境准备](/installation/preparation.md)
+    - [应用部署](/installation/deployment.md)
+    - [常见问题](/installation/question.md)
+- 集成说明
+  - [集成方式](/integration/introduce.md)
+  - [核心功能集成说明](/integration/method.md)
+  - [埋点集成SDK及文档](/integration/document.md)
+  - [集成测试](/integration/reference.md)
 - 贡献者指南
   - [贡献者指南](/contributor/guide.md)
   - [贡献者协议](/contributor/agreement.md)
 - [**合作协议**](/license.md)
-
-<!-- 
-- 系列产品
+<!-- - 系列产品
   - AccessLog
     - [产品介绍](/accesslog/introduce.md)
     - [应用部署](/accesslog/deployment.md) -->

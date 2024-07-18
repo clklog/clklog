@@ -19,6 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <link rel="stylesheet" href="assets/css/font.css" />
     <link rel="stylesheet" href="assets/css/style@1.1.9.css" />
+    <link rel="stylesheet" href="assets/plugins/sidebar/sidebar.min.css" />
     <script src="/assets/plugins/autotrack@2.5.js"></script>
     <script>
       window.$docsify = {
@@ -42,6 +43,7 @@
         maxLevel: 5,
         // 自定义侧边栏后默认不会再生成目录，设置生成目录的最大层级（建议配置为2-4）
         subMaxLevel: 6,
+        sidebarDisplayLevel: 4, // set sidebar display level
         // 小屏设备下合并导航栏到侧边栏
         mergeNavbar: true,
         notFoundPage: '404.md',
@@ -79,6 +81,13 @@
             label: '切记'
           }
         },
+        // scrollToTop: {
+        //   auto: true,
+        //   text: '🔼',
+        //   right: 12,
+        //   bottom: 52,
+        //   offset: 25
+        // },
         tabs: {
           persist: true, // default
           sync: true, // default
@@ -163,7 +172,9 @@
     <!-- <script src="assets/plugins/countable.js" rel="stylesheet"></script> -->
     <script src="assets/plugins/prismjs@1.22.0/components/prism-java.min.js" rel="stylesheet"></script>
     <script src="assets/plugins/docsify-footer.min.js"></script>
-    <script src="assets/plugins/docsify-pagination.min.js"></script>
+    <script src="assets/plugins/docsify-scroll-to-top.min.js"></script>
+    <script src="assets/plugins/sidebar/docsify-sidebar-collapse.min.js"></script>
+    <!-- <script src="assets/plugins/docsify-pagination.min.js"></script> -->
     <script src="assets/plugins/docsify-tabs@1.js"></script>
     <!-- <script src="//unpkg.com/docsify-share/build/index.min.js"></script> -->
     <script>

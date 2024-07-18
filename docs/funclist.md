@@ -208,32 +208,22 @@
         </td>
     </tr>
     <tr>
-        <!-- <td> 17 </td> -->
-        <td rowspan="3"> <span class="pro-func">系统设置 </span></td>
-        <td> <span class="pro-func">项目管理 </span>    </td>
-        <td> <span class="pro-func">项目新增、项目数据采集相关统计参数配置</span> </td>
-        <td class="func-desc-td">
-            <br />
-            <span class="pro-func">Ø  项目新增、项目数据采集相关统计参数配置 </span> <br /><br />
-              <span class="pro-func">Ø  项目数据采集相关统计参数配置，相关参数包含：排查的全局IP地址、用户代理、URL参数、站内搜索关键词等</span>  <br /><br />
+        <td > <span class="pro-func">App崩溃分析</span></td>
+        <td> <span class="pro-func">App崩溃分析</span></td>
+        <td> <span class="pro-func">
+        从时间段，按时、按日、按周、按月查询分析App崩溃相关指标数据。</span>
         </td>
-    </tr>
-   <tr>
-        <!-- <td> 18 </td> -->
-        <td> <span class="pro-func">全局设置 </span></td>
-        <td> <span class="pro-func">全局项目数据采集相关统计参数配置</span> </td>
         <td class="func-desc-td">
-            <br />
-            <span class="pro-func">Ø  全局项目数据采集相关统计参数配置，相关参数包含：排查的全局IP地址、用户代理、URL参数、站内搜索关键词等</span><br /><br />
-        </td>
-    </tr>
-    <tr>
-        <!-- <td> 19 </td> -->
-        <td><span class="pro-func">日志汇总 </span></td>
-        <td><span class="pro-func">采集日志总量汇总</span> </td>
-        <td class="func-desc-td">
-            <br />
-            <span class="pro-func">Ø  按时间段查询统计数据接收服务接收的日志和存入clickhouse的原始日志总量</span><br /><br />
+        <br>
+            <span class="pro-func">
+                Ø 崩溃数据指标概览<br /><br />
+                Ø 按日、按周、按月展示App崩溃相关指标数据变化趋势 <br /><br />
+                Ø 按日、按周、按月展示IOS版本App崩溃相关指标数据变化趋势 <br /><br />
+                Ø 按日、按周、按月展示Android版本App崩溃相关指标数据变化趋势 <br /><br />
+                Ø 按App的应用版本、操作系统查询统计出现App崩溃的设备型号数量、崩溃次数、崩溃用户数等<br /><br />
+                Ø 按App的应用版本、操作系统查询崩溃详细日志信息<br /><br />
+                Ø 按App的应用版本、操作系统、设备型号查询统计出现App崩溃的各类型设备崩溃次数、崩溃用户数等<br /><br />
+            </span>
         </td>
     </tr>
     <tr>
@@ -301,6 +291,35 @@
                 Ø 分析结果数据趋势图<br /><br />
                 Ø 分层和平铺两种模式展示分析结果数据<br /><br />
             </span>
+        </td>
+    </tr>
+    <tr>
+        <!-- <td> 17 </td> -->
+        <td rowspan="3"> <span class="pro-func">系统设置 </span></td>
+        <td> <span class="pro-func">项目管理 </span>    </td>
+        <td> <span class="pro-func">项目新增、项目数据采集相关统计参数配置</span> </td>
+        <td class="func-desc-td">
+            <br />
+            <span class="pro-func">Ø  项目新增、项目数据采集相关统计参数配置 </span> <br /><br />
+              <span class="pro-func">Ø  项目数据采集相关统计参数配置，相关参数包含：排查的全局IP地址、用户代理、URL参数、站内搜索关键词等</span>  <br /><br />
+        </td>
+    </tr>
+   <tr>
+        <!-- <td> 18 </td> -->
+        <td> <span class="pro-func">全局设置 </span></td>
+        <td> <span class="pro-func">全局项目数据采集相关统计参数配置</span> </td>
+        <td class="func-desc-td">
+            <br />
+            <span class="pro-func">Ø  全局项目数据采集相关统计参数配置，相关参数包含：排查的全局IP地址、用户代理、URL参数、站内搜索关键词等</span><br /><br />
+        </td>
+    </tr>
+    <tr>
+        <!-- <td> 19 </td> -->
+        <td><span class="pro-func">日志汇总 </span></td>
+        <td><span class="pro-func">采集日志总量汇总</span> </td>
+        <td class="func-desc-td">
+            <br />
+            <span class="pro-func">Ø  按时间段查询统计数据接收服务接收的日志和存入clickhouse的原始日志总量</span><br /><br />
         </td>
     </tr>
      <tr>
