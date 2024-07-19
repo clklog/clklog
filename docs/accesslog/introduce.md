@@ -29,11 +29,11 @@ AccessLog 主要是通过采集工具（推荐：vector或filebeat）对服务�
 
 #### **标准模式**
 
-![](../assets/imgs/accesslog/all-process.png)
+![](../assets/imgs/accesslog/all-process1.png)
 
 #### **快速模式**
 
-![](../assets/imgs/accesslog/fast-process.png)
+![](../assets/imgs/accesslog/fast-process1.png)
 
 <!-- tabs:end -->
 

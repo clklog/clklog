@@ -65,18 +65,13 @@
 
 3. 验证镜像是否安装成功
 
-   - 前端地址： <http://YOUR_IP/>  
+   - 前端地址： <http://YOUR_DOMAIN/>  
        - 登录账号/密码：admin/clklog
   
-   - 统计接口说明地址： <http://YOUR_IP/api/doc.html>
+   - 统计接口说明地址： <http://YOUR_DOMAIN/api/doc.html>
 
-   - 埋点数据接收地址： <http://YOUR_IP/receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a>
+   - 埋点数据接收地址： <http://YOUR_DOMAIN/receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a>
 
 ## 埋点代码接入
 
    埋点代码接入方式参考：[sdk-埋点集成参考](/integration/reference.md)
-
-## 验证埋点接入是否成功
-
-- 埋点代码接入成功后，等待1分钟，返回前端 <http://YOUR_IP/> ，刷新数据概览页面，如下图所示，当页面上的浏览概览相关数据值开始有数据说明埋点接入成功。
-   ![image](../assets/imgs/clklogindex.png)  
