@@ -26,7 +26,10 @@
 - 系列产品
   - AccessLog
     - [产品介绍](/accesslog/introduce.md)
-    - [应用部署](/accesslog/deployment.md)
+    - [功能清单](/accesslog/funclist.md)
+    - 安装说明
+      - [Docker安装](/accesslog/installation.md)
+      - [步骤部署](/accesslog/deployment.md)
 - 贡献者指南
   - [贡献者指南](/contributor/guide.md)
   - [贡献者协议](/contributor/agreement.md)

@@ -1,7 +1,10 @@
-# 项目简介
+# Project Introduction/项目简介
 
+ClkLog is an open-source system that records and analyzes user online behaviors to build a user profile. Technical personnel can quickly complete private deployment.
 ClkLog是一款记录并分析用户行为和画像的开源软件，技术人员可快速完成私有化部署。<br>
+ClkLog is based on the Sensors Analysis SDK. It uses the ClickHouse database to store collected data by using the front-end and back-end separation method. Here, you can easily see the users’ behavior track when they access the web pages, mobile apps, Wechat mini-programs or other business systems. You can also collect the users’ all-round information from multiple dimensions such as time, region, channel, visitor type, etc.
 ClkLog基于神策分析SDK，采用ClickHouse数据库对采集数据进行存储，使用前后端分离的方式来实现。在这里，你可以轻松看到用户访问网页、APP、小程序或业务系统的行为轨迹，同时也可以从时间、地域、渠道、用户访客类型等多维度了解用户的全方位信息。<br>
+ClkLog also provides a commercial version with more advanced analysis functions based on the open-source community version.
 ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功能的商业版本。
 
 # 核心功能

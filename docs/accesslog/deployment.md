@@ -1,6 +1,6 @@
 
 ## 环境准备
-
+<!-- - Ubuntu SMP -->
 - Linux服务器（本文档以ubuntu为例）
 - JDK 1.8
 - Nginx 1.18
@@ -9,71 +9,46 @@
 - Kafka 2.12-3.3.1
 - Clickhouse 23.2.1
 - Flink 1.16.3 （可选）
-  
-[环境初始化步骤参考](../installation/preparation.md#初始化步骤参考)
+- nodejs >= 8.9
+- npm >=3.0.0
+
+[环境初始化步骤参考](/installation/preparation.md#初始化步骤参考)
 
 ## 部署步骤
 
-### 1.创建数据库
+### 1.数据库初始化
 
- 在Clickhouse中创建数据库，执行脚本如下：
+1. 根据 `accesslog-scripts` 下的`clickhouse/sql.txt`文件创建clickhouse实例schema和表
 
- ```
- --数据库
-CREATE DATABASE IF NOT EXISTS accesslogdb ENGINE = Atomic;
+  ```
+  clickhouse-client --host localhost --user default --queries-file PATH_TO_SQL_FILE
+  ```
 
---表
-CREATE TABLE accesslogdb.gp_nginx_access
-(
-    `country` String,
-    `upstream_uri` String,
-    `upstream_addr` String,
-    `uri` String,
-    `request_method` String,
-    `http_host` String,
-    `http_user_agent` String,
-    `stat_hour` String,
-    `manufacturer` String,
-    `remote_user` String,
-    `upstream_status` String,
-    `request_time` Float32,
-    `province` String,
-    `browser` String,
-    `model` String,
-    `browser_version` String,
-    `brand` String,
-    `remote_addr` String,
-    `stat_date` Date,
-    `stat_min` String,
-    `time_local` DateTime64(3),
-    `http_version` String,
-    `city` String,
-    `body_sent_bytes` String,
-    `http_referrer` String,
-    `server_name` String,
-    `upstream_response_time` String,
-    `status` String,
-    `application_code` String,
-    `create_time` DateTime64(3) DEFAULT now()
-)
-ENGINE = MergeTree
-PARTITION BY stat_date
-ORDER BY (application_code, http_host, status, request_method, remote_addr, country, province, city, uri, browser, time_local)
-SETTINGS index_granularity = 8192
+2. 在kafka中创建队列clklog
 
- ```
+  ```
+  /usr/local/services/kafka_2.12-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --replication-factor 1 --partitions 6 --topic accesslog
+  ```
+
+<br>
 
 ### 2.日志采集配置
 
-使用vector或filebeat或其它采集工具采集nginx的access日志，写入kafka,topic为accesslog。
+使用vector采集工具采集nginx的access日志，写入kafka,topic为accesslog。
+
+vector配置方法参考：
+
+<https://github.com/clklog/accesslog-scripts/tree/main/vector>
+
+<https://gitee.com/clklog/accesslog-scripts/tree/main/vector>
 
 ### 3.部署accesslog-processing 服务
 
-    accesslog-processing 服务可选择是否使用flink。
+accesslog-processing 服务可选择是否使用flink。
 
-    不使用flink，则部署accesslog-processing-simple服务。
+不使用flink，则部署accesslog-processing-simple服务。
 
-    使用flink，则部署accesslog-processing服务。
+使用flink，则部署accesslog-processing服务。
 
 #### accesslog-processing-sample 服务部署
 
@@ -120,24 +95,15 @@ SETTINGS index_granularity = 8192
         username: default
         password:
 
-    accesslog:
-    # 处理线程数
-    thread-count: 2
+    accesslog-processing:
+        # 处理线程数
+        thread-count: 2
 
-    # kafka配置
-    kafka-bootstrap-servers: localhost:9092
-    kafka-consumer-group-id: accesslog-group
-    topic-name: accesslog
-    nginx_access_table: gp_nginx_access
-
-    # 匹配accesslog的正则表达式
-    accesslog-grok: '%{IPORHOST:remote_addr} - \[%{DATA:x_forward_for}\] - %{DATA:remote_user} \[%{HTTPDATE:time}\] \"%{WORD:request_method} %{DATA:uri} HTTP/%{NUMBER:http_version}\" %{NUMBER:status} %{NUMBER:body_sent_bytes} \"%{DATA:http_referrer}\" \"%{DATA:http_user_agent}\" %{NUMBER:request_length} %{NUMBER:request_time} \[%{DATA:proxy_upstream_name}\] %{DATA:upstream_addr} %{DATA:upstream_response_length} %{DATA:upstream_response_time} %{DATA:upstream_status} %{DATA:req_id} %{DATA:host} \[\]'
-
-    # 服务器名
-    server-name: accesslog
-
-    # 应用名
-    application-code: accesslog
+        # kafka配置
+        kafka-bootstrap-servers: localhost:9092
+        kafka-consumer-group-id: accesslog-group
+        topic-name: accesslog
+        nginx_access_table: gp_nginx_access
 
     ```
 
@@ -192,9 +158,6 @@ SETTINGS index_granularity = 8192
     clickhouse.password=123456
     
     kafka.bootstrap.server=localhost:9092
-    
-    # 匹配accesslog的正则表达式
-    accesslog-grok=%{IPORHOST:remote_addr} - \[%{DATA:x_forward_for}\] - %{DATA:remote_user} \[%{HTTPDATE:time}\] \"%{WORD:request_method} %{DATA:uri} HTTP/%{NUMBER:http_version}\" %{NUMBER:status} %{NUMBER:body_sent_bytes} \"%{DATA:http_referrer}\" \"%{DATA:http_user_agent}\" %{NUMBER:request_length} %{NUMBER:request_time} \[%{DATA:proxy_upstream_name}\] %{IP:upstream_addr}:%{NUMBER:upstream_addr_port} %{NUMBER:upstream_response_length} %{NUMBER:upstream_response_time} %{NUMBER:upstream_status} %{DATA:req_id} %{DATA:host} \[\]
     kafka.accesslog-topic=accesslog
     kafka.accesslog-group-id=accesslog-group
     flink.accesslog-data-source-name=AccesslogKafkaSource
@@ -267,8 +230,8 @@ SETTINGS index_granularity = 8192
     file:
         path: log
     accesslogapi:
-    access-control-allow-origin: "*"
-    project-name: accesslog
+        access-control-allow-origin: "*"
+        project-name: accesslog
     ```
 
 4. 创建服务
@@ -297,6 +260,7 @@ SETTINGS index_granularity = 8192
 
 1. 在开发环境编译前端应用程序
     本地前端代码运行步骤参考：
+
     1）部署依赖
 
     ```
@@ -347,13 +311,13 @@ SETTINGS index_granularity = 8192
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 
-    location /accesslog_api/ {
+    location /api/ {
             proxy_pass http://accesslog_api_server/;
             proxy_set_header Host $host:$server_port;
     }
 
-    location /accesslog_api/v3/ {
-            proxy_pass http://accesslog_api_server/accesslog_api/v3/;
+    location /api/v3/ {
+            proxy_pass http://accesslog_api_server/api/v3/;
             proxy_set_header Host $host:$server_port;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -361,7 +325,7 @@ SETTINGS index_granularity = 8192
     }
     ```
 
-2. 重启nginx
+1. 重启nginx
 
     ```
     systemctl restart nginx

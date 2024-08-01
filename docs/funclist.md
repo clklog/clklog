@@ -4,7 +4,7 @@
 <table class="func-list-table">
     <tr>
         <!-- <th> 序号        </th> -->
-        <th> 功能模块        </th>
+        <th class="func-title-td"> 功能模块        </th>
         <th> 子模块        </th>
         <th class="func-intro-td">功能简介        </th>
         <th class="func-desc-td">核心功能（<span class="pro-func">蓝色部分为商业版功能</span>）        </th>

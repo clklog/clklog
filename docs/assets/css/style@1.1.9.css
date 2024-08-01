@@ -429,6 +429,9 @@ body.close .content {
     display: none;
   }
 }
+.func-list-table .func-title-td {
+  width: 90px;
+}
 .func-list-table .func-intro-td {
   width: 140px;
 }
