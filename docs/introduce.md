@@ -33,17 +33,17 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 
 #### **标准模式**
 
-![](../assets/imgs/all-process2.png)
+![](assets/imgs/all-process1.png)
 
 #### **快速模式**
 
-![](../assets/imgs/fast-process2.png)
+![](assets/imgs/fast-process1.png)
 
 <!-- tabs:end -->
 
 ## 项目组成
 
-- **接收服务 【clklog-receiver】**：接收客服端采集的日志数据并存入kafka。
+- **接收服务 【clklog-receiver】**：接收客户端采集的日志数据并存入kafka。
 
 - **处理服务  【clklog-processing】**： 依托flink，消费kafka数据并存入clickhouse。
 
