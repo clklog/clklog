@@ -7,25 +7,29 @@ ClkLog基于神策分析SDK，采用ClickHouse数据库对采集数据进行存�
 ClkLog also provides a commercial version with more advanced analysis functions based on the open-source community version.
 ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功能的商业版本。
 
-# 核心功能
+# Core Functions/核心功能
 
+- **Data collection**: supports data collection from multiple channels such as web pages, Wechat mini-programs, IOS, Android, etc.
 - **数据采集**：支持网页、小程序、IOS、Android等多端数据采集
-
+<br>
+- **Traffic overview**: provides multi-dimensional analysis from channels, devices, regions to visitor types.
 - **流量概览**：提供流量渠道、设备、地域、访客类型多维度分析
-
+<br>
+- **User Profile**: analyzes user unique IDs to locate and track full life cycle user profile.
 - **用户画像**：解析用户唯一ID，定位追踪用户全生命周期画像
-
+<br>
+- **Data Summary**: supports downloading of various summarized data and detailed data.
 - **数据下载**：支持各项汇总数据、明细数据的下载
 
-# 技术栈选择
+# Technology Selection/技术栈选择
 
-- **后端**：Redis 、Zookeeper、Kafka 、Flink
+- **Backend/后端**：Redis 、Zookeeper、Kafka 、Flink
 
-- **前端**：vue、vue-element-admin、element-ui 、echarts
+- **Frontend/前端**：vue、vue-element-admin、element-ui 、echarts
 
-- **数据**：Clickhouse
+- **Database/数据**：Clickhouse
 
-# 示意图
+# Screenshot Samples/示意图
 
 | ![](docs/assets/imgs/1.png) | ![](docs/assets/imgs/2.png) |
 | --------------------------- | --------------------------- |
@@ -33,13 +37,13 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 | ![](docs/assets/imgs/5.png) | ![](docs/assets/imgs/6.png) |
 | ![](docs/assets/imgs/7.png) | ![](docs/assets/imgs/8.png) |
 
-# 在线体验
+# Online Demo/在线体验
 
-演示地址：<a href="https://demo.clklog.com" target="_blank">https://demo.clklog.com</a>
+Demo address/演示地址：<a href="https://demo.clklog.com" target="_blank">https://demo.clklog.com</a>
 
-# 快速接入
+# Quick Start Tutorial/快速接入
 
-官方文档：<a href="https://clklog.com">https://clklog.com</a>
+Official Documents/官方文档：<a href="https://clklog.com">https://clklog.com</a>
 
 <!-- # 开源社区
 
@@ -47,20 +51,22 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 
 参与讨论：[https://github.com/orgs/clklog/discussions](https://github.com/orgs/clklog/discussions) -->
 
-# 协议许可
+# License Agreement/协议许可
 
-- 开源协议：[AGPL V3.0](https://www.gnu.org/licenses/agpl-3.0.en.html)
-
+- Open-source agreement/开源协议：[AGPL V3.0](https://www.gnu.org/licenses/agpl-3.0.en.html)
+<br>
+- Free use: Clklog follows the AGPL V3.0 open-source license. Organizations or individuals using it must comply with the relevant terms when copying, distributing, forwarding or modifying it, and must not remove the ClkLog related copyright logo. If violated, ClkLog reserves the right to pursue liability for infringement.
 - 免费使用：Clklog遵循AGPL V3.0开源许可证, 使用的组织或个人在复制、分发、转发或修改时请遵守相关条款，不得移除ClkLog相关版权标识进行。如有违反，ClkLog将保留对侵权者追究责任的权利。
+<br>
+- Commercial use: Please contact customer service for detailed consultation.
+- 商业使用：请联系客服进行细节咨询。
 
-- 商业使用：请联系客服进行细节咨询
+# Contact Us/联系我们
 
-# 联系我们
+- Customer service Email/客服邮箱：<info@clklog.com>
 
-- 客服邮箱：<info@clklog.com>
+- Customer service mobile/客服手机：16621363853
 
-- 客服手机：16621363853
+- Customer service WeChat/客服微信：opensoft66
 
-- 客服微信：opensoft66
-
-- 客服二维码：<img title="" src="docs/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top">
+- Customer service QR Code/客服二维码：<img title="" src="docs/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top">
