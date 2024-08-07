@@ -5,7 +5,7 @@ ClkLog是一款记录并分析用户行为和画像的开源软件，技术人�
 ClkLog is based on the Sensors Analysis SDK. It uses the ClickHouse database to store collected data by using the front-end and back-end separation method. Here, you can easily see the users’ behavior track when they access the web pages, mobile apps, Wechat mini-programs or other business systems. You can also collect the users’ all-round information from multiple dimensions such as time, region, channel, visitor type, etc.<br>
 ClkLog基于神策分析SDK，采用ClickHouse数据库对采集数据进行存储，使用前后端分离的方式来实现。在这里，你可以轻松看到用户访问网页、APP、小程序或业务系统的行为轨迹，同时也可以从时间、地域、渠道、用户访客类型等多维度了解用户的全方位信息。<br><br>
 ClkLog also provides a commercial version with more advanced analysis functions based on the open-source community version.<br>
-ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功能的商业版本。<br><br>
+ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功能的商业版本。<br>
 
 # Core Functions/核心功能
 
@@ -17,7 +17,7 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 - **用户画像**：解析用户唯一ID，定位追踪用户全生命周期画像<br><br>
 - **Data Summary**: supports downloading of various summarized data and detailed data.<br>
 - **数据下载**：支持各项汇总数据、明细数据的下载
-<br><br>
+<br>
 
 # Technology Selection/技术栈选择
 
@@ -26,6 +26,7 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 - **Frontend/前端**：vue、vue-element-admin、element-ui 、echarts
 
 - **Database/数据**：Clickhouse
+<br>
 
 # Screenshot Samples/示意图
 
@@ -52,12 +53,10 @@ Official Documents/官方文档：<a href="https://clklog.com">https://clklog.co
 # License Agreement/协议许可
 
 - Open-source agreement/开源协议：[AGPL V3.0](https://www.gnu.org/licenses/agpl-3.0.en.html)
-<br>
 - Free use: Clklog follows the AGPL V3.0 open-source license. Organizations or individuals using it must comply with the relevant terms when copying, distributing, forwarding or modifying it, and must not remove the ClkLog related copyright logo. If violated, ClkLog reserves the right to pursue liability for infringement.<br>
 - 免费使用：Clklog遵循AGPL V3.0开源许可证, 使用的组织或个人在复制、分发、转发或修改时请遵守相关条款，不得移除ClkLog相关版权标识进行。如有违反，ClkLog将保留对侵权者追究责任的权利。
-<br><br>
 - Commercial use: Please contact customer service for detailed consultation.<br>
-- 商业使用：请联系客服进行细节咨询。<br><br>
+- 商业使用：请联系客服进行细节咨询。
 
 # Contact Us/联系我们
 
