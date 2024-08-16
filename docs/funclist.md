@@ -228,7 +228,7 @@
     </tr>
     <tr>
         <!-- <td > <span class="pro-func">20</span>  </td> -->
-        <td rowspan="5"> <span class="pro-func">事件分析 </span>  </td>
+        <td rowspan="6"> <span class="pro-func">事件分析 </span>  </td>
         <td> <span class="pro-func">元数据管理 </span>  </td>
         <td> <span class="pro-func">定义业务系统自定义事件以及神策预置事件埋点的事件及属性（事件、用户、公共）的相关的元数据。</span>  </td>
         <td class="func-desc-td">
@@ -293,6 +293,23 @@
             </span>
         </td>
     </tr>
+     <tr>
+        <!-- <td> <span class="pro-func">24</span>  </td> -->
+        <td><span class="pro-func">漏斗分析</span></td>
+        <td><span class="pro-func">统计指定时间段内所选漏斗模型在转化周期内，漏斗模型中的各个步骤的用户转化情况。</span></td>
+        <td class="func-desc-td">
+        <br>
+            <span class="pro-func">
+                Ø 漏斗模型的定义<br />
+                漏斗模型是根据实际业务情况定义出来的多步骤事件转化模型<br /><br />
+                Ø 漏斗转化分析<br/>
+                可自主选择时间段，对漏斗模型在转化周期内，用户从第一个步骤进行到最后一个步骤的转化情况进行统计。<br /> <br />
+                Ø 各步骤转化漏斗图、各步骤转化趋势图<br/>
+                <br />
+                Ø 总体转化及各步骤转化详细数据结果展示 <br /><br />
+            </span>
+        </td>
+    </tr>
     <tr>
         <!-- <td> 17 </td> -->
         <td rowspan="3"> <span class="pro-func">系统设置 </span></td>
@@ -300,7 +317,7 @@
         <td> <span class="pro-func">项目新增、项目数据采集相关统计参数配置</span> </td>
         <td class="func-desc-td">
             <br />
-            <span class="pro-func">Ø  项目新增、项目数据采集相关统计参数配置 </span> <br /><br />
+            <span class="pro-func">Ø 项目新增、项目数据采集相关统计参数配置 </span> <br /><br />
               <span class="pro-func">Ø  项目数据采集相关统计参数配置，相关参数包含：排查的全局IP地址、用户代理、URL参数、站内搜索关键词等</span>  <br /><br />
         </td>
     </tr>
@@ -336,7 +353,6 @@
             </span>
         </td>
     </tr>
-
 </table>
 <!-- #### **开发中的功能**
 <table class="func-list-table">

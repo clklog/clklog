@@ -34,7 +34,8 @@ Web JS用户登录集成方式参考神策官方集成方法，参考链接如�
 
 预置属性，是神策 SDK 自动采集的与预置事件属性，例如：页面路径（$url_path）、启动
 场景（$scene）、屏幕宽高（$screen_height、$screen_width ）等。
-神策预置事件和预置属性详细参考：神策预置事件与预置属性。
+
+神策预置事件和预置属性详细参考：[神策预置事件与预置属性](https://manual.sensorsdata.cn/sa/latest/zh_cn/tech_sdk_preset_events_and_preset_properties-7542128.html)。
 
 - ###### 3）自定义事件
 

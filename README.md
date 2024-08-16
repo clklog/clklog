@@ -17,7 +17,6 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 - **用户画像**：解析用户唯一ID，定位追踪用户全生命周期画像<br><br>
 - **Data Summary**: supports downloading of various summarized data and detailed data.<br>
 - **数据下载**：支持各项汇总数据、明细数据的下载
-<br>
 
 # Technology Selection/技术栈选择
 
@@ -26,7 +25,6 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 - **Frontend/前端**：vue、vue-element-admin、element-ui 、echarts
 
 - **Database/数据**：Clickhouse
-<br>
 
 # Screenshot Samples/示意图
 

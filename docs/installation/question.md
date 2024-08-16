@@ -25,7 +25,7 @@
 
 3. 退出保存后，重新执行安装
 
-    [查看nginx安装步骤](preparation.md#nginx安装注意事项)
+    [查看nginx安装步骤](/installation/preparation.md#nginx-安装参考)
 
 - ## redis安装注意事项
 
@@ -53,7 +53,7 @@
     yum make install
     ```
 
-    [查看Redis安装步骤](preparation.md#redis安装注意事项)
+    [查看Redis安装步骤](/installation/preparation.md#redis-324-安装参考)
 
 - ## nginx 出现权限问题（13：Permission denied）
 
