@@ -141,19 +141,19 @@ elif [ "$1" = "jobmanager" ]; then
     args=("${args[@]:1}")
 
     echo "Starting Job Manager"
-
+    try_download_iplib
     exec $(drop_privs_cmd) "$FLINK_HOME/bin/jobmanager.sh" start-foreground "${args[@]}"
 elif [ "$1" = ${COMMAND_STANDALONE} ]; then
     args=("${args[@]:1}")
 
     echo "Starting Job Manager"
 	try_download_iplib
-	to_search="--fromSavepoint" #the value variable is assigned a regex that matches the exact value of the first argument 
+	to_search="--fromSavepoint" #the value variable is assigned a regex that matches the exact value of the first argument
 	if [[ $(echo ${args[@]} | fgrep -w -- $to_search) ]]; then
 		echo "Savepoint is Set"
 	else
 		last_checkpoint=$(ls $FLINK_HOME/usrlib/checkpoints/$PROCESSING_JOB_ID/* -td | egrep 'chk-.+' 2>&1 | head -n1)
-		if [ ! -z "${last_checkpoint}" ]; then 
+		if [ ! -z "${last_checkpoint}" ]; then
 			echo "Savepoint Discovered"
 			args=("${args[@]}" "--fromSavepoint" "${last_checkpoint}")
 		fi
@@ -169,7 +169,7 @@ elif [ "$1" = "taskmanager" ]; then
     args=("${args[@]:1}")
 
     echo "Starting Task Manager"
-
+    try_download_iplib
     exec $(drop_privs_cmd) "$FLINK_HOME/bin/taskmanager.sh" start-foreground "${args[@]}"
 fi
 
