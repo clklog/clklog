@@ -1,7 +1,7 @@
 <!-- _navbar.md -->
 
 * [主页](/#/)
-* [版本介绍](/version.md)
+* [版本介绍](/version.md?r=0817)
 * [功能清单](/funclist.md)
 * [演示环境](https://demo.clklog.com)
   * [ClkLog 社区版](https://demo.clklog.com)
