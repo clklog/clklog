@@ -23,9 +23,9 @@
   - [核心功能集成说明](/integration/method.md)
   - [埋点集成SDK及文档](/integration/document.md)
   - [集成测试](/integration/reference.md)
-<!-- - 技术指南
-  - [常见问题](/tutorials/faq.md)
-  - [神策无全埋点SDK的集成方案](/tutorials/ClkViewScreen.md) -->
+- 技术指南
+  <!-- - [常见问题](/tutorials/faq.md) -->
+  - [神策无全埋点SDK的集成方案](/tutorials/ClkViewIntegrated.md)
 - 系列产品
   - AccessLog
     - [产品介绍](/accesslog/introduce.md)

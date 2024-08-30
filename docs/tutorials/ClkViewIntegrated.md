@@ -102,7 +102,7 @@ ClkLog定义了一个专有的自定义事件“ClkViewScreen”，提取了实�
 
 ### 3）扩展配置
 
-在clklog-api中扩展lib-type-map配置。
+在clklog-api服务中扩展lib-type-map配置。
 参考代码如下：
 
 ```
