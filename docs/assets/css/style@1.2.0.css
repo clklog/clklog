@@ -637,10 +637,40 @@ section.cover .cover-main a[href='#/introduce']:hover {
   opacity: 0.8;
   color: #fff;
 }
+section.cover .cover-main a[href='#/docker_installation/preperation']:last-child {
+  border-color: #0074d9;
+  border-radius: 2rem;
+  border-style: solid;
+  border-width: 1px;
+  box-sizing: border-box;
+  color: #fff;
+  background: #0074d9;
+  display: inline-block;
+  font-size: 1.05rem;
+  letter-spacing: 0.1rem;
+  margin: 0.5rem 1rem;
+  padding: 0.75em 2rem;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+section.cover .cover-main a[href='#/docker_installation/preperation']:hover {
+  color: inherit;
+  opacity: 0.8;
+  color: #fff;
+}
+/* section.cover .cover-main .entry {
+  clear: both;
+}
+section.cover .cover-main .entry li {
+  float: left;
+  display: block;
+  width: 50%;
+} */
 section.cover .cover-main > p:last-child a:hover {
   color: inherit;
 }
 section.cover .cover-main .features {
+  clear: both;
   border-top: 1px solid #eaecef;
   padding: 1.2rem 0;
   margin-top: 2.5rem;

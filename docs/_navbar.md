@@ -3,6 +3,7 @@
 * [主页](/#/)
 * [版本介绍](/version.md?r=0817)
 * [功能清单](/funclist.md)
+* [技术指南](/integration/introduce.md)
 * [演示环境](https://demo.clklog.com)
   * [ClkLog 社区版](https://demo.clklog.com)
   * [ClkLog 商业版](https://pro.clklog.com)

@@ -18,14 +18,15 @@
     - [环境准备](/installation/preparation.md)
     - [应用部署](/installation/deployment.md)
     - [常见问题](/installation/question.md)
-- 集成说明
-  - [集成方式](/integration/introduce.md)
-  - [核心功能集成说明](/integration/method.md)
-  - [埋点集成SDK及文档](/integration/document.md)
-  - [集成测试](/integration/reference.md)
+
 - 技术指南
-  <!-- - [常见问题](/tutorials/faq.md) -->
-  - [神策无全埋点SDK的集成方案](/tutorials/ClkViewIntegrated.md)
+  - [集成方式](/integration/introduce.md)
+  - [集成说明](/integration/method.md)
+  - [集成测试](/integration/reference.md)
+  - [埋点集成SDK及文档](/integration/document.md)
+  - [神策无全埋点的SDK集成方案](/tutorials/ClkViewIntegrated.md)
+  <!-- - 常见问题
+    - [埋点集成相关](/tutorials/faq.md) -->
 - 系列产品
   - AccessLog
     - [产品介绍](/accesslog/introduce.md)

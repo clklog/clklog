@@ -8,7 +8,7 @@
   ```
   ├── 网站根目录    //SDK引用位置可根据实际应用情况进行调整   
       ├── plugins
-      │   ├── session-event
+      │   ├── session-event  //必须引用
       │   │   ├── index.js
       |── sensorsdata.js   
       |── autotrack.js
@@ -32,6 +32,9 @@
   1）如果是单页面应用，标题不变但需要自动采集页面浏览事件，需要将`autotrack.js`中的`is_track_single_page`值设置为`ture`。
 
   2）如果是单页面应用，标题会随着页面变化，同时也需要采集页面浏览事件，需要将`autotrack.js` 中的`is_track_single_page` 值设置为`false`，同时在页面标题改变结束后执行代码：  `sensors.quick('autoTrackSinglePage');`
+
+> [!tip]
+> 如果您是直接从神策官网下载的sdk并按照官网引用方法进行埋点的，请注意session-event的引用。
 
 ### 1.3. 接入埋点跟踪代码
 

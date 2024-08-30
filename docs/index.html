@@ -18,7 +18,7 @@
     <link rel="apple-touch-icon" sizes="any" href="assets/imgs/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <link rel="stylesheet" href="assets/css/font.css" />
-    <link rel="stylesheet" href="assets/css/style@1.1.9.css" />
+    <link rel="stylesheet" href="assets/css/style@1.2.0.css" />
     <link rel="stylesheet" href="assets/plugins/sidebar/sidebar.min.css" />
     <script src="/assets/plugins/autotrack@2.5.js"></script>
     <script>
@@ -40,10 +40,10 @@
         loadFooter: true,
         // 封面支持，默认加载的是项目根目录下的_footer.md文件
         // 最大支持渲染的标题层级
-        maxLevel: 5,
+        maxLevel: 2,
         // 自定义侧边栏后默认不会再生成目录，设置生成目录的最大层级（建议配置为2-4）
-        subMaxLevel: 6,
-        sidebarDisplayLevel: 4, // set sidebar display level
+        subMaxLevel: 2,
+        sidebarDisplayLevel: 1, // set sidebar display level
         // 小屏设备下合并导航栏到侧边栏
         mergeNavbar: true,
         notFoundPage: '404.md',
@@ -81,13 +81,13 @@
             label: '切记'
           }
         },
-        // scrollToTop: {
-        //   auto: true,
-        //   text: '🔼',
-        //   right: 12,
-        //   bottom: 52,
-        //   offset: 25
-        // },
+        scrollToTop: {
+          auto: true,
+          text: 'Top',
+          right: 12,
+          bottom: 52,
+          offset: 25
+        },
         tabs: {
           persist: true, // default
           sync: true, // default
@@ -120,6 +120,45 @@
   <body>
     <nav>
       <a href="www.clklog.com"> </a>
+      <ul>
+        <li>
+          <p><a href="#/?id=%2f" title="主页">主页</a></p>
+        </li>
+        <li>
+          <p><a href="#/version" title="版本介绍">版本介绍</a></p>
+        </li>
+        <li>
+          <p><a href="#/funclist" title="功能清单">功能清单</a></p>
+        </li>
+        <li>
+          <p><a href="https://demo.clklog.com" target="_blank" rel="noopener" title="演示环境">演示环境</a></p>
+          <ul>
+            <li><a href="https://demo.clklog.com" target="_blank" rel="noopener" title="社区版">社区版</a></li>
+            <li><a href="https://pro.clklog.com" target="_blank" rel="noopener" title="商业版">商业版</a></li>
+          </ul>
+        </li>
+        <li>
+          <p><a href="https://demo.clklog.com/api/doc.html#/home" target="_blank" rel="noopener" title="API文档">API文档</a></p>
+        </li>
+        <li>
+          <p><a href="#/introduce?id" title="源码下载">源码下载</a></p>
+          <ul>
+            <li>
+              <a href="https://github.com/clklog" target="_clkloggithub" title=" GitHub"
+                ><img src="/assets/imgs/export.png" height="10" /> GitHub</a
+              >
+            </li>
+            <li>
+              <a href="https://gitee.com/clklog" target="_clkloggitee" title=" Gitee"
+                ><img src="/assets/imgs/export.png" height="10" /> Gitee</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p><a href="https://docs.clklog.com" target="_clklogdocs" title="文章库">文章库</a></p>
+        </li>
+      </ul>
     </nav>
     <div id="docs-entry">
       <ul>
@@ -131,6 +170,9 @@
         </li>
         <li>
           <p><a href="#/funclist" title="功能清单">功能清单</a></p>
+        </li>
+        <li>
+          <p><a href="#/integration/introduce" title="技术指南">技术指南</a></p>
         </li>
         <li>
           <p><a href="https://demo.clklog.com" target="_blank" rel="noopener" title="演示环境">演示环境</a></p>
@@ -175,6 +217,7 @@
     <script src="assets/plugins/docsify-scroll-to-top.min.js"></script>
     <script src="assets/plugins/sidebar/docsify-sidebar-collapse.min.js"></script>
     <!-- <script src="assets/plugins/docsify-pagination.min.js"></script> -->
+    <script src="assets/plugins/docsify-plugin-flexible-alerts.min.js"></script>
     <script src="assets/plugins/docsify-tabs@1.js"></script>
     <!-- <script src="//unpkg.com/docsify-share/build/index.min.js"></script> -->
     <script>
