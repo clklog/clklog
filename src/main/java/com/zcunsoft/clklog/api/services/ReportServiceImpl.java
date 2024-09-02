@@ -1705,7 +1705,7 @@ public class ReportServiceImpl implements IReportService {
             GetVisitorSessionListPageRequest getVisitorSessionListPageRequest) {
     	MapSqlParameterSource paramMap = new MapSqlParameterSource();
 		String getListSql = "select t.distinct_id as distinct_id,t.event_session_id as event_session_id,sourcesite as sourcesite,searchword as searchword,arrayStringConcat(groupUniqArray(concat(toString(t.client_ip),'-',toString(t.province),'-',toString(t.pv))),',') as client_ip,min(first_time) as first_time,sum(visit_time) as visit_time,sum(t.pv) as pv from visitor_detail_bysession t";
-		String getCountSql = "select count(1)  from (select t.distinct_id as distinct_id,t.event_session_id,sourcesite as sourcesite,searchword as searchword from visitor_detail_bysession t";
+		String getCountSql = "select count(1)  from (select t.distinct_id as distinct_id,t.event_session_id,sourcesite as sourcesite,searchword as searchword,sum(t.pv) as pv from visitor_detail_bysession t";
 		List<VisitorDetailbysession> visitorDetailbysessionList = new ArrayList<VisitorDetailbysession>();
 		Integer total = 0;
 		StringBuilder whereBuilder = new StringBuilder();
