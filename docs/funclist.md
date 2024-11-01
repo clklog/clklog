@@ -3,11 +3,11 @@
 
 <table class="func-list-table">
     <tr>
-        <!-- <th> 序号        </th> -->
+        <!-- <th>序号</th> -->
         <th class="func-title-td"> 功能模块        </th>
         <th> 子模块        </th>
         <th class="func-intro-td">功能简介        </th>
-        <th class="func-desc-td">核心功能（<span class="pro-func">蓝色部分为商业版功能</span>）        </th>
+        <th class="func-desc-td">核心功能（<span class="pro-func">蓝色部分为付费版功能</span>）        </th>
     </tr>
     <tr>
         <!-- <td>1</td> -->
@@ -69,8 +69,8 @@
             <br />
             Ø 所选维度下的网站各项基础流量指标数据汇总概览<br /><br />
             Ø 按省份（仅限中国）统计分析各省份的访问用户各项流量指标数据 <br /><br />
-            <span class="pro-func">Ø  按国家统计分析各个国家的访问用户的各项流量指标数据</span> <br /><br />
-            <span class="pro-func">Ø  按城市统计分析各个省份下的城市的访问用户的各项流量指标数据</span> <br /><br />
+            <span class="pro-func">Ø 按国家统计分析各个国家的访问用户的各项流量指标数据</span> <br /><br />
+            <span class="pro-func">Ø 按城市统计分析各个省份下的城市的访问用户的各项流量指标数据</span> <br /><br />
             Ø 动态下载所选维度下的省份、<span class="pro-func">国家或城市</span>的各项流量基础指标（可选）汇总数据<br /><br />
         </td>
     </tr>
@@ -104,11 +104,11 @@
         <td> 从时间段、地域、渠道、访客类型维度，对用户的访问设备和操作系统的各项访问指标数据进行统计分析 </td>
         <td class="func-desc-td">
             <br />
-            <span class="pro-func">Ø  访客数最多的网络访问设备数据展示</span> <br /><br />
-            <span class="pro-func">Ø  平均访问页数最多的网络访问设备数据展示</span> <br /><br />
+            <span class="pro-func">Ø 访客数最多的网络访问设备数据展示</span> <br /><br />
+            <span class="pro-func">Ø 平均访问页数最多的网络访问设备数据展示</span> <br /><br />
             Ø 列表模式统计查看各种类型的网络访问设备相关的流量指标数据 <br /><br />
             Ø 动态下载所选维度下的各种类型的网络访问设备的各项流量基础指标（可选）汇总数据 <br /><br />
-            <span class="pro-func">Ø  访问用户的操作系统类型数据统计分析展示</span><br /><br />
+            <span class="pro-func">Ø 访问用户的操作系统类型数据统计分析展示</span><br /><br />
         </td>
     </tr>
      <tr>
@@ -121,10 +121,10 @@
             Ø 所选维度下的受访页面相关各项流量指标数据汇总概览 <br /><br />
             Ø 列表模式统计查看、搜索受访页面各项流量指标数据 <br /><br />
             Ø 树状结构化模式统计查看受访页面各项流量指标数据 <br /><br />
-            <span class="pro-func">Ø  列表模式统计查看、搜索入口页面各项流量指标数据分析</span> <br /><br />
-            <span class="pro-func">Ø  列表模式统计查看、搜索退出页面各项流量指标数据分析</span> <br /><br />
+            <span class="pro-func">Ø 列表模式统计查看、搜索入口页面各项流量指标数据分析</span> <br /><br />
+            <span class="pro-func">Ø 列表模式统计查看、搜索退出页面各项流量指标数据分析</span> <br /><br />
             Ø 动态下载所选维度下的受访页面、入口页、退出页的各项流量基础指标（可选）汇总数据 <br /><br />
-            <span class="pro-func">Ø  单个受访页面，所选维度下的相关各项流量指标数据汇总及数据变化趋势</span> <br /><br />
+            <span class="pro-func">Ø 单个受访页面，所选维度下的相关各项流量指标数据汇总及数据变化趋势</span> <br /><br />
         </td>
     </tr>
     <tr>
@@ -136,7 +136,7 @@
             <span class="pro-func">Ø 列表模式统计查看站内搜索词的搜索次数等相关指标数据 </span><br /><br />
             <span class="pro-func">Ø 动态下载所选维度下的站内搜索词的搜索次数及相关各项流量基础指标（可选）汇总数据 </span><br /><br />
         </td>
-    </tr>
+  </tr>
   <tr>
         <!-- <td> 11 </td> -->
         <td>站外搜索</td>
@@ -229,7 +229,7 @@
     </tr>
     <tr>
         <!-- <td > <span class="pro-func">20</span>  </td> -->
-        <td rowspan="6"> <span class="pro-func">事件分析 </span>  </td>
+        <td rowspan="7"> <span class="pro-func">事件分析 </span>  </td>
         <td> <span class="pro-func">元数据管理 </span>  </td>
         <td> <span class="pro-func">定义业务系统自定义事件以及神策预置事件埋点的事件及属性（事件、用户、公共）的相关的元数据。</span>  </td>
         <td class="func-desc-td">
@@ -312,6 +312,20 @@
         </td>
     </tr>
     <tr>
+        <!-- <td> <span class="pro-func">24</span>  </td> -->
+        <td><span class="pro-func">自定义SQL查询</span></td>
+        <td><span class="pro-func">提供可视化界面在线编写的SQL查询语句</span></td>
+        <td class="func-desc-td">
+        <br>
+            <span class="pro-func">
+                Ø 查看表结构、表信息、表中数据详情<br /><br />
+                Ø 创建、执行SQL脚本<br /><br />
+                Ø 保存查询脚本<br /><br />
+                Ø 导出查询结果数据 <br/><br />
+            </span>
+        </td>
+    </tr>
+    <tr>
         <!-- <td> 17 </td> -->
         <td rowspan="3"> <span class="pro-func">系统设置 </span></td>
         <td> <span class="pro-func">项目管理 </span>    </td>
@@ -361,7 +375,7 @@
         <th> 计划上线时间           </th>
         <th> 功能模块             </th>
         <th class="func-intro-td"> 功能简介 </th>
-        <th class="func-desc-td">  核心功能（<span class="pro-func">蓝色部分为商业版功能</span>） </th>
+        <th class="func-desc-td">  核心功能（<span class="pro-func">蓝色部分为付费版功能</span>） </th>
     </tr>
      <tr>
         <td> <span class="pro-func">2</span>  </td>
