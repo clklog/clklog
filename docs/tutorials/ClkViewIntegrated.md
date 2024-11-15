@@ -108,14 +108,15 @@ ClkLog定义了一个专有的自定义事件“ClkViewScreen”，提取了实�
 ```
 clklog-api:
   lib-type-map:
-    all: 全部
-    Android: 安卓
-    iOS: 苹果
-    js: 网站
-    MiniProgram: 微信小程序
-    HarmonyOS: 鸿蒙
-    DotNET: DotNET
-    cpp: cpp
+    all: all,全部
+    android: Android,安卓
+    ios: iOS,苹果
+    js: js,网站
+    miniprogram: MiniProgram,微信小程序
+    harmonyos: HarmonyOS,鸿蒙
+    dotnet: DotNET,DotNET
+    cpp: cpp,cpp
+    java: Java,Java
 ```
 
 ### 4）验证是否接入成功

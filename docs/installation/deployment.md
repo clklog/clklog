@@ -44,7 +44,6 @@
             server localhost:8081;
     }
 
-
     server {
         listen 80;
         listen [::]:80;
@@ -83,7 +82,8 @@
             }
 
     }
-    ```
+
+  ```
 
 2. 重启nginx
 
@@ -240,7 +240,7 @@
 
 2. 上传程序文件
 
-    在目录`/usr/local/services/`中创建`clklog-receiver`目录并将文件包`clklog-receiver.jar`、配置文件`application.yml`以及源码中的`iplib`文件夹和`app-setting.json`文件拷贝进去，代码如下：
+    在目录`/usr/local/services/`中创建`clklog-receiver`目录并将文件包`clklog-receiver.jar`、配置文件`application.yml`以及源码中的`iplib`文件夹和`project-setting.json`文件拷贝进去，代码如下：
 
     ```
     cd /usr/local/services/
@@ -331,6 +331,7 @@
 3. 修改配置项
 
    ```
+
     vim config.properties
 
     # clickhouse 数据库连接配置
@@ -416,7 +417,14 @@
 
     将 `scripts`目录下的 `定时脚本.txt`文件,内容复制过去`.wq`保存。
 
-    备注：脚本的日志在`/usr/local/services/scripts/clklog/`
+    备注：
+
+    - 脚本的日志在`/usr/local/services/scripts/clklog/`
+
+    - cron运行计算脚本过程中可能有数个目录会出现权限不足问题；
+
+    - 如出现crontab执行脚本后，脚本的日志/usr/local/services/scripts/clklog/中产生了log文件但内容为空的情况，可能是由于crontab默认使用sh，需要在crontab -e最上方加入一行SHELL= /bin/bash
+
 <br>
 
 ### 9. 部署环境验证
