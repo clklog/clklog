@@ -22,8 +22,10 @@
 - 技术指南
   - [集成方式](/integration/introduce.md)
   - [集成说明](/integration/method.md)
-  - [集成测试参考](/integration/reference.md)
   - [集成SDK及文档](/integration/document.md)
+  - [集成测试参考](/integration/reference.md)
+  - [集成注意事项](/tutorials/notes.md)
+  - [统计指标说明](/tutorials/statindicator.md)
   - [神策无全埋点的SDK集成方案](/tutorials/ClkViewIntegrated.md)
   <!-- - 常见问题
     - [埋点集成相关](/tutorials/faq.md) -->

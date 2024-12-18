@@ -14,7 +14,7 @@ ClkLog定义了一个专有的自定义事件“ClkViewScreen”，提取了实�
 
 ### 1）导入事件模板
 
-下载模板“<a href="https://clklog.com/res/Clklog基础访问统计事件模板.xlsx" target="_blank" rel="noopener" id="clkViewScreenTemplateDownload">Clklog基础访问统计事件模板.xlsx</a>” 并导入【ClkLog-事件分析-元数据管理-元事件】
+下载模板“<a href="/res/Clklog基础访问统计事件模板.xlsx" target="_blank" rel="noopener" id="clkViewScreenTemplateDownload">Clklog基础访问统计事件模板.xlsx</a>” 并导入【ClkLog-事件分析-元数据管理-元事件】
 
 ### 2）自定义代码埋点
 

@@ -59,19 +59,19 @@
 
 ## 2. Android SDK 埋点集成
 
-  集成方式参考 [神策Android SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/android-7541696.html) , 集成时将数据接收地址更换成clklog-receiver的接收服务地址。
+  集成方式参考 [神策Android SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/android-7541696.html)。
 
 ## 3. IOS SDK 埋点集成
 
-  集成方式参考 [神策IOS SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/ios-7538614.html) , 集成时将数据接收地址更换成clklog-receiver的接收服务地址。
+  集成方式参考 [神策IOS SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/ios-7538614.html)。
 
 ## 4. 小程序 SDK 埋点集成
 
-  集成方式参考 [神策微信小程序 SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/%E9%9B%86%E6%88%90%E6%96%87%E6%A1%A3%EF%BC%88%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89-1573892.html) , 集成时将数据接收地址更换成clklog-receiver的接收服务地址。
+  集成方式参考 [神策微信小程序 SDK集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/%E9%9B%86%E6%88%90%E6%96%87%E6%A1%A3%EF%BC%88%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%EF%BC%89-1573892.html)。
 
 ## 4. uni-app SDK 埋点集成
 
-  集成方式参考 [神策uni-app SDK集成文档](https://manual.sensorsdata.cn/sa/3.0/zh_cn/tech_sdk_client_uni_app-22256311.html) , 集成时将数据接收地址更换成clklog-receiver的接收服务地址。
+  集成方式参考 [神策uni-app SDK集成文档](https://manual.sensorsdata.cn/sa/3.0/zh_cn/tech_sdk_client_uni_app-22256311.html)。
 
   **ClkLog-uniapp-deme 集成参考示例**
 
@@ -80,9 +80,18 @@
 
 ## 5. react-native SDK 埋点集成
 
-  集成方式参考 [神策react-native SDK集成文档](https://manual.sensorsdata.cn/sa/3.0/zh_cn/tech_sdk_client_three_react-1574002.html) , 集成时将数据接收地址更换成clklog-receiver的接收服务地址。
+  集成方式参考 [神策react-native SDK集成文档](https://manual.sensorsdata.cn/sa/3.0/zh_cn/tech_sdk_client_three_react-1574002.html)。
   
-  **ClkLog-uniapp-deme 集成参考示例**
+  **ClkLog-react-native-deme 集成参考示例**
 
 - [clklog-react-native-demo in github](https://github.com/clklog/clklog-react-native-demo)
 - [clklog-react-native-demo in gitee](https://gitee.com/clklog/clklog-react-native-demo)
+
+## 6. unity3d SDK 埋点集成
+
+  集成方式参考 [神策unity3d SDK集成文档](https://manual.sensorsdata.cn/sa/3.0/zh_cn/tech_sdk_client_unity-17565840.html) 。
+  
+  **ClkLog-unity3d-deme 集成参考示例**
+
+- [clklog-unity3d-demo in github](https://github.com/clklog/clklog-unity3d-demo)
+- [clklog-unity3d-demo in gitee](https://gitee.com/clklog/clklog-unity3d-demo)
