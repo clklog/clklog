@@ -325,7 +325,7 @@ accesslog-processing 服务可选择是否使用flink。
     }
     ```
 
-1. 重启nginx
+2. 重启nginx
 
     ```
     systemctl restart nginx

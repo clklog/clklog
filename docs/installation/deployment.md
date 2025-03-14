@@ -201,11 +201,14 @@
 
     # 生产环境接口服务代理配置修改
     # 方式一、先修改public/config.js 文件中配置，再发布
+    
         BASE_API: "http://YOUR_DOMAIN/api" //clklog-api的接口的代理地址
         
         npm run build
+
     # 方式二、发布后修改代理配置
         npm run build 
+
         dist/config.js
         BASE_API: "http://YOUR_DOMAIN/api" //clklog-api的接口的代理地址
     ```

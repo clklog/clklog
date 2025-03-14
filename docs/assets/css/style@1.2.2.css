@@ -62,7 +62,7 @@ body {
 body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  color: #34495e;
+  color: #444446;
   font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
   letter-spacing: 0;
@@ -211,7 +211,7 @@ main.hidden {
   transition: all 0.3s;
 }
 .anchor span {
-  color: #34495e;
+  color: #444446;
 }
 .anchor:hover {
   text-decoration: underline;
@@ -402,7 +402,7 @@ body.sticky .sidebar-toggle {
   background-color: #efefef;
 }
 .markdown-section p.tip em {
-  color: #34495e;
+  color: #444446;
 }
 .markdown-section p.warn {
   background: rgba(66, 185, 131, 0.1);

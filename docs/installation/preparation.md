@@ -96,7 +96,7 @@ systemctl start nginx
 
 - #### [redis安装注意事项](installation/question.md#redis安装注意事项)
 
-5. 修改配置
+6. 修改配置
 
     拷贝`redis.conf` 至`/etc/redis/redis.conf`
 
@@ -115,13 +115,13 @@ systemctl start nginx
     appendonly yes
     ```  
 
-6. 启动服务
+7. 启动服务
 
     ```
     /usr/local/bin/redis-server /etc/redis/redis.conf
     ```
 
-7. 检查安装是否成功
+8. 检查安装是否成功
 
     ```
     cd /usr/local/bin
