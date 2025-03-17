@@ -23,6 +23,6 @@
 <!-- ![](_media/bg.png) -->
 
 <!-- background color -->
-<div class="copyright"> Copyright © ClkLog . 2023-2024 All rights reserved.</div>
+<div class="copyright"> Copyright © ClkLog . 2023-2025 All rights reserved.</div>
 
 ![color](#fff)
