@@ -6,7 +6,6 @@ import visitorAnalysis from "./modules/visitor-analysis";
 import accessAnalysis from "./modules/access-analysis";
 import userBehavior from "./modules/user-behavior";
 
-
 export const constantRoutes = [
   {
     path: "/redirect",
@@ -61,17 +60,28 @@ export const constantRoutes = [
         path: "trend",
         component: () => import("@/views/visitor-analysis/trend-analysis"),
         name: "trend",
-        meta: { title: "趋势分析", icon: "trend", affix: true, },
+        meta: { title: "趋势分析", icon: "trend", affix: true },
       },
     ],
   },
- 
 ];
 
 export const asyncRoutes = [
   visitorAnalysis,
   accessAnalysis,
   userBehavior,
+  {
+    path: "/pro",
+    component: Layout,
+    redirect: "/clklog",
+    children: [
+      {
+        path: "https://pro.clklog.com",
+        name: "clklog",
+        meta: { title: "商业版功能", icon: "morefunc", affix: true },
+      },
+    ],
+  },
   { path: "*", redirect: "/index", hidden: true },
 ];
 
