@@ -21,11 +21,11 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 
 ## 技术栈选择
 
-- **后端**：Redis 、Zookeeper、Kafka 、Flink
+- **后端**：Java、Redis 、Zookeeper、Kafka 、Flink
 
 - **前端**：vue、vue-element-admin、element-ui 、echarts
 
-- **数据**：Clickhouse
+- **数据**：Clickhouse、mysql
 
 ## 系统架构
 
@@ -33,13 +33,63 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 
 #### **标准模式**
 
+**采集日志直接存入clickhouse**
+>
 ![](assets/imgs/all-process1.png)
 
 #### **快速模式**
 
+**采集日志数据先存入kafka，经由flink处理后再存入clickhouse**
+
 ![](assets/imgs/fast-process1.png)
 
 <!-- tabs:end -->
+
+#### **模式区别**
+
+<table>
+   <tr>
+        <th></th>
+        <th>标准模式</th>
+        <th>快速模式</th>
+    </tr>
+    <tr>
+        <th rowspan=5> 模式区别
+        </th>
+        <td align=center>
+        采集的埋点数据通过中间件进行队列缓冲和流式计算然后写入数据库
+        </td>
+        <td  align=center>
+        采集的埋点数据直接写入数据库，不需要中间件系统缓存和处理
+        </td>
+    </tr>
+    <tr>
+        <td  align=center>满足高可用性能要求</td>
+        <td  align=center>满足一般性能要求</td>
+    </tr>
+    <tr>
+        <td  align=center>采集数据不会丢失</td>
+        <td  align=center>采集数据可能会丢失</td>
+    </tr>
+    <tr>
+        <td  align=center>部署流程相对复杂</td>
+        <td  align=center>部署流程简单</td>
+    </tr>
+    <tr>
+        <td  align=center>二开门槛相对较高</td>
+        <td  align=center>二开门槛较低</td>
+    </tr>
+    <tr>
+        <th>适用场景</th>
+        <td  align=center>
+        网站访问量极大、业务场景复杂、
+        数据安全性可靠性较高、性能要求较高
+        </td>
+        <td  align=center>
+        网站访问量较小、业务场景比较简单
+        </td>
+    </tr>
+</table>
 
 ## 项目组成
 

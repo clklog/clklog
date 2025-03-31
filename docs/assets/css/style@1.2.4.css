@@ -1131,3 +1131,8 @@ main .content .copyright {
 #docs-entry {
   display: none;
 }
+
+.medium-zoom-image {
+  max-width: 1200px;
+  width: 100%;
+}
