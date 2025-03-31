@@ -632,6 +632,7 @@ section.cover .cover-main .entry.demo li a#demo {
 section.cover .cover-main .entry.demo li a#pro {
   background-color: #0074d9;
   border: #0074d9;
+  line-height: 16px;
 }
 section.cover .cover-main .entry a {
   border-color: #0074d9;

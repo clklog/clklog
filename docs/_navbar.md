@@ -2,9 +2,9 @@
 
 * [主页](/#/)
 * [产品介绍](/introduce.md)
-  * [功能清单](/funclist.md)
+  <!-- * [功能清单](/funclist.md)
   * [指标项说明](/indicator-desc.md)
-  * [更新说明](/changelog.md)
+  * [更新说明](/changelog.md) -->
 * [版本介绍](/version.md?r=1101)
 * [功能清单](/funclist.md)
 * [技术指南](#)
@@ -18,7 +18,7 @@
   * [统计指标说明](/tutorials/statindicator.md)
 * [演示环境](https://demo.clklog.com)
   * [ClkLog 社区版](https://demo.clklog.com)
-  * [ClkLog 付费版](https://pro.clklog.com)
+  * [ClkLog 付费版(pro+cdp)](https://pro.clklog.com)
   * [AccessLog 社区版](https://demo.access.clklog.com/)
 * [系列产品](#)
   * [AccessLog](/accesslog/introduce.md)

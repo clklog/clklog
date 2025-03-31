@@ -1,5 +1,4 @@
 
-> [!tip]
 >**更多ClkLog产品版本详细功能介绍请参考：<https://kdocs.cn/l/cfYaXd5MlRTY>**
 
 <table style="width:100%">

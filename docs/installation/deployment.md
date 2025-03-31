@@ -29,7 +29,7 @@
     vim /etc/nginx/conf.d/clklog.conf
     ```
 
-  内容如下，注意替换`YOUR_DOMAIN`为您为监控后台配置的域名：
+    内容如下，注意替换`YOUR_DOMAIN`为您为监控后台配置的域名：
 
     ```
     upstream clklog_api_server {
@@ -83,7 +83,7 @@
 
     }
 
-  ```
+    ```
 
 2. 重启nginx
 

@@ -91,6 +91,12 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
     </tr>
 </table>
 
+>[!tip]可根据实际情况选择标准模式还是快速模式部署，后续也可进行模式切换.
+>
+> [Docker部署模式切换参考](</docker_installation/modetoggle>)
+>
+> [源码部署模式切换参考receiver配置的enable-simple-version配置](/installation/deployment.md#_6部署接收服务-clklog-receiver)
+
 ## 项目组成
 
 - **接收服务 【clklog-receiver】**：接收客户端采集的日志数据并存入kafka。
