@@ -353,7 +353,9 @@
   <td>　</td>
  </tr>
  <tr >
-  <td rowspan=20 >用户管理</td>
+  <td rowspan=20 >用户画像管理<br/><br/>
+  <a href="https://docs.clklog.com/article/d17eeb874478496590ab0d4f47d66800" target="_blank">功能介绍</a>
+  </td>
   <td>标签分类管理</td>
   <td>用户标签分类的多级结构管理</td>
   <td>　</td>

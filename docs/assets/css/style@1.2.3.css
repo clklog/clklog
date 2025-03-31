@@ -546,7 +546,7 @@ section.cover.has-mask .mask {
 }
 section.cover .cover-main {
   flex: 1;
-  margin: 100px auto 0px;
+  margin: 100px auto;
   text-align: center;
   position: relative;
   max-width: 960px;
@@ -615,8 +615,25 @@ section.cover .cover-main > p:last-child a:last-child:hover {
   color: inherit;
   opacity: 0.8;
 }
-
-section.cover .cover-main a[href='#/introduce']:last-child {
+section.cover .cover-main .entry {
+  clear: both;
+}
+section.cover .cover-main .entry li {
+  margin: 0 auto;
+}
+section.cover .cover-main .entry.demo li {
+  width: 50%;
+  float: left;
+}
+section.cover .cover-main .entry.demo li a#demo {
+  background-color: #c3c4c4;
+  border: #c3c4c4;
+}
+section.cover .cover-main .entry.demo li a#pro {
+  background-color: #0074d9;
+  border: #0074d9;
+}
+section.cover .cover-main .entry a {
   border-color: #0074d9;
   border-radius: 2rem;
   border-style: solid;
@@ -632,7 +649,7 @@ section.cover .cover-main a[href='#/introduce']:last-child {
   text-decoration: none;
   transition: all 0.15s ease;
 }
-section.cover .cover-main a[href='#/introduce']:hover {
+section.cover .cover-main .entry a:hover {
   color: inherit;
   opacity: 0.8;
   color: #fff;
