@@ -73,7 +73,7 @@
 
   集成方式参考 [神策uni-app SDK集成文档](https://manual.sensorsdata.cn/sa/3.0/zh_cn/tech_sdk_client_uni_app-22256311.html)。
 
-  **ClkLog-uniapp-deme 集成参考示例**
+  **ClkLog uniapp 集成参考示例**
 
 - [clklog-uniapp-demo in gitee](https://gitee.com/clklog/clklog-uniapp-demo)
 - [clklog-uniapp-demo in github](https://github.com/clklog/clklog-uniapp-demo)
@@ -82,16 +82,25 @@
 
   集成方式参考 [神策react-native SDK集成文档](https://manual.sensorsdata.cn/sa/3.0/zh_cn/tech_sdk_client_three_react-1574002.html)。
   
-  **ClkLog-react-native-deme 集成参考示例**
+  **ClkLog react-native 集成参考示例**
 
 - [clklog-react-native-demo in github](https://github.com/clklog/clklog-react-native-demo)
 - [clklog-react-native-demo in gitee](https://gitee.com/clklog/clklog-react-native-demo)
+
+## 7. flutter SDK 埋点集成
+
+  集成方式参考 [神策flutter SDK集成文档](https://manual.sensorsdata.cn/sa/docs/integrate_flutter/v0300) 。
+  
+  **ClkLog flutter 集成参考示例**
+
+- [clklog-flutter-demo in github](https://github.com/clklog/clklog-flutter-demo)
+- [clklog-flutter-demo in gitee](https://gitee.com/clklog/clklog-flutter-demo)
 
 ## 6. unity3d SDK 埋点集成
 
   集成方式参考 [神策unity3d SDK集成文档](https://manual.sensorsdata.cn/sa/3.0/zh_cn/tech_sdk_client_unity-17565840.html) 。
   
-  **ClkLog-unity3d-deme 集成参考示例**
+  **ClkLog unity3d 集成参考示例**
 
 - [clklog-unity3d-demo in github](https://github.com/clklog/clklog-unity3d-demo)
 - [clklog-unity3d-demo in gitee](https://gitee.com/clklog/clklog-unity3d-demo)

@@ -2,8 +2,8 @@
   
 - 产品说明
   - [产品介绍](/introduce.md)
-  - [版本介绍](/version.md?r=1101)
-  - [功能清单](/funclist.md)
+  - [版本介绍](/version.md?r=0314)
+  - [功能清单](/funclist.md?r=0314)
   - [指标项说明](/indicator-desc.md)
   - [更新说明](/changelog.md)
 
@@ -23,7 +23,7 @@
   - [集成方式](/integration/introduce.md)
   - [集成说明](/integration/method.md)
   - [集成SDK及文档](/integration/document.md)
-  - [集成测试参考](/integration/reference.md)
+  - [集成测试参考](/integration/reference.md?r=0401)
   - [集成注意事项](/tutorials/notes.md)
   - [统计指标说明](/tutorials/statindicator.md)
   - [神策无全埋点的SDK集成方案](/tutorials/ClkViewIntegrated.md)
