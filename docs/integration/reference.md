@@ -87,7 +87,7 @@
 - [clklog-react-native-demo in github](https://github.com/clklog/clklog-react-native-demo)
 - [clklog-react-native-demo in gitee](https://gitee.com/clklog/clklog-react-native-demo)
 
-## 7. flutter SDK 埋点集成
+## 6. flutter SDK 埋点集成
 
   集成方式参考 [神策flutter SDK集成文档](https://manual.sensorsdata.cn/sa/docs/integrate_flutter/v0300) 。
   
@@ -96,7 +96,7 @@
 - [clklog-flutter-demo in github](https://github.com/clklog/clklog-flutter-demo)
 - [clklog-flutter-demo in gitee](https://gitee.com/clklog/clklog-flutter-demo)
 
-## 6. unity3d SDK 埋点集成
+## 7. unity3d SDK 埋点集成
 
   集成方式参考 [神策unity3d SDK集成文档](https://manual.sensorsdata.cn/sa/3.0/zh_cn/tech_sdk_client_unity-17565840.html) 。
   
