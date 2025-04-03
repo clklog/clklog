@@ -27,6 +27,7 @@
   * <a href="https://gitee.com/clklog/clklog"  target="_clkloggitee"><img src="/assets/imgs/export.png" height="10"/> ClkLog in Gitee</a>
   * <a href="https://github.com/clklog/accesslog"  target="_clkloggithub"><img src="/assets/imgs/export.png" height="10"/> AccessLog in GitHub</a>
   * <a href="https://gitee.com/clklog/accesslog"  target="_clkloggitee"><img src="/assets/imgs/export.png" height="10"/> AccessLog in Gitee</a>
-  
 * <a href="https://docs.clklog.com"  target="_clklogdocs">文章库</a>
-* <a href="https://www.zcunsoft.com/about.html" target="_blank">关于我们</a>
+* [关于我们](#)
+  * <a href="https://www.zcunsoft.com" target="_blank">公司官网</a>
+  * [资质认证](/certification.md?r=0403)
