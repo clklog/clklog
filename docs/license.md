@@ -14,4 +14,4 @@
 
 - 客服微信：opensoft66
 
-- 客服二维码：<img title="" src="/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top">
+- 客服二维码：<img title="" src="/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top;width:120px;">

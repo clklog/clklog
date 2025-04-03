@@ -1137,3 +1137,36 @@ main .content .copyright {
   max-width: 1200px;
   width: 100%;
 }
+.cert.company,
+.cert.software {
+  width: 100%;
+  clear: both;
+  display: flex;
+  text-align: center;
+}
+
+.cert.company .item {
+  width: 33.33%;
+  float: left;
+  list-style-type: none;
+  min-height: 50px;
+}
+
+.cert.software .item {
+  width: 33.33%;
+  float: left;
+  list-style-type: none;
+  min-height: 50px;
+}
+.cert .item img {
+  width: 90%;
+}
+.cert.software .item.copy-right {
+  width: 25%;
+  float: left;
+  list-style-type: none;
+  min-height: 50px;
+}
+.cert.software .item.copy-right img {
+  width: 61.5%;
+}
