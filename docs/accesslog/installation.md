@@ -91,3 +91,5 @@ vector配置方法参考：
 <https://github.com/clklog/accesslog-scripts/tree/main/vector>
 
 <https://gitee.com/clklog/accesslog-scripts/tree/main/vector>
+
+<https://gitcode.com/clklog/accesslog-scripts/tree/main/vector>

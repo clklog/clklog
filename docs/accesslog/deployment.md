@@ -42,6 +42,8 @@ vector配置方法参考：
 
 <https://gitee.com/clklog/accesslog-scripts/tree/main/vector>
 
+<https://gitcode.com/clklog/accesslog-scripts/tree/main/vector>
+
 ### 3.部署accesslog-processing 服务
 
 accesslog-processing 服务可选择是否使用flink。

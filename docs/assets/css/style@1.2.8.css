@@ -362,6 +362,7 @@ body.sticky .sidebar-toggle {
   border: 1px solid #ddd;
   font-weight: bold;
   padding: 10px 13px;
+  text-align: left;
 }
 .markdown-section td {
   border: 1px solid #ddd;
@@ -804,7 +805,8 @@ body {
 .markdown-section blockquote {
   border-left: 4px solid #0074d9;
   border-left: 4px solid var(--theme-color, #0074d9);
-  color: #858585;
+  /* color: #858585; */
+  color: #444446;
   margin: 2em 0;
   padding-left: 20px;
 }
