@@ -13,6 +13,7 @@ import com.zcunsoft.model.LogBean;
 import com.zcunsoft.model.QueryCriteria;
 import com.zcunsoft.model.Region;
 import com.zcunsoft.util.ExtractUtil;
+import com.zcunsoft.util.IOUtil;
 import com.zcunsoft.util.KafkaProducerUtil;
 import com.zcunsoft.util.ObjectMapperUtil;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
@@ -385,9 +386,9 @@ public class ReceiveServiceImpl implements IReceiveService {
     @Override
     public void loadCity() {
         try {
-            List<String> lineCityList = FileUtils.readLines(new File(
+            List<String> lineCityList = IOUtil.readAllLines(
                     getResourcePath() + File.separator + "iplib" + File.separator
-                            + "chinacity.txt"), Charset.forName("GB2312"));
+                            + "chinacity.txt");
 
             ConcurrentMap<String, String> htForCity = constsDataHolder.getHtForCity();
             for (String line : lineCityList) {
@@ -405,8 +406,8 @@ public class ReceiveServiceImpl implements IReceiveService {
     @Override
     public void loadProvince() {
         try {
-            List<String> lineProvinceList = FileUtils.readLines(new File(getResourcePath() + File.separator + "iplib" + File.separator
-                    + "chinaprovince.txt"), Charset.forName("GB2312"));
+            List<String> lineProvinceList = IOUtil.readAllLines(getResourcePath() + File.separator + "iplib" + File.separator
+                    + "chinaprovince.txt");
 
             ConcurrentMap<String, String> htForProvince = constsDataHolder.getHtForProvince();
             for (String line : lineProvinceList) {
@@ -424,8 +425,7 @@ public class ReceiveServiceImpl implements IReceiveService {
     @Override
     public void loadCountry() {
         try {
-            List<String> countryList = FileUtils.readLines(new File(getResourcePath() + File.separator + "iplib" + File.separator
-                    + "country.txt"), Charset.forName("GB2312"));
+            List<String> countryList = IOUtil.readAllLines(getResourcePath() + File.separator + "iplib" + File.separator + "country.txt");
 
             ConcurrentMap<String, String> htForCountry = constsDataHolder.getHtForCountry();
             for (String line : countryList) {

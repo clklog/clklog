@@ -84,6 +84,8 @@ public class LogReceiveProcessBoss {
                         logList.clear();
                     }
                 } catch (Exception ex) {
+                    count = 0;
+                    logList.clear();
                     logger.error("handle err ", ex);
                     try {
                         Thread.sleep(5000);

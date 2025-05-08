@@ -1,34 +1,34 @@
-Shanghai,ÉÏº£
-Yunnan,ÔÆÄÏ
-nei mongol,ÄÚÃÉ¹Å
-Beijing,±±¾©
-Taiwan,Ì¨Íå
-Jilin,¼ªÁÖ
-Sichuan,ËÄ´¨
-Tianjin,Ìì½ò
-ningxia huizu,ÄşÏÄ
-Anhui,°²»Õ
-Shandong,É½¶«
-Shanxi,É½Î÷
-Guangdong,¹ã¶«
-guangxi zhuangzu,¹ãÎ÷
-xinjiang uygur,ĞÂ½®
-Jiangsu,½­ËÕ
-Jiangxi,½­Î÷
-Hebei,ºÓ±±
-Henan,ºÓÄÏ
-Zhejiang,Õã½­
-Hainan,º£ÄÏ
-Hubei,ºş±±
-Hunan,ºşÄÏ
-macau,°ÄÃÅ
-Gansu,¸ÊËà
-Fujian,¸£½¨
-xizang,Î÷²Ø
-Guizhou,¹óÖİ
-Liaoning,ÁÉÄş
-Chongqing,ÖØÇì
-Shaanxi,ÉÂÎ÷
-Qinghai,Çàº£
-HongKong,Ïã¸Û
-Heilongjiang,ºÚÁú½­
+ï»¿Shanghai,ä¸Šæµ·
+Yunnan,äº‘å—
+nei mongol,å†…è’™å¤
+Beijing,åŒ—äº¬
+Taiwan,å°æ¹¾
+Jilin,å‰æ—
+Sichuan,å››å·
+Tianjin,å¤©æ´¥
+ningxia huizu,å®å¤
+Anhui,å®‰å¾½
+Shandong,å±±ä¸œ
+Shanxi,å±±è¥¿
+Guangdong,å¹¿ä¸œ
+guangxi zhuangzu,å¹¿è¥¿
+xinjiang uygur,æ–°ç–†
+Jiangsu,æ±Ÿè‹
+Jiangxi,æ±Ÿè¥¿
+Hebei,æ²³åŒ—
+Henan,æ²³å—
+Zhejiang,æµ™æ±Ÿ
+Hainan,æµ·å—
+Hubei,æ¹–åŒ—
+Hunan,æ¹–å—
+macau,æ¾³é—¨
+Gansu,ç”˜è‚ƒ
+Fujian,ç¦å»º
+xizang,è¥¿è—
+Guizhou,è´µå·
+Liaoning,è¾½å®
+Chongqing,é‡åº†
+Shaanxi,é™•è¥¿
+Qinghai,é’æµ·
+HongKong,é¦™æ¸¯
+Heilongjiang,é»‘é¾™æ±Ÿ
