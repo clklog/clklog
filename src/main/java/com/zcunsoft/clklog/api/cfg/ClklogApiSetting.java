@@ -3,7 +3,6 @@ package com.zcunsoft.clklog.api.cfg;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 
 @ConfigurationProperties("clklog-api")
 public class ClklogApiSetting {
@@ -11,8 +10,6 @@ public class ClklogApiSetting {
     private String[] accessControlAllowOriginPatterns;
 
     private String projectName;
-
-    private List<String> projectHost;
 
     /**
      * 渠道对照表
@@ -35,13 +32,6 @@ public class ClklogApiSetting {
         this.projectName = projectName;
     }
 
-    public List<String> getProjectHost() {
-        return projectHost;
-    }
-
-    public void setProjectHost(List<String> projectHost) {
-        this.projectHost = projectHost;
-    }
 
     public LinkedHashMap<String, String> getLibTypeMap() {
         return libTypeMap;

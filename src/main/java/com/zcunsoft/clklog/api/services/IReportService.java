@@ -132,6 +132,9 @@ public interface IReportService {
      */
     GetChannelResponse getChannelList(GetChannelRequest getChannelRequest);
 
+
+    void loadUrlRule();
+
     /**
      * 缓存项目渠道列表.
      */

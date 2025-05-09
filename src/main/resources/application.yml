@@ -38,7 +38,6 @@ logging:
 clklog-api:
   access-control-allow-origin-patterns: "*"
   project-name: clklogapp
-  project-host: http://www.zcunsoft.com
   lib-type-map:
     all: all,全部
     android: Android,安卓

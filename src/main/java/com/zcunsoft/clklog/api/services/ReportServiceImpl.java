@@ -1,10 +1,12 @@
 package com.zcunsoft.clklog.api.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.zcunsoft.clklog.api.cfg.ClklogApiSetting;
 import com.zcunsoft.clklog.api.cfg.RedisConstsConfig;
 import com.zcunsoft.clklog.api.constant.Constants;
 import com.zcunsoft.clklog.api.entity.clickhouse.*;
 import com.zcunsoft.clklog.api.handlers.ConstsDataHolder;
+import com.zcunsoft.clklog.api.models.ProjectSetting;
 import com.zcunsoft.clklog.api.models.TimeFrame;
 import com.zcunsoft.clklog.api.models.area.*;
 import com.zcunsoft.clklog.api.models.channel.*;
@@ -27,6 +29,8 @@ import com.zcunsoft.clklog.api.models.visitor.*;
 import com.zcunsoft.clklog.api.models.visituri.*;
 import com.zcunsoft.clklog.api.services.utils.FilterBuildUtils;
 import com.zcunsoft.clklog.api.utils.TimeUtils;
+import com.zcunsoft.clklog.api.utils.TreeUtils;
+import com.zcunsoft.clklog.common.utils.ObjectMapperUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -90,13 +94,20 @@ public class ReportServiceImpl implements IReportService {
 
     private final ConstsDataHolder constsDataHolder;
 
+    private final ObjectMapperUtil objectMapper;
+
     private final StringRedisTemplate queueRedisTemplate;
+
     private final RedisConstsConfig redisConstsConfig;
 
-    public ReportServiceImpl(NamedParameterJdbcTemplate clickHouseJdbcTemplate, ClklogApiSetting clklogApiSetting, ConstsDataHolder constsDataHolder, RedisConstsConfig redisConstsConfig, StringRedisTemplate queueRedisTemplate) {
+    private final TypeReference<HashMap<String, ProjectSetting>> htProjectSettingTypeReference = new TypeReference<HashMap<String, ProjectSetting>>() {
+    };
+
+    public ReportServiceImpl(NamedParameterJdbcTemplate clickHouseJdbcTemplate, ClklogApiSetting clklogApiSetting, ConstsDataHolder constsDataHolder, ObjectMapperUtil objectMapper, RedisConstsConfig redisConstsConfig, StringRedisTemplate queueRedisTemplate) {
         this.clickHouseJdbcTemplate = clickHouseJdbcTemplate;
         this.clklogApiSetting = clklogApiSetting;
         this.constsDataHolder = constsDataHolder;
+        this.objectMapper = objectMapper;
         this.redisConstsConfig = redisConstsConfig;
         this.queueRedisTemplate = queueRedisTemplate;
     }
@@ -260,8 +271,8 @@ public class ReportServiceImpl implements IReportService {
         String getVisitUriSql = "select sum(pv) as pv,sum(uv) as uv,sum(new_uv) as newUv,sum(down_pv_count) as downPvCount,sum(exit_count) as exitCount,sum(visit_count) as visitCount,sum(visit_time) as visitTime,sum(bounce_count) as bounceCount,sum(ip_count) as ipCount from visituri_detail_bydate t ";
         String where = "";
         where = buildChannelFilter(getVisitUriDetailRequest.getChannel(), paramMap, where);
-        where = buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
-        where = buildStatDateEndFilter(getVisitUriDetailRequest.getEndTime(), paramMap, where);
+        where = FilterBuildUtils.buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
+        where = FilterBuildUtils.buildStatDateEndFilter(getVisitUriDetailRequest.getEndTime(), paramMap, where);
         where = buildProjectNameFilter(getVisitUriDetailRequest.getProjectName(), paramMap, where);
         where = buildCountryFilter(getVisitUriDetailRequest.getCountry(), paramMap, where);
         where = buildProvinceFilter(getVisitUriDetailRequest.getProvince(), paramMap, where);
@@ -3399,27 +3410,30 @@ public class ReportServiceImpl implements IReportService {
     }
 
     @Override
-    public GetVisitUriPathTreeTotalResponse getVisitUriPathTreeTotal(GetVisitUriDetailRequest getVisitUriDetailRequest) {
+    public GetVisitUriPathTreeTotalResponse getVisitUriPathTreeTotal(
+            GetVisitUriDetailRequest getVisitUriDetailRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count,sum(down_pv_count) as down_pv_count,sum(exit_count) as exit_count,sum(entry_count) as entry_count from visituri_detail_bydate t";
         String getListSql = "select t.uri_path as uri,t.host," + selectSql;
 
         String where = "";
-        where = buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
-        where = buildStatDateEndFilter(getVisitUriDetailRequest.getEndTime(), paramMap, where);
-        where = buildChannelFilter(getVisitUriDetailRequest.getChannel(), paramMap, where);
-        where = buildProjectNameFilter(getVisitUriDetailRequest.getProjectName(), paramMap, where);
-        where = buildCountryFilter(getVisitUriDetailRequest.getCountry(), paramMap, where);
-        where = buildProvinceFilter(getVisitUriDetailRequest.getProvince(), paramMap, where);
-        where = buildVisitorTypeFilter(getVisitUriDetailRequest.getVisitorType(), paramMap, where);
+        where = FilterBuildUtils.buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
+        where = FilterBuildUtils.buildStatDateEndFilter(getVisitUriDetailRequest.getEndTime(), paramMap, where);
+        where = FilterBuildUtils.buildChannelFilter(getVisitUriDetailRequest.getChannel(), paramMap, where);
+        where = FilterBuildUtils.buildProjectNameFilter(getVisitUriDetailRequest.getProjectName(),
+                clklogApiSetting.getProjectName(), paramMap, where);
+        where = FilterBuildUtils.buildCountryFilter(getVisitUriDetailRequest.getCountry(), paramMap, where);
+        where = FilterBuildUtils.buildProvinceFilter(getVisitUriDetailRequest.getProvince(), paramMap, where);
+        where = FilterBuildUtils.buildVisitorTypeFilter(getVisitUriDetailRequest.getVisitorType(), paramMap, where);
 
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
-            getListSql += " where t.uri <> 'all' and " + where;
+            getListSql += " where t.uri <> 'all' and t.uri <> '未取到' and  t.uri <> 'N/A' and " + where;
         }
         getListSql += " group by t.uri_path,t.host order by t.uri_path";
 
-        List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
+        List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap,
+                new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
 
         List<VisitUriPathDetail> visitUriDetailList = new ArrayList<>();
 
@@ -3440,59 +3454,83 @@ public class ReportServiceImpl implements IReportService {
             visitUriDetail.setUri(visituriDetailbydate.getUri());
             visitUriDetail.setUv(visituriDetailbydate.getUv());
             visitUriDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
-            String[] pathArr = visituriDetailbydate.getUri().split("/", -1);
-            visitUriDetail.setPathList(new ArrayList<>(Arrays.asList(pathArr)));
+            SplitUriPathInfo splitUriPathInfo = TreeUtils.splitUriPath(visituriDetailbydate.getUri());
+            List<String> pathArr = new ArrayList<>(Arrays.asList(splitUriPathInfo.getUriPathArr()));
+            visitUriDetail.setPathList(pathArr);
             visitUriDetail.setPathLength(visitUriDetail.getPathList().size());
             visitUriDetail.setHost(visituriDetailbydate.getHost());
             visitUriDetailList.add(visitUriDetail);
         }
         List<VisitUriTreeStatData> visitUriTreeStatDataList = new ArrayList<>();
-        List<String> hostList = visitUriDetailList.stream().map(VisitUriPathDetail::getHost).distinct().collect(Collectors.toList());
-        hostList = hostList.stream().filter(f -> clklogApiSetting.getProjectHost().contains(f)).collect(Collectors.toList());
-        if (clklogApiSetting.getProjectHost() != null && !clklogApiSetting.getProjectHost().isEmpty()) {
-            hostList = hostList.stream().filter(clklogApiSetting.getProjectHost()::contains)
-                    .collect(Collectors.toList());
+        List<String> hostList = visitUriDetailList.stream().map(VisitUriPathDetail::getHost).distinct()
+                .collect(Collectors.toList());
+        if (constsDataHolder.getHtProjectSetting().containsKey(getVisitUriDetailRequest.getProjectName())) {
+            ProjectSetting setting = constsDataHolder.getHtProjectSetting().get(getVisitUriDetailRequest.getProjectName());
+            if (StringUtils.isNotBlank(setting.getRootUrls())) {
+                List<String> rootUrlList = Arrays.asList(setting.getRootUrls().split(",", -1));
+                hostList = hostList.stream().filter(rootUrlList::contains)
+                        .collect(Collectors.toList());
+            }
         }
         for (String host : hostList) {
-            List<VisitUriTreeStatData> hostStatDataList = genUriTree(visitUriDetailList, host, "/", new ArrayList<>());
+            List<String> pathList = visitUriDetailList.stream().filter(f -> f.getHost().equalsIgnoreCase(host)).map(VisitUriPathDetail::getUri).collect(Collectors.toList());
+            List<UriPathNode> nodeTree = TreeUtils.buildTree(pathList, host);
 
-            boolean needVisutalRoot = false;
-            if (hostStatDataList.size() >= 2) {
-                needVisutalRoot = true;
-            } else if (hostStatDataList.size() == 1) {
-                if (!hostStatDataList.get(0).getPath().equalsIgnoreCase("/")) {
-                    needVisutalRoot = true;
-                }
+            List<UriPathNode> rootTree = new ArrayList<>();
+            UriPathNode uriPathNode = new UriPathNode();
+            uriPathNode.setParentUriPath("");
+            uriPathNode.setUriPath("");
+            uriPathNode.setSegment("");
+            uriPathNode.setLeaves(nodeTree);
+            uriPathNode.setSplitChar("");
+            uriPathNode.setOriginalUriPath(new ArrayList<>());
+            for (UriPathNode leafNode : nodeTree) {
+                uriPathNode.getOriginalUriPath().addAll(leafNode.getOriginalUriPath());
             }
-            if (needVisutalRoot) {
-                VisitUriTreeStatData rootStatData = new VisitUriTreeStatData();
-                rootStatData.setPath("/");
-                rootStatData.setUri(host + rootStatData.getPath());
-                rootStatData.setSegment("");
-                rootStatData.setHost(host);
-                rootStatData.setLeafUri(hostStatDataList);
-                VisitUriPathDetail rootDetail = new VisitUriPathDetail();
-                rootDetail.setUri(rootStatData.getUri());
-                rootDetail.setHost(host);
-                for (VisitUriTreeStatData leafUriStat : hostStatDataList) {
-                    rootDetail.setPv(rootDetail.getPv() + leafUriStat.getDetail().getPv());
-                    rootDetail.setUv(rootDetail.getUv() + leafUriStat.getDetail().getUv());
-                    rootDetail.setIpCount(rootDetail.getIpCount() + leafUriStat.getDetail().getIpCount());
-                    rootDetail.setExitCount(rootDetail.getExitCount() + leafUriStat.getDetail().getExitCount());
-                    rootDetail.setExitRate(rootDetail.getExitRate() + leafUriStat.getDetail().getExitRate());
-                    rootDetail.setEntryCount(rootDetail.getEntryCount() + leafUriStat.getDetail().getEntryCount());
-                    rootDetail.setAvgVisitTime(rootDetail.getAvgVisitTime() + leafUriStat.getDetail().getAvgVisitTime());
-                    rootDetail.setDownPvCount(rootDetail.getDownPvCount() + leafUriStat.getDetail().getDownPvCount());
-                }
-
-                rootStatData.setDetail(rootDetail);
-                visitUriTreeStatDataList.add(rootStatData);
-            } else {
-                visitUriTreeStatDataList.addAll(hostStatDataList);
-            }
+            rootTree.add(uriPathNode);
+            List<VisitUriTreeStatData> list = statLeafNode(visitUriDetailList, host, rootTree);
+            visitUriTreeStatDataList.addAll(list);
         }
         response.setData(visitUriTreeStatDataList);
         return response;
+    }
+
+    private List<VisitUriTreeStatData> statLeafNode(List<VisitUriPathDetail> visitUriDetailList, String host, List<UriPathNode> nodeTree) {
+        List<VisitUriTreeStatData> visitUriTreeStatDataList = new ArrayList<>();
+        for (UriPathNode uriPathNode : nodeTree) {
+            List<VisitUriPathDetail> subList = visitUriDetailList.stream().filter(f -> uriPathNode.getOriginalUriPath().contains(f.getUri())).collect(Collectors.toList());
+
+            List<VisitUriTreeStatData> validLeaf = statLeafNode(visitUriDetailList, host, uriPathNode.getLeaves());
+
+            VisitUriTreeStatData rootStatData = new VisitUriTreeStatData();
+            if (uriPathNode.isStartSplitChar()) {
+                rootStatData.setPath(uriPathNode.getSplitChar() + uriPathNode.getUriPath());
+            } else {
+                rootStatData.setPath(uriPathNode.getUriPath());
+            }
+            rootStatData.setUri(host + rootStatData.getPath());
+            rootStatData.setHost(host);
+            rootStatData.setLeafUri(validLeaf);
+            rootStatData.setSegment(uriPathNode.getSegment());
+            VisitUriPathDetail rootDetail = new VisitUriPathDetail();
+            rootDetail.setUri(rootStatData.getUri());
+            rootDetail.setHost(host);
+            for (VisitUriPathDetail leafUriStat : subList) {
+                rootDetail.setPv(rootDetail.getPv() + leafUriStat.getPv());
+                rootDetail.setUv(rootDetail.getUv() + leafUriStat.getUv());
+                rootDetail.setIpCount(rootDetail.getIpCount() + leafUriStat.getIpCount());
+                rootDetail.setExitCount(rootDetail.getExitCount() + leafUriStat.getExitCount());
+                rootDetail.setExitRate(rootDetail.getExitRate() + leafUriStat.getExitRate());
+                rootDetail.setEntryCount(rootDetail.getEntryCount() + leafUriStat.getEntryCount());
+                rootDetail
+                        .setAvgVisitTime(rootDetail.getAvgVisitTime() + leafUriStat.getAvgVisitTime());
+                rootDetail.setDownPvCount(rootDetail.getDownPvCount() + leafUriStat.getDownPvCount());
+            }
+
+            rootStatData.setDetail(rootDetail);
+            visitUriTreeStatDataList.add(rootStatData);
+        }
+        return visitUriTreeStatDataList;
     }
 
     private List<VisitUriTreeStatData> genUriTree(List<VisitUriPathDetail> visitUriDetailList, String host, String parentUri, List<String> pathList) {
@@ -3646,6 +3684,22 @@ public class ReportServiceImpl implements IReportService {
 
         response.setData(channelList);
         return response;
+    }
+
+    @Scheduled(fixedDelay = 30000)
+    @Override
+    public void loadUrlRule() {
+        try {
+            FilterBuildUtils.setLibTypeMap(clklogApiSetting.getLibTypeMap());
+            String projectSettingContent = queueRedisTemplate.opsForValue().get(redisConstsConfig.getProjectSettingKey());
+            if (StringUtils.isNotBlank(projectSettingContent)) {
+                HashMap<String, ProjectSetting> projectSettingHashMap = objectMapper.readValue(projectSettingContent,
+                        htProjectSettingTypeReference);
+                constsDataHolder.getHtProjectSetting().putAll(projectSettingHashMap);
+            }
+        } catch (Exception ex) {
+            logger.error("load ProjectSetting err", ex);
+        }
     }
 
     @Scheduled(fixedDelay = 60000)
