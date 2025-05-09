@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-@EnableConfigurationProperties({ ClklogApiSetting.class })
+@EnableConfigurationProperties({ClklogApiSetting.class, RedisConstsConfig.class})
 public class SpringConfiguration {
 
     @Bean

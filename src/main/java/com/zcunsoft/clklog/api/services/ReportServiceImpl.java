@@ -1,13 +1,13 @@
 package com.zcunsoft.clklog.api.services;
 
 import com.zcunsoft.clklog.api.cfg.ClklogApiSetting;
+import com.zcunsoft.clklog.api.cfg.RedisConstsConfig;
 import com.zcunsoft.clklog.api.constant.Constants;
 import com.zcunsoft.clklog.api.entity.clickhouse.*;
 import com.zcunsoft.clklog.api.handlers.ConstsDataHolder;
 import com.zcunsoft.clklog.api.models.TimeFrame;
 import com.zcunsoft.clklog.api.models.area.*;
-import com.zcunsoft.clklog.api.models.channel.GetChannelDetailRequest;
-import com.zcunsoft.clklog.api.models.channel.GetChannelDetailResponse;
+import com.zcunsoft.clklog.api.models.channel.*;
 import com.zcunsoft.clklog.api.models.device.*;
 import com.zcunsoft.clklog.api.models.enums.DimensionType;
 import com.zcunsoft.clklog.api.models.enums.LibType;
@@ -33,9 +33,15 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -84,10 +90,15 @@ public class ReportServiceImpl implements IReportService {
 
     private final ConstsDataHolder constsDataHolder;
 
-    public ReportServiceImpl(NamedParameterJdbcTemplate clickHouseJdbcTemplate, ClklogApiSetting clklogApiSetting, ConstsDataHolder constsDataHolder) {
+    private final StringRedisTemplate queueRedisTemplate;
+    private final RedisConstsConfig redisConstsConfig;
+
+    public ReportServiceImpl(NamedParameterJdbcTemplate clickHouseJdbcTemplate, ClklogApiSetting clklogApiSetting, ConstsDataHolder constsDataHolder, RedisConstsConfig redisConstsConfig, StringRedisTemplate queueRedisTemplate) {
         this.clickHouseJdbcTemplate = clickHouseJdbcTemplate;
         this.clklogApiSetting = clklogApiSetting;
         this.constsDataHolder = constsDataHolder;
+        this.redisConstsConfig = redisConstsConfig;
+        this.queueRedisTemplate = queueRedisTemplate;
     }
 
     private static final ThreadLocal<DecimalFormat> decimalFormat =
@@ -3597,5 +3608,104 @@ public class ReportServiceImpl implements IReportService {
             host = hostMatcher.group();
         }
         return host;
+    }
+
+    @Override
+    public GetChannelResponse getChannelList(GetChannelRequest getChannelRequest) {
+        Object objLib = queueRedisTemplate.opsForHash().get(redisConstsConfig.getProjectChannelHashKey(), getChannelRequest.getProjectName());
+
+        String libs = "all";
+        if (objLib != null) {
+            libs = objLib.toString();
+        }
+        List<Channel> channelList = new ArrayList<>();
+        String[] libArr = libs.split(",");
+        for (String lib : libArr) {
+            Channel channel = new Channel();
+            channel.setName(lib);
+            channel.setDisplayName(lib);
+            channelList.add(channel);
+        }
+
+        int ordernum = 100;
+        LinkedHashMap<String, String> libTypeMap = clklogApiSetting.getLibTypeMap();
+        List<String> keyList = new ArrayList<>(libTypeMap.keySet());
+        for (Channel channel : channelList) {
+            String key = channel.getName().toLowerCase(Locale.ROOT);
+            if (libTypeMap.containsKey(key)) {
+                channel.setDisplayName(libTypeMap.get(key).split(",")[1]);
+                channel.setOrdernum(keyList.indexOf(channel.getName().toLowerCase(Locale.ROOT)) + 1);
+            } else {
+                channel.setDisplayName(channel.getName());
+                channel.setOrdernum(ordernum++);
+            }
+        }
+        channelList = channelList.stream().sorted(Comparator.comparingInt(Channel::getOrdernum)).collect(Collectors.toList());
+
+        GetChannelResponse response = new GetChannelResponse();
+
+        response.setData(channelList);
+        return response;
+    }
+
+    @Scheduled(fixedDelay = 60000)
+    @Override
+    public void loadChannelList() {
+        try {
+            long sinceTimestamp = 1704038400000L;
+
+            String latestTime = queueRedisTemplate.opsForValue().get(redisConstsConfig.getLatestTimeOfCacheChannelKey());
+            if (StringUtils.isNotBlank(latestTime)) {
+                sinceTimestamp = Long.parseLong(latestTime);
+            }
+
+            // 获取自上次缓存以来的项目渠道情况
+            MapSqlParameterSource paramMap = new MapSqlParameterSource();
+            String getListSql = "select project_name, arrayStringConcat(groupUniqArray(lib),',') as libs from flow_trend_bydate t";
+            String where = "";
+            where = FilterBuildUtils.buildStatDateStartFilter(new Timestamp(sinceTimestamp - DateUtils.MILLIS_PER_DAY), paramMap, where);
+
+            where = FilterBuildUtils.buildVisitorTypeFilter("", paramMap, where);
+            where = FilterBuildUtils.buildCountryFilter(new ArrayList<>(), paramMap, where);
+            where = FilterBuildUtils.buildProvinceFilter(new ArrayList<>(), paramMap, where);
+
+            getListSql += " where " + where.substring(4) + " group by project_name";
+
+            List<ProjectChannel> projectChannelList = clickHouseJdbcTemplate.query(getListSql, paramMap,
+                    new BeanPropertyRowMapper<ProjectChannel>(ProjectChannel.class));
+
+            // 获取上一次的项目渠道情况
+            Map<Object, Object> oldProjectChannelMap = queueRedisTemplate.opsForHash().entries(redisConstsConfig.getProjectChannelHashKey());
+
+            for (ProjectChannel projectChannel : projectChannelList) {
+                if (oldProjectChannelMap.containsKey(projectChannel.getProjectName())) {
+                    String oldChannel = oldProjectChannelMap.get(projectChannel.getProjectName()).toString();
+
+                    List<String> oldChannelList = new ArrayList<>(Arrays.asList(oldChannel.split(",")));
+                    List<String> currentChannelList = new ArrayList<>(Arrays.asList(projectChannel.getLibs().split(",")));
+
+                    oldChannelList.addAll(currentChannelList);
+                    oldChannelList = oldChannelList.stream().distinct().collect(Collectors.toList());
+                    oldProjectChannelMap.put(projectChannel.getProjectName(), String.join(",", oldChannelList));
+                } else {
+                    oldProjectChannelMap.put(projectChannel.getProjectName(), projectChannel.getLibs());
+                }
+            }
+            // 缓存到redis
+            RedisSerializer<String> rs = (RedisSerializer<String>) queueRedisTemplate.getKeySerializer();
+            queueRedisTemplate.executePipelined(new RedisCallback<Object>() {
+                @Override
+                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                    byte[] byKey = rs.serialize(redisConstsConfig.getProjectChannelHashKey());
+                    for (Map.Entry<Object, Object> entry : oldProjectChannelMap.entrySet()) {
+                        connection.hSet(byKey, rs.serialize(entry.getKey().toString()), rs.serialize(entry.getValue().toString()));
+                    }
+                    connection.set(rs.serialize(redisConstsConfig.getLatestTimeOfCacheChannelKey()), rs.serialize(String.valueOf(System.currentTimeMillis())));
+                    return null;
+                }
+            });
+        } catch (Exception ex) {
+            logger.error("load loadChannelList err", ex);
+        }
     }
 }

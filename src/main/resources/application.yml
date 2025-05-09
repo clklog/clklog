@@ -20,7 +20,18 @@ spring:
       password: 123456
       driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
       connection-timeout: 20000
+      socket-timeout: 60000
       maximum-pool-size: 5
+  redis:
+    host: 10.10.220.37
+    port: 6379
+    database: 0
+    password:
+    lettuce:
+      pool:
+        min-idle: 4
+        max-idle: 4
+        max-active: 4
 logging:
   file:
     path: log
@@ -28,3 +39,14 @@ clklogapi:
   access-control-allow-origin-patterns: "*"
   project-name: clklogapp
   project-host: http://www.zcunsoft.com
+  lib-type-map:
+    all: all,全部
+    android: Android,安卓
+    ios: iOS,苹果
+    js: js,网站
+    miniprogram: MiniProgram,微信小程序
+    harmonyos: HarmonyOS,鸿蒙
+    dotnet: DotNET,DotNET
+    cpp: cpp,cpp
+    java: Java,Java
+    python: Python,Python
