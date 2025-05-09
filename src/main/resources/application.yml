@@ -1,0 +1,48 @@
+springdoc:
+  swagger-ui:
+    enabled: true
+    tagsSorter: alpha
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.zcunsoft.clklog.manage.controllers,com.zcunsoft.clklog.sysmgmt.controllers
+server:
+  port: 8080
+spring:
+  application.name: clklog-manage
+  datasource:
+    mysql:
+      jdbc-url: jdbc:mysql://10.10.223.231:3306/clklog?characterEncoding=UTF-8&useTimezone=true&serverTimezone=GMT%2B8
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    clickhouse:
+      jdbc-url: jdbc:clickhouse://10.10.220.188:8123/default
+      username: default
+      password:
+      driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+  redis:
+    # 单机配置
+    host: 10.10.220.37
+    port: 6379
+  # password:
+  # 哨兵配置
+  # sentinel:
+  #  master: gct
+  #  nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
+token:
+  # 令牌自定义标识
+  header: Authorization
+  # 令牌密钥
+  secret: c609737e578978eccc64cef4be680
+  # 令牌有效期（默认30分钟）
+  expireTime: 300
+logging:
+  file:
+    path: log
+clklog-common:
+  access-control-allow-origin-patterns: "*"
+  anonymous-method-list: /auth/login
