@@ -32,11 +32,16 @@ spring:
         min-idle: 4
         max-idle: 4
         max-active: 4
+token:
+  header: Authorization
+  secret: c609737e578978eccc64cef4be680
+  expireTime: 300
 logging:
   file:
     path: log
-clklog-api:
+clklog-common:
   access-control-allow-origin-patterns: "*"
+clklog-api:
   project-name: clklogapp
   lib-type-map:
     all: all,全部

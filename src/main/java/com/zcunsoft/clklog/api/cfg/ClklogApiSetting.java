@@ -7,22 +7,12 @@ import java.util.LinkedHashMap;
 @ConfigurationProperties("clklog-api")
 public class ClklogApiSetting {
 
-    private String[] accessControlAllowOriginPatterns;
-
     private String projectName;
 
     /**
      * 渠道对照表
      */
     private LinkedHashMap<String, String> libTypeMap;
-
-    public String[] getAccessControlAllowOriginPatterns() {
-        return accessControlAllowOriginPatterns;
-    }
-
-    public void setAccessControlAllowOriginPatterns(String[] accessControlAllowOriginPatterns) {
-        this.accessControlAllowOriginPatterns = accessControlAllowOriginPatterns;
-    }
 
     public String getProjectName() {
         return projectName;
