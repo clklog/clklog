@@ -551,7 +551,7 @@ public class ExportReportServiceImpl implements IExportReportService {
     @Override
 	public List<FlowDetail> getVisitorList(DownloadRequest downloadRequest) {
 		MapSqlParameterSource paramMap = new MapSqlParameterSource();
-        String selectSql = "sum(pv) as pv,sum(visit_count) as visit_count,sum(visit_time) as visit_time,max(latest_time) as latest_time from visitor_summary_byvisitor t";
+        String selectSql = "sum(pv) as pv,sum(visit_count) as visit_count,sum(visit_time) as visit_time,max(latest_time) as latest_time from visitor_detail_byinfo t";
         String getListSql = "select t.distinct_id as distinct_id,t.is_first_day as is_first_day," + selectSql;
         String where = "";
 
@@ -569,21 +569,21 @@ public class ExportReportServiceImpl implements IExportReportService {
         }
         getListSql += " group by t.distinct_id,t.is_first_day";
         getListSql += " order by pv desc ";
-        List<VisitorSummarybyvisitor> visitorSummarybyvisitorList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorSummarybyvisitor>(VisitorSummarybyvisitor.class));
+        List<VisitorDetailbyinfo> visitorDetailbyinfoList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorDetailbyinfo>(VisitorDetailbyinfo.class));
 
         List<FlowDetail> visitorListList = new ArrayList<>();
 
-        for (VisitorSummarybyvisitor visitorSummarybyvisitor : visitorSummarybyvisitorList) {
+        for (VisitorDetailbyinfo visitorDetailbyinfo : visitorDetailbyinfoList) {
         	FlowDetail flowDetail = new FlowDetail();
 
-            flowDetail.setDistinctId(visitorSummarybyvisitor.getDistinctId());
-        	flowDetail.setLatestTime(visitorSummarybyvisitor.getLatestTime());
-        	flowDetail.setVisitCount(visitorSummarybyvisitor.getVisitCount());
-        	flowDetail.setPv(visitorSummarybyvisitor.getPv());
-        	flowDetail.setVisitTime(visitorSummarybyvisitor.getVisitTime());
-        	flowDetail.setVisitorType(VisitorType.getName(visitorSummarybyvisitor.getIsFirstDay()));
-        	if (visitorSummarybyvisitor.getVisitCount() > 0) {
-                float avgPv = visitorSummarybyvisitor.getPv() * 1.0f / visitorSummarybyvisitor.getVisitCount();
+            flowDetail.setDistinctId(visitorDetailbyinfo.getDistinctId());
+            flowDetail.setLatestTime(visitorDetailbyinfo.getLatestTime());
+            flowDetail.setVisitCount(visitorDetailbyinfo.getVisitCount());
+            flowDetail.setPv(visitorDetailbyinfo.getPv());
+            flowDetail.setVisitTime(visitorDetailbyinfo.getVisitTime());
+            flowDetail.setVisitorType(VisitorType.getName(visitorDetailbyinfo.getIsFirstDay()));
+            if (visitorDetailbyinfo.getVisitCount() > 0) {
+                float avgPv = visitorDetailbyinfo.getPv() * 1.0f / visitorDetailbyinfo.getVisitCount();
                 flowDetail.setAvgPv(Float.parseFloat(decimalFormat.get().format(avgPv)));
         	} else {
         		flowDetail.setAvgPv(0.0f);

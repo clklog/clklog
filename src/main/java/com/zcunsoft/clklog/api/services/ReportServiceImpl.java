@@ -1671,9 +1671,9 @@ public class ReportServiceImpl implements IReportService {
     @Override
     public GetVisitorListPageResponse getVisitorList(GetVisitorListPageRequest getVisitorListPageRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
-        String selectSql = "sum(pv) as pv,sum(visit_count) as visit_count,sum(visit_time) as visit_time,max(latest_time) as latest_time from visitor_summary_byvisitor t";
+        String selectSql = "sum(pv) as pv,sum(visit_count) as visit_count,sum(visit_time) as visit_time,max(latest_time) as latest_time from visitor_detail_byinfo t";
         String getListSql = "select t.distinct_id as distinct_id,t.is_first_day as is_first_day," + selectSql;
-        String getCountSql = "select count(1) from (select t.distinct_id as distinct_id from visitor_summary_byvisitor t";
+        String getCountSql = "select count(1) from (select t.distinct_id as distinct_id from visitor_detail_byinfo t";
         String where = "";
 
         where = buildChannelByAllFilter(getVisitorListPageRequest.getChannel(), paramMap, where);
@@ -1683,6 +1683,7 @@ public class ReportServiceImpl implements IReportService {
         where = buildCountryByAllFilter(getVisitorListPageRequest.getCountry(), paramMap, where);
         where = buildProvinceByAllFilter(getVisitorListPageRequest.getProvince(), paramMap, where);
         where = buildVisitorTypeByAllFilter(getVisitorListPageRequest.getVisitorType(), paramMap, where);
+        where = FilterBuildUtils.buildDistinctIdFilter(getVisitorListPageRequest.getDistinctId(), paramMap, where);
 
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
@@ -1695,7 +1696,7 @@ public class ReportServiceImpl implements IReportService {
         getListSql += " limit " + (getVisitorListPageRequest.getPageNum() - 1) * getVisitorListPageRequest.getPageSize() + "," + getVisitorListPageRequest.getPageSize();
 
         getCountSql += " group by t.distinct_id,t.is_first_day)";
-        List<VisitorSummarybyvisitor> visitorSummarybyvisitorList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorSummarybyvisitor>(VisitorSummarybyvisitor.class));
+        List<VisitorDetailbyinfo> visitorDetailbyinfoList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorDetailbyinfo>(VisitorDetailbyinfo.class));
 
         Integer total = clickHouseJdbcTemplate.queryForObject(getCountSql, paramMap, Integer.class);
 
@@ -1703,19 +1704,19 @@ public class ReportServiceImpl implements IReportService {
 
         GetVisitorListPageResponse response = new GetVisitorListPageResponse();
         GetVisitorListPageResponseData responseData = new GetVisitorListPageResponseData();
-        for (VisitorSummarybyvisitor visitorSummarybyvisitor : visitorSummarybyvisitorList) {
+        for (VisitorDetailbyinfo visitorDetailbyinfo : visitorDetailbyinfoList) {
             VisitorList visitorList = new VisitorList();
-            if (visitorSummarybyvisitor.getVisitCount() > 0) {
-                float avgPv = visitorSummarybyvisitor.getPv() * 1.0f / visitorSummarybyvisitor.getVisitCount();
+            if (visitorDetailbyinfo.getVisitCount() > 0) {
+                float avgPv = visitorDetailbyinfo.getPv() * 1.0f / visitorDetailbyinfo.getVisitCount();
                 visitorList.setAvgPv(Float.parseFloat(decimalFormat.get().format(avgPv)));
             }
 
-            visitorList.setDistinctId(visitorSummarybyvisitor.getDistinctId());
-            visitorList.setVisitorType(isFirstDayToConvert(visitorSummarybyvisitor.getIsFirstDay()));
-            visitorList.setLatestTime(visitorSummarybyvisitor.getLatestTime());
-            visitorList.setPv(visitorSummarybyvisitor.getPv());
-            visitorList.setVisitCount(visitorSummarybyvisitor.getVisitCount());
-            visitorList.setVisitTime(visitorSummarybyvisitor.getVisitTime());
+            visitorList.setDistinctId(visitorDetailbyinfo.getDistinctId());
+            visitorList.setVisitorType(isFirstDayToConvert(visitorDetailbyinfo.getIsFirstDay()));
+            visitorList.setLatestTime(visitorDetailbyinfo.getLatestTime());
+            visitorList.setPv(visitorDetailbyinfo.getPv());
+            visitorList.setVisitCount(visitorDetailbyinfo.getVisitCount());
+            visitorList.setVisitTime(visitorDetailbyinfo.getVisitTime());
             ;
             visitorListList.add(visitorList);
         }

@@ -37,4 +37,10 @@ public class GetVisitorListPageRequest extends BaseSort {
 
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
     private String projectName;
+
+    /**
+     * 用户ID
+     */
+    @Schema(description = "用户ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "8609475f862bd2cc")
+    private String distinctId;
 }
