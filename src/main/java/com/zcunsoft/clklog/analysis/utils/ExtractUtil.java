@@ -370,6 +370,10 @@ public class ExtractUtil {
                     logBean.setOsVersion(osVersion);
                 }
 
+                if (properties.has("app_crashed_reason")) {
+                    logBean.setAppCrashedReason(properties.get("app_crashed_reason").asText());
+                }
+
                 String jnUrlPath = logBean.getUrlPath();
                 if ("js".equalsIgnoreCase(logBean.getLib())) {
                     if ("/".equalsIgnoreCase(jnUrlPath) || StringUtils.isBlank(jnUrlPath)) {

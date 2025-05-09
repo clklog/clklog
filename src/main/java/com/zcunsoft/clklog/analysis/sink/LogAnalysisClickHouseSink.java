@@ -33,7 +33,7 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
             "manufacturer,matched_key,matching_key_list,model,network_type,os,os_version,receive_time,screen_name,screen_orientation," +
             "short_url_key,short_url_target,source_package_name,track_signup_original_id,user_agent,utm_campaign,utm_content,utm_matching_type,utm_medium,utm_source," +
             "utm_term,viewport_position,wifi,kafka_data_time,project_token,crc,is_compress,event_duration,user_key," +
-            "is_logined,download_channel,event_session_id,raw_url,create_time)" +
+            "is_logined,download_channel,event_session_id,raw_url,create_time,app_crashed_reason)" +
             " values " +
             "(?,?,?,?,?,?,?,?,?,?," +
             "?,?,?,?,?,?,?,?,?,?," +
@@ -45,7 +45,7 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
             "?,?,?,?,?,?,?,?,?,?," +
             "?,?,?,?,?,?,?,?,?,?," +
             "?,?,?,?,?,?,?,?,?," +
-            "?,?,?,?,?)"; //每一行十个字段
+            "?,?,?,?,?,?)"; //每一行十个字段
 
 
     @Override
@@ -193,6 +193,7 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
                 pst.setString(98, value.getEventSessionId());
                 pst.setString(99, value.getRawUrl());
                 pst.setString(100, value.getCreateTime());
+                pst.setString(101, value.getAppCrashedReason());
                 pst.addBatch();
             }
         }
