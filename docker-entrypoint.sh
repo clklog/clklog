@@ -114,7 +114,7 @@ try_download_iplib() {
 	if [ -z "${iplib_exists}" ] || [ -z "${iplibv6_exists}" ]; then
 		echo "Iplib not found, try downloading default iplib..."
 	    # try download default iplib
-		local wget_output=$(wget -q https://www.clklog.com/res/IP2LOCATION-LITE-DB3.tar.gz)
+		local wget_output=$(wget -q https://clklog.com/res/IP2LOCATION-LITE-DB3.tar.gz)
 		if [ $? -ne 0 ]; then
 			echo "Failed to download default iplib. Please check your network and retry."
 			exit 1
