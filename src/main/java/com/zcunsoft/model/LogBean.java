@@ -51,6 +51,10 @@ public class LogBean {
     String appName = "";
     String appState = "";
     String appVersion = "";
+    /**
+     * 崩溃原因.
+     */
+    String appCrashedReason = "";
     String brand = "";
     String browser = "";
     String browserVersion = "";
