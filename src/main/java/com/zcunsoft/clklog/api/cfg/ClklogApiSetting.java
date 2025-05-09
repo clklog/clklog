@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-@ConfigurationProperties("clklogapi")
+@ConfigurationProperties("clklog-api")
 public class ClklogApiSetting {
 
     private String[] accessControlAllowOriginPatterns;

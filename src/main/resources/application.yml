@@ -35,7 +35,7 @@ spring:
 logging:
   file:
     path: log
-clklogapi:
+clklog-api:
   access-control-allow-origin-patterns: "*"
   project-name: clklogapp
   project-host: http://www.zcunsoft.com
