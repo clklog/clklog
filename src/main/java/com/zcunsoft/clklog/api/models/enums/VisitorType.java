@@ -4,7 +4,7 @@ public enum VisitorType {
 
     New("新访客","true" ),
 
-    IOS("老访客","false" ),
+    Old("老访客", "false"),
     All("全部","all") ;
     /**
      * 枚举值.
@@ -43,7 +43,7 @@ public enum VisitorType {
     	VisitorType libType = parse(name);
         return  libType != null ? libType.getName() : name;
     }
-    
+
     /**
      * 获取枚举值.
      *

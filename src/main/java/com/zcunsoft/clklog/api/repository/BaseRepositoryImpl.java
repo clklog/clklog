@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.Iterator;
 
@@ -64,11 +63,4 @@ public class BaseRepositoryImpl <T, ID extends Serializable> extends SimpleJpaRe
         return var1;
     }
 
-    @Override
-    public int delById(String tableName, Long id) {
-        Query nativeQuery = entityManager.createNativeQuery("alter table " + tableName + " delete where id=?");
-        nativeQuery.setParameter(1, id);
-        int count = nativeQuery.executeUpdate();
-        return count;
-    }
 }

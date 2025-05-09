@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
+import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -20,13 +21,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@EntityScan(basePackages = "com.zcunsoft.clklog.api.entity.clickhouse")
+@EntityScan(basePackages = "com.zcunsoft.clklog.api.entity.ck")
 @EnableJpaRepositories(
-        basePackages = "com.zcunsoft.clklog.api.repository.clickhouse",
+        basePackages = "com.zcunsoft.clklog.api.repository",
         entityManagerFactoryRef = "clickhouseEntityManagerFactory",
         transactionManagerRef = "clickhouseTransactionManager",
         repositoryBaseClass = BaseRepositoryImpl.class)
-//        enableDefaultTransactions = false)
 @EnableTransactionManagement
 public class ClickhouseConfig {
     @Autowired
@@ -37,6 +37,8 @@ public class ClickhouseConfig {
     protected Map<String, Object> jpaProperties() {
         Map<String, Object> props = new HashMap<>();
         props.put("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
+        props.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
+
         return props;
     }
 
@@ -46,7 +48,7 @@ public class ClickhouseConfig {
         return builder
                 .dataSource(dataSource)
                 .properties(jpaProperties())
-                .packages("com.zcunsoft.clklog.report.entity.clickhouse")
+                .packages("com.zcunsoft.clklog.api.entity.ck")
                 .persistenceUnit("clickhousePersistenceUnit")
                 .build();
 

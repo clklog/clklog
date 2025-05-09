@@ -11,5 +11,4 @@ public interface BaseRepository<T, ID extends Serializable> extends JpaRepositor
     <S extends T> Iterable<S> batchInsert(Iterable<S> var1);
     <S extends T> Iterable<S> batchUpdate(Iterable<S> var1);
 
-    int delById(String tableName, Long id);
 }

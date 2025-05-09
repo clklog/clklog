@@ -23,6 +23,7 @@ import com.zcunsoft.clklog.api.models.trend.GetFlowTrendDetailResponseData;
 import com.zcunsoft.clklog.api.models.uservisit.BaseUserVisit;
 import com.zcunsoft.clklog.api.models.visitor.GetVisitorDetailResponse;
 import com.zcunsoft.clklog.api.poi.DownloadRequest;
+import com.zcunsoft.clklog.api.services.utils.FilterBuildUtils;
 import com.zcunsoft.clklog.api.utils.TimeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -197,13 +198,13 @@ public class ExportReportServiceImpl implements IExportReportService {
             flowDetail.setSearchword(searchWordDetailbydate.getSearchword());
             flowDetailList.add(flowDetail);
         }
-	    
+
         responseData.setRows(flowDetailList);
         responseData.setTotal(0);
         response.setData(responseData);
         return response;
     }
-    
+
     @Override
     public List<FlowDetail> getAreaDetailList(DownloadRequest downloadRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -223,7 +224,7 @@ public class ExportReportServiceImpl implements IExportReportService {
             getListSql += " where t.province<>'all' and t.city<> 'all' and t.country='中国' and " + where;
             getSummarySql += " where t.province='all' and t.city='all' and t.country='中国' and " + where;
         }
-        
+
         getListSql += " group by t.province,t.country ";
         getListSql += " order by pv desc ";
         List<AreaDetailbydate> areaDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<AreaDetailbydate>(AreaDetailbydate.class));
@@ -271,7 +272,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         }
         return assemblyFlowDetail(totalAreaDetailbydate, totalAreaDetailbydate);
     }
-    
+
     @Override
     public FlowDetail getVisitUriTotal(DownloadRequest downloadRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -314,13 +315,13 @@ public class ExportReportServiceImpl implements IExportReportService {
         where = buildCountryFilter(downloadRequest.getCountry(), paramMap, where);
         where = buildProvinceFilter(downloadRequest.getProvince(), paramMap, where);
         where = buildVisitorTypeFilter(downloadRequest.getVisitorType(), paramMap, where);
-        
+
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
             getListSql += " where t.uri <> 'all' and t.uri_path <> 'all' and t.title<> 'all' and t.pv>0 and " + where;
         }
-        getListSql += " group by t.uri,t.uri_path,t.title "; 
-        getListSql += " order by pv desc "; 
+        getListSql += " group by t.uri,t.uri_path,t.title ";
+        getListSql += " order by pv desc ";
         List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
 
         List<FlowDetail> visitUriDetailList = new ArrayList<>();
@@ -341,7 +342,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         }
         return visitUriDetailList;
     }
-    
+
     @Override
     public GetSourceWebsiteDetailPageResponse getSourceWebSiteDetail(DownloadRequest downloadRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -363,9 +364,9 @@ public class ExportReportServiceImpl implements IExportReportService {
             getListSql += " where t.sourcesite<>'all' and " + where;
             getSummarySql += " where t.sourcesite='all' and " + where;
         }
-        getListSql += " group by t.sourcesite"; 
-        getListSql += " order by pv desc "; 
-        
+        getListSql += " group by t.sourcesite";
+        getListSql += " order by pv desc ";
+
         List<SourcesiteDetailbydate> sourcesiteDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<SourcesiteDetailbydate>(SourcesiteDetailbydate.class));
 
         List<SourcesiteDetailbydate> summarySourcesiteDetailbydate = clickHouseJdbcTemplate.query(getSummarySql, paramMap, new BeanPropertyRowMapper<SourcesiteDetailbydate>(SourcesiteDetailbydate.class));
@@ -392,7 +393,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         response.setData(responseData);
         return response;
     }
-    
+
     @Override
     public GetVisitorDetailResponse getVisitorDetail(DownloadRequest downloadRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -468,7 +469,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         }
         return flowDetail;
     }
-    
+
     @Override
     public GetDeviceDetailResponse getDeviceDetail(DownloadRequest downloadRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -508,7 +509,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         response.setData(flowDetailList);
         return response;
     }
-    
+
     @Override
     public GetChannelDetailResponse getChannelDetail(DownloadRequest downloadRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -546,7 +547,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         response.setData(flowDetailList);
         return response;
     }
-    
+
     @Override
 	public List<FlowDetail> getVisitorList(DownloadRequest downloadRequest) {
 		MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -574,8 +575,8 @@ public class ExportReportServiceImpl implements IExportReportService {
 
         for (VisitorSummarybyvisitor visitorSummarybyvisitor : visitorSummarybyvisitorList) {
         	FlowDetail flowDetail = new FlowDetail();
-           
-        	flowDetail.setDistinctId(visitorSummarybyvisitor.getDistinctId());
+
+            flowDetail.setDistinctId(visitorSummarybyvisitor.getDistinctId());
         	flowDetail.setLatestTime(visitorSummarybyvisitor.getLatestTime());
         	flowDetail.setVisitCount(visitorSummarybyvisitor.getVisitCount());
         	flowDetail.setPv(visitorSummarybyvisitor.getPv());
@@ -591,7 +592,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         }
 		return visitorListList;
 	}
-    
+
     @Override
     public List<BaseUserVisit> getUserVisit(DownloadRequest downloadRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
@@ -1129,10 +1130,10 @@ public class ExportReportServiceImpl implements IExportReportService {
 
     private String buildSummaryWhere(BaseSummaryRequest baseSummaryRequest, MapSqlParameterSource paramMap, boolean needFilterVisitorType, boolean needFilterArea) {
         String where = "";
-        where = buildChannelFilter(baseSummaryRequest.getChannel(), paramMap, where);
-        where = buildStatDateStartFilter(baseSummaryRequest.getStartTime(), paramMap, where, baseSummaryRequest.getTimeType());
-        where = buildStatDateEndFilter(baseSummaryRequest.getEndTime(), paramMap, where, baseSummaryRequest.getTimeType());
-        where = buildProjectNameFilter(baseSummaryRequest.getProjectName(), paramMap, where);
+        where = FilterBuildUtils.buildChannelFilter(baseSummaryRequest.getChannel(), paramMap, where);
+        where = FilterBuildUtils.buildStatDateStartFilter(baseSummaryRequest.getStartTime(), paramMap, where, baseSummaryRequest.getTimeType());
+        where = FilterBuildUtils.buildStatDateEndFilter(baseSummaryRequest.getEndTime(), paramMap, where, baseSummaryRequest.getTimeType());
+        where = FilterBuildUtils.buildProjectNameFilter(baseSummaryRequest.getProjectName(), clklogApiSetting.getProjectName(), paramMap, where);
         if (needFilterArea) {
             where = buildCountryFilter(new ArrayList<>(), paramMap, where);
             where = buildProvinceFilter(new ArrayList<>(), paramMap, where);
@@ -1162,7 +1163,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         flowDetail.setIpCountRate(0.0f);
         flowDetail.setVisitTimeRate(0.0f);
         flowDetail.setExitRate(0.23f);
-        
+
         if (flowDetail.getVisitCount() > 0) {
 
             float avgPv = baseDetailbydate.getPv() * 1.0f / baseDetailbydate.getVisitCount();
@@ -1284,7 +1285,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         paramMap.addValue("province", provinceList);
         return where;
     }
-    
+
     private String buildProvinceByAllFilter(List<String> provinceList, MapSqlParameterSource paramMap, String where) {
     	if (provinceList != null && !provinceList.isEmpty()) {
     		where += " and t.province in (:province)";
@@ -1305,7 +1306,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         paramMap.addValue("country", countryList);
         return where;
     }
-    
+
     private String buildCountryByAllFilter(List<String> countryList, MapSqlParameterSource paramMap, String where) {
         if (countryList != null && !countryList.isEmpty()) {
         	where += " and t.country in (:country)";
@@ -1329,7 +1330,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         paramMap.addValue("is_first_day", visitorType);
         return where;
     }
-    
+
     private String buildVisitorTypeByAllFilter(String visitorType, MapSqlParameterSource paramMap, String where) {
         if (StringUtils.isNotBlank(visitorType)) {
             if ("老访客".equalsIgnoreCase(visitorType)) {
@@ -1369,7 +1370,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         paramMap.addValue("channel", channelList);
         return where;
     }
-    
+
     private String buildChannelByAllFilter(List<String> channels, MapSqlParameterSource paramMap, String where) {
         List<String> channelList = new ArrayList<>();
         if (channels != null && !channels.isEmpty()) {
@@ -1485,7 +1486,7 @@ public class ExportReportServiceImpl implements IExportReportService {
         }
         return timeFrame;
     }
-    
+
     private String isFirstDayToConvert(String isFirstDay) {
     	if("true".equalsIgnoreCase(isFirstDay)){
     		return "新访客";
