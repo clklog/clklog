@@ -30,4 +30,3 @@ init:
     visituri_detail_bydate: '0 */1 * * * ?'
     visitor_detail_byinfo: '0 */1 * * * ?'
     visitor_detail_bysession: '0 */1 * * * ?'
-    visitor_summary_byvisitor: '0 */1 * * * ?'
