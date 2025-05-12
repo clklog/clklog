@@ -4,6 +4,7 @@ import com.zcunsoft.model.LogBean;
 import com.zcunsoft.model.QueryCriteria;
 import com.zcunsoft.model.Region;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface IReceiveService {
@@ -22,4 +23,6 @@ public interface IReceiveService {
     void loadCountry();
 
     void loadProjectSetting();
+
+    void extractLog(QueryCriteria queryCriteria, HttpServletRequest request);
 }

@@ -2,20 +2,18 @@ package com.zcunsoft.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ip2location.IP2Location;
 import com.ip2location.IPResult;
 import com.zcunsoft.cfg.KafkaSetting;
 import com.zcunsoft.cfg.ReceiverSetting;
 import com.zcunsoft.handlers.ConstsDataHolder;
-import com.zcunsoft.model.ProjectSetting;
 import com.zcunsoft.model.LogBean;
+import com.zcunsoft.model.ProjectSetting;
 import com.zcunsoft.model.QueryCriteria;
 import com.zcunsoft.model.Region;
-import com.zcunsoft.util.ExtractUtil;
-import com.zcunsoft.util.IOUtil;
-import com.zcunsoft.util.KafkaProducerUtil;
-import com.zcunsoft.util.ObjectMapperUtil;
+import com.zcunsoft.util.*;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,17 +25,20 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+import java.net.InetAddress;
+import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Pattern;
 
 @Service
 public class ReceiveServiceImpl implements IReceiveService {
@@ -47,6 +48,8 @@ public class ReceiveServiceImpl implements IReceiveService {
     private final ConstsDataHolder constsDataHolder;
 
     private final Logger logger = LogManager.getLogger(this.getClass());
+
+    private final Logger storeLogger = LogManager.getLogger("com.zcunsoft.store");
 
     private final ObjectMapperUtil objectMapper;
 
@@ -91,6 +94,160 @@ public class ReceiveServiceImpl implements IReceiveService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void extractLog(QueryCriteria queryCriteria, HttpServletRequest request) {
+        if (serverSettings.getProjectList().contains(queryCriteria.getProject())) {
+            String bodyString = getBodyString(request);
+            String[] bodyStringList = bodyString.split("&");
+            if (bodyStringList.length == 1 && !bodyString.equals(""))
+                try {
+                    JsonNode jsonNode = objectMapper.readTree(bodyString);
+
+                    queryCriteria.setGzip(jsonNode.get("gzip").asText());
+                    queryCriteria.setData_list(jsonNode.get("data_list").asText());
+                    queryCriteria.setData(jsonNode.get("data").asText());
+                    queryCriteria.setCrc(jsonNode.get("crc").asText());
+                } catch (Exception exception) {
+                }
+            for (String s : bodyStringList) {
+                String[] elm = s.split("=");
+                if (elm[0].equals("data_list")) {
+                    queryCriteria.setData_list(elm[1]);
+                } else if (elm[0].equals("data")) {
+                    queryCriteria.setData(elm[1]);
+                } else if (elm[0].equals("crc")) {
+                    queryCriteria.setCrc(elm[1]);
+                } else if (elm[0].equals("gzip")) {
+                    queryCriteria.setGzip(elm[1]);
+                }
+            }
+            String ip = getIpAddr(request);
+            try {
+                String dataFinal, decodedString = null;
+                if (queryCriteria.getData_list() != null) {
+                    if (Pattern.matches(".*\\+.*|.*\\/.*|.*=.*", queryCriteria.getData_list())) {
+                        decodedString = queryCriteria.getData_list();
+                    } else {
+                        decodedString = URLDecoder.decode(queryCriteria.getData_list());
+                    }
+                } else if (queryCriteria.getData() != null) {
+                    if (Pattern.matches(".*\\+.*|.*\\/.*|.*=.*", queryCriteria.getData())) {
+                        decodedString = queryCriteria.getData();
+                    } else {
+                        decodedString = URLDecoder.decode(queryCriteria.getData());
+                    }
+                } else {
+                    logger.error("data为空");
+                }
+                if (decodedString != null) {
+                    Base64.Decoder decoder = Base64.getDecoder();
+                    byte[] byteArrayNEW = decoder.decode(decodedString);
+
+                    if (queryCriteria.getGzip().equals("1")) {
+                        dataFinal = GZIPUtils.uncompressToString(byteArrayNEW);
+                    } else {
+                        dataFinal = new String(byteArrayNEW);
+                    }
+                    queryCriteria.setData(dataFinal);
+                    queryCriteria.setClientIp(ip);
+                    String ua = request.getHeader("user-agent");
+                    if (ua == null) {
+                        ua = request.getHeader("User-Agent");
+                    }
+                    queryCriteria.setUa(ua);
+
+                    JsonNode json = objectMapper.readTree(dataFinal);
+                    if (json instanceof ArrayNode) {
+                        for (JsonNode jn : json) {
+                            ObjectNode objectNode = ((ObjectNode) jn.get("properties"));
+                            objectNode.put("$user_agent", ua);
+                        }
+                    } else {
+                        ObjectNode objectNode = ((ObjectNode) json.get("properties"));
+                        objectNode.put("$user_agent", ua);
+                    }
+                    dataFinal = objectMapper.writeValueAsString(json);
+                    queryCriteria.setData(dataFinal);
+                    constsDataHolder.getLogQueue().put(queryCriteria);
+                    storeLogger.info(ip + "," + dataFinal);
+                }
+            } catch (Exception e) {
+                String logData = queryCriteria.toString();
+                logger.error(logData, e);
+            }
+        }
+
+    }
+
+    private String getBodyString(HttpServletRequest request) {
+        ServletInputStream servletInputStream = null;
+        StringBuilder sb = new StringBuilder();
+        BufferedReader reader = null;
+        try {
+            servletInputStream = request.getInputStream();
+            reader = new BufferedReader(new InputStreamReader((InputStream) servletInputStream, StandardCharsets.UTF_8));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (servletInputStream != null) {
+                try {
+                    servletInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    private String getIpAddr(HttpServletRequest request) {
+        String ipAddress = null;
+        try {
+            ipAddress = request.getHeader("x-forwarded-for");
+            if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+                ipAddress = request.getHeader("Proxy-Client-IP");
+            }
+            if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+                ipAddress = request.getHeader("WL-Proxy-Client-IP");
+            }
+            if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+                ipAddress = request.getRemoteAddr();
+                if (ipAddress.equals("127.0.0.1")) {
+
+                    InetAddress inet = null;
+                    try {
+                        inet = InetAddress.getLocalHost();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                    if (inet != null) {
+                        ipAddress = inet.getHostAddress();
+                    }
+                }
+            }
+            if (ipAddress != null && ipAddress.length() > 15) {
+                if (ipAddress.indexOf(",") > 0) {
+                    ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
+                }
+            }
+        } catch (Exception e) {
+            ipAddress = "";
+        }
+
+        return ipAddress;
     }
 
     @Override
