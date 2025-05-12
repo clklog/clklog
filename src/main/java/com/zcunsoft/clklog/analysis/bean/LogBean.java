@@ -2,6 +2,8 @@ package com.zcunsoft.clklog.analysis.bean;
 
 import lombok.Data;
 
+import java.sql.Timestamp;
+
 @Data
 public class LogBean {
     String kafkaDataTime = "";
@@ -14,9 +16,9 @@ public class LogBean {
     String distinctId = "";
     String typeContext = "";
     String event = "";
-    String time = "";
+    long time = 0;
     String trackId = "";
-    String flushTime = "";
+    long flushTime = 0;
     String country = "";
     String province = "";
     String city = "";
@@ -43,7 +45,7 @@ public class LogBean {
     String latestTrafficSourceType = "";
     String isFirstDay = "";
     String isFirstTime = "";
-    String logTime = "";
+    Timestamp logTime = null;
     String statDate = "";
     String statHour = "";
     String elementId = "";
@@ -112,4 +114,9 @@ public class LogBean {
     String eventSessionId = "";
     String rawUrl = "";
     String createTime = "";
+    String internalSearchKeyword = "";
+    /**
+     * 匿名 ID.
+     */
+    String anonymousId;
 }

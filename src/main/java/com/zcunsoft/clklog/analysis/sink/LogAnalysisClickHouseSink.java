@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanCollection>> {
@@ -82,9 +81,9 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
                 pst.setString(1, value.getDistinctId());
                 pst.setString(2, value.getTypeContext());
                 pst.setString(3, value.getEvent());
-                pst.setString(4, value.getTime());
+                pst.setString(4, String.valueOf(value.getTime()));
                 pst.setString(5, value.getTrackId());
-                pst.setString(6, value.getFlushTime());
+                pst.setString(6, String.valueOf(value.getFlushTime()));
                 pst.setString(7, value.getIdentityCookieId());
                 pst.setString(8, value.getLib());
                 pst.setString(9, value.getLibMethod());
@@ -104,7 +103,7 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
                 pst.setString(23, value.getIsFirstDay());
                 pst.setString(24, value.getIsFirstTime());
                 pst.setString(25, value.getReferrerHost());
-                pst.setTimestamp(26, Timestamp.valueOf(value.getLogTime()));
+                pst.setTimestamp(26, value.getLogTime());
                 pst.setDate(27, java.sql.Date.valueOf(value.getStatDate()));
                 pst.setString(28, value.getStatHour());
                 pst.setString(29, value.getElementId());
