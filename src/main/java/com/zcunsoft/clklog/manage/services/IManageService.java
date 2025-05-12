@@ -86,4 +86,7 @@ public interface IManageService {
      */
     void reloadProjectSetting();
 
+    void cacheCityEngChsMap();
+
+    void cacheCountryEngChsMap();
 }

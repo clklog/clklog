@@ -14,6 +14,10 @@ public class RedisConstsConfig {
      */
     private String projectSettingKey = "ProjectSettingKey";
 
+    /**
+     * 城市中英文对照表 hash key.
+     */
+    private String cityEngChsMapKey = "CityEngChsMapKey";
 
     public String getProjectSettingKey() {
         return projectSettingKey;
@@ -23,4 +27,11 @@ public class RedisConstsConfig {
         this.projectSettingKey = projectSettingKey;
     }
 
+    public String getCityEngChsMapKey() {
+        return cityEngChsMapKey;
+    }
+
+    public void setCityEngChsMapKey(String cityEngChsMapKey) {
+        this.cityEngChsMapKey = cityEngChsMapKey;
+    }
 }

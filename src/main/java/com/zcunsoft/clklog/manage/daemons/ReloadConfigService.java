@@ -31,4 +31,21 @@ public class ReloadConfigService {
     public void statByProjectName() {
         manageService.statByProjectName();
     }
+
+    /**
+     * 缓存国家中英文对照表.
+     */
+    @Scheduled(fixedDelay = 60000)
+    public void cacheCountryEngChsMap() {
+        manageService.cacheCountryEngChsMap();
+    }
+
+    /**
+     * 缓存城市中英文对照表.
+     */
+    @Scheduled(fixedDelay = 60000)
+    public void cacheCityEngChsMap() {
+        manageService.cacheCityEngChsMap();
+    }
+
 }

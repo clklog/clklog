@@ -20,15 +20,20 @@ import com.zcunsoft.clklog.manage.repository.mysql.ProjectLogStatRepository;
 import com.zcunsoft.clklog.manage.repository.mysql.ProjectRepository;
 import com.zcunsoft.clklog.manage.repository.mysql.ProjectStatRepository;
 import com.zcunsoft.clklog.manage.utils.ExtensionFilter;
+import com.zcunsoft.clklog.manage.utils.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -830,4 +835,64 @@ public class ManageServiceImpl implements IManageService {
             logger.error("reloadProjectSetting err ", ex);
         }
     }
+
+    @Override
+    public void cacheCityEngChsMap() {
+        List<String> cityEngChsList = IOUtil.readAllLines(System.getProperty("user.dir") + File.separator + "setting" + File.separator
+                + "city-eng-chs-map.txt");
+
+        HashMap<String, String> htCityMap = new HashMap<>();
+        for (String line : cityEngChsList) {
+            String[] pair = line.split(";");
+            String country = pair[0].toLowerCase(Locale.ROOT);
+            String province = pair[1];
+            String[] provinceArr = province.split("-", -1);
+            String key = country + "_" + provinceArr[0].toLowerCase(Locale.ROOT);
+            htCityMap.put(key, provinceArr[1]);
+            for (int i = 1; i < pair.length; i++) {
+                String district = pair[i];
+                String[] districtArr = district.split("-", -1);
+                String[] cities = districtArr[0].split(",", -1);
+                for (String city : cities) {
+                    htCityMap.put(key + "_" + city.toLowerCase(Locale.ROOT), districtArr[1]);
+                }
+            }
+        }
+
+        RedisSerializer<String> rs = (RedisSerializer<String>) redisTemplate.getKeySerializer();
+        redisTemplate.executePipelined(new RedisCallback<Object>() {
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                byte[] byKey = rs.serialize(redisConstsConfig.getCityEngChsMapKey());
+                for (Map.Entry<String, String> entry : htCityMap.entrySet()) {
+                    connection.hSet(byKey, rs.serialize(entry.getKey()), rs.serialize(entry.getValue()));
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void cacheCountryEngChsMap() {
+        List<String> regionEngChsList = IOUtil.readAllLines(System.getProperty("user.dir") + File.separator + "setting" + File.separator
+                + "country-eng-chs-map.txt");
+        if (!regionEngChsList.isEmpty()) {
+            RedisSerializer<String> rs = (RedisSerializer<String>) redisTemplate.getKeySerializer();
+
+            redisTemplate.executePipelined(new RedisCallback<Object>() {
+                @Override
+                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                    byte[] byKey = rs.serialize(redisConstsConfig.getCityEngChsMapKey());
+                    for (String line : regionEngChsList) {
+                        String[] pair = line.split("-");
+                        if (pair.length >= 2) {
+                            connection.hSet(byKey, rs.serialize(pair[0].toLowerCase(Locale.ROOT)), rs.serialize(pair[1]));
+                        }
+                    }
+                    return null;
+                }
+            });
+        }
+    }
+
 }

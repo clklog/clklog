@@ -1,0 +1,34 @@
+cn;Shanghai-上海
+cn;Yunnan-云南;KUNMING-昆明;Qujing-曲靖;YUXI-玉溪;BAOSHAN-保山;ZHAOTONG-昭通;LIJIANG-丽江;pu'er-普洱;LINCANG-临沧;CHUXIONG-楚雄彝族自治州;honghe,Mengzi,Gejiu,Kaiyuan,Mile-红河哈尼族彝族自治州;wenshan-文山壮族苗族自治州;Xishuangbanna,Jinghong-西双版纳傣族自治州;dali-大理白族自治州;dehong,Ruili,Mangshi-德宏傣族景颇族自治州;Nujiang-怒江傈僳族自治州;diqing-迪庆藏族自治州
+cn;nei mongol-内蒙古;hohhot-呼和浩特;BAOTOU-包头;WUHAI-乌海;CHIFENG-赤峰;TONGLIAO-通辽;ordos-鄂尔多斯;hulunbuir,Manzhouli-呼伦贝尔;bayannur-巴彦淖尔;ulanqab-乌兰察布;Hinggan,Ulanhot,Arxan-兴安盟;Xilinhot,Erenhot-锡林郭勒盟;Alxa-阿拉善盟
+cn;Beijing-北京
+cn;Taiwan-台湾;Taipei,New Taipei,Taoyuan,Hsinchu,Keelung,Hualien,Nantou,Changhua,Taitung,Chiayi,Miaoli,Tainan,Lienchiang,Penghu,Kaohsiung,Pingtung,Kinmen-台湾;
+cn;Jilin-吉林;Changchun,Dehui,Gongzhuling-长春;Jilin,Panshi,Shulan,Huadian,Jiaohe-吉林;Yanji,Longjing,Dunhua,Tumen,Helong,Hunchun-延边朝鲜族自治州;Songyuan-松原;Liaoyuan-辽源;Tonghua,Meihekou-通化;Siping-四平;Baishan-白山;Baicheng,Taonan-白城;
+cn;Sichuan-四川;Chengdu,Pengzhou,Dujiangyan-成都;Mianyang,Jiangyou-绵阳;Dazhou-达州;Guangyuan-广元;Panzhihua-攀枝花;Yibin-宜宾;Nanchong,Langzhong-南充;Bazhong-巴中;Guang'an-广安;Ziyang-资阳;Deyang,Guanghan-德阳;Luzhou-泸州;Zigong-自贡;Neijiang-内江;Leshan-乐山;Ya'an-雅安;Xichang,Huili-凉山彝族自治州;Suining-遂宁;Meishan-眉山;Kangding-甘孜藏族自治州;Barkam-阿坝藏族羌族自治州;
+cn;Tianjin-天津
+cn;ningxia huizu-宁夏;Yinchuan-银川;Wuzhong,Qingtongxia-吴忠;Shizuishan-石嘴山;Zhongwei-中卫;Guyuan-固原
+cn;Anhui-安徽;Hefei-合肥;Chizhou-池州;Suzhou-宿州;Wuhu-芜湖;Huaibei-淮北;Tongling-铜陵;Bengbu-蚌埠;Ma'anshan-马鞍山;Bozhou-亳州;Fuyang,Jieshou-阜阳;Chuzhou,Mingguang-滁州;Huainan-淮南;Huangshan-黄山;Anqing-安庆;Lu'an-六安;Xuancheng-宣城;Chaohu-巢湖
+cn;Shandong-山东;Weifang,Zhucheng,Anqiu,Gaomi,Qingzhou-潍坊;Yantai,Longkou,Laiyang,Zhaoyuan-烟台;Jinan-济南;Qingdao,Pingdu,Laixi-青岛;Binzhou-滨州;Zibo-淄博;Liaocheng,Linqing-聊城;Linyi-临沂;Jining,Qufu,Zoucheng-济宁;Tai'an,Xintai,Feicheng-泰安;Dongying-东营;Weihai-威海;Zaozhuang,Tengzhou-枣庄;Heze-菏泽;Dezhou,Leling,Yucheng-德州;Rizhao-日照;
+cn;Shanxi-山西;Taiyuan,Gujiao-太原;Jincheng,Gaoping-晋城;Yangquan-阳泉;Xinzhou,Yuanping-忻州;Fenyang,Xiaoyi-吕梁;Yuncheng,Hejin-运城;Changzhi-长治;Jinzhong,Jiexiu-晋中;Yuncheng-运城;Datong-大同;Shuozhou-朔州;Huozhou,Linfen-临汾
+cn;Guangdong-广东;Guangzhou-广州;Shenzhen-深圳;Dongguan-东莞;Zhanjiang,Lianjiang,Leizhou,Wuchuan-湛江;Huizhou-惠州;Foshan-佛山;Zhongshan-中山;Yunfu-云浮;Zhaoqing-肇庆;Chaozhou-潮州;Maoming,Xinyi-茂名;Shanwei-汕尾;Meizhou-梅州;Shantou-汕头;Yangjiang-阳江;Zhuhai-珠海;Heyuan-河源;Jieyang,Puning-揭阳;Jiangmen,Kaiping,Taishan-江门;Qingyuan,Lianzhou-清远;Shaoguan-韶关
+cn;guangxi zhuangzu-广西;Nanning-南宁;Laibin-来宾;Liuzhou-柳州;Guilin-桂林;Wuzhou-梧州;Beihai-北海;Yulin-玉林;Baise-百色;Hechi-河池;Hezhou-贺州;Qinzhou-钦州;Chongzuo-崇左;Guigang-贵港;Fangchenggang-防城港;Guiping-桂平
+cn;xinjiang uygur-新疆;Artux-克孜勒苏柯尔克孜自治州;Kashgar-喀什;Changji,Fukang-昌吉回族自治州;Altay-阿勒泰;Hotan-和田;Karamay-克拉玛依;Tacheng-塔城;Hami-哈密;Turpan-吐鲁番;Yining,Kuytun-伊犁哈萨克自治州;Korla-巴音郭楞蒙古自治州;Shihezi-石河子;Bole-博尔塔拉蒙古自治州;Aksu-阿克苏;Beitun-北屯;Tumxuk-图木舒克;Wujiaqu-五家渠;Aral-阿拉尔
+cn;Jiangsu-江苏;Nanjing-南京;Wuxi-无锡;Suzhou,Kunshan,Changshu,Zhangjiagang,Taicang-苏州;Huai'an-淮安;Yancheng,Dongtai-盐城;Nantong,Hai'an-南通;Xuzhou,Pizhou-徐州;Yangzhou-扬州;Taizhou,Taixing,Xinghua-泰州;Suqian-宿迁;Zhenjiang,Danyang,Jurong-镇江;Changzhou-常州;Lianyungang-连云港;
+cn;Jiangxi-江西;Ji'an,Jinggangshan-吉安;Yichun,Zhangshu-宜春;Nanchang-南昌;Ganzhou,Longnan-赣州;Jingdezhen,Leping-景德镇;Lushan,Jiujiang-九江;Pingxiang-萍乡;Shangrao,Dexing-上饶;Fuzhou-抚州;Xinyu-新余;Yingtan,Guixi-鹰潭;
+cn;Hebei-河北;Shijiazhuang,Xinji-石家庄;Baoding,Gaobeidian,Dingzhou,Zhuozhou-保定;Tangshan,Zunhua-唐山;Handan-邯郸;Langfang,Sanhe,Bazhou-廊坊;Cangzhou,Renqiu,Hejian,Botou-沧州;Hengshui-衡水;Xingtai,Nangong-邢台;Zhangjiakou-张家口;Qinhuangdao-秦皇岛;Chengde,Pingquan-承德;
+cn;Henan-河南;Zhengzhou,Dengfeng,Xingyang,Xinzheng,Gongyi-郑州;Luohe-漯河;Zhumadian-驻马店;Xinxiang-新乡;Kaifeng-开封;Nanyang-南阳;Luoyang-洛阳;Zhoukou-周口;Pingdingshan-平顶山;Anyang-安阳;Jiaozuo,Qinyang-焦作;Sanmenxia,Yima-三门峡;Puyang-濮阳;Xuchang,Yuzhou-许昌;Shangqiu,Yongcheng-商丘;Xinyang-信阳;Hebi-鹤壁;Jiyuan-济源;
+cn;Zhejiang-浙江;Hangzhou-杭州;Wenzhou,Longgang,Yueqing-温州;Jiaxing,Haining,Tongxiang,Pinghu-嘉兴;Taizhou,Linhai,Wenling-台州;Ningbo,Cixi,Yuyao-宁波;Lishui,Longquan-丽水;Jinhua,Yiwu,Lanxi,Dongyang-金华;Quzhou,Jiangshan-衢州;Zhoushan-舟山;Shaoxing,Zhuji,Shengzhou-绍兴;Huzhou-湖州;
+cn;Hainan-海南;Haikou-海口;Sanya-三亚;Wenchang-文昌;Danzhou-儋州;Wanning-万宁;Qionghai-琼海;Wuzhishan-五指山;Dongfang-东方
+cn;Hubei-湖北;Wuhan-武汉;Jingzhou,Honghu-荆州;Yichang-宜昌;Xiangyang,Yicheng,Laohekou-襄阳;Xiaogan,Anlu-孝感;Huanggang,Wuxue,Macheng-黄冈;Huangshi-黄石;Xianning-咸宁;Enshi,Lichuan-恩施;Jingmen,Zhongxiang-荆门;Shiyan,Danjiangkou-十堰;Ezhou-鄂州;Qianjiang-潜江;Suizhou,Guangshui-随州;Xiantao-仙桃;Tianmen-天门;
+cn;Hunan-湖南;Changsha,Liuyang-长沙;Loudi,Lengshuijiang-娄底;Changde-常德;Zhuzhou-株洲;Xiangtan-湘潭;Chenzhou-郴州;Hengyang,Leiyang-衡阳;Huaihua,Hongjiang-怀化;Yongzhou-永州;Yueyang-岳阳;Yiyang,Yuanjiang-益阳;Zhangjiajie-张家界;Shaoyang,Wugang-邵阳;Jishou-湘西土家族苗族自治州;
+cn;macau-澳门
+cn;Gansu-甘肃;Lanzhou-兰州;Dingxi-定西;Tianshui-天水;Qingyang-庆阳;Longnan-陇南;Baiyin-白银;Pingliang-平凉;Jinchang-金昌;Wuwei-武威;Jiuquan,Yumen-酒泉;Jiayuguan-嘉峪关;Linxia-临夏回族自治州;Zhangye-张掖;Hezuo-甘南藏族自治州
+cn;Fujian-福建;Fuzhou,Fuqing-福州;Xiamen-厦门;Sanming,Yong'an-三明;Putian-莆田;Nanping,Jian'ou,Shaowu-南平;Ningde,Fu'an,Fuding-宁德;Quanzhou,Shishi,Jinjiang,Nan'an-泉州;Zhangzhou-漳州;Longyan-龙岩
+cn;xizang-西藏;Lhasa-拉萨;Qamdo-昌都;Nagqu-那曲;Shannan-山南;Xigase-日喀则;Nyingchi-林芝;
+cn;Guizhou-贵州;Anshun-安顺;Duyun,Fuquan-黔南布依族苗族自治州;Tongren-铜仁;Guiyang-贵阳;Bijie-毕节;Zunyi-遵义;Xingyi-黔西南布依族苗族自治州;Liupanshui-六盘水;Kaili-黔东南苗族侗族自治州
+cn;Liaoning-辽宁;Dalian,Wafangdian,Zhuanghe-大连;Shenyang,Xinmin-沈阳;Chaoyang,Beipiao,Lingyuan-朝阳;Jinzhou-锦州;Anshan-鞍山;Yingkou,Gaizhou-营口;Fushun-抚顺;Panjin-盘锦;Benxi-本溪;Fuxin-阜新;Huludao,Xingcheng-葫芦岛;Dandong-丹东;Tieling,Kaiyuan-铁岭;Liaoyang-辽阳
+cn;Chongqing-重庆
+cn;Shaanxi-陕西;Xi'an-西安;Weinan,Hancheng-渭南;Hanzhong-汉中;Shangluo-商洛;Ankang-安康;Yulin-榆林;Baoji-宝鸡;Xianyang,Xingping-咸阳;Yan'an-延安;Tongchuan-铜川
+cn;Qinghai-青海;Xining-西宁;Delingha,Golmud-海西蒙古族藏族自治州;Haidong-海东;Yushu-玉树藏族自治州
+cn;HongKong-香港港;Pan Long Wan,San Tin Hang,Kai Ham,Tei Tong Tsui,Tit Kim Hang,Kap Pin Long,Ngau Pui Wo,Tai Wong Ha,Fu Tei Kok,Tai Lam Liu,To Fung Shan,Cheung Kang,Kwai Po Lau,Wong Nai Tau,Kon Hang,Ha Tei Ha,Lo Tsz Tin,Tai Po Kau San Wai,Sha Lan,Tsung Tsai Yuen,Tong Kai Tseng,Kwun Hang,Wong Yue Tan,Yiu Tsz Kin,Pak Shek Kiu,Yi Pei Chun,Kei Lun Wai,Wong Fung Leng,Wong Ka Wai,Nim Shue Wan Tsuen,Yung Shue Ha,Yi Pak,Tai Wan San Tsuen,Yuen Long Kau Hui,Sheung Pak Nai,Po Tong Ha,yau tsim mong,Lau Hang,Pak Kok Kau Tsuen,Hong Kong-香港;
+cn;Heilongjiang-黑龙江;Hegang-鹤岗;Harbin,Wuchang,Shangzhi-哈尔滨;Mudanjiang,Hailin,Suifenhe-牡丹江;Suihua,Zhaodong-绥化;Qiqihar-齐齐哈尔;Shuangyashan-双鸭山;Jixi-鸡西;Daqing-大庆;Jiamusi-佳木斯;Heihe,Wudalianchi,Bei'an-黑河;Qitaihe-七台河;Yichun-伊春;
