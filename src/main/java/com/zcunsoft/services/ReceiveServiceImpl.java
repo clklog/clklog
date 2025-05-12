@@ -12,7 +12,10 @@ import com.zcunsoft.model.LogBean;
 import com.zcunsoft.model.ProjectSetting;
 import com.zcunsoft.model.QueryCriteria;
 import com.zcunsoft.model.Region;
-import com.zcunsoft.util.*;
+import com.zcunsoft.util.ExtractUtil;
+import com.zcunsoft.util.GZIPUtils;
+import com.zcunsoft.util.KafkaProducerUtil;
+import com.zcunsoft.util.ObjectMapperUtil;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
@@ -257,7 +260,7 @@ public class ReceiveServiceImpl implements IReceiveService {
             /* redis里没有clientIp的信息,则从IP库分析 */
             region = analysisRegionFromIpBaseOnIp2Loc(clientIp);
             if (region != null) {
-                region = ExtractUtil.translateRegion(region, constsDataHolder.getHtForCountry(), constsDataHolder.getHtForProvince(), constsDataHolder.getHtForCity());
+                region = ExtractUtil.translateRegion(region, constsDataHolder.getHtForCity());
                 String sbRegion = region.getClientIp() + "," + region.getCountry() + "," + region.getProvince() + "," + region.getCity();
                 queueRedisTemplate.opsForHash().put(redisConstsConfig.getClientIpRegionHashKey(), region.getClientIp(), sbRegion);
             }
@@ -527,58 +530,15 @@ public class ReceiveServiceImpl implements IReceiveService {
     @Override
     public void loadCity() {
         try {
-            List<String> lineCityList = IOUtil.readAllLines(
-                    getResourcePath() + File.separator + "iplib" + File.separator
-                            + "chinacity.txt");
+            /* 从redis读取城市中英文对照表，保存在本地缓存 */
+            Map<Object, Object> entryMap = queueRedisTemplate.opsForHash().entries(redisConstsConfig.getCityEngChsMapKey());
 
             ConcurrentMap<String, String> htForCity = constsDataHolder.getHtForCity();
-            for (String line : lineCityList) {
-
-                String[] pair = line.split(",");
-                if (pair.length >= 2) {
-                    htForCity.put(pair[0].toLowerCase(Locale.ROOT), pair[1]);
-                }
+            for (Map.Entry<Object, Object> entry : entryMap.entrySet()) {
+                htForCity.put(entry.getKey().toString(), entry.getValue().toString());
             }
         } catch (Exception ex) {
             logger.error("load City err", ex);
-        }
-    }
-
-    @Override
-    public void loadProvince() {
-        try {
-            List<String> lineProvinceList = IOUtil.readAllLines(getResourcePath() + File.separator + "iplib" + File.separator
-                    + "chinaprovince.txt");
-
-            ConcurrentMap<String, String> htForProvince = constsDataHolder.getHtForProvince();
-            for (String line : lineProvinceList) {
-
-                String[] pair = line.split(",");
-                if (pair.length >= 2) {
-                    htForProvince.put(pair[0].toLowerCase(Locale.ROOT), pair[1]);
-                }
-            }
-        } catch (Exception ex) {
-            logger.error("load Province err", ex);
-        }
-    }
-
-    @Override
-    public void loadCountry() {
-        try {
-            List<String> countryList = IOUtil.readAllLines(getResourcePath() + File.separator + "iplib" + File.separator + "country.txt");
-
-            ConcurrentMap<String, String> htForCountry = constsDataHolder.getHtForCountry();
-            for (String line : countryList) {
-
-                String[] pair = line.split(",");
-                if (pair.length >= 2) {
-                    htForCountry.put(pair[0].toLowerCase(Locale.ROOT), pair[1]);
-                }
-            }
-
-        } catch (Exception ex) {
-            logger.error("load Country err", ex);
         }
     }
 

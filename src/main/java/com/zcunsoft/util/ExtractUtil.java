@@ -821,7 +821,7 @@ public class ExtractUtil {
      * @param htForCity 城市中英文映射表
      * @return 地域信息
      */
-    public static Region translateRegion(Region region, Map<String, String> htForCountry, Map<String, String> htForProvince, Map<String, String> htForCity) {
+    public static Region translateRegion(Region region, Map<String, String> htForCity) {
         Region translatedRegion = null;
         if (region != null) {
             translatedRegion = new Region();
@@ -831,43 +831,19 @@ public class ExtractUtil {
             String province = region.getProvince();
             String city = region.getCity();
 
-            if ("-".equalsIgnoreCase(country)) {
-                country = "";
-            }
-            if ("-".equalsIgnoreCase(province)) {
-                province = "";
-            }
-            if ("-".equalsIgnoreCase(city)) {
-                city = "";
-            }
-            if (StringUtils.isNotBlank(country)) {
-                if (country.equalsIgnoreCase("TW")) {
-                    country = "cn";
-                    province = "taiwan";
-                }
-                if (country.equalsIgnoreCase("hk")) {
-                    country = "cn";
-                    province = "hongkong";
-                    city = "hongkong";
-                }
-                if (country.equalsIgnoreCase("mo")) {
-                    country = "cn";
-                    province = "macau";
-                    city = "macau";
-                }
-                if (htForCountry.containsKey(country)) {
-                    country = htForCountry.get(country);
-                }
-            }
             if (StringUtils.isNotBlank(province)) {
-                if (htForProvince.containsKey(province)) {
-                    province = htForProvince.get(province);
+                String provinceKey = country + "_" + province;
+                String cityKey = country + "_" + province + "_" + city;
+                if (htForCity.containsKey(cityKey)) {
+                    city = htForCity.get(cityKey);
+                }
+                if (htForCity.containsKey(provinceKey)) {
+                    province = htForCity.get(provinceKey);
                 }
             }
-            if (StringUtils.isNotBlank(city)) {
-                if (htForCity.containsKey(city)) {
-                    city = htForCity.get(city);
-                }
+
+            if (htForCity.containsKey(country)) {
+                country = htForCity.get(country);
             }
             translatedRegion.setCountry(country);
             translatedRegion.setProvince(province);

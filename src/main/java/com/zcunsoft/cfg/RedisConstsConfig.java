@@ -21,4 +21,9 @@ public class RedisConstsConfig {
      * 项目的配置 key.
      */
     private String projectSettingKey = "ProjectSettingKey";
+
+    /**
+     * 城市中英文对照表 hash key.
+     */
+    private String cityEngChsMapKey = "CityEngChsMapKey";
 }

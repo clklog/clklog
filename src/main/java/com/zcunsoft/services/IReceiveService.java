@@ -20,10 +20,6 @@ public interface IReceiveService {
 
     void loadCity();
 
-    void loadProvince();
-
-    void loadCountry();
-
     void loadProjectSetting();
 
     void extractLog(QueryCriteria queryCriteria, HttpServletRequest request);
