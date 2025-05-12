@@ -2,12 +2,11 @@ package com.zcunsoft.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ip2location.IP2Location;
 import com.ip2location.IPResult;
 import com.zcunsoft.cfg.KafkaSetting;
 import com.zcunsoft.cfg.ReceiverSetting;
+import com.zcunsoft.cfg.RedisConstsConfig;
 import com.zcunsoft.handlers.ConstsDataHolder;
 import com.zcunsoft.model.LogBean;
 import com.zcunsoft.model.ProjectSetting;
@@ -15,7 +14,6 @@ import com.zcunsoft.model.QueryCriteria;
 import com.zcunsoft.model.Region;
 import com.zcunsoft.util.*;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.apache.logging.log4j.LogManager;
@@ -31,11 +29,9 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
@@ -72,7 +68,12 @@ public class ReceiveServiceImpl implements IReceiveService {
 
     private final KafkaSetting kafkaSetting;
 
-    public ReceiveServiceImpl(ConstsDataHolder constsDataHolder, ObjectMapperUtil objectMapper, StringRedisTemplate queueRedisTemplate, AbstractUserAgentAnalyzer userAgentAnalyzer, JdbcTemplate clickHouseJdbcTemplate, ReceiverSetting serverSettings, KafkaSetting kafkaSetting) {
+    /**
+     * redis常量配置.
+     */
+    private final RedisConstsConfig redisConstsConfig;
+
+    public ReceiveServiceImpl(ConstsDataHolder constsDataHolder, ObjectMapperUtil objectMapper, StringRedisTemplate queueRedisTemplate, AbstractUserAgentAnalyzer userAgentAnalyzer, JdbcTemplate clickHouseJdbcTemplate, ReceiverSetting serverSettings, KafkaSetting kafkaSetting, RedisConstsConfig redisConstsConfig) {
         this.objectMapper = objectMapper;
         this.queueRedisTemplate = queueRedisTemplate;
         this.userAgentAnalyzer = userAgentAnalyzer;
@@ -80,6 +81,7 @@ public class ReceiveServiceImpl implements IReceiveService {
         this.clickHouseJdbcTemplate = clickHouseJdbcTemplate;
         this.serverSettings = serverSettings;
         this.kafkaSetting = kafkaSetting;
+        this.redisConstsConfig = redisConstsConfig;
         String binIpV4file = getResourcePath() + File.separator + "iplib" + File.separator + "IP2LOCATION-LITE-DB3.BIN";
 
         try {
@@ -98,10 +100,10 @@ public class ReceiveServiceImpl implements IReceiveService {
 
     @Override
     public void extractLog(QueryCriteria queryCriteria, HttpServletRequest request) {
-        if (serverSettings.getProjectList().contains(queryCriteria.getProject())) {
+        if (queryCriteria.getProject() != null && constsDataHolder.getHtProjectSetting().containsKey(queryCriteria.getProject())) {
             String bodyString = getBodyString(request);
             String[] bodyStringList = bodyString.split("&");
-            if (bodyStringList.length == 1 && !bodyString.equals(""))
+            if (bodyStringList.length == 1 && !bodyString.equals("")) {
                 try {
                     JsonNode jsonNode = objectMapper.readTree(bodyString);
 
@@ -111,6 +113,7 @@ public class ReceiveServiceImpl implements IReceiveService {
                     queryCriteria.setCrc(jsonNode.get("crc").asText());
                 } catch (Exception exception) {
                 }
+            }
             for (String s : bodyStringList) {
                 String[] elm = s.split("=");
                 if (elm[0].equals("data_list")) {
@@ -122,6 +125,9 @@ public class ReceiveServiceImpl implements IReceiveService {
                 } else if (elm[0].equals("gzip")) {
                     queryCriteria.setGzip(elm[1]);
                 }
+            }
+            if (queryCriteria.getCrc() == null) {
+                queryCriteria.setCrc("");
             }
             String ip = getIpAddr(request);
             try {
@@ -157,18 +163,6 @@ public class ReceiveServiceImpl implements IReceiveService {
                         ua = request.getHeader("User-Agent");
                     }
                     queryCriteria.setUa(ua);
-
-                    JsonNode json = objectMapper.readTree(dataFinal);
-                    if (json instanceof ArrayNode) {
-                        for (JsonNode jn : json) {
-                            ObjectNode objectNode = ((ObjectNode) jn.get("properties"));
-                            objectNode.put("$user_agent", ua);
-                        }
-                    } else {
-                        ObjectNode objectNode = ((ObjectNode) json.get("properties"));
-                        objectNode.put("$user_agent", ua);
-                    }
-                    dataFinal = objectMapper.writeValueAsString(json);
                     queryCriteria.setData(dataFinal);
                     constsDataHolder.getLogQueue().put(queryCriteria);
                     storeLogger.info(ip + "," + dataFinal);
@@ -250,68 +244,22 @@ public class ReceiveServiceImpl implements IReceiveService {
         return ipAddress;
     }
 
+    /**
+     * @param clientIp 客户端IP
+     * @return 地域信息
+     */
     @Override
     public Region analysisRegionFromIp(String clientIp) {
         Region region = new Region();
         region.setClientIp(clientIp);
-        String regionInfo = (String) queueRedisTemplate.opsForHash().get("ClientIpRegionHash", clientIp);
+        String regionInfo = (String) queueRedisTemplate.opsForHash().get(redisConstsConfig.getClientIpRegionHashKey(), clientIp);
         if (regionInfo == null) {
-            IPResult rec = null;
-            if (validator.isValidInet4Address(clientIp)) {
-                rec = analysisIp(true, clientIp);
-            } else if (validator.isValidInet6Address(clientIp)) {
-                rec = analysisIp(false, clientIp);
-            }
-
-            if (rec != null && "OK".equalsIgnoreCase(rec.getStatus())) {
-                String country = rec.getCountryShort().toLowerCase(Locale.ROOT);
-                String province = rec.getRegion().toLowerCase(Locale.ROOT);
-                String city = rec.getCity().toLowerCase(Locale.ROOT);
-                if ("-".equalsIgnoreCase(country)) {
-                    country = "";
-                }
-                if ("-".equalsIgnoreCase(province)) {
-                    province = "";
-                }
-                if ("-".equalsIgnoreCase(city)) {
-                    city = "";
-                }
-                if (StringUtils.isNotBlank(country)) {
-                    if (country.equalsIgnoreCase("TW")) {
-                        country = "cn";
-                        province = "taiwan";
-                    }
-                    if (country.equalsIgnoreCase("hk")) {
-                        country = "cn";
-                        province = "hongkong";
-                        city = "hongkong";
-                    }
-                    if (country.equalsIgnoreCase("mo")) {
-                        country = "cn";
-                        province = "macau";
-                        city = "macau";
-                    }
-                    if (constsDataHolder.getHtForCountry().containsKey(country)) {
-                        country = constsDataHolder.getHtForCountry().get(country);
-                    }
-                }
-                if (StringUtils.isNotBlank(province)) {
-                    if (constsDataHolder.getHtForProvince().containsKey(province)) {
-                        province = constsDataHolder.getHtForProvince().get(province);
-                    }
-                }
-                if (StringUtils.isNotBlank(city)) {
-                    if (constsDataHolder.getHtForCity().containsKey(city)) {
-                        city = constsDataHolder.getHtForCity().get(city);
-                    }
-                }
-
-                region.setCountry(country);
-                region.setProvince(province);
-                region.setCity(city);
-
+            /* redis里没有clientIp的信息,则从IP库分析 */
+            region = analysisRegionFromIpBaseOnIp2Loc(clientIp);
+            if (region != null) {
+                region = ExtractUtil.translateRegion(region, constsDataHolder.getHtForCountry(), constsDataHolder.getHtForProvince(), constsDataHolder.getHtForCity());
                 String sbRegion = region.getClientIp() + "," + region.getCountry() + "," + region.getProvince() + "," + region.getCity();
-                queueRedisTemplate.opsForHash().put("ClientIpRegionHash", region.getClientIp(), sbRegion);
+                queueRedisTemplate.opsForHash().put(redisConstsConfig.getClientIpRegionHashKey(), region.getClientIp(), sbRegion);
             }
         } else {
             String[] regionArr = regionInfo.split(",", -1);
@@ -324,6 +272,57 @@ public class ReceiveServiceImpl implements IReceiveService {
         return region;
     }
 
+    /**
+     * @param clientIp 客户端IP
+     * @return 地域信息
+     */
+    @Override
+    public Region analysisRegionFromIpBaseOnIp2Loc(String clientIp) {
+        IPResult rec = null;
+        if (validator.isValidInet4Address(clientIp)) {
+            rec = analysisIp(true, clientIp);
+        } else if (validator.isValidInet6Address(clientIp)) {
+            rec = analysisIp(false, clientIp);
+        }
+        Region region = null;
+        if (rec != null && "OK".equalsIgnoreCase(rec.getStatus())) {
+            String country = rec.getCountryShort().toLowerCase(Locale.ROOT);
+            String province = rec.getRegion().toLowerCase(Locale.ROOT);
+            String city = rec.getCity().toLowerCase(Locale.ROOT);
+            if ("-".equalsIgnoreCase(country)) {
+                country = "";
+            }
+            if ("-".equalsIgnoreCase(province)) {
+                province = "";
+            }
+            if ("-".equalsIgnoreCase(city)) {
+                city = "";
+            }
+            if (StringUtils.isNotBlank(country)) {
+                if (country.equalsIgnoreCase("TW")) {
+                    country = "cn";
+                    province = "taiwan";
+                }
+                if (country.equalsIgnoreCase("hk")) {
+                    country = "cn";
+                    province = "hongkong";
+                    city = "hongkong";
+                }
+                if (country.equalsIgnoreCase("mo")) {
+                    country = "cn";
+                    province = "macau";
+                    city = "macau";
+                }
+            }
+            region = new Region();
+            region.setClientIp(clientIp);
+            region.setCountry(country);
+            region.setProvince(province);
+            region.setCity(city);
+        }
+        return region;
+    }
+
     private IPResult analysisIp(boolean isIpV4, String clientIp) {
         IPResult rec = null;
         try {
@@ -332,7 +331,6 @@ public class ReceiveServiceImpl implements IReceiveService {
             } else {
                 rec = locIpV6.IPQuery(clientIp);
             }
-            //    loc.Close();
         } catch (Exception e) {
             logger.error("analysisIp error ", e);
         }
@@ -353,35 +351,17 @@ public class ReceiveServiceImpl implements IReceiveService {
             }
             if (array.isArray()) {
                 for (JsonNode jn : array) {
-                    ObjectNode objectNode = ((ObjectNode) jn.get("properties"));
-                    objectNode.put("$user_agent", ua);
-                    LogBean logBean = ExtractUtil.extractToLogBean(jn, userAgentAnalyzer, projectSetting);
-                    logBean.setKafkaDataTime(String.valueOf(System.currentTimeMillis() / 1000));
-                    logBean.setProjectName(queryCriteria.getProject());
-                    logBean.setProjectToken(queryCriteria.getToken());
-                    logBean.setCrc("");
-                    logBean.setIsCompress("0");
-                    logBean.setClientIp(queryCriteria.getClientIp());
-                    logBean.setCountry(region.getCountry());
-                    logBean.setProvince(region.getProvince());
-                    logBean.setCity(region.getCity());
-                    logBeanList.add(logBean);
+                    LogBean logBean = ExtractUtil.extractToLogBean(jn, userAgentAnalyzer, projectSetting, region, queryCriteria);
+                    if (ExtractUtil.filterData(logBean, projectSetting)) {
+                        logBeanList.add(logBean);
+                    }
                 }
 
             } else {
-                ObjectNode objectNode = ((ObjectNode) array.get("properties"));
-                objectNode.put("$user_agent", ua);
-                LogBean logBean = ExtractUtil.extractToLogBean(array, userAgentAnalyzer, projectSetting);
-                logBean.setKafkaDataTime(String.valueOf(System.currentTimeMillis() / 1000));
-                logBean.setProjectName(queryCriteria.getProject());
-                logBean.setProjectToken(queryCriteria.getToken());
-                logBean.setCrc("");
-                logBean.setIsCompress("0");
-                logBean.setClientIp(queryCriteria.getClientIp());
-                logBean.setCountry(region.getCountry());
-                logBean.setProvince(region.getProvince());
-                logBean.setCity(region.getCity());
-                logBeanList.add(logBean);
+                LogBean logBean = ExtractUtil.extractToLogBean(array, userAgentAnalyzer, projectSetting, region, queryCriteria);
+                if (ExtractUtil.filterData(logBean, projectSetting)) {
+                    logBeanList.add(logBean);
+                }
             }
         } catch (Exception ex) {
             logger.error("analysisData err", ex);
@@ -395,10 +375,13 @@ public class ReceiveServiceImpl implements IReceiveService {
         List<LogBean> allList = new ArrayList<>();
         for (QueryCriteria queryCriteria : queryCriteriaList) {
             List<LogBean> logBeanList = analysisData(queryCriteria);
-
-            allList.addAll(logBeanList);
+            if (!logBeanList.isEmpty()) {
+                allList.addAll(logBeanList);
+            }
         }
-        doSaveToClickHouse(allList);
+        if (!allList.isEmpty()) {
+            doSaveToClickHouse(allList);
+        }
     }
 
     private void doSaveToClickHouse(List<LogBean> logBeanList) {
@@ -434,9 +417,9 @@ public class ReceiveServiceImpl implements IReceiveService {
                 pst.setString(1, value.getDistinctId());
                 pst.setString(2, value.getTypeContext());
                 pst.setString(3, value.getEvent());
-                pst.setString(4, value.getTime());
+                pst.setString(4, String.valueOf(value.getTime()));
                 pst.setString(5, value.getTrackId());
-                pst.setString(6, value.getFlushTime());
+                pst.setString(6, String.valueOf(value.getFlushTime()));
                 pst.setString(7, value.getIdentityCookieId());
                 pst.setString(8, value.getLib());
                 pst.setString(9, value.getLibMethod());
@@ -456,7 +439,7 @@ public class ReceiveServiceImpl implements IReceiveService {
                 pst.setString(23, value.getIsFirstDay());
                 pst.setString(24, value.getIsFirstTime());
                 pst.setString(25, value.getReferrerHost());
-                pst.setTimestamp(26, Timestamp.valueOf(value.getLogTime()));
+                pst.setTimestamp(26, value.getLogTime());
                 pst.setDate(27, java.sql.Date.valueOf(value.getStatDate()));
                 pst.setString(28, value.getStatHour());
                 pst.setString(29, value.getElementId());
@@ -602,15 +585,35 @@ public class ReceiveServiceImpl implements IReceiveService {
     @Override
     public void loadProjectSetting() {
         try {
-            String projectSettingContent = FileUtils.readFileToString(new File(getResourcePath() + File.separator +
-                    "project-setting.json"), Charset.forName("GB2312"));
-
-            HashMap<String, ProjectSetting> projectSettingHashMap = objectMapper.readValue(projectSettingContent,
-                    htProjectSettingTypeReference);
+            HashMap<String, ProjectSetting> projectSettingHashMap = getProjectSetting();
             constsDataHolder.getHtProjectSetting().putAll(projectSettingHashMap);
         } catch (Exception ex) {
             logger.error("load ProjectSetting err", ex);
         }
+    }
+
+    /**
+     * 获取项目配置.
+     *
+     * @return 项目配置
+     */
+    private HashMap<String, ProjectSetting> getProjectSetting() {
+        HashMap<String, ProjectSetting> projectSettingHashMap = new HashMap<>();
+        try {
+            /* 从redis读取项目配置 */
+            String projectSettingContent = queueRedisTemplate.opsForValue().get(redisConstsConfig.getProjectSettingKey());
+            if (StringUtils.isNotBlank(projectSettingContent)) {
+                projectSettingHashMap = objectMapper.readValue(projectSettingContent,
+                        htProjectSettingTypeReference);
+
+                for (Map.Entry<String, ProjectSetting> item : projectSettingHashMap.entrySet()) {
+                    item.getValue().setPathRuleList(ExtractUtil.extractPathRule(item.getValue().getUriPathRules()));
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("get ProjectSetting err", ex);
+        }
+        return projectSettingHashMap;
     }
 
     @Override

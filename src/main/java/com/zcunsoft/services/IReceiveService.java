@@ -9,8 +9,10 @@ import java.util.List;
 
 public interface IReceiveService {
     void enqueueKafka(List<QueryCriteria> queryCriteriaList);
-    
+
     Region analysisRegionFromIp(String clientIp);
+
+    Region analysisRegionFromIpBaseOnIp2Loc(String clientIp);
 
     List<LogBean> analysisData(QueryCriteria queryCriteria);
 

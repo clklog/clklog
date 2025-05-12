@@ -78,7 +78,7 @@ public class LogReceiveProcessBoss {
                     } else {
                         break;
                     }
-                    if (count >= 20) {
+                    if (count >= 1000) {
                         handle(logList);
                         count = 0;
                         logList.clear();
