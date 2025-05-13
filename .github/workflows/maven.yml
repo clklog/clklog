@@ -37,7 +37,7 @@ jobs:
     - name: Set Release version env variable
       run: |
         echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-        
+
     # 上传文件并发布 Release
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
@@ -79,6 +79,6 @@ jobs:
     - name: Push image to Aliyun Docker Registry
       run: |
         docker buildx imagetools create \
-          --tag ${{ secrets.ALIYUN_REGISTRY }}/clklog/api:latest \
-          zcunsoft/api:${{ github.ref_name }}
+          --tag ${{ secrets.ALIYUN_REGISTRY }}/clklog/api:${{ steps.set-tag.outputs.tag }} \
+          zcunsoft/api:${{ steps.set-tag.outputs.tag }}
 
