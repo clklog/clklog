@@ -13,8 +13,8 @@ FROM (
          FROM (
                   SELECT lib, project_name
                        , if(app_version = '', 'N/A', app_version) AS app_version
-                       , multiIf(event IN ('$AppViewScreen'), user_id, event = 'ClkViewScreen', user_id, NULL) AS user
-			, if(event = 'AppCrashed', user_id, NULL) AS crashed_user
+                       , multiIf(event IN ('$AppViewScreen'), distinct_id, event = 'ClkViewScreen', distinct_id, NULL) AS user
+			, if(event = 'AppCrashed', distinct_id, NULL) AS crashed_user
 			, model, client_ip
                   FROM ${CLKLOG_LOG_DB}.log_analysis
                   WHERE stat_date = ':cal_date'
