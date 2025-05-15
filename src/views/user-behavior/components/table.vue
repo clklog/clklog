@@ -2,7 +2,32 @@
   <div>
     <div class="search_wrappy public-hoverItem">
       <div class="search_table">
-        <span class="public-firstHead">用户列表</span>
+        <div style="padding-bottom: 0px">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <p class="public-firstHead" style="margin: 20px 0">用户列表</p>
+            <div style="display: flex; align-items: center">
+              <el-input
+                placeholder="请输入用户ID"
+                v-model="searchId"
+                style="width: 300px"
+                @keyup.enter.native="handleClick()"
+              >
+                <i
+                  slot="suffix"
+                  class="el-input__icon el-icon-search"
+                  @click="handleClick()"
+                ></i>
+              </el-input>
+            </div>
+          </div>
+        </div>
+
         <div class="setTable">
           <el-table
             border
@@ -20,7 +45,7 @@
               :show-overflow-tooltip="true"
               style="cursor: pointer !important"
               prop="distinctId"
-              label="访客ID"
+              label="用户ID"
               width="450"
             >
               <template slot-scope="scope">
@@ -31,12 +56,17 @@
                     justify-content: space-between;
                     cursor: pointer;
                   "
-                  @click="handleCellClick(scope.row.distinctId)"
+                  
                 >
-                  <div style="overflow: hidden; text-overflow: ellipsis">
+                  <div style="overflow: hidden; text-overflow: ellipsis;cursor: pointer;" @click="handleCellClick(scope.row.distinctId)">
                     {{ scope.row.distinctId }}
                   </div>
-                  <div class="el-icon-view" style="color: #2c7be5"></div>
+                  <!-- <div class="el-icon-view" style="color: #2c7be5"></div> -->
+                  <div
+                    @click="copyRowId(scope.row.distinctId)"
+                    class="el-icon-document-copy"
+                    style="color: #2c7be5; margin-left: 5px"
+                  ></div>
                 </div>
               </template>
             </el-table-column>
@@ -177,6 +207,7 @@ export default {
   },
   data() {
     return {
+      searchId: "",
       pointValue: ["访客数", "访问次数"],
       chart: null,
       emptyList: "",
@@ -237,6 +268,18 @@ export default {
     this.chart = null;
   },
   methods: {
+    copyRowId(id) {     
+      const textarea = document.createElement("textarea");
+      textarea.value = id;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      this.$message.success("复制成功！");
+    },
+    handleClick() {
+      this.$emit("searchUserId", this.searchId);
+    },
     averageRulesEvent(num) {
       return averageRules(num);
     },
@@ -469,31 +512,37 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "~@/styles/components/custom-select.scss";
+
 ::v-deep {
   @import "~@/styles/components/el-pagination.scss";
+
   .el-table__header {
     // 使表格兼容safari，不错位,表头宽度较小
     width: 100%;
     table-layout: fixed !important;
   }
+
   .el-table__body {
     width: 100%;
     // 使表格兼容safari，不错位
     table-layout: fixed !important;
   }
 }
+
 .trafficHead {
   font-size: 16px;
   font-weight: 600;
   color: #4d4d4d;
   padding: 0px 30px 20px;
 }
+
 img {
   width: 11.44px;
   height: 11.44px;
   margin-left: 12px;
   cursor: pointer;
 }
+
 .trendHead {
   display: flex;
   align-items: center;
@@ -501,6 +550,7 @@ img {
   font-weight: 500;
   line-height: 33px;
   color: #4d4d4d;
+
   .iconFlag {
     position: absolute;
     right: 13px;
@@ -510,18 +560,21 @@ img {
     cursor: pointer;
   }
 }
+
 .chartsIcon {
   margin: 20px;
   // width: calc(100% -20px);
   min-height: 300px;
   display: flex;
   justify-content: space-between;
+
   .chartLeft {
     border-radius: 6px;
     background-color: #fff;
     padding: 15px;
     width: 100%;
     min-height: 400px;
+
     .point {
       padding-right: 10px;
     }
@@ -537,6 +590,7 @@ img {
   min-height: 530px;
   padding: 22px;
 }
+
 .search_table {
   height: 100%;
   // padding: 18px 22px;

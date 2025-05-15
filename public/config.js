@@ -1,10 +1,4 @@
-
 window.globalConfig = {
-  BASE_API: "/api", // 这里可以根据需要覆盖或者扩展配置
-  projectList: [  //根据需要配置项目
-    {
-      value: "clklogapp",
-      label: "clklog",
-    },
-  ],
+  BASE_API: "http://YOUR_DOMAIN/api", //clklog-api接口应用路径
+  BASE_API_MANAGE: "http://YOUR_DOMAIN/manage", //clklog-manage-api接口应用路径
 };

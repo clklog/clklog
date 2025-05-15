@@ -10,7 +10,6 @@ export function getSourceWebSiteTotalApi(params) {
 // 获取Top10来源网站10 
 export function getSourceWebsiteApi(params) {
   return request({
-    // url: '/sourcewebsite/getSourceWebsite',
     url: '/sourcewebsite/getSourceWebSiteTop10',
     method: 'post',
     data: params

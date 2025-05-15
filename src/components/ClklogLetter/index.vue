@@ -1,13 +1,12 @@
 <template>
   <div>
-    <!-- top="2vh" -->
     <el-dialog
       :visible.sync="DialogVisible"
       :modal-append-to-body="false"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false"
-      top="2vh"
+      center
       width="800px"
       style="min-height: 90vh; border-radius: 6px"
       class="custom_warry"

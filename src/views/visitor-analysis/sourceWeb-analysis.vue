@@ -69,13 +69,13 @@ export default {
     getSourceWebSiteTotal() {
       getSourceWebSiteTotalApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.originView.originEvent(res.data);
+          this.$refs.originView && this.$refs.originView.originEvent(res.data);
         }
       });
     },
     getSourceSiteDetail(val) {
       let newvalue = copyObj(this.commonParams);
-      this.pageNum= 1;
+      this.pageNum = 1;
       if (val) {
         newvalue.pageNum = val.page;
         newvalue.pageSize = val.size;
@@ -90,18 +90,20 @@ export default {
         newvalue.sortOrder = this.sortOrder;
         newvalue.pageNum = this.pageNum;
         newvalue.pageSize = this.pageSize;
-        this.$refs.sourceWebTable.initCurrentPage()
+        this.$refs.sourceWebTable.initCurrentPage();
       }
       getSourceSiteDetailApi(newvalue).then((res) => {
         if (res.code == 200) {
-          this.$refs.sourceWebTable.getSourceSite(res.data);
+          this.$refs.sourceWebTable &&
+            this.$refs.sourceWebTable.getSourceSite(res.data);
         }
       });
     },
     getSourceWebSiteTop10() {
       getSourceWebsiteApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.sourceWebChart.getSourceChart(res.data);
+          this.$refs.sourceWebChart &&
+            this.$refs.sourceWebChart.getSourceChart(res.data);
         }
       });
     },

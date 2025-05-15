@@ -2,24 +2,23 @@ import axios from "axios";
 import { MessageBox, Message } from "element-ui";
 import store from "@/store";
 import { getToken } from "@/utils/auth";
+import Router from '@/router';
 // create an axios instance
 const service = axios.create({
-  baseURL: "", 
+  baseURL: "",
   timeout: 5000,
 });
 // request interceptor
 service.interceptors.request.use(
   (config) => {
-    // do something before request is sent
-    // if (store.getters.token) {
-    //   config.headers["X-Token"] = getToken();
-    // }
+    if (store.getters.token) {
+      config.headers["Authorization"] = "Bearer " + getToken(); // 让每个请求携带自定义token 请根据实际情况自行修改
+    }
     const isMock = config.url.includes("/vue-element-admin/user");
     if ((config.method === "post" || config.method === "put") && !isMock) {
       if (!config.headers["Content-Type"]) {
         config.headers["Content-Type"] = "application/json;";
       }
-     
       if (process.env.NODE_ENV == "development") {
         if (
           config.url == "/info/skip-subscription" ||
@@ -43,8 +42,8 @@ service.interceptors.request.use(
     } else if (config.method === "get") {
       if (process.env.NODE_ENV == "development") {
         config.url = "/DEV-API" + config.url;
-      } else{
-        config.url =  window.globalConfig.BASE_API + config.url;
+      } else {
+        config.url = window.globalConfig.BASE_API + config.url;
       }
     }
     return config;
@@ -55,7 +54,7 @@ service.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
+let isLoggingOut = false; // 添加标志位，防止死循环
 // response interceptor
 service.interceptors.response.use(
   /**
@@ -73,6 +72,26 @@ service.interceptors.response.use(
 
     // if the custom code is not 200, it is judged as an error.
     if (res.code !== 200) {
+      if (response.config.url.includes("info/subscribe")) {
+        Message({
+          message: "订阅失败",
+          type: "error",
+          duration: 5 * 1000,
+        });
+        return;
+      }
+
+      if (res.code == 403) {
+        if (!isLoggingOut) {
+          // 检查标志位
+          isLoggingOut = true; // 设置标志位为 true
+          store.dispatch("user/logout").then(() => {        
+            Router.push({ path: "/login" });
+            isLoggingOut = false; // 重置标志位
+          });
+        }
+        return; // 直接返回，避免继续处理
+      }
       Message({
         message: res.message || "Error",
         type: "error",

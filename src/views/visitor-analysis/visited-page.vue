@@ -75,11 +75,12 @@ export default {
         newvalue.sortOrder = this.sortOrder;
         newvalue.pageNum = this.pageNum;
         newvalue.pageSize = this.pageSize;
-        this.$refs.visitedAnalysis.initCurrentPage();
+        this.$refs.visitedAnalysis && this.$refs.visitedAnalysis.initCurrentPage();
       }
       getVisitUriDetailApi(newvalue).then((res) => {
         if (res.code == 200) {
-          this.$refs.visitedAnalysis.vistedAnalysis(res.data);
+          this.$refs.visitedAnalysis &&
+            this.$refs.visitedAnalysis.vistedAnalysis(res.data);
         }
       });
     },
@@ -87,14 +88,18 @@ export default {
     getVisitUriPathTreeTotal() {
       getVisitUriPathTreeTotalApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.visitedAnalysis.treeListEvent(res.data,this.commonParams);
+          this.$refs.visitedAnalysis &&
+            this.$refs.visitedAnalysis.treeListEvent(
+              res.data,
+              this.commonParams
+            );
         }
       });
     },
     getVisitUriTotal() {
       getVisitUriTotalApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.originView.originEvent(res.data);
+          this.$refs.originView && this.$refs.originView.originEvent(res.data);
         }
       });
     },

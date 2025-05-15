@@ -141,6 +141,7 @@ import {
   exportVisitorApi,
   exportVisitorListApi,
 } from "@/api/trackingapi/download";
+import { setLocalStorage } from "@/utils/localStorage";
 export default {
   props: {
     bySub: {
@@ -476,7 +477,7 @@ export default {
     },
     // 单选切换时间 timeType
     handleChange(val) {
-      localStorage.setItem('timeFlag',this.timeFlag)
+      setLocalStorage('timeFlag', this.timeFlag)
       this.checked = false; //暂定清空日期
       this.contrastFlag = false;
       this.checkLabel = "对比时间段";

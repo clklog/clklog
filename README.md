@@ -55,41 +55,43 @@ npm install --registry=https://registry.npm.taobao.org
 
 # 启动服务
 npm run dev
-```
-## 本地环境跨域服务代理
-
-```bash
-1、vue.config.js 文件中 /DEV-API 配置 
-   target='代理地址'
 
 ```
-## 发布
+## 本地环境接口服务代理配置修改
+```
+ # 修改vue.config.js 文件中的代理配置 
+'/DEV-API'的'target'为clklog-api接口的代理地址 'http://YOUR_DOMAIN/api'
+'/DEV-API-MANAGE'的'target'为clklog-manage接口的代理地址 'http://YOUR_DOMAIN/api/manage'
+```
 
-```bash
-# 构建生产环境
 
-方式一、public/config.js 文件中配置 
-       BASE_API: "api接口基础路径"
-       npm run build
+## 生产环境接口服务代理配置修改
+```
+ # 方式一、先修改public/config.js 文件中配置，再发布
+    BASE_API: "http://YOUR_DOMAIN/api" //clklog-api的接口的代理地址
+    BASE_API_MANAGE: "http://YOUR_DOMAIN/manage" //clklog-manage-api接口的代理地址
+    npm run build
 
-方式二、npm run build 
-       dist/config.js
-       BASE_API: "api接口基础路径"
+ # 方式二、发布后修改代理配置
+    npm run build 
+    dist/config.js
+    BASE_API: "http://YOUR_DOMAIN/api" //clklog-api的接口的代理地址
+    BASE_API_MANAGE: "http://YOUR_DOMAIN/manage" //clklog-manage-api接口的代理地址
+
 ```
 
 ## 其它
 
-```bash
-# 预览发布环境效果
+## 预览发布环境效果
 npm run preview
 
-# 预览发布环境效果 + 静态资源分析
+## 预览发布环境效果 + 静态资源分析
 npm run preview -- --report
 
-# 代码格式检查
+## 代码格式检查
 npm run lint
 
-# 代码格式检查并自动修复
+## 代码格式检查并自动修复
 npm run lint -- --fix
 
 ## Online Demo
