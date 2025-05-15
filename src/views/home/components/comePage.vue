@@ -6,7 +6,7 @@
           <div class="trafficHead">Top10受访页面</div>
           <div
             class="iconFlag"
-            @click="$router.push('/visitorAnalysis/visitedPage')"
+            @click="$router.push('/access/visitedPage')"
           >
             >
           </div>

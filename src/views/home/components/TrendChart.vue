@@ -1,6 +1,6 @@
 <template>
   <div class="TrendChart block-main public-hoverItem">
-    <div class="block-head"  @click="$router.push('/visitorAnalysis/trend')">
+    <div class="block-head"  @click="$router.push('/trendAnalysis/trend')">
       <div class="block-title">趋势图</div>
       <el-select
         class="custom_select"
