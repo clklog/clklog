@@ -14,6 +14,12 @@ public class InitSetting {
 
     private boolean quartzEnabled = true;
 
+
+    private int sleepMillisecAfterOneRound = 300000;
+
+
+    private int sleepMillisecAfterOneScript = 2000;
+
     private HashMap<String, String> quartz;
 
     public String getResourcePath() {
@@ -46,5 +52,21 @@ public class InitSetting {
 
     public void setLogDb(String logDb) {
         this.logDb = logDb;
+    }
+
+    public int getSleepMillisecAfterOneScript() {
+        return sleepMillisecAfterOneScript;
+    }
+
+    public void setSleepMillisecAfterOneScript(int sleepMillisecAfterOneScript) {
+        this.sleepMillisecAfterOneScript = sleepMillisecAfterOneScript;
+    }
+
+    public int getSleepMillisecAfterOneRound() {
+        return sleepMillisecAfterOneRound;
+    }
+
+    public void setSleepMillisecAfterOneRound(int sleepMillisecAfterOneRound) {
+        this.sleepMillisecAfterOneRound = sleepMillisecAfterOneRound;
     }
 }
