@@ -1,6 +1,5 @@
 package com.zcunsoft.clklog.api.entity.ck;
 
-import com.zcunsoft.clklog.api.models.visitor.LogAnalysis;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

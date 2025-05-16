@@ -3,12 +3,10 @@ package com.zcunsoft.clklog.api.models.visitor;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Schema(description = "原始数据")
-@Entity(name = "log_analysis")
 @Data
 public class LogAnalysis {
 
