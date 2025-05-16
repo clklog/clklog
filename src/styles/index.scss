@@ -31,6 +31,24 @@ html {
 #app {
   height: 100%;
 }
+// 重置和刷新按钮样式统一
+.tabBarBtn {
+  display: flex;
+  position: fixed;
+  right: 30px;
+  width: 160px;
+  z-index: 1000;
+}
+.tabBarBtn .el-loading-spinner {
+  margin-top: -6px;
+}
+.tabBarBtn .refresh {
+  width: 70px;
+}
+.tabBarBtn .reset {
+  width: 70px;
+  margin-left: 20px;
+}
 // 共用自定义样式
 .zc_explain_tip {
   font-size: 14px;

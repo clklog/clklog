@@ -7,7 +7,6 @@
           <div style="display: flex; align-items: center; white-space: nowrap">
             <div class="check_item public_border_color" style="height: 30">
               <span>时间:</span>
-
               <!-- 单选事件 -->
               <el-radio-group
                 v-model="timeFlag"
@@ -20,6 +19,7 @@
                 <el-radio label="month">过去30天</el-radio>
               </el-radio-group>
             </div>
+            <!-- 日期1 -->
             <el-date-picker
               class="timnePickCSS"
               style="margin-left: 20px; width: 250px; height: 30px"
@@ -31,7 +31,7 @@
               end-placeholder="结束日期"
               value-format="yyyy-MM-dd"
               :picker-options="pickerBeginOption"
-              @change="checkDateEvent"
+              @change="checkDateEvnet"
             >
             </el-date-picker>
             <div style="margin-left: 20px; line-height: 30px" v-if="ByContrast">
@@ -40,39 +40,15 @@
               }}</el-checkbox>
             </div>
 
-            <div
-              :style="
-                device == 'desktop'
-                  ? 'position: fixed; right: 50px'
-                  : 'position:relative;margin-left:50px;margin-right:30px'
-              "
-              v-if="ByRefresh"
-            >
-              <div class="tabBarBtn" style="position: relative;right: 0;">
-                <el-button class="zc_btn refresh" icon="el-icon-refresh-right" @click="refreshAPI"
-                  >刷新</el-button
-                >
-                <el-button
-                  icon="el-icon-refresh"
-                  @click="collapseResetApiList"
-                  class="zc_btn_default reset"
-                  >重置</el-button
-                >
-              </div>
-            </div>
-          </div>
-
-          <!-- 第二行 -->
-          <div style="display: flex; margin-left: 20px; margin-top: 12px">
             <div v-if="ByDayOrHour">
               <el-radio-group
                 size="mini"
                 v-model="timeType"
-                style="font-size: 13px; height: 30px"
+                style="font-size: 13px; height: 30px; margin-left: 20px"
               >
-                <el-radio-button label="hour" :disabled="dayFlag ? true : false"
+                <!-- <el-radio-button label="hour" :disabled="dayFlag ? true : false"
                   >按时</el-radio-button
-                >
+                > -->
                 <el-radio-button label="day" :disabled="dayFlag ? true : false"
                   >按日</el-radio-button
                 >
@@ -88,58 +64,38 @@
                 >
               </el-radio-group>
             </div>
-            <div class="warry_select" v-if="ByGrop">
-              <div class="title">分组:</div>
-              <el-select
-                v-model="groupName"
-                class="single_select"
-                placeholder="请选择状态"
-              >
-                <el-option
-                  v-for="item in groupList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
-              </el-select>
-            </div>
-            <el-input
-              v-if="BySearchWord"
-              class="custom_input"
-              style="width: 250px; border-radius: 4px; height: 30px"
-              placeholder="请输入事件英文名"
-              v-model="name"
-              @keyup.enter.native="searchEvent()"
-              clearable
+
+            <div
+              :style="
+                device == 'desktop'
+                  ? 'position: fixed; right: 0px'
+                  : 'position:relative;margin-left:50px;margin-right:30px'
+              "
+              v-if="ByRefresh"
             >
-              <i
-                @click="searchEvent"
-                slot="prefix"
-                class="el-input__icon el-icon-search"
-              ></i>
-            </el-input>
-           
-            <el-cascader
-              :append-to-body="false"
-              v-if="BySearchCustom"
-              :key="generateRandomKey()"
-              v-model="name"
-              :options="protoList"
-              :show-all-levels="false"
-              style="font-size: 13px"
-              :ref="'cascader_one'"
-              class="custom_cascader"
-              filterable
-              :props="{
-                value: 'name',
-                label: 'displayName',
-                children: 'events',
-                multiple: false,
-                emitPath: false,
-              }"
-              @change="fileterCascader"
-            ></el-cascader>
+              <!-- <el-button
+                class="custom_button"
+                icon="el-icon-refresh-right"
+                :disabled="isDisableBtn"
+                @click="customAnalysisRefreshApi"
+                >刷新</el-button
+              > -->
+              <div class="tabBarBtn" style="position: relative">
+                <el-button
+                  class="zc_btn refresh"
+                  icon="el-icon-refresh-right"
+                  :disabled="isDisableBtn"
+                  @click="customAnalysisRefreshApi"
+                  >刷新</el-button
+                >
+                <el-button
+                  icon="el-icon-refresh"
+                  @click="collapseResetApiList"
+                  class="zc_btn_default reset"
+                  >重置</el-button
+                >
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -149,12 +105,8 @@
 
 <script>
 import { mapState } from "vuex";
+import _ from "lodash";
 import { copyObj } from "@/utils/copy";
-import {
-  getGroupNameListEventApi,
-  getGroupedPropertiesApi,
-} from "@/api/sysmanage/manageEvent";
-import { getListNoGroupEventApi } from "@/api/sysmanage/manageEvent";
 export default {
   props: {
     ByEventGrop: {
@@ -182,11 +134,11 @@ export default {
       type: Boolean,
       default: false,
     },
-    BySearchCustom: {
+    ByRefresh: {
       type: Boolean,
       default: false,
     },
-    ByRefresh: {
+    ByCollapse: {
       type: Boolean,
       default: false,
     },
@@ -195,21 +147,19 @@ export default {
       default: false,
     },
   },
-
   data() {
     return {
-      monthFlag: false,
-      weekFlag: false,
+      isDisableBtn: false, //是否开启刷新
+      isNotAnalysis: true, //是否展示开始分析
+      monthFlag: true,
+      weekFlag: true,
       dayFlag: false,
-      timeType: "hour",
+      timeType: "day",
       groupList: [],
       all: {
         label: "全部",
         value: "",
       },
-      // start
-      protoList: [],
-      // ----
       pickerBeginOption: {
         disabledDate(date) {
           const today = new Date();
@@ -276,16 +226,43 @@ export default {
       ],
       currentTime: "",
       groupName: "",
-      // searchWord: "",
+      searchWord: "",
       startTime: "",
       endTime: "",
       name: "", //搜索词
+      intervalTime: "",
+      initNum: 4,
+      commonData: "",
+      loadingApi: false,
     };
   },
+  created() {},
   mounted() {
-    this.initDateHandle();
-    this.getPageList(); //事件分组
-    // this.getPrototype();
+    // 参数更新
+    if (this.$route.query.query) {
+      let routeObj = JSON.parse(this.$route.query.query);
+      this.startTime = routeObj.startDate;
+      this.endTime = routeObj.endDate;
+      this.timeType = routeObj.dataType;
+      this.currentTime = [this.startTime, this.endTime];
+      if (routeObj.timeFlag) {
+        this.timeFlag = routeObj.timeFlag;
+        this.handleChange(this.timeFlag);
+      }
+      this.anTimeEcho();
+    } else {
+      this.initDateHandle();
+    }
+    this.$bus.$on("$isOpen", (val) => {
+      this.isNotAnalysis = val;
+    });
+    // 初始调用漏斗接口
+    this.$bus.$on("$refreshRoute", () => {
+      this.customAnalysisRefreshApi();
+    });
+    this.$bus.$on("$isDisable", (val) => {
+      this.isDisableBtn = val;
+    });
   },
   computed: {
     projectName() {
@@ -295,113 +272,62 @@ export default {
       device: (state) => (state.app.device ? state.app.device : "desktop"),
     }),
     defaultParams() {
-      const { startTime, endTime } = this;
+      const { startTime, endTime, timeFlag } = this;
       return {
         startTime,
         endTime,
+        timeFlag,
       };
     },
     commonParams() {
-      const { name, groupName } = this;
+      const { name, groupName, timeType } = this;
       let obj = {};
       obj = Object.assign(obj, this.defaultParams);
       if (this.BySearchWord) {
-        // this.name = this.searchWord
-        obj = Object.assign(obj, { name });
-      }
-      if (this.BySearchCustom) {
         obj = Object.assign(obj, { name });
       }
       if (this.ByGrop) {
         obj = Object.assign(obj, { groupName });
+      }
+      if (this.ByDayOrHour) {
+        obj = Object.assign(obj, { groupName, timeType });
       }
       return obj;
     },
   },
   watch: {
     commonParams: {
-      deep: false,
+      deep: true,
       immediate: false,
-      handler(newVal, oldVal) {
+      handler: _.debounce(function (newVal, oldVal) {
         if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+          this.commonData = newVal;
           this.$nextTick(() => {
             this.setTopFilterParams(newVal);
           });
         }
-      },
+      }, 500),
     },
   },
   methods: {
-    fileterCascader(event) {
-      // this.name = this.searchWord;
-      // this.refreshAPI();
+    collapseResetApiList() {
+      this.timeType = "day";
+      this.timeFlag = "day";
+      this.handleChange(this.timeFlag);
     },
-    generateRandomKey() {
-      let randomNumber = "";
-      randomNumber = this.$options.filters.createUniqueString();
-      return randomNumber;
-    },
-    getPrototype() {
-      getGroupedPropertiesApi({
-        projectName: this.projectName,
-      }).then((res) => {
-        if (res.code == 200) {
-          if (res.data) {
-            res.data.map((item, index) => {
-              item.displayName = item.groupName;
-              item.name = item.groupName;
-              item.events.map((sub, sub_index) => {
-                if (sub_index == 0 && index == 0) {
-                  this.eventType = sub.name;
-                }
-              });
-            });
-            this.protoList = res.data;
-            let all = {
-              displayName: "全部",
-              name: " ",
-            };
-            this.protoList.unshift(all);
-          }
-        }
-      });
+    collapseRefreshApi() {
+      this.loadingApi = true;
+      if (!this.commonData) {
+        this.commonData = this.commonParams;
+      }
+      this.setTopFilterParams(this.commonData);
+      setTimeout(() => {
+        this.loadingApi = false;
+      }, 500);
     },
 
-    refreshAPI() {
-      let params = copyObj(this.commonParams);
-      // params.name = this.searchWord;
-      this.setTopFilterParams(params);
-    },
-    collapseResetApiList() {
-      this.timeFlag = 'day';
-      this.handleChange(this.timeFlag)
-      // this.searchWord = ''
-      this.name = '';
-      this.groupName = ''
-    },
-    getPageList() {
-      let params = {
-        projectName: this.projectName,
-      };
-      if (this.ByGrop) {
-        getGroupNameListEventApi(params).then((res) => {
-          if (res.code == 200) {
-            this.groupList = res.data.filter((item) => {
-              if (typeof item === "string") {
-                return item.trim() !== "";
-              }
-              return true;
-            });
-            this.groupList = this.groupList.map((item) => {
-              return { ["label"]: item, ["value"]: item };
-            });
-            this.groupList.unshift(this.all);
-          }
-        });
-      }
-    },
-    searchEvent() {
-      // this.name = this.searchWord;
+    customAnalysisRefreshApi() {
+      this.$emit("startAnalysiApi");
     },
     // 单选切换时间
     handleChange(val) {
@@ -411,24 +337,90 @@ export default {
       let dateTime = this.toDateNow();
       let toData =
         new Date(new Date().toLocaleDateString()).getTime() + 8 * 3600 * 1000;
+
       if (val == "day") {
         this.currentTime = [dateTime, dateTime];
+        this.dateTimeCount(1);
+        this.timeType = "day";
       } else if (val == "previous") {
         this.timeDifference = toData - 3600 * 24 * 1000;
         this.timestampToTime(this.timeDifference);
         this.currentTime = [this.checkDateTime, this.checkDateTime];
+        this.dateTimeCount(1);
+        this.timeType = "day";
       } else if (val == "week") {
         this.timeDifference = toData - 6 * 3600 * 24 * 1000;
         this.timestampToTime(this.timeDifference);
         this.currentTime = [this.checkDateTime, dateTime];
+        this.dateTimeCount(6);
+        this.timeType = "day";
       } else {
         this.timeDifference = toData - 29 * 3600 * 24 * 1000;
         this.timestampToTime(this.timeDifference);
         this.currentTime = [this.checkDateTime, dateTime];
+        this.dateTimeCount(29);
+        this.timeType = "day";
       }
       this.startTime = this.currentTime[0];
       this.endTime = this.currentTime[1];
     },
+    // 日期计算
+    dateTimeCount(result) {
+      if (6 <= result <= 29) {
+        this.weekFlag = false;
+        this.dayFlag = false;
+        this.monthFlag = true;
+        switch (this.timeType) {
+          case "month":
+            this.timeType = "day";
+            break;
+
+          default:
+            break;
+        }
+      }
+      if (result >= 29) {
+        this.monthFlag = false;
+        this.weekFlag = false;
+        this.dayFlag = false;
+      }
+      if (result < 6) {
+        this.dayFlag = false;
+        this.monthFlag = true;
+        this.weekFlag = true;
+        switch (this.timeType) {
+          case "month":
+          case "week":
+            this.timeType = "day";
+            break;
+        }
+      }
+    },
+
+    anTimeEcho() {
+      // 按时 按日
+      const toDate = this.$options.filters.todateFunc(); //当日
+      let timeStamp =
+        new Date(this.endTime).getTime() - new Date(this.startTime).getTime();
+      if (timeStamp == 0) {
+        if (toDate == this.startTime) {
+          this.timeFlag = "day";
+        } else {
+          this.timeFlag = "previous";
+        }
+      } else if (timeStamp == 518400000) {
+        this.timeFlag = "week";
+      } else if (timeStamp == 2505600000) {
+        this.timeFlag = "month";
+      } else {
+        this.timeFlag = "";
+      }
+    },
+
+    searchEvent() {
+      this.name = this.searchWord;
+    },
+
     toDateNow() {
       var date = new Date();
       return (
@@ -478,7 +470,7 @@ export default {
     setTopFilterParams(val) {
       this.$emit("setFilterBarParams", val);
     },
-    checkDateEvent(val) {
+    checkDateEvnet(val) {
       this.checked = false; //暂定清空日期
       this.contrastFlag = false;
       this.checkLabel = "对比时间段";
@@ -486,7 +478,47 @@ export default {
       this.timeFlag = "";
       this.startTime = val[0];
       this.endTime = val[1];
+      this.changeTimestamp(this.startTime, this.endTime);
     },
+    // 计算时间戳
+    changeTimestamp(start, end) {
+      let endTimed = new Date(end).getTime();
+      let startTimed = new Date(start).getTime();
+      let timeStamp = endTimed - startTimed;
+      if (timeStamp == 0) {
+        // this.timeType = "hour";
+        this.timeType = "day";
+        this.monthFlag = true;
+        this.weekFlag = true;
+        this.dayFlag = false;
+        // 604800000
+      } else if (timeStamp <= 604800000) {
+        this.timeType = "day";
+        this.monthFlag = true;
+        this.weekFlag = false;
+        this.dayFlag = false;
+      }
+      // 2592000000
+      else if (timeStamp <= 2592000000) {
+        // 三个月
+        this.timeType = "day";
+        this.monthFlag = false;
+        this.weekFlag = false;
+        this.dayFlag = false;
+      } else if (timeStamp <= 15552000000) {
+        // 六个月
+        this.timeType = "week";
+        this.monthFlag = false;
+        this.weekFlag = false;
+        this.dayFlag = false;
+      } else if (timeStamp >= 31536000000) {
+        this.timeType = "month";
+        this.monthFlag = false;
+        this.weekFlag = false;
+        this.dayFlag = true;
+      }
+    },
+
     checkTimeSlot(val) {
       switch (val) {
         case true:
@@ -502,39 +534,15 @@ export default {
       this.contrastFlag = val;
     },
   },
+  beforeDestroy() {
+    this.$bus.$off("$isOpen");
+  },
 };
 </script>
-<style>
-.el-select-dropdown__empty {
-  display: none !important;
-}
-</style>
+
 <style lang="scss" scoped>
 @import "~@/styles/components/TopFilter.scss";
 ::v-deep {
-  .el-select .el-input .el-select__caret {
-    line-height: 30px;
-  }
-  .el-select-dropdown__list {
-    padding: 0 0 6px;
-  }
-  .el-radio-group {
-    margin: 0px;
-  }
-  .el-radio-button {
-    height: 20px;
-    font-size: 12px;
-  }
-  .el-radio-button--medium .el-radio-button__inner {
-    padding: 6px;
-    font-size: 13px;
-  }
-  .el-input--medium .el-input__inner {
-    height: 30px;
-    line-height: 30px;
-    font-size: 12px;
-  }
-
   .el-radio-button--mini .el-radio-button__inner {
     padding: 9px 15px;
   }
@@ -600,19 +608,6 @@ export default {
     width: 100px;
   }
 }
-.empty-text {
-  display: flex;
-  text-align: center;
-  color: #909399;
-  padding: 10px 0;
-  margin-bottom: 10px;
-}
-.select_empty {
-  text-align: center;
-  margin-bottom: 10px;
-  font-size: 12px;
-  color: #909399;
-}
 .custom_button {
   height: 30px;
   color: #fff;
@@ -620,7 +615,7 @@ export default {
   background-color: #2c7be5;
 }
 .headerFilter {
-  min-height: 105px;
+  min-height: 60px;
   color: #194580;
   font-size: 13px;
   background: #fff;
@@ -632,7 +627,7 @@ export default {
   flex-wrap: nowrap !important;
   overflow-x: auto;
   .tabBar {
-    min-height: 105px;
+    min-height: 60px;
     position: fixed;
     z-index: 999;
     background: #fff;
@@ -642,6 +637,7 @@ export default {
     justify-content: center;
     overflow-x: auto;
     overflow-y: hidden;
+    padding: 0 20px;
     width: 100%;
   }
 
@@ -679,7 +675,7 @@ export default {
   }
   .warry_select {
     display: flex;
-    border: 1px solid #d5dfed;
+    border: 1px solid #acb2ba;
     border-radius: 4px;
     align-items: center;
     height: 30px;

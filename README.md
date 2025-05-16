@@ -61,7 +61,7 @@ npm run dev
 ```
  # 修改vue.config.js 文件中的代理配置 
 '/DEV-API'的'target'为clklog-api接口的代理地址 'http://YOUR_DOMAIN/api'
-'/DEV-API-MANAGE'的'target'为clklog-manage接口的代理地址 'http://YOUR_DOMAIN/api/manage'
+'/DEV-API-MANAGE'的'target'为clklog-manage接口的代理地址 'http://YOUR_DOMAIN/manage'
 ```
 
 

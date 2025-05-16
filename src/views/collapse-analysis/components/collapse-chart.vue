@@ -1,6 +1,6 @@
 <template>
   <div class="chart_container">
-    <div class="singItem">
+    <!-- <div class="singItem">
       <div
         v-loading="loadingRefresh"
         class="block-main public-hoverItem collapseLeft"
@@ -30,10 +30,10 @@
             </el-option>
           </el-select>
         </div>
-        <!-- 图表 -->
+       
         <div id="countLine" style="width: 90%; height: 400px"></div>
       </div>
-    </div>
+    </div> -->
 
     <div class="singItem" style="margin-top: 20px">
       <div
@@ -116,7 +116,6 @@
 import { copyObj } from "@/utils/copy";
 import echarts from "echarts";
 import { trendSummaryApi } from "@/api/trackingapi/collapse";
-import { getVisitorRevisitAndSilentTrendApi } from "@/api/trackingapi/visitor";
 export default {
   data() {
     return {
@@ -168,7 +167,7 @@ export default {
   methods: {
     paramsEvent(params) {
       this.commonParams = copyObj(params);
-      this.silientTableEvent();
+      // this.silientTableEvent();
       this.silientTableEvent("安卓");
       this.silientTableEvent("苹果");
     },
@@ -186,10 +185,7 @@ export default {
             } else if (type == "安卓") {
               this.channelAndroidList = res.data;
               this.filterEvent("Android");
-            } else {
-              this.channelAllList = res.data;
-              this.filterEvent("all");
-            }
+            } 
           }
         })
         .catch(() => {
@@ -214,10 +210,7 @@ export default {
         dynamicTrendList = [];
 
       switch (type) {
-        case "all":
-          newHeadLege = this.headLege;
-          dynamicTrendList = this.channelAllList;
-          break;
+        
         case "IOS":
           newHeadLege = this.headLegeIos;
           dynamicTrendList = this.channelIosList;
@@ -297,9 +290,6 @@ export default {
       ];
 
       switch (type) {
-        case "all":
-          this.countLineEcharts(echartList);
-          break;
         case "IOS":
           this.IosLineEcharts(echartList);
           break;
@@ -311,106 +301,11 @@ export default {
     handleCheckPointer(type) {
       this.filterEvent(type);
     },
-    countLineEcharts(echartList) {
-      let _that = this;
-      echartList = echartList.map((item) => ({
-        ...item,
-        data: item.data,
-      }));
-      this.countLineChart = echarts.init(document.getElementById("countLine"));
-      let option = {
-        tooltip: {
-          trigger: "axis",
-          axisPointer: {
-            lineStyle: {
-              color: "#C0CADB",
-              width: 2,
-            },
-          },
-          formatter: function (params) {
-            var html = params[0].name + "<br>";
-            let number = 0;
-            for (var i = 0; i < params.length; i++) {
-              number = params[i].value;
-              if (
-                params[i].seriesName == "崩溃率" ||
-                params[i].seriesName == "崩溃用户占比"
-              ) {
-                number = _that.$options.filters.percenTable(params[i].value);
-              }
-              html +=
-                "<div>" +
-                params[i].marker +
-                params[i].seriesName +
-                "：" +
-                number;
-              +"</div>";
-            }
-            return html + "<br>";
-          },
-        },
-        legend: {
-          x: "center",
-          y: "top",
-          data: this.headLege,
-        },
-        grid: {
-          left: "10%",
-          right: "2%",
-          top: "10%",
-          bottom: "10%",
-          containLabel: true,
-        },
-
-        dataZoom: [
-          {
-            type: "inside",
-            startValue: 0,
-            endValue: 30,
-            minValueSpan: 10,
-            zoomOnMouseWheel: false,
-            moveOnMouseWheel: true,
-            moveOnMouseMove: true,
-          },
-        ],
-
-        xAxis: {
-          type: "category",
-          data: this.statTime,
-          axisTick: {
-            show: false,
-          },
-          axisLabel: {
-            interval: 2,
-            rotate: "45",
-          },
-        },
-        yAxis: {
-          axisTick: {
-            show: false,
-          },
-          type: "value",
-        },
-        series: echartList,
-      };
-      this.countLineChart.setOption(option, true);
-      window.addEventListener("resize", () => {
-        this.countLineChart && this.countLineChart.resize();
-      });
-    },
+   
     IosLineEcharts(echartList) {
       let Ioschart = echarts.init(document.getElementById("Ioschart"));
       let _that = this;
       let Iosoption = {
-        // tooltip: {
-        //   trigger: "axis",
-        //   axisPointer: {
-        //     lineStyle: {
-        //       color: "#C0CADB",
-        //       width: 2,
-        //     },
-        //   },
-        // },
         tooltip: {
           trigger: "axis",
           axisPointer: {

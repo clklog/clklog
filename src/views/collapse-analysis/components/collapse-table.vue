@@ -3,140 +3,6 @@
     <!-- 测试台湾地图展示内容-->
     <!-- <div ref="map" id="chartOne" style="width: 800px; height: 600px"></div> -->
     <el-tabs @tab-click="handleClick" v-model="activeTab">
-      <el-tab-pane label="数据汇总" name="数据汇总">
-        <div class="tab-warry block-main" style="padding-top: 0">
-          <div class="tab-sing">
-            <div style="display: flex">
-              <el-input
-                class="custom_input"
-                placeholder="请输入应用版本"
-                style="width: 200px; border-radius: 4px"
-                v-model="version"
-                @keyup.enter.native="searchEvent()"
-                clearable
-                @clear="handleClear"
-              >
-                <i
-                  @click="searchEvent"
-                  slot="prefix"
-                  class="el-input__icon el-icon-search"
-                ></i>
-              </el-input>
-            </div>
-            <div class="warry_select">
-              <div class="title">操作系统:</div>
-              <el-select
-                style="width: 100px"
-                v-model="channelValue"
-                class="single_select"
-                @change="changSystemEvent('数据汇总')"
-              >
-                <el-option
-                  v-for="item in allChaneList"
-                  :key="item.id"
-                  :label="item.label"
-                  :value="item.id"
-                >
-                </el-option>
-              </el-select>
-            </div>
-            <!-- <div class="warry_select">
-              <div class="title">崩溃原因:</div>
-              <el-select
-                style="width: 100px"
-                v-model="selectVal"
-                class="single_select"
-                placeholder=""
-              >
-                <el-option
-                  v-for="item in optionList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
-              </el-select>
-            </div> -->
-          </div>
-          <div class="table-block">
-            <el-table
-              :header-cell-style="{
-                textAlign: 'center',
-                background: '#f7fafe ',
-              }"
-              :cell-style="{ textAlign: 'center' }"
-              class="public-radius"
-              border
-              :data="dataSumList"
-              style="width: 100%"
-            >
-              <el-table-column
-                label="序号"
-                type="index"
-                width="80"
-                align="center"
-              >
-                <template slot-scope="scope">
-                  <span v-text="getIndex(scope.$index)"> </span>
-                </template>
-              </el-table-column>
-              <el-table-column prop="appVersion" label="应用版本" width="180">
-              </el-table-column>
-
-              <el-table-column prop="channel" label="操作系统" width="180">
-              </el-table-column>
-              <el-table-column prop="" label="设备型数" width="180">
-                <template slot-scope="{ row }">
-                  <div
-                    style="
-                      display: flex;
-                      justify-content: center;
-                      position: relative;
-                    "
-                    @click="handleRowClick(row)"
-                  >
-                    <div style="text-align: center">{{ row.modelCount }}</div>
-
-                    <img
-                      src="@/assets/images/showFlag.png"
-                      style="
-                        width: 13px;
-                        height: 13px;
-                        position: absolute;
-                        right: 0;
-                        cursor: pointer;
-                      "
-                    />
-                  </div>
-                </template>
-              </el-table-column>
-              <el-table-column prop="visitCount" label="访问次数">
-              </el-table-column>
-              <el-table-column prop="crashedCount" label="崩溃次数">
-              </el-table-column>
-              <el-table-column prop="pvRate" label="崩溃率">
-                <template slot-scope="{ row }">
-                  {{ row.pvRate | percentage }}
-                </template>
-              </el-table-column>
-              <el-table-column prop="uv" label="访问用户数"> </el-table-column>
-              <el-table-column prop="crashedUv" label="崩溃触发用户数">
-              </el-table-column>
-
-              <el-table-column prop="uvRate" label="崩溃触发用户占比">
-                <template slot-scope="{ row }">
-                  {{ row.uvRate | percentage }}
-                </template>
-              </el-table-column>
-              <el-table-column prop="pvRate" label="崩溃数占比">
-                <template slot-scope="{ row }">
-                  {{ row.pvRate | percentage }}
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </div>
-      </el-tab-pane>
       <el-tab-pane label="崩溃日志" name="崩溃日志">
         <div class="tab-warry block-main" style="padding-top: 0">
           <div class="tab-sing">
@@ -216,7 +82,6 @@
                 width="250"
                 label="崩溃详情信息"
               >
-                <!-- :show-overflow-tooltip="true" -->
                 <template slot-scope="{ row }">
                   <div
                     style="
@@ -313,7 +178,7 @@
 import echarts from "echarts";
 import taiwan from "echarts/map/json/province/taiwan.json";
 import { copyObj } from "@/utils/copy";
-import { getPageApi, groupedSummaryApi } from "@/api/trackingapi/collapse";
+import { getPageApi } from "@/api/trackingapi/collapse";
 import dialogCollapase from "./dialog";
 import collapseDetail from "./collapseDetail-dialog.vue";
 export default {
@@ -378,7 +243,7 @@ export default {
         ],
       },
       commonParams: {},
-      activeTab: "数据汇总",
+      activeTab: "崩溃日志",
       version: "",
       channelValue: "",
       optionList: [],
@@ -417,7 +282,6 @@ export default {
           realtime: false,
           calculable: true,
           inRange: {
-            // color: ["lightskyblue", "yellow", "orangered"],
             color: ["#fff", "#2c7be5"],
           },
         },
@@ -436,8 +300,6 @@ export default {
             type: "map",
             map: "taiwan",
             zoom: 1.1,
-            // top: "10%",
-            // x: "center",
             label: {
               show: true, // 显示
               textStyle: {
@@ -490,7 +352,6 @@ export default {
       this.checkApiType(this.activeTab);
     },
     changSystemEvent(type) {
-      // this.checkApiType(type);
       this.checkApiType(this.activeTab);
     },
     searchEvent() {
@@ -509,20 +370,6 @@ export default {
       this.commonParams.channel = this.channelValue ? [this.channelValue] : [];
       this.loadingRefresh = true;
       if (type == "数据汇总") {
-        let params = copyObj(this.commonParams);
-        delete params.pageNum;
-        delete params.pageSize;
-        groupedSummaryApi(params)
-          .then((res) => {
-            if (res.code == 200) {
-              this.loadingRefresh = false;
-              // this.total = res.data.total;
-              this.dataSumList = res.data;
-            }
-          })
-          .catch(() => {
-            this.loadingRefresh = false;
-          });
       } else {
         let params = copyObj(this.commonParams);
         params.startTime = this.currentTime[0];
@@ -561,6 +408,13 @@ export default {
 <style lang="scss" scoped>
 ::v-deep {
   @import "~@/styles/components/el-pagination.scss";
+  // 自定义选中样式
+  .el-tabs__item.is-active {
+    background: #f9fafd !important;
+  }
+  .el-tabs__active-bar {
+    background: #fff;
+  }
   // 设置input
   .el-input__inner {
     font-size: 11px;
