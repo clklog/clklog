@@ -24,7 +24,7 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 
 - **Frontend/前端**：vue、vue-element-admin、element-ui 、echarts
 
-- **Database/数据**：Clickhouse
+- **Database/数据**：Clickhouse、mysql
 
 # Screenshot Samples/示意图
 

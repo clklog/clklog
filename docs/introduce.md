@@ -50,8 +50,8 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 <table>
    <tr>
         <th></th>
-        <th>标准模式</th>
-        <th>快速模式</th>
+        <th style="text-align:center">标准模式</th>
+        <th style="text-align:center">快速模式</th>
     </tr>
     <tr>
         <th rowspan=5> 模式区别
@@ -95,19 +95,19 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 >
 > [Docker部署模式切换参考](</docker_installation/modetoggle>)
 >
-> [源码部署模式切换参考receiver配置的enable-simple-version配置](/installation/deployment.md#_6部署接收服务-clklog-receiver)
+> [源码部署模式切换参考receiver配置的enable-simple-version配置](/installation/deployment.md#_7部署接收服务-clklog-receiver)
 
 ## 项目组成
 
-- **接收服务 【clklog-receiver】**：接收客户端采集的日志数据并存入kafka。
+- **处理脚本 【clklog-init】**：初始化服务，用于数据库初始化和定时脚本任务配置。
 
-- **处理服务  【clklog-processing】**： 依托flink，消费kafka数据并存入clickhouse。
+- **接收服务 【clklog-receiver】**：数据接收服务，接收客户端采集的日志数据并存入kafka。
 
-- **处理脚本 【clklog-scripts】**：基于Clickhouse集群中的log_analysis表进行多维计算，获得各个维度上的统计报表。使用Cron来进行任务的定时调度。
+- **处理服务  【clklog-processing】**：数据处理服务，依托flink，消费kafka数据并存入clickhouse。
 
-- **统计接口 【clklog-api】**： 提供多维度数据统计接口。
+- **统计接口 【clklog-api】**：统计接口，提供前端各维度数据查询统计分析接口。
 
-- **统计展示 【clklog-ui】**：基于 vue-element-admin 实现的统计分析数据界面展示。
+- **统计展示 【clklog-ui】**：基于 vue-element-admin 实现的相关统计分析及系统相关功能配置的前端应用。
 
 ## 示意图
 

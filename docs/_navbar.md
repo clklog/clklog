@@ -1,27 +1,27 @@
-<!-- _navbar.md?r=0418 -->
+<!-- _navbar.md?r=0519 -->
 
 * [主页](/#/)
-* [产品介绍](/introduce.md?r=0418)
-  <!-- * [功能清单](/funclist.md?r=0418)
-  * [指标项说明](/indicator-desc.md?r=0418)
-  * [更新说明](/changelog.md?r=0418) -->
-* [版本介绍](/version.md?r=0418)
-* [功能清单](/funclist.md?r=0418)
+* [产品介绍](/introduce.md?r=0519)
+  <!-- * [功能清单](/funclist.md?r=0519)
+  * [指标项说明](/indicator-desc.md?r=0519)
+  * [更新说明](/changelog.md?r=0519) -->
+* [版本介绍](/version.md?r=0519)
+* [功能清单](/funclist.md?r=0519)
 * [技术指南](#)
-  * [Docker安装](/docker_installation/preperation.md?r=0418)
-  * [步骤安装](/installation/preparation.md?r=0418)
-  * [集成方式](/integration/introduce.md?r=0418)
-  * [集成说明](/integration/method.md?r=0418)
-  * [集成SDK及文档](/integration/document.md?r=0418)
-  * [集成测试参考](/integration/reference.md?r=0418?r=0418)
-  * [集成注意事项](/tutorials/notes.md?r=0418)
-  * [统计指标说明](/tutorials/statindicator.md?r=0418)
+  * [Docker安装](/docker_installation/preperation.md?r=0519)
+  * [步骤安装](/installation/preparation.md?r=0519)
+  * [集成方式](/integration/introduce.md?r=0519)
+  * [集成说明](/integration/method.md?r=0519)
+  * [集成SDK及文档](/integration/document.md?r=0519)
+  * [集成测试参考](/integration/reference.md?r=0519?r=0519)
+  * [集成注意事项](/tutorials/notes.md?r=0519)
+  * [统计指标说明](/tutorials/statindicator.md?r=0519)
 * [演示环境](https://demo.clklog.com)
   * [ClkLog 社区版](https://demo.clklog.com)
   * [ClkLog 付费版(pro+cdp)](https://pro.clklog.com)
   * [AccessLog 社区版](https://demo.access.clklog.com/)
 * [系列产品](#)
-  * [AccessLog](/accesslog/introduce.md?r=0418)
+  * [AccessLog](/accesslog/introduce.md?r=0519)
 * [源码下载](#)
   * <a href="https://github.com/clklog/clklog"  target="_clkloggithub"><img src="/assets/imgs/export.png" height="10"/> ClkLog in GitHub</a>
   * <a href="https://gitee.com/clklog/clklog"  target="_clkloggitee"><img src="/assets/imgs/export.png" height="10"/> ClkLog in Gitee</a>
@@ -32,4 +32,4 @@
 * <a href="https://docs.clklog.com"  target="_clklogdocs">文章库</a>
 * [关于我们](#)
   * <a href="https://www.zcunsoft.com" target="_blank">公司官网</a>
-  * [资质认证](/certification.md?r=0418)
+  * [资质认证](/certification.md?r=0519)

@@ -65,10 +65,10 @@
 |          | [clklog-unity3d-demo in gitee](https://gitee.com/clklog/clklog-unity3d-demo)          |
 |          | [clklog-unity3d-demo in gitcode](https://gitcode.com/clklog/clklog-unity3d-demo)      |
 
-## 服务端 SDK
+<!-- ## 服务端 SDK
 
 | SDK下载  | [GitHub - sensorsdata/sa-sdk-java](https://github.com/sensorsdata/sa-sdk-java)       |
 | -------- | ------------------------------------------------------------------------------------ |
-| 集成文档 | [Java 集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/java-sdk-1573929.html) |
+| 集成文档 | [Java 集成文档](https://manual.sensorsdata.cn/sa/latest/zh_cn/java-sdk-1573929.html) | --> |
 
 <br><br>更多其他平台集成方式参考：<a href="https://manual.sensorsdata.cn/sa/3.0/zh_cn/tech-1573416.html"  target="satechguide">神策官方SDK集成技术指南</a>

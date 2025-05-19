@@ -7,11 +7,11 @@
 
 ### 2.数据库初始化
 
-1. 根据 `scripts` 下的`sql脚本.txt`文件创建clickhouse实例schema和表
+1. 解压[docker安装镜像文件],根据镜像目录`clklog_dc_config\init\` 下的`mysql_clklog.sql`文件创建mysql实例schema和表。
 
-  ```
-  clickhouse-client --host localhost --user default --queries-file PATH_TO_SQL_FILE
-  ```
+```
+mysql -u root -p < PATH_TO_SQL_FILE
+```
 
 2. 在kafka中创建队列clklog
 
@@ -21,77 +21,142 @@
 
 <br>
 
-### 3.nginx 路由配置参考
+### 3. 部署初始化服务 clklog-init
 
-1. 创建配置文件，设置路由
+ClkLog初始化服务，用于clickhouse数据库初始化和定时脚本任务配置。
 
-    ```
-    vim /etc/nginx/conf.d/clklog.conf
-    ```
+1. 编译应用程序
 
-    内容如下，注意替换`YOUR_DOMAIN`为您为监控后台配置的域名：
+2. 上传程序文件
+在目录`/usr/local/services/`中创建`clklog-init`目录并将文件包`clklog-init.jar`、配置文件`application.yml`以及源码中的`scripts文件夹`拷贝进去，代码如下：
 
-    ```
-    upstream clklog_api_server {
-            server localhost:8087;
-        }
+  ```
+  cd /usr/local/services/
+  mkdir clklog-init
+  
+  # 为防止出现权限问题导致脚本不能执行，建议上传完脚本以后执行以下代码
+  chmod 500 clklog-init.jar
+  ```
 
-    upstream clklog_receiver_server {
-            server localhost:8002;
-        }
+3. 修改配置文件，设置$开头的变量
+根据前面安装的组件配置，修改`application.yml`中`clickhouse`、`mysql`相关配置，代码如下
 
-    upstream clklog_flink_server{
-            server localhost:8081;
-    }
+```
+  server:
+    port: 8001
+  logging:
+    file:
+      path: log
+  spring:
+    application.name: clklog-init
+    datasource:
+  # clickhouse 配置
+      clickhouse:
+        jdbc-url: jdbc:clickhouse://$clickhouse_host:8123/default
+        username: default
+        password: 123456
+  init:
+    # clklog数据库名
+      log-db: clklog
+    # 是否启用计划执行
+      quartz-enabled: true
+    # 各脚本的cron配置，calc-in-order为false时有效
+      quartz:
+        area_detail_bydate: '0 */1 * * * ?'
+        visituri_summary_bydate: '0 */1 * * * ?'
+        flow_trend_bydate: '0 */1 * * * ?'
+        flow_trend_byhour: '0 */1 * * * ?'
+        searchword_detail_bydate: '0 */1 * * * ?'
+        channel_detail_bydate: '0 */1 * * * ?'
+        device_detail_bydate: '0 */1 * * * ?'
+        sourcesite_detail_bydate: '0 */1 * * * ?'
+        crashed_detail_bydate: '0 */1 * * * ?'
+        user_pv_bydate: '0 */1 * * * ?'
+        user_visit_bydate: '0 */1 * * * ?'
+        user_visittime_bydate: '0 */1 * * * ?'
+        visitor_detail_bydate: '0 */1 * * * ?'
+        visitor_life_bydate: '0 */1 * * * ?'
+        visituri_detail_bydate: '0 */1 * * * ?'
+        visitor_detail_byinfo: '0 */1 * * * ?'
+        visitor_detail_bysession: '0 */1 * * * ?'
+```
 
-    server {
-        listen 80;
-        listen [::]:80;
-        server_name localhost YOUR_DOMAIN;
+### 4.部署管理接口 clklog-manage
 
-    location / {
-                root   /usr/share/nginx/html;
-                index  index.html index.htm;
-                proxy_set_header Host $host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            }
+ClkLog管理接口，提供clklog-ui前端项目管理、账号管理及数据清洗过滤配置相关接口。
 
-    location /receiver/ {
-                proxy_pass http://clklog_receiver_server/;
-                proxy_set_header Host $host:$server_port;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            }
+1. 编译应用程序
+2. 上传程序文件
+拷贝`clklog-manage.jar`包、源码里的`setting文件夹`和`application.yml`文件至`/usr/local/services/clklog-manage`目录：
 
-    location /api/ {
-                proxy_pass http://clklog_api_server/;
-                proxy_set_header Host $host:$server_port;
-            }
+  ```
+  cd /usr/local/services
+  mkdir /usr/local/services/clklog-manage
+  chmod 500 clklog-manage.jar
+  ```
 
-    location /api/v3/ {
-                proxy_pass http://clklog_api_server/api/v3/;
-                proxy_set_header Host $host:$server_port;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            }
+3. 修改配置文件，设置$开头的变量
+根据前面安装的组件配置，修改`application.yml`中的相关配置，代码如下：
 
-    location /clklog_flink/ {
-                proxy_pass http://clklog_flink_server/;
-                proxy_set_header Host $host:$server_port;
-            }
+  ```
+  springdoc:
+    swagger-ui:
+      enabled: true
+      tagsSorter: alpha
+    api-docs:
+      path: /api/manage/v3/api-docs
+      enabled: true
+    group-configs:
+      - group: 'default'
+        paths-to-match: '/**'
+        packages-to-scan: com.zcunsoft.clklog.manage.controllers, com.zcunsoft.clklog.sysmgmt.controllers
+  server:
+    port: 8091
+  spring:
+    application.name: clklog-manage
+    datasource:
+      mysql:
+        jdbc-url: jdbc:mysql://$mysql_host:3306/clklog?characterEncoding=UTF-8&useTimezone=true&serverTimezone=GMT%2B8
+        username: $mysql_user
+        password: $mysql_pass
+        driver-class-name: com.mysql.cj.jdbc.Driver
+      clickhouse:
+        jdbc-url: jdbc:clickhouse://$clickhouse_host:8123/clklog
+        username: $clickhouse_user
+        password: $clickhouse_pass
+        driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+    jpa:
+      show-sql: false
 
-    }
+    redis:
+      # 单机配置
+      host: $redis_host
+      port: 6379
+      password: $redis_pass
+    # 哨兵配置
+    # sentinel:
+    #  master: gct
+    #  nodes: $node1:26379,$node2:26379,$node3:26379
+  token:
+    # 令牌自定义标识
+    header: Authorization
+    # 令牌密钥
+    secret: c609737e578978eccc64cef4be680
+    # 令牌有效期（默认30分钟）
+    expireTime: 300
+  logging:
+    file:
+      path: log
+  clklog-common:
+    access-control-allow-origin-patterns: "*"
+    anonymous-method-list: /auth/login
+  clklog-manage:
+    log-store-path:
+  ```
 
-    ```
+### 5. 部署统计接口 clklog-api
 
-2. 重启nginx
-
-    ```
-    systemctl restart nginx
-    ```
-
-### 4. 部署统计接口 clklog-api
+ClkLog统计接口，提供clklog-ui前端各维度数据查询统计分析接口。
 
 1. 编译应用程序
 
@@ -133,15 +198,23 @@
           driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
           connection-timeout: 20000
           maximum-pool-size: 5
+      redis:
+        host: 10.10.220.37
+        port: 6379
+        database: 0
+        password:
+    token:
+      header: Authorization
+      secret: c609737e578978eccc64cef4be680
+      expireTime: 300
     logging:
       file:
         path: log
-    clklog-api:
+    clklog-common:
       access-control-allow-origin: "*"
+    clklog-api:
       # 默认前端埋点project默认名称，一般不用修改
       project-name: clklogapp    
-      # 埋点网站域名配置，多个域名以英文逗号分隔
-      project-host: http(s)://{{hostname}}
     ```
 
 4. 创建服务
@@ -179,7 +252,9 @@
 
 <br>
 
-### 5. 统计后台前端展示 clklog-ui
+### 6. 统计后台前端展示 clklog-ui
+
+ClkLog前端项目，该项目是基于 vue-element-admin 实现的ClkLog相关统计分析及系统相关功能配置的前端应用。
 
 1. 开发环境编译前端应用程序
 
@@ -237,7 +312,9 @@
    此时您可访问http://YOUR_DOMAIN/ ，验证部署成果。
    预置账号密码为 admin/clklog。
 
-### 6.部署接收服务 clklog-receiver
+### 7.部署接收服务 clklog-receiver
+
+ClkLog数据接收服务，用于接收客户端项目通过神策SDK埋点后采集的日志数据并存入kafka。
 
 1. 编译应用程序
 
@@ -271,15 +348,28 @@
         # sentinel:
         # master: gct
         # nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
-    receiver: 
-      # 对应前端埋点代码配置的project名称，多个project以逗号分隔。
-      project-list: clklogapp
+   kafka:
+
+  bootstrap-servers: 10.10.220.188:9092
+  producer: # 生产者
+    client-id: "clklog-producer-group"
+    retries: 3 # 设置大于 0 的值，则客户端会将发送失败的记录重新发送
+    topic: clklog
+    acks: 0
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    properties:
+   linger:
+     ms: 1000
+  listener:
+    ack-mode: MANUAL_IMMEDIATE
+    receiver:
       # resource-path 默认为空，如果资源及配置文件(iplib,app-setting.json)不与jar同目录，则修改为它们的父路径，否则无需配置。
       resource-path:  
       # enable-simple-version 默认为false, 表示日志存入kafka，由flink处理后存入clickhouse；当值为true时，表示日志直接存入clickhouse，无需安装kafka和flink。配置修改后需重启clklog-receiver服务。
       enable-simple-version: false
       access-control-allow-origin-patterns: "*"
-     
+
     ```
 
 4. 创建服务
@@ -315,7 +405,9 @@
     systemctl start clklog-receiver
     ```
 
-### 7.部署处理服务 clklog-processing
+### 8.部署处理服务 clklog-processing
+
+ClkLog数据处理服务，依托flink，消费kafka数据并存入clickhouse。
 
 1. 编译应用程序
 
@@ -360,6 +452,11 @@
     redis.host=localhost
     redis.port=6379
     redis.password=
+    redis.database=0
+    redis.pool.max-active=3
+    redis.pool.max-idle=3
+    redis.pool.min-idle=0
+    redis.pool.max-wait=-1
     ```
 
 4. 启动应用程序
@@ -372,65 +469,104 @@
 
     其中 `-s` 参数为`checkpoint`位置。对于中断后再执行的任务，需要指定该参数，如不指定则从头开始消费`kafka`消息。
 
-### 8. 部署计算脚本clklog-scripts
+### 9. nginx 路由配置参考
 
-- 计算脚本是基于Clickhouse集群中`log_analysis`表进行多维计算，获得各个维度上的统计报表。
-  使用Cron来进行任务的定时调度。
+1. 确认您使用的nginx捆绑了with-http_auth_request_module模组
 
-1. 创建脚本及日志存放目录
+```
+# 执行如下命令，确认输出包含 --with-http_auth_request_module
 
-    ```
-    mkdir /usr/local/services/scripts
-    mkdir /usr/local/services/scripts/sh
-    mkdir /usr/local/services/scripts/flock
-    mkdir /usr/local/services/scripts/crontab_log
-    mkdir /usr/local/services/scripts/clklog
-    ```
+nginx -V 2>&1 | grep -- 'http_auth_request_module'
 
-2. 上传sh计算脚本
+# 如果没有，请重新安装nginx
 
-   - **注意：上传脚本时，需设置迁移类型为ASCII(I)**
-  
-    脚本上传于`/usr/local/services/scripts/sh`目录,  为防止出现权限问题导致脚本不能执行，建议上传完脚本以后执行以下代码：
+```
+
+2. 创建配置文件，设置路由
 
     ```
-    chmod 500 *.sh
+    vim /etc/nginx/conf.d/clklog.conf
     ```
 
-1. 修改脚本中的数据库链接配置
-
-    根据clickhouse配置，修改脚本目录中`clklog-scripts.env`文件的clickhouse的`用户名、密码`配置信息：
-
-    ````
-    # [Clickhouse]
-    CK_USER_NAME=default
-    CK_USER_PWD=123456
-
-    # [ClkLog]
-    CLKLOG_LOG_DB=clklog
-    CLKLOG_STAT_DB=clklog
-    CLKLOG_SCRIPT_LOG=/usr/local/services/scripts/clklog
-    ````
-
-2. 设置调度任务
+    内容如下，注意替换`YOUR_DOMAIN`为您为监控后台配置的域名：
 
     ```
-    crontab -e
+    upstream clklog_api_server {
+            server localhost:8087;
+        }
+
+    upstream clklog_receiver_server {
+            server localhost:8002;
+        }
+
+    upstream clklog_flink_server{
+            server localhost:8081;
+    }
+    upstream clklog_manage_server{
+            server localhost:8091;
+    }
+
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name localhost YOUR_DOMAIN;
+
+    location / {
+                root   /usr/share/nginx/html;
+                index  index.html index.htm;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+
+    location /receiver/ {
+                proxy_pass http://clklog_receiver_server/;
+                proxy_set_header Host $host:$server_port;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+    location /api/manage/ {
+            proxy_pass http://clklog_manage_server/;
+            proxy_set_header Host $host:$server_port;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+
+    location /api/manage/v3/ {
+            proxy_pass http://clklog_manage_server/manage/v3/;
+            proxy_set_header Host $host:$server_port;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+
+    location /api/ {
+                proxy_pass http://clklog_api_server/;
+                proxy_set_header Host $host:$server_port;
+            }
+
+    location /api/v3/ {
+                proxy_pass http://clklog_api_server/api/v3/;
+                proxy_set_header Host $host:$server_port;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+    #因安全问题，建议限制flink后台访问
+    location /clklog_flink/ {
+                proxy_pass http://clklog_flink_server/;
+                proxy_set_header Host $host:$server_port;
+            }
+
+    }
+
     ```
 
-    将 `scripts`目录下的 `定时脚本.txt`文件,内容复制过去`.wq`保存。
+3. 重启nginx
 
-    备注：
+    ```
+    systemctl restart nginx
+    ```
 
-    - 脚本的日志在`/usr/local/services/scripts/clklog/`
-
-    - cron运行计算脚本过程中可能有数个目录会出现权限不足问题；
-
-    - 如出现crontab执行脚本后，脚本的日志/usr/local/services/scripts/clklog/中产生了log文件但内容为空的情况，可能是由于crontab默认使用sh，需要在crontab -e最上方加入一行SHELL= /bin/bash
-
-<br>
-
-### 9. 部署环境验证
+### 10. 部署环境验证
 
 1. Flink后台地址
 
@@ -449,6 +585,10 @@
     ```
     统计接口说明地址
     http://YOUR_DOMAIN/api/doc.html#/home
+
+    管理接口说明地址
+    http://YOUR_DOMAIN/api/manage/doc.html#/home
+
     ```
 
 4. 前端地址

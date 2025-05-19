@@ -3,18 +3,33 @@
 
 1. 下载 ClkLog Docker Compose配置文件，参考代码如下
 
+   - github 镜像下载
+
     ```
-   curl -O https://clklog.com/res/docker/clklog-docker-compose.tar.gz
+    curl -O https://github.com/clklog/clklog-deploy/raw/refs/heads/main/releases/clklog-docker-compose-1.2.0.tar.gz
     ```
+
+   - gitee 镜像下载
+
+    ```
+    curl -O https://gitee.com/clklog/clklog-deploy/raw/main/releases/clklog-docker-compose-1.2.0.tar.gz
+    ```
+
+   <!-- - gitcode 镜像下载
+
+    ```
+    curl -O 
+    https://gitcode.com/clklog/clklog-deploy/blob/main/releases/clklog-docker-compose-1.1.0.tar.gz
+    ``` -->
 
 2. 拷贝镜像,并解压镜像文件，参考代码如下：
 
     ```
-    tar -zxvf clklog-docker-compose.tar.gz
+    tar -zxvf clklog-docker-compose-1.2.0.tar.gz
     cd clklog-docker-compose 
     ```
 <!-- 
-3. 根据实际情况修改`.env`文件中的默认配置：
+1. 根据实际情况修改`.env`文件中的默认配置：
 
     ```
     #[Clickhouse]
@@ -28,7 +43,7 @@
     CLKLOG_LOG_DB=clklog    
     ``` -->
 
-3. 执行目录初始化脚本，代码如下：
+2. 执行目录初始化脚本，代码如下：
 
     ```
     mkdir -p clklog_dc_data/redis
