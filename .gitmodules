@@ -4,9 +4,6 @@
 [submodule "ui"]
 	path = ui
 	url = ../clklog-ui.git
-[submodule "scripts"]
-	path = scripts
-	url = ../clklog-scripts.git
 [submodule "processing"]
 	path = processing
 	url = ../clklog-processing.git
