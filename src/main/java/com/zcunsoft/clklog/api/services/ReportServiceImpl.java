@@ -1,14 +1,17 @@
 package com.zcunsoft.clklog.api.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.zcunsoft.clklog.api.cfg.ClklogApiSetting;
+import com.zcunsoft.clklog.api.cfg.RedisConstsConfig;
 import com.zcunsoft.clklog.api.constant.Constants;
 import com.zcunsoft.clklog.api.entity.clickhouse.*;
 import com.zcunsoft.clklog.api.handlers.ConstsDataHolder;
+import com.zcunsoft.clklog.api.models.ProjectSetting;
 import com.zcunsoft.clklog.api.models.TimeFrame;
 import com.zcunsoft.clklog.api.models.area.*;
-import com.zcunsoft.clklog.api.models.channel.GetChannelDetailRequest;
-import com.zcunsoft.clklog.api.models.channel.GetChannelDetailResponse;
+import com.zcunsoft.clklog.api.models.channel.*;
 import com.zcunsoft.clklog.api.models.device.*;
+import com.zcunsoft.clklog.api.models.enums.DimensionType;
 import com.zcunsoft.clklog.api.models.enums.LibType;
 import com.zcunsoft.clklog.api.models.enums.SortType;
 import com.zcunsoft.clklog.api.models.enums.VisitorType;
@@ -24,16 +27,25 @@ import com.zcunsoft.clklog.api.models.trend.*;
 import com.zcunsoft.clklog.api.models.uservisit.*;
 import com.zcunsoft.clklog.api.models.visitor.*;
 import com.zcunsoft.clklog.api.models.visituri.*;
+import com.zcunsoft.clklog.api.services.utils.FilterBuildUtils;
 import com.zcunsoft.clklog.api.utils.TimeUtils;
+import com.zcunsoft.clklog.api.utils.TreeUtils;
+import com.zcunsoft.clklog.common.utils.ObjectMapperUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -42,7 +54,6 @@ import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -83,10 +94,22 @@ public class ReportServiceImpl implements IReportService {
 
     private final ConstsDataHolder constsDataHolder;
 
-    public ReportServiceImpl(NamedParameterJdbcTemplate clickHouseJdbcTemplate, ClklogApiSetting clklogApiSetting, ConstsDataHolder constsDataHolder) {
+    private final ObjectMapperUtil objectMapper;
+
+    private final StringRedisTemplate queueRedisTemplate;
+
+    private final RedisConstsConfig redisConstsConfig;
+
+    private final TypeReference<HashMap<String, ProjectSetting>> htProjectSettingTypeReference = new TypeReference<HashMap<String, ProjectSetting>>() {
+    };
+
+    public ReportServiceImpl(NamedParameterJdbcTemplate clickHouseJdbcTemplate, ClklogApiSetting clklogApiSetting, ConstsDataHolder constsDataHolder, ObjectMapperUtil objectMapper, RedisConstsConfig redisConstsConfig, StringRedisTemplate queueRedisTemplate) {
         this.clickHouseJdbcTemplate = clickHouseJdbcTemplate;
         this.clklogApiSetting = clklogApiSetting;
         this.constsDataHolder = constsDataHolder;
+        this.objectMapper = objectMapper;
+        this.redisConstsConfig = redisConstsConfig;
+        this.queueRedisTemplate = queueRedisTemplate;
     }
 
     private static final ThreadLocal<DecimalFormat> decimalFormat =
@@ -107,16 +130,16 @@ public class ReportServiceImpl implements IReportService {
 
             GetFlowRequest previousReq = new GetFlowRequest();
             BeanUtils.copyProperties(getFlowRequest, previousReq);
-            previousReq.setStartTime(this.yMdFORMAT.get().format(timeFrame.getStartTime()));
-            previousReq.setEndTime(this.yMdFORMAT.get().format(timeFrame.getEndTime()));
+            previousReq.setStartTime(timeFrame.getStartTime());
+            previousReq.setEndTime(timeFrame.getEndTime());
             responseData.setPrevious(getFlowByTimeframe(previousReq));
 
             TimeFrame samePeriodTimeframe = getSamePeriodTimeframe(getFlowRequest.getStartTime(), getFlowRequest.getTimeType());
             if (samePeriodTimeframe != null) {
                 GetFlowRequest sameReq = new GetFlowRequest();
                 BeanUtils.copyProperties(getFlowRequest, sameReq);
-                sameReq.setStartTime(this.yMdFORMAT.get().format(samePeriodTimeframe.getStartTime()));
-                sameReq.setEndTime(this.yMdFORMAT.get().format(samePeriodTimeframe.getEndTime()));
+                sameReq.setStartTime(samePeriodTimeframe.getStartTime());
+                sameReq.setEndTime(samePeriodTimeframe.getEndTime());
                 responseData.setSamePeriod(getFlowByTimeframe(sameReq));
             }
             responseData.setCurrentPrediction(getTodayFlowPrediction(responseData.getCurrent(), getFlowRequest));
@@ -149,8 +172,8 @@ public class ReportServiceImpl implements IReportService {
             getListSql += " order by t.stat_date";
 
             List<FlowTrendbydate> flowTrendbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<FlowTrendbydate>(FlowTrendbydate.class));
-            Timestamp startTime = transformFilterTime(getFlowTrendRequest.getStartTime(), true, getFlowTrendRequest.getTimeType());
-            Timestamp endTime = transformFilterTime(getFlowTrendRequest.getEndTime(), false, getFlowTrendRequest.getTimeType());
+            Timestamp startTime = FilterBuildUtils.transformFilterTime(getFlowTrendRequest.getStartTime(), true, getFlowTrendRequest.getTimeType());
+            Timestamp endTime = FilterBuildUtils.transformFilterTime(getFlowTrendRequest.getEndTime(), false, getFlowTrendRequest.getTimeType());
 
             if ("week".equalsIgnoreCase(getFlowTrendRequest.getTimeType())) {
                 flowDetailList = getFlowTrendByDate(flowTrendbydateList, null, startTime, endTime);
@@ -209,10 +232,10 @@ public class ReportServiceImpl implements IReportService {
         String getSummarySql = "select sum(pv) as pv from visituri_summary_bydate t";
 
         String summaryWhere = "";
-        summaryWhere = buildChannelByAllFilter(getVisitUriRequest.getChannel(), paramMap, summaryWhere);
-        summaryWhere = buildStatDateStartFilter(getVisitUriRequest.getStartTime(), paramMap, summaryWhere, getVisitUriRequest.getTimeType());
-        summaryWhere = buildStatDateEndFilter(getVisitUriRequest.getEndTime(), paramMap, summaryWhere, getVisitUriRequest.getTimeType());
-        summaryWhere = buildProjectNameFilter(getVisitUriRequest.getProjectName(), paramMap, summaryWhere);
+        summaryWhere = FilterBuildUtils.buildChannelByAllFilter(getVisitUriRequest.getChannel(), paramMap, summaryWhere);
+        summaryWhere = FilterBuildUtils.buildStatDateStartFilter(getVisitUriRequest.getStartTime(), paramMap, summaryWhere, getVisitUriRequest.getTimeType());
+        summaryWhere = FilterBuildUtils.buildStatDateEndFilter(getVisitUriRequest.getEndTime(), paramMap, summaryWhere, getVisitUriRequest.getTimeType());
+        summaryWhere = FilterBuildUtils.buildProjectNameFilter(getVisitUriRequest.getProjectName(), clklogApiSetting.getProjectName(), paramMap, summaryWhere);
 
         if (StringUtils.isNotBlank(summaryWhere)) {
             getListSql += " where t.uri <> 'all' and t.title <> 'all' and " + summaryWhere.substring(4);
@@ -248,8 +271,8 @@ public class ReportServiceImpl implements IReportService {
         String getVisitUriSql = "select sum(pv) as pv,sum(uv) as uv,sum(new_uv) as newUv,sum(down_pv_count) as downPvCount,sum(exit_count) as exitCount,sum(visit_count) as visitCount,sum(visit_time) as visitTime,sum(bounce_count) as bounceCount,sum(ip_count) as ipCount from visituri_detail_bydate t ";
         String where = "";
         where = buildChannelFilter(getVisitUriDetailRequest.getChannel(), paramMap, where);
-        where = buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
-        where = buildStatDateEndFilter(getVisitUriDetailRequest.getEndTime(), paramMap, where);
+        where = FilterBuildUtils.buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
+        where = FilterBuildUtils.buildStatDateEndFilter(getVisitUriDetailRequest.getEndTime(), paramMap, where);
         where = buildProjectNameFilter(getVisitUriDetailRequest.getProjectName(), paramMap, where);
         where = buildCountryFilter(getVisitUriDetailRequest.getCountry(), paramMap, where);
         where = buildProvinceFilter(getVisitUriDetailRequest.getProvince(), paramMap, where);
@@ -1648,9 +1671,9 @@ public class ReportServiceImpl implements IReportService {
     @Override
     public GetVisitorListPageResponse getVisitorList(GetVisitorListPageRequest getVisitorListPageRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
-        String selectSql = "sum(pv) as pv,sum(visit_count) as visit_count,sum(visit_time) as visit_time,max(latest_time) as latest_time from visitor_summary_byvisitor t";
+        String selectSql = "sum(pv) as pv,sum(visit_count) as visit_count,sum(visit_time) as visit_time,max(latest_time) as latest_time from visitor_detail_byinfo t";
         String getListSql = "select t.distinct_id as distinct_id,t.is_first_day as is_first_day," + selectSql;
-        String getCountSql = "select count(1) from (select t.distinct_id as distinct_id from visitor_summary_byvisitor t";
+        String getCountSql = "select count(1) from (select t.distinct_id as distinct_id from visitor_detail_byinfo t";
         String where = "";
 
         where = buildChannelByAllFilter(getVisitorListPageRequest.getChannel(), paramMap, where);
@@ -1660,6 +1683,7 @@ public class ReportServiceImpl implements IReportService {
         where = buildCountryByAllFilter(getVisitorListPageRequest.getCountry(), paramMap, where);
         where = buildProvinceByAllFilter(getVisitorListPageRequest.getProvince(), paramMap, where);
         where = buildVisitorTypeByAllFilter(getVisitorListPageRequest.getVisitorType(), paramMap, where);
+        where = FilterBuildUtils.buildDistinctIdFilter(getVisitorListPageRequest.getDistinctId(), paramMap, where);
 
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
@@ -1672,7 +1696,7 @@ public class ReportServiceImpl implements IReportService {
         getListSql += " limit " + (getVisitorListPageRequest.getPageNum() - 1) * getVisitorListPageRequest.getPageSize() + "," + getVisitorListPageRequest.getPageSize();
 
         getCountSql += " group by t.distinct_id,t.is_first_day)";
-        List<VisitorSummarybyvisitor> visitorSummarybyvisitorList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorSummarybyvisitor>(VisitorSummarybyvisitor.class));
+        List<VisitorDetailbyinfo> visitorDetailbyinfoList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisitorDetailbyinfo>(VisitorDetailbyinfo.class));
 
         Integer total = clickHouseJdbcTemplate.queryForObject(getCountSql, paramMap, Integer.class);
 
@@ -1680,19 +1704,19 @@ public class ReportServiceImpl implements IReportService {
 
         GetVisitorListPageResponse response = new GetVisitorListPageResponse();
         GetVisitorListPageResponseData responseData = new GetVisitorListPageResponseData();
-        for (VisitorSummarybyvisitor visitorSummarybyvisitor : visitorSummarybyvisitorList) {
+        for (VisitorDetailbyinfo visitorDetailbyinfo : visitorDetailbyinfoList) {
             VisitorList visitorList = new VisitorList();
-            if (visitorSummarybyvisitor.getVisitCount() > 0) {
-                float avgPv = visitorSummarybyvisitor.getPv() * 1.0f / visitorSummarybyvisitor.getVisitCount();
+            if (visitorDetailbyinfo.getVisitCount() > 0) {
+                float avgPv = visitorDetailbyinfo.getPv() * 1.0f / visitorDetailbyinfo.getVisitCount();
                 visitorList.setAvgPv(Float.parseFloat(decimalFormat.get().format(avgPv)));
             }
 
-            visitorList.setDistinctId(visitorSummarybyvisitor.getDistinctId());
-            visitorList.setVisitorType(isFirstDayToConvert(visitorSummarybyvisitor.getIsFirstDay()));
-            visitorList.setLatestTime(visitorSummarybyvisitor.getLatestTime());
-            visitorList.setPv(visitorSummarybyvisitor.getPv());
-            visitorList.setVisitCount(visitorSummarybyvisitor.getVisitCount());
-            visitorList.setVisitTime(visitorSummarybyvisitor.getVisitTime());
+            visitorList.setDistinctId(visitorDetailbyinfo.getDistinctId());
+            visitorList.setVisitorType(isFirstDayToConvert(visitorDetailbyinfo.getIsFirstDay()));
+            visitorList.setLatestTime(visitorDetailbyinfo.getLatestTime());
+            visitorList.setPv(visitorDetailbyinfo.getPv());
+            visitorList.setVisitCount(visitorDetailbyinfo.getVisitCount());
+            visitorList.setVisitTime(visitorDetailbyinfo.getVisitTime());
             ;
             visitorListList.add(visitorList);
         }
@@ -2515,20 +2539,21 @@ public class ReportServiceImpl implements IReportService {
 
     private FlowSummary getTodayFlowPrediction(FlowSummary current, GetFlowRequest getFlowRequest) throws IOException {
         FlowSummary flowSummary = null;
-        Timestamp today = new Timestamp(System.currentTimeMillis() - System.currentTimeMillis() % 1000);
-        String todayStr = this.yMdFORMAT.get().format(today);
-        if ("day".equalsIgnoreCase(getFlowRequest.getTimeType())
-                && (todayStr.equalsIgnoreCase(getFlowRequest.getStartTime()) && todayStr.equalsIgnoreCase(getFlowRequest.getEndTime()) || (StringUtils.isBlank(getFlowRequest.getStartTime())
-                && StringUtils.isBlank(getFlowRequest.getEndTime())
-        ))) {
+        Timestamp today = TimeUtils.getToday();
+
+        if (DimensionType.day.getValue().equalsIgnoreCase(getFlowRequest.getTimeType())
+                && (today.getTime() == getFlowRequest.getStartTime().getTime())
+                && today.getTime() == getFlowRequest.getEndTime().getTime()
+                || (getFlowRequest.getStartTime() == null && getFlowRequest.getEndTime() == null)) {
             // 获取今天之前有多少天数据.
             MapSqlParameterSource paramMap = new MapSqlParameterSource();
             paramMap.addValue("stat_date", this.yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis())));
-
-            Integer statDateCount = clickHouseJdbcTemplate.queryForObject("select countDistinct(stat_date) from flow_trend_byhour where stat_date<:stat_date", paramMap,
+            paramMap.addValue("project_name", getFlowRequest.getProjectName());
+            Integer statDateCount = clickHouseJdbcTemplate.queryForObject(
+                    "select countDistinct(stat_date) from flow_trend_byhour where stat_date<:stat_date and project_name=:project_name", paramMap,
                     Integer.class);
             if (statDateCount != null) {
-                if (statDateCount >0 && statDateCount <= 7) {
+                if (statDateCount > 0 && statDateCount <= 7) {
                     List<String> statDateList = new ArrayList<>();
                     for (int i = 1; i <= statDateCount; i++) {
                         Timestamp ts = new Timestamp(today.getTime() - DateUtils.MILLIS_PER_DAY * i);
@@ -2539,22 +2564,36 @@ public class ReportServiceImpl implements IReportService {
 
                     flowSummary = new FlowSummary();
                     flowSummary.setStatTime(current.getStatTime());
-                    Float predictionPv = current.getPv() * (1 + predictionAvg.getAvgPvAfter() / predictionAvg.getAvgPvBefore());
-                    flowSummary.setPv(predictionPv.intValue());
+                    Float predictionPv = 0F;
+                    if (predictionAvg.getAvgPvBefore() > 0) {
+                        predictionPv = current.getPv()
+                                * (1 + predictionAvg.getAvgPvAfter() / predictionAvg.getAvgPvBefore());
+                    }
+                    flowSummary.setPv(predictionPv.longValue());
 
-                    Float predictionUv = current.getUv() * (1 + predictionAvg.getAvgUvAfter() / predictionAvg.getAvgUvBefore());
-                    flowSummary.setUv(predictionUv.intValue());
+                    Float predictionUv = 0F;
+                    if (predictionAvg.getAvgUvBefore() > 0) {
+                        predictionUv = current.getUv()
+                                * (1 + predictionAvg.getAvgUvAfter() / predictionAvg.getAvgUvBefore());
+                    }
+                    flowSummary.setUv(predictionUv.longValue());
 
-                    Float predictionIpCount = current.getIpCount() * (1 + predictionAvg.getAvgIpCountAfter() / predictionAvg.getAvgIpCountBefore());
-                    flowSummary.setIpCount(predictionIpCount.intValue());
-
-                    Float predictionVisitCount = current.getVisitCount() * (1 + predictionAvg.getAvgVisitCountAfter() / predictionAvg.getAvgVisitCountBefore());
-                    flowSummary.setVisitCount(predictionVisitCount.intValue());
+                    Float predictionIpCount = 0F;
+                    if (predictionAvg.getAvgIpCountBefore() > 0) {
+                        predictionIpCount = current.getIpCount()
+                                * (1 + predictionAvg.getAvgIpCountAfter() / predictionAvg.getAvgIpCountBefore());
+                    }
+                    flowSummary.setIpCount(predictionIpCount.longValue());
+                    Float predictionVisitCount = 0F;
+                    if (predictionAvg.getAvgVisitCountBefore() > 0) {
+                        predictionVisitCount = current.getVisitCount()
+                                * (1 + predictionAvg.getAvgVisitCountAfter() / predictionAvg.getAvgVisitCountBefore());
+                    }
+                    flowSummary.setVisitCount(predictionVisitCount.longValue());
                     if (predictionVisitCount > 0) {
                         float avgPv = predictionPv * 1.0f / predictionVisitCount;
                         flowSummary.setAvgPv(Float.parseFloat(decimalFormat.get().format(avgPv)));
                     }
-
                 } else if (statDateCount > 7 && statDateCount <= 28) {
                     List<String> statDateSameWeekdayList = new ArrayList<>();
                     List<String> otherStatDateList = new ArrayList<>();
@@ -2567,31 +2606,78 @@ public class ReportServiceImpl implements IReportService {
                             otherStatDateList.add(this.yMdFORMAT.get().format(ts));
                         }
                     }
-                    PredictionAvg predictionAvgForSameWeekday = getPredictionAvg(getFlowRequest, statDateSameWeekdayList);
+                    PredictionAvg predictionAvgForSameWeekday = getPredictionAvg(getFlowRequest,
+                            statDateSameWeekdayList);
                     PredictionAvg predictionAvgForOther = getPredictionAvg(getFlowRequest, otherStatDateList);
 
                     flowSummary = new FlowSummary();
                     flowSummary.setStatTime(current.getStatTime());
-                    Float predictionPv = current.getPv() * (1 + predictionAvgForSameWeekday.getAvgPvAfter() / predictionAvgForSameWeekday.getAvgPvBefore() * 0.7f
-                            + predictionAvgForOther.getAvgPvAfter() / predictionAvgForOther.getAvgPvBefore() * 0.3f);
-                    flowSummary.setPv(predictionPv.intValue());
 
-                    Float predictionUv = current.getUv() * (1 + predictionAvgForSameWeekday.getAvgUvAfter() / predictionAvgForSameWeekday.getAvgUvBefore() * 0.7f
-                            + predictionAvgForOther.getAvgUvAfter() / predictionAvgForOther.getAvgUvBefore() * 0.3f);
-                    flowSummary.setUv(predictionUv.intValue());
+                    /* 预测 Pv */
+                    float avgPvPercentForSameWeekday = 0f;
+                    if (predictionAvgForSameWeekday.getAvgPvBefore() > 0) {
+                        avgPvPercentForSameWeekday = predictionAvgForSameWeekday.getAvgPvAfter() / predictionAvgForSameWeekday.getAvgPvBefore();
+                    }
+                    float avgPvPercentForOther = 0f;
+                    if (predictionAvgForOther.getAvgPvBefore() > 0) {
+                        avgPvPercentForOther = predictionAvgForOther.getAvgPvAfter() / predictionAvgForOther.getAvgPvBefore();
+                    }
+                    Float predictionPv = current.getPv() * (1
+                            + avgPvPercentForSameWeekday
+                            * 0.7f
+                            + avgPvPercentForOther * 0.3f);
+                    flowSummary.setPv(predictionPv.longValue());
 
-                    Float predictionIpCount = current.getIpCount() * (1 + predictionAvgForSameWeekday.getAvgIpCountAfter() / predictionAvgForSameWeekday.getAvgIpCountBefore() * 0.7f
-                            + predictionAvgForOther.getAvgIpCountAfter() / predictionAvgForOther.getAvgIpCountBefore() * 0.3f);
-                    flowSummary.setIpCount(predictionIpCount.intValue());
+                    /* 预测 Uv */
+                    float avgUvPercentForSameWeekday = 0f;
+                    if (predictionAvgForSameWeekday.getAvgUvBefore() > 0) {
+                        avgUvPercentForSameWeekday = predictionAvgForSameWeekday.getAvgUvAfter() / predictionAvgForSameWeekday.getAvgUvBefore();
+                    }
+                    float avgUvPercentForOther = 0f;
+                    if (predictionAvgForOther.getAvgUvBefore() > 0) {
+                        avgUvPercentForOther = predictionAvgForOther.getAvgUvAfter() / predictionAvgForOther.getAvgUvBefore();
+                    }
 
-                    Float predictionVisitCount = current.getVisitCount() * (1 + predictionAvgForSameWeekday.getAvgVisitCountAfter() / predictionAvgForSameWeekday.getAvgVisitCountBefore() * 0.7f
-                            + predictionAvgForOther.getAvgVisitCountAfter() / predictionAvgForOther.getAvgVisitCountBefore() * 0.3f);
-                    flowSummary.setVisitCount(predictionVisitCount.intValue());
+                    Float predictionUv = current.getUv() * (1
+                            + avgUvPercentForSameWeekday
+                            * 0.7f
+                            + avgUvPercentForOther * 0.3f);
+                    flowSummary.setUv(predictionUv.longValue());
+
+                    /* 预测 Ip */
+                    float avgIpCountPercentForSameWeekday = 0f;
+                    if (predictionAvgForSameWeekday.getAvgIpCountBefore() > 0) {
+                        avgIpCountPercentForSameWeekday = predictionAvgForSameWeekday.getAvgIpCountAfter() / predictionAvgForSameWeekday.getAvgIpCountBefore();
+                    }
+                    float avgIpCountPercentForOther = 0f;
+                    if (predictionAvgForOther.getAvgIpCountBefore() > 0) {
+                        avgIpCountPercentForOther = predictionAvgForOther.getAvgIpCountAfter() / predictionAvgForOther.getAvgIpCountBefore();
+                    }
+
+                    Float predictionIpCount = current.getIpCount() * (1
+                            + avgIpCountPercentForSameWeekday * 0.7f
+                            + avgIpCountPercentForOther
+                            * 0.3f);
+                    flowSummary.setIpCount(predictionIpCount.longValue());
+
+                    /* 预测 visitCount */
+                    float avgVisitCountPercentForSameWeekday = 0f;
+                    if (predictionAvgForSameWeekday.getAvgVisitCountBefore() > 0) {
+                        avgVisitCountPercentForSameWeekday = predictionAvgForSameWeekday.getAvgVisitCountAfter() / predictionAvgForSameWeekday.getAvgVisitCountBefore();
+                    }
+                    float avgVisitCountPercentForOther = 0f;
+                    if (predictionAvgForOther.getAvgVisitCountBefore() > 0) {
+                        avgVisitCountPercentForOther = predictionAvgForOther.getAvgVisitCountAfter() / predictionAvgForOther.getAvgVisitCountBefore();
+                    }
+
+                    Float predictionVisitCount = current.getVisitCount() * (1
+                            + avgVisitCountPercentForSameWeekday * 0.7f
+                            + avgVisitCountPercentForOther * 0.3f);
+                    flowSummary.setVisitCount(predictionVisitCount.longValue());
                     if (predictionVisitCount > 0) {
                         float avgPv = predictionPv * 1.0f / predictionVisitCount;
                         flowSummary.setAvgPv(Float.parseFloat(decimalFormat.get().format(avgPv)));
                     }
-
                 } else if (statDateCount > 28) {
                     List<String> statDateList = new ArrayList<>();
                     int end = statDateCount / 7;
@@ -2607,17 +2693,32 @@ public class ReportServiceImpl implements IReportService {
 
                     flowSummary = new FlowSummary();
                     flowSummary.setStatTime(current.getStatTime());
-                    Float predictionPv = current.getPv() * (1 + predictionAvg.getAvgPvAfter() / predictionAvg.getAvgPvBefore());
-                    flowSummary.setPv(predictionPv.intValue());
+                    Float predictionPv = 0F;
+                    if (predictionAvg.getAvgPvBefore() > 0) {
+                        predictionPv = current.getPv()
+                                * (1 + predictionAvg.getAvgPvAfter() / predictionAvg.getAvgPvBefore());
+                    }
+                    flowSummary.setPv(predictionPv.longValue());
 
-                    Float predictionUv = current.getUv() * (1 + predictionAvg.getAvgUvAfter() / predictionAvg.getAvgUvBefore());
-                    flowSummary.setUv(predictionUv.intValue());
+                    Float predictionUv = 0F;
+                    if (predictionAvg.getAvgUvBefore() > 0) {
+                        predictionUv = current.getUv()
+                                * (1 + predictionAvg.getAvgUvAfter() / predictionAvg.getAvgUvBefore());
+                    }
+                    flowSummary.setUv(predictionUv.longValue());
 
-                    Float predictionIpCount = current.getIpCount() * (1 + predictionAvg.getAvgIpCountAfter() / predictionAvg.getAvgIpCountBefore());
-                    flowSummary.setIpCount(predictionIpCount.intValue());
-
-                    Float predictionVisitCount = current.getVisitCount() * (1 + predictionAvg.getAvgVisitCountAfter() / predictionAvg.getAvgVisitCountBefore());
-                    flowSummary.setVisitCount(predictionVisitCount.intValue());
+                    Float predictionIpCount = 0F;
+                    if (predictionAvg.getAvgIpCountBefore() > 0) {
+                        predictionIpCount = current.getIpCount()
+                                * (1 + predictionAvg.getAvgIpCountAfter() / predictionAvg.getAvgIpCountBefore());
+                    }
+                    flowSummary.setIpCount(predictionIpCount.longValue());
+                    Float predictionVisitCount = 0F;
+                    if (predictionAvg.getAvgVisitCountBefore() > 0) {
+                        predictionVisitCount = current.getVisitCount()
+                                * (1 + predictionAvg.getAvgVisitCountAfter() / predictionAvg.getAvgVisitCountBefore());
+                    }
+                    flowSummary.setVisitCount(predictionVisitCount.longValue());
                     if (predictionVisitCount > 0) {
                         float avgPv = predictionPv * 1.0f / predictionVisitCount;
                         flowSummary.setAvgPv(Float.parseFloat(decimalFormat.get().format(avgPv)));
@@ -2912,9 +3013,9 @@ public class ReportServiceImpl implements IReportService {
     private String buildSummaryWhere(BaseSummaryRequest baseSummaryRequest, MapSqlParameterSource paramMap, boolean needFilterVisitorType, boolean needFilterArea) {
         String where = "";
         where = buildChannelFilter(baseSummaryRequest.getChannel(), paramMap, where);
-        where = buildStatDateStartFilter(baseSummaryRequest.getStartTime(), paramMap, where, baseSummaryRequest.getTimeType());
-        where = buildStatDateEndFilter(baseSummaryRequest.getEndTime(), paramMap, where, baseSummaryRequest.getTimeType());
-        where = buildProjectNameFilter(baseSummaryRequest.getProjectName(), paramMap, where);
+        where = FilterBuildUtils.buildStatDateStartFilter(baseSummaryRequest.getStartTime(), paramMap, where, baseSummaryRequest.getTimeType());
+        where = FilterBuildUtils.buildStatDateEndFilter(baseSummaryRequest.getEndTime(), paramMap, where, baseSummaryRequest.getTimeType());
+        where = FilterBuildUtils.buildProjectNameFilter(baseSummaryRequest.getProjectName(), clklogApiSetting.getProjectName(), paramMap, where);
         if (needFilterArea) {
             where = buildCountryFilter(new ArrayList<>(), paramMap, where);
             where = buildProvinceFilter(new ArrayList<>(), paramMap, where);
@@ -3239,17 +3340,18 @@ public class ReportServiceImpl implements IReportService {
         return timestamp;
     }
 
-    private TimeFrame getPreviousTimeframe(String startTime, String timeType) {
-        Timestamp start = transformFilterTime(startTime, true, timeType);
+    private TimeFrame getPreviousTimeframe(Timestamp startTime, String timeType) {
+
+        Timestamp start = FilterBuildUtils.transformFilterTime(startTime, true, timeType);
         start = new Timestamp(start.getTime() - DateUtils.MILLIS_PER_DAY);
         Timestamp end = null;
-        if ("day".equalsIgnoreCase(timeType)) {
+        if (DimensionType.day.getValue().equalsIgnoreCase(timeType)) {
             end = start;
-        } else if ("week".equalsIgnoreCase(timeType)) {
+        } else if (DimensionType.week.getValue().equalsIgnoreCase(timeType)) {
             long[] prev = TimeUtils.getCurrentWeekTimeFrame(start);
             start = new Timestamp(prev[0]);
             end = new Timestamp(prev[1]);
-        } else if ("month".equalsIgnoreCase(timeType)) {
+        } else if (DimensionType.month.getValue().equalsIgnoreCase(timeType)) {
             long[] prev = TimeUtils.getCurrentMonthTimeFrame(start);
             start = new Timestamp(prev[0]);
             end = new Timestamp(prev[1]);
@@ -3266,14 +3368,14 @@ public class ReportServiceImpl implements IReportService {
         return timeFrame;
     }
 
-    private TimeFrame getSamePeriodTimeframe(String startTime, String timeType) {
+    private TimeFrame getSamePeriodTimeframe(Timestamp startTime, String timeType) {
         TimeFrame timeFrame = null;
-        Timestamp start = transformFilterTime(startTime, true, timeType);
+        Timestamp start = FilterBuildUtils.transformFilterTime(startTime, true, timeType);
         Timestamp end = null;
-        if ("day".equalsIgnoreCase(timeType)) {
+        if (DimensionType.day.getValue().equalsIgnoreCase(timeType)) {
             start = new Timestamp(start.getTime() - DateUtils.MILLIS_PER_DAY * 7);
             end = start;
-        } else if ("month".equalsIgnoreCase(timeType)) {
+        } else if (DimensionType.month.getValue().equalsIgnoreCase(timeType)) {
             Calendar month = Calendar.getInstance();
             month.setTime(start);
             Calendar first = Calendar.getInstance();
@@ -3309,27 +3411,30 @@ public class ReportServiceImpl implements IReportService {
     }
 
     @Override
-    public GetVisitUriPathTreeTotalResponse getVisitUriPathTreeTotal(GetVisitUriDetailRequest getVisitUriDetailRequest) {
+    public GetVisitUriPathTreeTotalResponse getVisitUriPathTreeTotal(
+            GetVisitUriDetailRequest getVisitUriDetailRequest) {
         MapSqlParameterSource paramMap = new MapSqlParameterSource();
         String selectSql = "sum(pv) as pv,sum(ip_count) as ip_count,sum(visit_count) as visit_count,sum(uv) as uv,sum(new_uv) as new_uv,sum(visit_time) as visit_time,sum(bounce_count) as bounce_count,sum(down_pv_count) as down_pv_count,sum(exit_count) as exit_count,sum(entry_count) as entry_count from visituri_detail_bydate t";
         String getListSql = "select t.uri_path as uri,t.host," + selectSql;
 
         String where = "";
-        where = buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
-        where = buildStatDateEndFilter(getVisitUriDetailRequest.getEndTime(), paramMap, where);
-        where = buildChannelFilter(getVisitUriDetailRequest.getChannel(), paramMap, where);
-        where = buildProjectNameFilter(getVisitUriDetailRequest.getProjectName(), paramMap, where);
-        where = buildCountryFilter(getVisitUriDetailRequest.getCountry(), paramMap, where);
-        where = buildProvinceFilter(getVisitUriDetailRequest.getProvince(), paramMap, where);
-        where = buildVisitorTypeFilter(getVisitUriDetailRequest.getVisitorType(), paramMap, where);
+        where = FilterBuildUtils.buildStatDateStartFilter(getVisitUriDetailRequest.getStartTime(), paramMap, where);
+        where = FilterBuildUtils.buildStatDateEndFilter(getVisitUriDetailRequest.getEndTime(), paramMap, where);
+        where = FilterBuildUtils.buildChannelFilter(getVisitUriDetailRequest.getChannel(), paramMap, where);
+        where = FilterBuildUtils.buildProjectNameFilter(getVisitUriDetailRequest.getProjectName(),
+                clklogApiSetting.getProjectName(), paramMap, where);
+        where = FilterBuildUtils.buildCountryFilter(getVisitUriDetailRequest.getCountry(), paramMap, where);
+        where = FilterBuildUtils.buildProvinceFilter(getVisitUriDetailRequest.getProvince(), paramMap, where);
+        where = FilterBuildUtils.buildVisitorTypeFilter(getVisitUriDetailRequest.getVisitorType(), paramMap, where);
 
         if (StringUtils.isNotBlank(where)) {
             where = where.substring(4);
-            getListSql += " where t.uri <> 'all' and " + where;
+            getListSql += " where t.uri <> 'all' and t.uri <> '未取到' and  t.uri <> 'N/A' and " + where;
         }
         getListSql += " group by t.uri_path,t.host order by t.uri_path";
 
-        List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap, new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
+        List<VisituriDetailbydate> visitUriDetailbydateList = clickHouseJdbcTemplate.query(getListSql, paramMap,
+                new BeanPropertyRowMapper<VisituriDetailbydate>(VisituriDetailbydate.class));
 
         List<VisitUriPathDetail> visitUriDetailList = new ArrayList<>();
 
@@ -3350,59 +3455,83 @@ public class ReportServiceImpl implements IReportService {
             visitUriDetail.setUri(visituriDetailbydate.getUri());
             visitUriDetail.setUv(visituriDetailbydate.getUv());
             visitUriDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
-            String[] pathArr = visituriDetailbydate.getUri().split("/", -1);
-            visitUriDetail.setPathList(new ArrayList<>(Arrays.asList(pathArr)));
+            SplitUriPathInfo splitUriPathInfo = TreeUtils.splitUriPath(visituriDetailbydate.getUri());
+            List<String> pathArr = new ArrayList<>(Arrays.asList(splitUriPathInfo.getUriPathArr()));
+            visitUriDetail.setPathList(pathArr);
             visitUriDetail.setPathLength(visitUriDetail.getPathList().size());
             visitUriDetail.setHost(visituriDetailbydate.getHost());
             visitUriDetailList.add(visitUriDetail);
         }
         List<VisitUriTreeStatData> visitUriTreeStatDataList = new ArrayList<>();
-        List<String> hostList = visitUriDetailList.stream().map(VisitUriPathDetail::getHost).distinct().collect(Collectors.toList());
-        hostList = hostList.stream().filter(f -> clklogApiSetting.getProjectHost().contains(f)).collect(Collectors.toList());
-        if (clklogApiSetting.getProjectHost() != null && !clklogApiSetting.getProjectHost().isEmpty()) {
-            hostList = hostList.stream().filter(clklogApiSetting.getProjectHost()::contains)
-                    .collect(Collectors.toList());
+        List<String> hostList = visitUriDetailList.stream().map(VisitUriPathDetail::getHost).distinct()
+                .collect(Collectors.toList());
+        if (constsDataHolder.getHtProjectSetting().containsKey(getVisitUriDetailRequest.getProjectName())) {
+            ProjectSetting setting = constsDataHolder.getHtProjectSetting().get(getVisitUriDetailRequest.getProjectName());
+            if (StringUtils.isNotBlank(setting.getRootUrls())) {
+                List<String> rootUrlList = Arrays.asList(setting.getRootUrls().split(",", -1));
+                hostList = hostList.stream().filter(rootUrlList::contains)
+                        .collect(Collectors.toList());
+            }
         }
         for (String host : hostList) {
-            List<VisitUriTreeStatData> hostStatDataList = genUriTree(visitUriDetailList, host, "/", new ArrayList<>());
+            List<String> pathList = visitUriDetailList.stream().filter(f -> f.getHost().equalsIgnoreCase(host)).map(VisitUriPathDetail::getUri).collect(Collectors.toList());
+            List<UriPathNode> nodeTree = TreeUtils.buildTree(pathList, host);
 
-            boolean needVisutalRoot = false;
-            if (hostStatDataList.size() >= 2) {
-                needVisutalRoot = true;
-            } else if (hostStatDataList.size() == 1) {
-                if (!hostStatDataList.get(0).getPath().equalsIgnoreCase("/")) {
-                    needVisutalRoot = true;
-                }
+            List<UriPathNode> rootTree = new ArrayList<>();
+            UriPathNode uriPathNode = new UriPathNode();
+            uriPathNode.setParentUriPath("");
+            uriPathNode.setUriPath("");
+            uriPathNode.setSegment("");
+            uriPathNode.setLeaves(nodeTree);
+            uriPathNode.setSplitChar("");
+            uriPathNode.setOriginalUriPath(new ArrayList<>());
+            for (UriPathNode leafNode : nodeTree) {
+                uriPathNode.getOriginalUriPath().addAll(leafNode.getOriginalUriPath());
             }
-            if (needVisutalRoot) {
-                VisitUriTreeStatData rootStatData = new VisitUriTreeStatData();
-                rootStatData.setPath("/");
-                rootStatData.setUri(host + rootStatData.getPath());
-                rootStatData.setSegment("");
-                rootStatData.setHost(host);
-                rootStatData.setLeafUri(hostStatDataList);
-                VisitUriPathDetail rootDetail = new VisitUriPathDetail();
-                rootDetail.setUri(rootStatData.getUri());
-                rootDetail.setHost(host);
-                for (VisitUriTreeStatData leafUriStat : hostStatDataList) {
-                    rootDetail.setPv(rootDetail.getPv() + leafUriStat.getDetail().getPv());
-                    rootDetail.setUv(rootDetail.getUv() + leafUriStat.getDetail().getUv());
-                    rootDetail.setIpCount(rootDetail.getIpCount() + leafUriStat.getDetail().getIpCount());
-                    rootDetail.setExitCount(rootDetail.getExitCount() + leafUriStat.getDetail().getExitCount());
-                    rootDetail.setExitRate(rootDetail.getExitRate() + leafUriStat.getDetail().getExitRate());
-                    rootDetail.setEntryCount(rootDetail.getEntryCount() + leafUriStat.getDetail().getEntryCount());
-                    rootDetail.setAvgVisitTime(rootDetail.getAvgVisitTime() + leafUriStat.getDetail().getAvgVisitTime());
-                    rootDetail.setDownPvCount(rootDetail.getDownPvCount() + leafUriStat.getDetail().getDownPvCount());
-                }
-
-                rootStatData.setDetail(rootDetail);
-                visitUriTreeStatDataList.add(rootStatData);
-            } else {
-                visitUriTreeStatDataList.addAll(hostStatDataList);
-            }
+            rootTree.add(uriPathNode);
+            List<VisitUriTreeStatData> list = statLeafNode(visitUriDetailList, host, rootTree);
+            visitUriTreeStatDataList.addAll(list);
         }
         response.setData(visitUriTreeStatDataList);
         return response;
+    }
+
+    private List<VisitUriTreeStatData> statLeafNode(List<VisitUriPathDetail> visitUriDetailList, String host, List<UriPathNode> nodeTree) {
+        List<VisitUriTreeStatData> visitUriTreeStatDataList = new ArrayList<>();
+        for (UriPathNode uriPathNode : nodeTree) {
+            List<VisitUriPathDetail> subList = visitUriDetailList.stream().filter(f -> uriPathNode.getOriginalUriPath().contains(f.getUri())).collect(Collectors.toList());
+
+            List<VisitUriTreeStatData> validLeaf = statLeafNode(visitUriDetailList, host, uriPathNode.getLeaves());
+
+            VisitUriTreeStatData rootStatData = new VisitUriTreeStatData();
+            if (uriPathNode.isStartSplitChar()) {
+                rootStatData.setPath(uriPathNode.getSplitChar() + uriPathNode.getUriPath());
+            } else {
+                rootStatData.setPath(uriPathNode.getUriPath());
+            }
+            rootStatData.setUri(host + rootStatData.getPath());
+            rootStatData.setHost(host);
+            rootStatData.setLeafUri(validLeaf);
+            rootStatData.setSegment(uriPathNode.getSegment());
+            VisitUriPathDetail rootDetail = new VisitUriPathDetail();
+            rootDetail.setUri(rootStatData.getUri());
+            rootDetail.setHost(host);
+            for (VisitUriPathDetail leafUriStat : subList) {
+                rootDetail.setPv(rootDetail.getPv() + leafUriStat.getPv());
+                rootDetail.setUv(rootDetail.getUv() + leafUriStat.getUv());
+                rootDetail.setIpCount(rootDetail.getIpCount() + leafUriStat.getIpCount());
+                rootDetail.setExitCount(rootDetail.getExitCount() + leafUriStat.getExitCount());
+                rootDetail.setExitRate(rootDetail.getExitRate() + leafUriStat.getExitRate());
+                rootDetail.setEntryCount(rootDetail.getEntryCount() + leafUriStat.getEntryCount());
+                rootDetail
+                        .setAvgVisitTime(rootDetail.getAvgVisitTime() + leafUriStat.getAvgVisitTime());
+                rootDetail.setDownPvCount(rootDetail.getDownPvCount() + leafUriStat.getDownPvCount());
+            }
+
+            rootStatData.setDetail(rootDetail);
+            visitUriTreeStatDataList.add(rootStatData);
+        }
+        return visitUriTreeStatDataList;
     }
 
     private List<VisitUriTreeStatData> genUriTree(List<VisitUriPathDetail> visitUriDetailList, String host, String parentUri, List<String> pathList) {
@@ -3518,5 +3647,120 @@ public class ReportServiceImpl implements IReportService {
             host = hostMatcher.group();
         }
         return host;
+    }
+
+    @Override
+    public GetChannelResponse getChannelList(GetChannelRequest getChannelRequest) {
+        Object objLib = queueRedisTemplate.opsForHash().get(redisConstsConfig.getProjectChannelHashKey(), getChannelRequest.getProjectName());
+
+        String libs = "all";
+        if (objLib != null) {
+            libs = objLib.toString();
+        }
+        List<Channel> channelList = new ArrayList<>();
+        String[] libArr = libs.split(",");
+        for (String lib : libArr) {
+            Channel channel = new Channel();
+            channel.setName(lib);
+            channel.setDisplayName(lib);
+            channelList.add(channel);
+        }
+
+        int ordernum = 100;
+        LinkedHashMap<String, String> libTypeMap = clklogApiSetting.getLibTypeMap();
+        List<String> keyList = new ArrayList<>(libTypeMap.keySet());
+        for (Channel channel : channelList) {
+            String key = channel.getName().toLowerCase(Locale.ROOT);
+            if (libTypeMap.containsKey(key)) {
+                channel.setDisplayName(libTypeMap.get(key).split(",")[1]);
+                channel.setOrdernum(keyList.indexOf(channel.getName().toLowerCase(Locale.ROOT)) + 1);
+            } else {
+                channel.setDisplayName(channel.getName());
+                channel.setOrdernum(ordernum++);
+            }
+        }
+        channelList = channelList.stream().sorted(Comparator.comparingInt(Channel::getOrdernum)).collect(Collectors.toList());
+
+        GetChannelResponse response = new GetChannelResponse();
+
+        response.setData(channelList);
+        return response;
+    }
+
+    @Scheduled(fixedDelay = 30000)
+    @Override
+    public void loadUrlRule() {
+        try {
+            FilterBuildUtils.setLibTypeMap(clklogApiSetting.getLibTypeMap());
+            String projectSettingContent = queueRedisTemplate.opsForValue().get(redisConstsConfig.getProjectSettingKey());
+            if (StringUtils.isNotBlank(projectSettingContent)) {
+                HashMap<String, ProjectSetting> projectSettingHashMap = objectMapper.readValue(projectSettingContent,
+                        htProjectSettingTypeReference);
+                constsDataHolder.getHtProjectSetting().putAll(projectSettingHashMap);
+            }
+        } catch (Exception ex) {
+            logger.error("load ProjectSetting err", ex);
+        }
+    }
+
+    @Scheduled(fixedDelay = 60000)
+    @Override
+    public void loadChannelList() {
+        try {
+            long sinceTimestamp = 1704038400000L;
+
+            String latestTime = queueRedisTemplate.opsForValue().get(redisConstsConfig.getLatestTimeOfCacheChannelKey());
+            if (StringUtils.isNotBlank(latestTime)) {
+                sinceTimestamp = Long.parseLong(latestTime);
+            }
+
+            // 获取自上次缓存以来的项目渠道情况
+            MapSqlParameterSource paramMap = new MapSqlParameterSource();
+            String getListSql = "select project_name, arrayStringConcat(groupUniqArray(lib),',') as libs from flow_trend_bydate t";
+            String where = "";
+            where = FilterBuildUtils.buildStatDateStartFilter(new Timestamp(sinceTimestamp - DateUtils.MILLIS_PER_DAY), paramMap, where);
+
+            where = FilterBuildUtils.buildVisitorTypeFilter("", paramMap, where);
+            where = FilterBuildUtils.buildCountryFilter(new ArrayList<>(), paramMap, where);
+            where = FilterBuildUtils.buildProvinceFilter(new ArrayList<>(), paramMap, where);
+
+            getListSql += " where " + where.substring(4) + " group by project_name";
+
+            List<ProjectChannel> projectChannelList = clickHouseJdbcTemplate.query(getListSql, paramMap,
+                    new BeanPropertyRowMapper<ProjectChannel>(ProjectChannel.class));
+
+            // 获取上一次的项目渠道情况
+            Map<Object, Object> oldProjectChannelMap = queueRedisTemplate.opsForHash().entries(redisConstsConfig.getProjectChannelHashKey());
+
+            for (ProjectChannel projectChannel : projectChannelList) {
+                if (oldProjectChannelMap.containsKey(projectChannel.getProjectName())) {
+                    String oldChannel = oldProjectChannelMap.get(projectChannel.getProjectName()).toString();
+
+                    List<String> oldChannelList = new ArrayList<>(Arrays.asList(oldChannel.split(",")));
+                    List<String> currentChannelList = new ArrayList<>(Arrays.asList(projectChannel.getLibs().split(",")));
+
+                    oldChannelList.addAll(currentChannelList);
+                    oldChannelList = oldChannelList.stream().distinct().collect(Collectors.toList());
+                    oldProjectChannelMap.put(projectChannel.getProjectName(), String.join(",", oldChannelList));
+                } else {
+                    oldProjectChannelMap.put(projectChannel.getProjectName(), projectChannel.getLibs());
+                }
+            }
+            // 缓存到redis
+            RedisSerializer<String> rs = (RedisSerializer<String>) queueRedisTemplate.getKeySerializer();
+            queueRedisTemplate.executePipelined(new RedisCallback<Object>() {
+                @Override
+                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                    byte[] byKey = rs.serialize(redisConstsConfig.getProjectChannelHashKey());
+                    for (Map.Entry<Object, Object> entry : oldProjectChannelMap.entrySet()) {
+                        connection.hSet(byKey, rs.serialize(entry.getKey().toString()), rs.serialize(entry.getValue().toString()));
+                    }
+                    connection.set(rs.serialize(redisConstsConfig.getLatestTimeOfCacheChannelKey()), rs.serialize(String.valueOf(System.currentTimeMillis())));
+                    return null;
+                }
+            });
+        } catch (Exception ex) {
+            logger.error("load loadChannelList err", ex);
+        }
     }
 }

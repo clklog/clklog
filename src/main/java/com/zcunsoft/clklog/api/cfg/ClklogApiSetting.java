@@ -1,26 +1,18 @@
 package com.zcunsoft.clklog.api.cfg;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
-@ConfigurationProperties("clklogapi")
+@ConfigurationProperties("clklog-api")
 public class ClklogApiSetting {
-
-    private String[] accessControlAllowOriginPatterns;
 
     private String projectName;
 
-    private List<String> projectHost;
-
-    public String[] getAccessControlAllowOriginPatterns() {
-        return accessControlAllowOriginPatterns;
-    }
-
-    public void setAccessControlAllowOriginPatterns(String[] accessControlAllowOriginPatterns) {
-        this.accessControlAllowOriginPatterns = accessControlAllowOriginPatterns;
-    }
+    /**
+     * 渠道对照表
+     */
+    private LinkedHashMap<String, String> libTypeMap;
 
     public String getProjectName() {
         return projectName;
@@ -30,11 +22,12 @@ public class ClklogApiSetting {
         this.projectName = projectName;
     }
 
-    public List<String> getProjectHost() {
-        return projectHost;
+
+    public LinkedHashMap<String, String> getLibTypeMap() {
+        return libTypeMap;
     }
 
-    public void setProjectHost(List<String> projectHost) {
-        this.projectHost = projectHost;
+    public void setLibTypeMap(LinkedHashMap<String, String> libTypeMap) {
+        this.libTypeMap = libTypeMap;
     }
 }

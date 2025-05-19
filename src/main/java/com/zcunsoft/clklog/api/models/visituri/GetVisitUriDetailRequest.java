@@ -1,8 +1,10 @@
 package com.zcunsoft.clklog.api.models.visituri;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +25,12 @@ public class GetVisitUriDetailRequest {
     private String visitorType;
 
     @Schema(description = "开始时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-06-08")
-    private String startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Timestamp startTime;
+
     @Schema(description = "结束时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2023-06-10")
-    private String endTime;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Timestamp endTime;
 
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
     private String projectName;

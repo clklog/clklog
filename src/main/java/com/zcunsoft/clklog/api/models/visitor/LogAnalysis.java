@@ -1,68 +1,67 @@
 package com.zcunsoft.clklog.api.models.visitor;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-
-import io.swagger.v3.oas.annotations.media.Schema;
-
+import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Schema(description = "原始数据")
 @Data
 public class LogAnalysis {
 
-	
+    @Id
 	@Schema(description = "用户ID")
     String distinctId;
-	
-	@Schema(description = "会话ID")
+
+    @Schema(description = "会话ID")
     String eventSessionId;
-	
-	@Schema(description = "页面地址")
+
+    @Schema(description = "页面地址")
     String uri;
-	
-	@Schema(description = "事件时间")
+
+    @Schema(description = "事件时间")
 	Timestamp logTime;
-	
-	@Schema(description = "页面标题")
+
+    @Schema(description = "页面标题")
 	String title;
-	
-	@Schema(description = "调用端IP")
+
+    @Schema(description = "调用端IP")
 	String clientIp;
-	
-	@Schema(description = "项目名称")
+
+    @Schema(description = "项目名称")
 	String projectName;
-    
+
     @Schema(description = "统计日期")
     Timestamp statDate;
-    
+
     @Schema(description = "统计时段")
     String statHour ;
-    
+
     @Schema(description = "")
     String flushTime ;
-    
+
     @Schema(description = "日志类型")
     String typeContext;
-    
+
     @Schema(description = "事件名称")
     String event;
-    
+
     @Schema(description = "日志时间")
     String time;
-    
+
     @Schema(description = "")
     String trackId;
-    
+
     @Schema(description = "Web cookie ID")
     String identityCookieId;
-    
+
     @Schema(description = "埋点类型")
     String lib;
-    
+
     @Schema(description = "埋点方式")
     String libMethod;
-    
+
     @Schema(description = "埋点版本")
     String libVersion;
     @Schema(description = "时区偏移量")
@@ -71,16 +70,16 @@ public class LogAnalysis {
     String screenHeight;
     @Schema(description = "屏幕宽度")
     String screenWidth;
-    
+
     @Schema(description = "视区高度")
     String viewportHeight;
-    
+
     @Schema(description = "视区宽度")
     String viewportWidth;
-    
+
     @Schema(description = "前向地址")
     String referrer;
-    
+
     @Schema(description = "页面路径")
     String urlPath;
     @Schema(description = "最近一次站外前向地址")
@@ -147,7 +146,7 @@ public class LogAnalysis {
     String firstChannelAdgroupId;
     @Schema(description = "首次渠道广告计划ID")
     String firstChannelCampaignId;
-    
+
     @Schema(description = "首次渠道监测点击ID")
     String firstChannelClickId;
     @Schema(description = "首次渠道名称")
@@ -184,7 +183,7 @@ public class LogAnalysis {
     String model;
     @Schema(description = "网络类型")
     String networkType;
-    
+
     @Schema(description = "操作系统")
     String os;
     @Schema(description = "操作系统版本")
@@ -229,5 +228,5 @@ public class LogAnalysis {
     String userKey;
     @Schema(description = "用户是否登录")
     Integer isLogined;
-	
+
 }
