@@ -14,6 +14,7 @@ const getters = {
   password:state => state.user.password,
   // tracking
   projectName: state => state.tracking.projectName,
+  projectArray: state => state.tracking.projectArray,
   filterBar: state => state.filterBar.checkList
 }
 export default getters

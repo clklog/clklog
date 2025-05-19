@@ -120,7 +120,6 @@ export default {
   methods: {
     // 传递数据内容
     apiDetailList(val) {
-      // this.flowTrendList = val.detail;
       this.flowTrendList = val;
     },
     changeChartValue(e) {

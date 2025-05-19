@@ -37,13 +37,13 @@ export default {
       const originalCluster = this.getThemeCluster(oldVal.replace('#', ''))
       console.log(themeCluster, originalCluster)
 
-      const $message = this.$message({
-        message: '  Compiling the theme',
-        customClass: 'theme-message',
-        type: 'success',
-        duration: 0,
-        iconClass: 'el-icon-loading'
-      })
+      // const $message = this.$message({
+      //   message: '  Compiling the theme',
+      //   customClass: 'theme-message',
+      //   type: 'success',
+      //   duration: 0,
+      //   iconClass: 'el-icon-loading'
+      // })
 
       const getHandler = (variable, id) => {
         return () => {
@@ -82,7 +82,7 @@ export default {
 
       this.$emit('change', val)
 
-      $message.close()
+      // $message.close()
     }
   },
 

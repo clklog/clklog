@@ -58,14 +58,14 @@ export default {
     getUserVisit() {
       getUserVisitApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.visitNum.getVisitNum(res.data);
+          this.$refs.visitNum && this.$refs.visitNum.getVisitNum(res.data);
         }
       });
     },
     getUserVisitTime() {
       getUserVisitTimeApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.visitTime.getVisitTime(res.data);
+          this.$refs.visitTime && this.$refs.visitTime.getVisitTime(res.data);
         }
       });
     },

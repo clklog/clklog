@@ -2,15 +2,16 @@ import axios from "axios";
 import { MessageBox, Message } from "element-ui";
 import store from "@/store";
 import { getToken } from "@/utils/auth";
+import Router from '@/router';
 const service = axios.create({
-  baseURL: '',
+  baseURL: "",
   timeout: 5000, // request timeout
 });
 service.interceptors.request.use(
   (config) => {
-    // if (store.getters.token) {
-    //   config.headers["X-Token"] = getToken();
-    // }
+    if (store.getters.token) {
+      config.headers["Authorization"] = "Bearer " + getToken(); // 让每个请求携带自定义token 请根据实际情况自行修改
+    }
     const isMock = config.url.includes("/vue-element-admin/user");
     if ((config.method === "post" || config.method === "put") && !isMock) {
       if (!config.headers["Content-Type"]) {
@@ -29,26 +30,26 @@ service.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+let isLoggingOut = false; // 添加标志位，防止死循环
 service.interceptors.response.use(
   (res) => {
-    // console.log(res, "下载------");
-    // return res;
-    // if (!res.type) {
-    //   Message({
-    //     message: res.message || "Error",
-    //     type: "error",
-    //     duration: 5 * 1000,
-    //   });
-    //   return Promise.reject(new Error(res.message || "Error"));
-    // } else {
-    //   return response;
-    // }
     if (res.status != 200) {
       Message({
         message: res.statusText || "Error",
         type: "error",
         duration: 5 * 1000,
       });
+      if (res.status == 403) {
+        if (!isLoggingOut) {
+          // 检查标志位
+          isLoggingOut = true; // 设置标志位为 true
+          store.dispatch("user/logout").then(() => {
+            Router.push({ path: "/login" });
+            isLoggingOut = false; // 重置标志位
+          });
+        }
+        return; // 直接返回，避免继续处理
+      }
       return Promise.reject(new Error(res.statusText || "Error"));
     } else {
       return res;

@@ -2,7 +2,7 @@
   <div class="PageView block-main public-hoverItem">
     <div
       class="block-head"
-      @click="$router.push('/visitorAnalysis/visitedPage')"
+      @click="$router.push('/access/visitedPage')"
     >
       <div class="block-title">Top10受访页面</div>
       <div class="block-head-icon">

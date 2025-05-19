@@ -2,9 +2,26 @@
 require("babel-polyfill");
 const path = require("path");
 const defaultSettings = require("./src/settings.js");
+
 function resolve(dir) {
   return path.join(__dirname, dir);
 }
+
+let MANAGE, DEVAPI;
+// 配置代理地本地代理地址
+function setProxy(env) {
+  // ******** 生产环境 ********
+  if (env === "prod") {  
+    MANAGE = "https:/http://YOUR_DOMAIN/manage"; //clklog-manage-api接口应用路径
+    DEVAPI = "http://YOUR_DOMAIN/api"; //clklog-api接口应用路径
+  } else {  
+    // ******* 测试环境 ********
+    MANAGE = "http://YOUR_DOMAIN/manage";
+    DEVAPI = "http://YOUR_DOMAIN/api";
+  }
+}
+//切换环境
+setProxy("dev");
 
 const name = defaultSettings.title || "ClkLog"; // page title
 
@@ -27,7 +44,6 @@ module.exports = {
   publicPath: "/",
   outputDir: "dist",
   assetsDir: "static",
-  // lintOnSave: process.env.NODE_ENV === 'development',
   lintOnSave: false,
   productionSourceMap: false,
   devServer: {
@@ -38,6 +54,20 @@ module.exports = {
       errors: true,
     },
     proxy: {
+      "/DEV-API-MANAGE": {
+        target: MANAGE,
+        changeOrigin: true,
+        pathRewrite: {
+          "^/DEV-API-MANAGE": "",
+        },
+      },
+      "/DEV-API": {
+        target: DEVAPI, // 配置基础api代理地址
+        changeOrigin: true, // 是否支持跨域
+        pathRewrite: {
+          "^/DEV-API": "", // 重写路径：去掉路径中开头的 '/api'
+        },
+      },    
       "/DEV-APISUB": {
         target: "https://support.clklog.com/public",
         changeOrigin: true,
@@ -45,16 +75,7 @@ module.exports = {
           "^/DEV-APISUB": "",
         },
       },
-      // 配置api接口基础路径
-      "/DEV-API": {
-        target: "/api", // 配置api接口基础路径
-        changeOrigin: true, // 是否支持跨域
-        pathRewrite: {
-          "^/DEV-API": "", // 重写路径：去掉路径中开头的 '/api'
-        },
-      },
     },
-    // before: require("./mock/mock-server.js"),
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

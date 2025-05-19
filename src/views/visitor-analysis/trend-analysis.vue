@@ -1,12 +1,7 @@
 <template>
   <div>
     <div class="documentation-container">
-      <FilterBar
-        ByArea
-        ByData
-        bySub
-        @setFilterBarParams="setFilterBarParams"
-      />
+      <FilterBar ByArea ByData bySub @setFilterBarParams="setFilterBarParams" />
     </div>
     <div class="public-block">
       <div class="Overview public-hoverItem">
@@ -78,10 +73,21 @@ export default {
       getFlowDetailApi(this.commonParams).then((res) => {
         if (res.code == 200) {
           if (noEchart) {
-            this.$refs.trendTable.apiDetailList(JSON.parse(JSON.stringify(res.data)),this.commonParams.timeType,this.commonParams);
-            this.$refs.indicatorChart.apiDetailList(res.data)
-          }else{
-            this.$refs.trendTable.apiDetailList(JSON.parse(JSON.stringify(res.data)),this.commonParams.timeType,this.commonParams);
+            this.$refs.trendTable &&
+              this.$refs.trendTable.apiDetailList(
+                JSON.parse(JSON.stringify(res.data)),
+                this.commonParams.timeType,
+                this.commonParams
+              );
+            this.$refs.indicatorChart &&
+              this.$refs.indicatorChart.apiDetailList(res.data);
+          } else {
+            this.$refs.trendTable &&
+              this.$refs.trendTable.apiDetailList(
+                JSON.parse(JSON.stringify(res.data)),
+                this.commonParams.timeType,
+                this.commonParams
+              );
           }
         }
       });

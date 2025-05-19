@@ -87,7 +87,7 @@
             width="400px"
             :show-overflow-tooltip="true"
           >
-            <template slot-scope="scope" style="display: flex">
+            <template slot-scope="scope">
               <!-- 最后一级增加节点 -->
               <div
                 v-if="
@@ -163,18 +163,7 @@
                 </div>
               </div>
 
-              <!-- <img
-                v-if="scope.row.leafUri.length > 0 && !scope.row.firstFlag"
-                style="
-                  position: absolute;
-                  right: 10px;
-                  top: 8px;
-                  cursor: pointer;
-                  width: 17px;
-                "
-                src="@/assets/images/showDialog.png"
-                @click="handleTree(scope.row, 'dialog')"
-              /> -->
+             
             </template>
           </el-table-column>
 

@@ -5,7 +5,7 @@ import Layout from "@/layout";
 import visitorAnalysis from "./modules/visitor-analysis";
 import accessAnalysis from "./modules/access-analysis";
 import userBehavior from "./modules/user-behavior";
-
+import systemManageRouter from "./modules/system-manage";
 export const constantRoutes = [
   {
     path: "/redirect",
@@ -60,16 +60,31 @@ export const constantRoutes = [
         path: "trend",
         component: () => import("@/views/visitor-analysis/trend-analysis"),
         name: "trend",
-        meta: { title: "趋势分析", icon: "trend", affix: true },
+        meta: { title: "趋势分析", icon: "trend", affix: true, },
       },
     ],
   },
+
 ];
 
 export const asyncRoutes = [
   visitorAnalysis,
   accessAnalysis,
   userBehavior,
+  {
+    path: "/crashAnalysis",
+    component: Layout,
+    redirect: "/crashAnalysis/crash",
+    children: [
+      {
+        path: "crash",
+        component: () => import("@/views/collapse-analysis/index"),
+        name: "crash",
+        meta: { title: "App崩溃分析", icon: "trend", affix: true, },
+      },
+    ],
+  },
+  systemManageRouter,
   {
     path: "/pro",
     component: Layout,

@@ -1,7 +1,7 @@
 <template>
   <div>
     <FilterBar @setFilterBarParams="setFilterBarParams" ByArea></FilterBar>
-    <analysisTable ref="analysisTable" @currentPage="currentPage"></analysisTable>
+    <analysisTable ref="analysisTable" @currentPage="currentPage" @searchUserId="searchUserId"></analysisTable>
   </div>
 </template>
 
@@ -26,6 +26,7 @@ export default {
       visitorTotal: null,
       sortName: null,
       sortOrder: null,
+      distinctId:"",
     };
   },
   computed: {
@@ -45,6 +46,10 @@ export default {
   },
   mounted() {},
   methods: {
+    searchUserId(ID) {
+      this.distinctId = ID;
+      this.getVisitorList();
+    },
     currentPage(val) {
       this.getVisitorList(val);
     },
@@ -63,6 +68,7 @@ export default {
       this.pageNum= 1;
       newvalue.pageNum = this.pageNum;
       newvalue.pageSize = this.pageSize;
+      newvalue.distinctId = this.distinctId;
       if (val) {
         newvalue.pageNum = val.page;
         newvalue.pageSize = val.size;

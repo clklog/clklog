@@ -31,25 +31,47 @@ html {
 #app {
   height: 100%;
 }
+// 重置和刷新按钮样式统一
+.tabBarBtn {
+  display: flex;
+  position: fixed;
+  right: 30px;
+  width: 160px;
+  z-index: 1000;
+}
+.tabBarBtn .el-loading-spinner {
+  margin-top: -6px;
+}
+.tabBarBtn .refresh {
+  width: 70px;
+}
+.tabBarBtn .reset {
+  width: 70px;
+  margin-left: 20px;
+}
 // 共用自定义样式
 .zc_explain_tip {
-  // text-indent: 2em;
   font-size: 14px;
   font-weight: 400;
   line-height: 25px;
   color: #4d4d4d;
   letter-spacing: 1px;
 }
-.zc_btn{
-  height: 32px;
-  line-height: 7px;
+.zc_btn {
+  z-index: 99;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: #fff !important;
   font-size: 13px;
   background-color: #2c7be5 !important;
 }
 .zc_btn_default {
   height: 30px;
-  line-height: 7px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-size: 13px;
   color: #2c7be5;
   border: 1px solid #2c7be5;
@@ -276,6 +298,13 @@ aside {
     vertical-align: middle;
     margin-bottom: 10px;
   }
+}
+.public-tableHead {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 25px;
+  color: #4d4d4d;
+  margin-bottom: 20px;
 }
 
 //refine vue-multiselect plugin
