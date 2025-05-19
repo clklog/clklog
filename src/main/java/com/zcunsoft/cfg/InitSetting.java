@@ -12,7 +12,15 @@ public class InitSetting {
 
     private String resourcePath = "";
 
+    private int eventSessionAcrossDay = 2;
+
     private boolean quartzEnabled = true;
+
+
+    private int sleepMillisecAfterOneRound = 300000;
+
+
+    private int sleepMillisecAfterOneScript = 2000;
 
     private HashMap<String, String> quartz;
 
@@ -46,5 +54,29 @@ public class InitSetting {
 
     public void setLogDb(String logDb) {
         this.logDb = logDb;
+    }
+
+    public int getSleepMillisecAfterOneScript() {
+        return sleepMillisecAfterOneScript;
+    }
+
+    public void setSleepMillisecAfterOneScript(int sleepMillisecAfterOneScript) {
+        this.sleepMillisecAfterOneScript = sleepMillisecAfterOneScript;
+    }
+
+    public int getSleepMillisecAfterOneRound() {
+        return sleepMillisecAfterOneRound;
+    }
+
+    public void setSleepMillisecAfterOneRound(int sleepMillisecAfterOneRound) {
+        this.sleepMillisecAfterOneRound = sleepMillisecAfterOneRound;
+    }
+
+    public int getEventSessionAcrossDay() {
+        return eventSessionAcrossDay;
+    }
+
+    public void setEventSessionAcrossDay(int eventSessionAcrossDay) {
+        this.eventSessionAcrossDay = eventSessionAcrossDay;
     }
 }

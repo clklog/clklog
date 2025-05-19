@@ -1,5 +1,6 @@
 package com.zcunsoft.daemons;
 
+import com.zcunsoft.handlers.ConstsDataHolder;
 import com.zcunsoft.services.IInitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,9 @@ public class InitProcessBoss {
 
     @Resource
     private IInitService initService;
+
+    @Resource
+    private ConstsDataHolder constsDataHolder;
 
     Thread thread = null;
 
@@ -39,7 +43,9 @@ public class InitProcessBoss {
         while (running) {
             try {
                 Thread.sleep(10000);
+                /* 初始化一次 */
                 if (initService.initDb()) {
+                    constsDataHolder.setDbInited(true);
                     running = false;
                 }
             } catch (InterruptedException e) {
