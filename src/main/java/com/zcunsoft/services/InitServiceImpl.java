@@ -56,8 +56,10 @@ public class InitServiceImpl implements IInitService {
                     + tableName + ".sql");
             sql = sql.replace("${CLKLOG_LOG_DB}", setting.getLogDb());
             if (!sql.isEmpty()) {
-                sql = sql.replaceAll(":cal_date", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis())));
-                sql = sql.replaceAll(":previous_date", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000 * 7)));
+                long now = System.currentTimeMillis();
+                String statDate = yMdFORMAT.get().format(new Timestamp(now));
+                sql = sql.replaceAll(":cal_date", statDate);
+                sql = sql.replaceAll(":previous_date", yMdFORMAT.get().format(new Timestamp(now - 86400000L * (setting.getEventSessionAcrossDay() - 1))));
                 if (script_name.equalsIgnoreCase("visitor_life_bydate")) {
                     sql = sql.replaceAll(":before_date_1", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000)));
                     sql = sql.replaceAll(":before_date_2", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000 * 2)));
@@ -65,7 +67,7 @@ public class InitServiceImpl implements IInitService {
                 }
                 logger.info(sql);
                 clickHouseJdbcTemplate.execute(sql);
-                clickHouseJdbcTemplate.execute("optimize table clklog." + tableName + " FINAL SETTINGS optimize_skip_merged_partitions=1");
+                clickHouseJdbcTemplate.execute("optimize table " + setting.getLogDb() + "." + tableName + " FINAL SETTINGS optimize_skip_merged_partitions=1");
             }
         } catch (Exception ex) {
             logger.error("calScript " + script_name + " error ", ex);

@@ -10,9 +10,12 @@ spring:
       jdbc-url: jdbc:clickhouse://localhost:8123/default
       username: default
       password:
+      driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+      socket_timeout: 300000
 init:
-  log-db: clklog
-  quartz-enabled: true
+  log-db: default
+  quartz-enabled: false
+  event-session-across-day: 2
   quartz:
     area_detail_bydate: '0 */1 * * * ?'
     visituri_summary_bydate: '0 */1 * * * ?'

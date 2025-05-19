@@ -12,6 +12,8 @@ public class InitSetting {
 
     private String resourcePath = "";
 
+    private int eventSessionAcrossDay = 2;
+
     private boolean quartzEnabled = true;
 
 
@@ -68,5 +70,13 @@ public class InitSetting {
 
     public void setSleepMillisecAfterOneRound(int sleepMillisecAfterOneRound) {
         this.sleepMillisecAfterOneRound = sleepMillisecAfterOneRound;
+    }
+
+    public int getEventSessionAcrossDay() {
+        return eventSessionAcrossDay;
+    }
+
+    public void setEventSessionAcrossDay(int eventSessionAcrossDay) {
+        this.eventSessionAcrossDay = eventSessionAcrossDay;
     }
 }
