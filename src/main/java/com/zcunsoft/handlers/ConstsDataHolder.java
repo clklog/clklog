@@ -11,12 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 
 @Data
-public class ConstsDataHolder { 
-
-	private final ConcurrentMap<String, String> htForCountry = new ConcurrentHashMap<String, String>();
-
-	private final ConcurrentMap<String, String> htForProvince = new ConcurrentHashMap<String, String>();
-
+public class ConstsDataHolder {
 
 	private final ConcurrentMap<String, String> htForCity = new ConcurrentHashMap<String, String>();
 

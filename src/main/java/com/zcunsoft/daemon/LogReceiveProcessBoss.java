@@ -78,12 +78,14 @@ public class LogReceiveProcessBoss {
                     } else {
                         break;
                     }
-                    if (count >= 20) {
+                    if (count >= 1000) {
                         handle(logList);
                         count = 0;
                         logList.clear();
                     }
                 } catch (Exception ex) {
+                    count = 0;
+                    logList.clear();
                     logger.error("handle err ", ex);
                     try {
                         Thread.sleep(5000);

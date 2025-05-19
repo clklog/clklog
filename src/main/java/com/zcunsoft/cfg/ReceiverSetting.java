@@ -2,15 +2,11 @@ package com.zcunsoft.cfg;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.List;
-
 
 @ConfigurationProperties("receiver")
 public class ReceiverSetting {
 
     private int threadCount = 2;
-
-    private List<String> projectList;
 
     private boolean enableSimpleVersion;
 
@@ -24,14 +20,6 @@ public class ReceiverSetting {
 
     public void setThreadCount(int threadCount) {
         this.threadCount = threadCount;
-    }
-
-    public List<String> getProjectList() {
-        return projectList;
-    }
-
-    public void setProjectList(List<String> projectList) {
-        this.projectList = projectList;
     }
 
     public String getResourcePath() {
