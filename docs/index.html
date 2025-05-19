@@ -98,8 +98,19 @@
         plugins: [
           function (hook, vm) {
             hook.doneEach(function () {
+              // console.log('doneEach' + document.title)
               sensors.quick('autoTrackSinglePage')
             })
+            // hook.beforeEach(function (content) {
+            //   console.log('beforeEach' + document.title)
+            //   return content
+            // })
+            // hook.mounted(function () {
+            //   console.log('mounted' + document.title)
+            // })
+            // hook.ready(function () {
+            //   console.log('ready' + document.title)
+            // })
           },
           function pageContact(hook, vm) {
             var contactHtml = [
@@ -115,6 +126,18 @@
           }
         ]
       }
+
+      document.addEventListener('visibilitychange', function () {
+        // 用户息屏、或者切到后台运行 （离开页面）
+        // if (document.visibilityState === 'hidden') {
+        //   console.log('hidden')
+        // }
+        // 用户打开或回到页面
+        if (document.visibilityState === 'visible') {
+          console.log('页面可见')
+          sensors.quick('autoTrackSinglePage')
+        }
+      })
     </script>
   </head>
   <body>

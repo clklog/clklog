@@ -1,4 +1,3 @@
-<!-- _navbar.md?r=0519 -->
 
 * [主页](/#/)
 * [产品介绍](/introduce.md?r=0519)
@@ -16,6 +15,7 @@
   * [集成测试参考](/integration/reference.md?r=0519?r=0519)
   * [集成注意事项](/tutorials/notes.md?r=0519)
   * [统计指标说明](/tutorials/statindicator.md?r=0519)
+
 * [演示环境](https://demo.clklog.com)
   * [ClkLog 社区版](https://demo.clklog.com)
   * [ClkLog 付费版(pro+cdp)](https://pro.clklog.com)
