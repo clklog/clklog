@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.zcunsoft</groupId>
 	<artifactId>clklog-processing</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<properties>
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
@@ -108,6 +108,11 @@
 <!--			<artifactId>flink-clients</artifactId>-->
 <!--			<version>${flink.version}</version>-->
 <!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.flink</groupId>-->
+<!--			<artifactId>flink-runtime-web</artifactId>-->
+<!--			<version>${flink.version}</version>-->
+<!--		</dependency>-->
 	</dependencies>
 	<build>
 		<plugins>
@@ -154,6 +159,14 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

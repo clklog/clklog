@@ -1,7 +1,9 @@
 package com.zcunsoft.clklog.analysis.utils;
 
-import com.zcunsoft.clklog.analysis.bean.ProjectSetting;
 import com.zcunsoft.clklog.analysis.bean.LogBean;
+import com.zcunsoft.clklog.analysis.bean.PathRule;
+import com.zcunsoft.clklog.analysis.bean.ProjectSetting;
+import com.zcunsoft.clklog.analysis.bean.Region;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import nl.basjes.parse.useragent.AgentField;
 import nl.basjes.parse.useragent.UserAgent;
@@ -12,26 +14,64 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.URI;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ExtractUtil {
     private static final Logger logger = LoggerFactory.getLogger(ExtractUtil.class);
+    /**
+     * A类IP的正则模式.
+     */
+    private static final Pattern IPPatternClassA = Pattern.compile("^([0-9]{1,3})\\.\\*\\.\\*\\.\\*$");
+    /**
+     * B类IP的正则模式.
+     */
+    private static final Pattern IPPatternClassB = Pattern.compile("^([0-9]{1,3})\\.([0-9]{1,3})\\.\\*\\.\\*$");
+
+    /**
+     * C类IP的正则模式.
+     */
+    private static final Pattern IPPatternClassC = Pattern
+            .compile("^([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.\\*$");
+    /**
+     * 单个IP的正则模式.
+     */
+    private static final Pattern IPPatternSingle = Pattern
+            .compile("^([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})$");
+
+    /**
+     * The time format.
+     */
+    private static final ThreadLocal<DateFormat> yMdHmsFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
 
-    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, ProjectSetting projectSetting) {
+    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, ProjectSetting projectSetting, String[] logInfoArr) {
 
         LogBean logBean = null;
         try {
             logBean = new LogBean();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            logBean.setCreateTime(sdf.format(new Timestamp(System.currentTimeMillis())));
+            logBean.setKafkaDataTime(logInfoArr[0]);
+            logBean.setProjectName(logInfoArr[1]);
+            logBean.setProjectToken(logInfoArr[2]);
+            logBean.setCrc(logInfoArr[3]);
+            logBean.setIsCompress(logInfoArr[4]);
+            logBean.setClientIp(logInfoArr[5]);
+            logBean.setCreateTime(yMdHmsFormat.get().format(new Timestamp(System.currentTimeMillis())));
             if (json.has("distinct_id")) {
                 logBean.setDistinctId(json.get("distinct_id").asText());
+            }
+            if (json.has("anonymous_id")) {
+                logBean.setAnonymousId(json.get("anonymous_id").asText());
+            } else {
+                /* 无anonymous_id的sdk类型,赋值anonymous_id为distinct_id */
+                logBean.setAnonymousId(logBean.getDistinctId());
             }
             if (json.has("type")) {
                 logBean.setTypeContext(json.get("type").asText());
@@ -43,15 +83,32 @@ public class ExtractUtil {
                 logBean.setTrackId(json.get("_track_id").asText());
             }
             if (json.has("time")) {
-                logBean.setTime(json.get("time").asText());
+                long ltime = 0L;
+                try {
+                    ltime = Long.parseLong(json.get("time").asText());
+                    if (ltime > 0) {
+                        String strTime = yMdHmsFormat.get().format(ltime);
+                        Timestamp logTime = Timestamp.valueOf(strTime);
+                        logBean.setLogTime(logTime);
+                        logBean.setStatDate(strTime.substring(0, 10));
+                        logBean.setStatHour(strTime.substring(11, 13));
+                    }
+                } catch (Exception ex) {
+                    logger.error("time error", ex);
+                }
+                logBean.setTime(ltime);
             }
             if (json.has("_flush_time")) {
-                logBean.setFlushTime(json.get("_flush_time").asText());
-            }
-            if (StringUtils.isNotBlank(logBean.getTime())) {
-                logBean.setLogTime(sdf.format(Long.parseLong(logBean.getTime())));
-                logBean.setStatDate(logBean.getLogTime().substring(0, 10));
-                logBean.setStatHour(logBean.getLogTime().substring(11, 13));
+                long lFlushTime = 0L;
+                try {
+                    lFlushTime = Long.parseLong(json.get("_flush_time").asText());
+                } catch (Exception ex) {
+                    logger.error("_flush_time error", ex);
+                }
+                logBean.setFlushTime(lFlushTime);
+            } else {
+                /* 无_flush_time的sdk类型,赋值_flush_time为time */
+                logBean.setFlushTime(logBean.getTime());
             }
             //identities
             if (json.has("identities")) {
@@ -303,14 +360,14 @@ public class ExtractUtil {
                 if (properties.has("DownloadChannel")) {
                     logBean.setDownloadChannel(properties.get("DownloadChannel").asText());
                 }
-                if (properties.has("country")) {
-                    logBean.setCountry(properties.get("country").asText());
+                if (properties.has("$country")) {
+                    logBean.setCountry(properties.get("$country").asText());
                 }
-                if (properties.has("province")) {
-                    logBean.setProvince(properties.get("province").asText());
+                if (properties.has("$province")) {
+                    logBean.setProvince(properties.get("$province").asText());
                 }
-                if (properties.has("city")) {
-                    logBean.setCity(properties.get("city").asText());
+                if (properties.has("$city")) {
+                    logBean.setCity(properties.get("$city").asText());
                 }
                 if (properties.has("$element_id")) {
                     logBean.setElementId(properties.get("$element_id").asText());
@@ -370,16 +427,29 @@ public class ExtractUtil {
                     logBean.setOsVersion(osVersion);
                 }
 
+                if (properties.has("app_crashed_reason")) {
+                    logBean.setAppCrashedReason(properties.get("app_crashed_reason").asText());
+                }
+
                 String jnUrlPath = logBean.getUrlPath();
                 if ("js".equalsIgnoreCase(logBean.getLib())) {
                     if ("/".equalsIgnoreCase(jnUrlPath) || StringUtils.isBlank(jnUrlPath)) {
-                        String parsedUrlPath = ExtractUtil.parseUrlPath(logBean.getUrl());
+                        String parsedUrlPath = parseUrlPath(projectSetting, logBean.getUrl());
+                        logBean.setUrlPath(parsedUrlPath);
+                    } else {
+                        String parsedUrlPath = processPathRule(logBean.getUrlPath(), projectSetting);
                         logBean.setUrlPath(parsedUrlPath);
                     }
+                } else {
+                    String parsedUrlPath = processPathRule(logBean.getUrlPath(), projectSetting);
+                    logBean.setUrlPath(parsedUrlPath);
                 }
-
                 if (projectSetting != null) {
-                    logBean.setUrl(ExtractUtil.excludeParamFromUrl(projectSetting.getExcludedUrlParams(), logBean.getUrl()));
+                    logBean.setUrl(excludeParamFromUrl(projectSetting, logBean.getUrl(), true));
+
+                    if (StringUtils.isNotBlank(projectSetting.getSearchwordKey())) {
+                        logBean.setInternalSearchKeyword(getSearchwordFromUrl(projectSetting.getSearchwordKey(), logBean.getRawUrl()));
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -388,15 +458,15 @@ public class ExtractUtil {
         return logBean;
     }
 
-    private static ProjectSetting getProjectSetting(String projectName, HashMap<String, ProjectSetting> htProjectSetting) {
-        ProjectSetting projectSetting = htProjectSetting.get("clklog-global");
+    private static ProjectSetting getProjectSetting(String globalAppCode, String projectName, HashMap<String, ProjectSetting> htProjectSetting) {
+        ProjectSetting projectSetting = htProjectSetting.get(globalAppCode);
         if (htProjectSetting.containsKey(projectName)) {
             projectSetting = htProjectSetting.get(projectName);
         }
         return projectSetting;
     }
 
-    public static List<LogBean> extractToLogBean(String line, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, ProjectSetting> htProjectSetting) {
+    public static List<LogBean> extractToLogBeanList(String line, String globalAppCode, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, ProjectSetting> htProjectSetting) {
         List<LogBean> logBeanList = new ArrayList<>();
         try {
             String[] arr = line.split(",", -1);
@@ -411,57 +481,61 @@ public class ExtractUtil {
 
                 ObjectMapperUtil objectMapper = new ObjectMapperUtil();
                 JsonNode json = objectMapper.readTree(jsonContext);
-                ProjectSetting projectSetting = getProjectSetting(projectName, htProjectSetting);
+                ProjectSetting projectSetting = getProjectSetting(globalAppCode, projectName, htProjectSetting);
 
                 if (json instanceof ArrayNode) {
                     ArrayNode arrayNode = (ArrayNode) json;
                     for (int i = 0; i < arrayNode.size(); i++) {
-                        LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, projectSetting);
-                        if (logBean != null && filterData(logBean)) {
-                            logBean.setKafkaDataTime(arr[0]);
-                            logBean.setProjectName(projectName);
-                            logBean.setProjectToken(arr[2]);
-                            logBean.setCrc(arr[3]);
-                            logBean.setIsCompress(arr[4]);
-                            logBean.setClientIp(arr[5]);
+                        LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, projectSetting, arr);
+                        if (filterData(logBean, projectSetting)) {
                             logBeanList.add(logBean);
                         }
                     }
                 } else {
-                    LogBean logBean = extractToLogBean(json, userAgentAnalyzer, projectSetting);
-                    if (logBean != null && filterData(logBean)) {
-                        logBean.setKafkaDataTime(arr[0]);
-                        logBean.setProjectName(projectName);
-                        logBean.setProjectToken(arr[2]);
-                        logBean.setCrc(arr[3]);
-                        logBean.setIsCompress(arr[4]);
-                        logBean.setClientIp(arr[5]);
+                    LogBean logBean = extractToLogBean(json, userAgentAnalyzer, projectSetting, arr);
+                    if (filterData(logBean, projectSetting)) {
                         logBeanList.add(logBean);
                     }
                 }
             }
         } catch (Exception e) {
-            logger.error("error data : " + line);
+            logger.error("error data : " + line, e);
         }
         return logBeanList;
     }
 
-    private static boolean filterData(LogBean logBean) {
-        boolean isAdd = true;
+    private static boolean filterData(LogBean logBean, ProjectSetting projectSetting) {
+        boolean isAdd = logBean != null;
 
-        //过滤超时的数据
-        if (logBean.getFlushTime() != null && logBean.getTime() != null) {
-            long diff = Long.parseLong(logBean.getFlushTime()) - Long.parseLong(logBean.getTime());
-            if (diff / 1000 > 60) {
+        if (isAdd) {
+            /* 过滤超时的数据 */
+            long diff = logBean.getFlushTime() - logBean.getTime();
+            if (diff > 60000 || logBean.getFlushTime() <= 0 || logBean.getTime() <= 0) {
                 isAdd = false;
             }
         }
-
-        //过滤event字段为空的
-        if (StringUtils.isBlank(logBean.getEvent())) {
-            isAdd = false;
+        if (isAdd) {
+            /* 过滤anonymouse_id或distinct_id字段为空的 */
+            if (StringUtils.isBlank(logBean.getAnonymousId()) || StringUtils.isBlank(logBean.getDistinctId())) {
+                isAdd = false;
+            }
         }
-
+        if (isAdd) {
+            /* 过滤logTime字段为空的 */
+            if (logBean.getLogTime() == null) {
+                isAdd = false;
+            }
+        }
+        if (isAdd) {
+            if (projectSetting != null) {
+                if (isAdd && StringUtils.isNotBlank(projectSetting.getExcludedIp())) {
+                    isAdd = !checkIfIpInExcludedIpList(projectSetting.getExcludedIp(), logBean.getClientIp());
+                }
+                if (isAdd && StringUtils.isNotBlank(projectSetting.getExcludedUa())) {
+                    isAdd = !checkIfUaContainsExcludedUa(projectSetting.getExcludedUa(), logBean.getUserAgent());
+                }
+            }
+        }
         return isAdd;
     }
 
@@ -471,7 +545,7 @@ public class ExtractUtil {
             StringBuilder parsedUrl = new StringBuilder();
             HashMap<String, String> delimiterMap = new HashMap<>();
             delimiterMap.put("/", "/");
-            delimiterMap.put("?", "？");
+            delimiterMap.put("?", "?");
             delimiterMap.put("&", "&");
             delimiterMap.put("#", "#");
 
@@ -497,7 +571,105 @@ public class ExtractUtil {
         }
     }
 
-    public static String parseUrlPath(String rawUrl) {
+    /**
+     * 排除url的指定参数.
+     *
+     * @param projectSetting 项目编码
+     * @param rawurl         url地址
+     * @param withParam      排除参数后的url是否需要带上key
+     * @return 排除参数后的url
+     */
+    public static String excludeParamFromUrl(ProjectSetting projectSetting, String rawurl, boolean withParam) {
+        String excludedParams = "";
+        if (projectSetting != null) {
+            excludedParams = projectSetting.getExcludedUrlParams();
+        }
+
+        String parsedUrl = rawurl;
+        try {
+            if (StringUtils.isNotBlank(excludedParams)) {
+                String[] urlPairArray = rawurl.split("((?=[?#/&])|(?<=[?#/&]))", -1);
+                StringBuilder sbParsedUrl = new StringBuilder();
+                HashMap<String, String> delimiterMap = new HashMap<>();
+                delimiterMap.put("/", "/");
+                delimiterMap.put("?", "?");
+                delimiterMap.put("&", "&");
+                delimiterMap.put("#", "#");
+
+                String[] paramsList = excludedParams.split("\n");
+                for (String urlPair : urlPairArray) {
+                    if (delimiterMap.containsKey(urlPair)) {
+                        if (withParam || (!"?".equalsIgnoreCase(urlPair) && !"&".equalsIgnoreCase(urlPair))) {
+                            sbParsedUrl.append(urlPair);
+                        }
+                    } else {
+                        String parseUrlPair = urlPair;
+                        for (String params : paramsList) {
+                            if (parseUrlPair.contains(params + "=")) {
+                                if (withParam) {
+                                    parseUrlPair = parseUrlPair.replaceAll("^" + params + "=[\\w\\W]+", params + "=");
+                                } else {
+                                    parseUrlPair = "";
+                                }
+                            } else if (parseUrlPair.contains("=" + params)) {
+                                if (withParam) {
+                                    parseUrlPair = parseUrlPair.replaceAll("[\\w\\W]+=" + params + "$", "=" + params);
+                                } else {
+                                    parseUrlPair = "";
+                                }
+                            } else {
+                                parseUrlPair = parseUrlPair.replaceAll("[\\w\\W]+=" + params + "$", "=" + params);
+                            }
+                        }
+                        sbParsedUrl.append(parseUrlPair);
+                    }
+                }
+                parsedUrl = sbParsedUrl.toString();
+            }
+
+            parsedUrl = processPathRule(parsedUrl, projectSetting);
+        } catch (Exception ex) {
+            logger.error("excludeParamFromUrl error ", ex);
+        }
+
+        return parsedUrl;
+    }
+
+    /**
+     * 解析路径清洗规则
+     *
+     * @param pathRuleContentList 路径清洗规则
+     * @return {@link List }<{@link PathRule }>
+     */
+    public static List<PathRule> extractPathRule(String pathRuleContentList) {
+        List<PathRule> pathRuleList = new ArrayList<>();
+        try {
+            if (StringUtils.isNotBlank(pathRuleContentList)) {
+                String[] pathRuleContentArr = pathRuleContentList.split("\n", -1);
+                for (String pathRuleContent : pathRuleContentArr) {
+                    String[] arr = pathRuleContent.split(",", -1);
+                    if (arr.length > 1) {
+                        PathRule pathRule = new PathRule();
+                        pathRule.setTarget(arr[0]);
+                        pathRule.setValue(pathRuleContent.substring(arr[0].length() + 1));
+                        pathRuleList.add(pathRule);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("extractUrlRule error ", ex);
+        }
+
+        return pathRuleList;
+    }
+
+    /**
+     * 解析url的路径.
+     *
+     * @param rawUrl 原url
+     * @return 路径
+     */
+    public static String parseUrlPath(ProjectSetting projectSetting, String rawUrl) {
         String path = File.separator;
 
         try {
@@ -511,15 +683,184 @@ public class ExtractUtil {
                     path = rawUrl.substring(index);
                 }
             } else {
-                URI uri = new URI(rawUrl);
-                path = uri.getPath();
+                if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
+                    URL url = new URL(rawUrl);
+                    path = url.getPath();
+                } else {
+                    int index2 = rawUrl.indexOf("?");
+                    if (index2 != -1) {
+                        path = rawUrl.substring(0, index2);
+                    } else {
+                        path = rawUrl;
+                    }
+                }
             }
+            path = processPathRule(path, projectSetting);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("parse url_path error", ex);
         }
-        if (!path.startsWith("/")) {
+        if (!path.startsWith("/") && path.contains("/")) {
             path = "/" + path;
         }
         return path;
+    }
+
+    public static String processPathRule(String rawUriPath, ProjectSetting projectSetting) {
+        String uriPath = rawUriPath;
+        if (projectSetting != null && projectSetting.getPathRuleList() != null) {
+            for (PathRule rule : projectSetting.getPathRuleList()) {
+                uriPath = uriPath.replaceAll(rule.getValue(), rule.getTarget());
+            }
+        }
+        return uriPath;
+    }
+
+    /**
+     * 从url解析站内搜索词.
+     *
+     * @param searchwordKey 搜索词关键字
+     * @param rawurl        原url
+     * @return 站内搜索词
+     */
+    public static String getSearchwordFromUrl(String searchwordKey, String rawurl) {
+        String[] urlPairArray = rawurl.split("((?=[?#/&])|(?<=[?#/&]))", -1);
+
+        HashMap<String, String> delimiterMap = new HashMap<>();
+        delimiterMap.put("/", "/");
+        delimiterMap.put("?", "?");
+        delimiterMap.put("&", "&");
+        delimiterMap.put("#", "#");
+
+        String searchword = "";
+        List<String> searchKeyList = new ArrayList<>(Arrays.asList(searchwordKey.split(",")));
+
+        for (String urlPair : urlPairArray) {
+            if (!delimiterMap.containsKey(urlPair)) {
+                String[] kv = urlPair.split("=", -1);
+                if (kv.length == 2) {
+                    if (searchKeyList.contains(kv[0])) {
+                        searchword = kv[1];
+                    } else if (searchKeyList.contains(kv[1])) {
+                        searchword = kv[0];
+                    }
+                    if (!searchword.isEmpty()) {
+                        try {
+                            searchword = URLDecoder.decode(searchword, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            logger.error("encoding error", e);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return searchword;
+    }
+
+    /**
+     * 判断UA是否包含指定UA
+     *
+     * @param excludedUa 指定UA,多个用\n分开
+     * @param uaToCheck  需要检查的UA
+     * @return true:包含，false:不包含
+     */
+    public static boolean checkIfUaContainsExcludedUa(String excludedUa, String uaToCheck) {
+        boolean isContains = false;
+        String[] uaList = excludedUa.split("\n");
+        for (String ua : uaList) {
+            Pattern pattern = Pattern.compile(ua);
+            Matcher prevMatcher = pattern.matcher(uaToCheck);
+            if (prevMatcher.find()) {
+                isContains = true;
+                break;
+            }
+        }
+        return isContains;
+    }
+
+    /**
+     * 判断IP是否在指定IP段内
+     *
+     * @param excludedIp 指定IP段,多个用\n分开
+     * @param ipToCheck  需要检查的IP
+     * @return true:在IP段内,false:不在IP段内
+     */
+    public static boolean checkIfIpInExcludedIpList(String excludedIp, String ipToCheck) {
+        boolean isIn = false;
+        String[] ipList = excludedIp.split("\n");
+        for (String ip : ipList) {
+            CIDRUtils subnetUtils = null;
+            try {
+                String tempIp = convertToCIDR(ip);
+                subnetUtils = new CIDRUtils(tempIp);
+            } catch (Exception e) {
+                logger.error("CIDRUtils err {}", e.getMessage());
+            }
+            if (subnetUtils != null) {
+                try {
+                    if (subnetUtils.isInRange(ipToCheck)) {
+                        isIn = true;
+                        break;
+                    }
+                } catch (Exception e) {
+                    logger.error("isInRange err {}", e.getMessage());
+                }
+            }
+        }
+        return isIn;
+    }
+
+    /**
+     * 转换IP段为CIDR.
+     *
+     * @param value IP段
+     * @return CIDR
+     */
+    private static String convertToCIDR(String value) {
+        if (IPPatternClassA.matcher(value).matches()) {
+            return value.replace('*', '0') + "/8";
+        }
+        if (IPPatternClassB.matcher(value).matches()) {
+            return value.replace('*', '0') + "/16";
+        }
+        if (IPPatternClassC.matcher(value).matches()) {
+            return value.replace('*', '0') + "/24";
+        }
+        if (IPPatternSingle.matcher(value).matches()) {
+            return value + "/32";
+        }
+        return value;
+    }
+
+
+    public static Region translateRegion(Region region, Map<String, String> htForCity) {
+        Region translatedRegion = null;
+        if (region != null) {
+            translatedRegion = new Region();
+            translatedRegion.setClientIp(region.getClientIp());
+
+            String country = region.getCountry();
+            String province = region.getProvince();
+            String city = region.getCity();
+
+            if (StringUtils.isNotBlank(province)) {
+                String provinceKey = country + "_" + province;
+                String cityKey = country + "_" + province + "_" + city;
+                if (htForCity.containsKey(cityKey)) {
+                    city = htForCity.get(cityKey);
+                }
+                if (htForCity.containsKey(provinceKey)) {
+                    province = htForCity.get(provinceKey);
+                }
+            }
+
+            if (htForCity.containsKey(country)) {
+                country = htForCity.get(country);
+            }
+            translatedRegion.setCountry(country);
+            translatedRegion.setProvince(province);
+            translatedRegion.setCity(city);
+        }
+        return translatedRegion;
     }
 }

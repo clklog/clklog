@@ -75,7 +75,7 @@ public class JieXiJson {
                     out.collect(logBeanCollectionList);
                 }
             }
-        });
+        }).name("clklog-window-all-to-ck");
 
         LogAnalysisClickHouseSink clickhouseSink = new LogAnalysisClickHouseSink();
         valueInWindow.addSink(clickhouseSink);

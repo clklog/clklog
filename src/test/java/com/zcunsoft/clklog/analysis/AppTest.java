@@ -21,10 +21,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.*;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -42,13 +40,13 @@ public class AppTest {
         target1.setIsCompress("0");
         target1.setClientIp("8.8.8.8");
         target1.setDistinctId("1a7cc28c-52e1-40bb-b506-d86cdcfd7361");
-        target1.setLogTime("2024-01-06 17:08:03");
+        target1.setLogTime(Timestamp.valueOf("2024-01-06 17:08:03"));
         target1.setStatDate("2024-01-06");
         target1.setStatHour("17");
-        target1.setFlushTime("1704532083880");
+        target1.setFlushTime(1704532083880L);
         target1.setTypeContext("track");
         target1.setEvent("$WebPageLeave");
-        target1.setTime("1704532083862");
+        target1.setTime(1704532083862L);
         target1.setTrackId("473513880");
         target1.setIdentityCookieId("1a7cc28c-52e1-40bb-b506-d86cdcfd7361");
         target1.setLib("js");
@@ -81,6 +79,7 @@ public class AppTest {
         target1.setEventSessionId("18cddfe8ce25c40ecd1936b62f5685773254d28080018cddfe8ce3435");
         target1.setCreateTime("2024-01-05 17:08:04");
         target1.setRawUrl("https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/all?tab=0");
+        target1.setAnonymousId("1a7cc28c-52e1-40bb-b506-d86cdcfd7361");
         Object[] actualArr = getFiledsInfo(target1).toArray();
 
         List<DynamicTest> dynamicTestList = new ArrayList<>();
@@ -99,7 +98,7 @@ public class AppTest {
         ObjectMapperUtil mapper = new ObjectMapperUtil();
         HashMap<String, ProjectSetting> htProjectSetting = mapper.readValue(projectSettingContent, htProjectSettingTypeReference);
 
-        List<LogBean> logBeanList = ExtractUtil.extractToLogBean(test1, userAgentAnalyzer, htProjectSetting);
+        List<LogBean> logBeanList = ExtractUtil.extractToLogBeanList(test1, "clklog-global", userAgentAnalyzer, htProjectSetting);
         logBeanList.get(0).setCreateTime(target1.getCreateTime());
         Object[] expectedArr = getFiledsInfo(logBeanList.get(0)).toArray();
         dynamicTestList.add(dynamicTest("test1 extractToLogBean dynamic test", () -> Assertions.assertArrayEquals(actualArr, expectedArr, "ok")));
@@ -139,6 +138,11 @@ public class AppTest {
         IPUtil ipUtil = new IPUtil(System.getProperty("user.dir"));
         ipUtil.loadIpFile();
         Region region = ipUtil.analysisRegionFromIp(testIp);
+        Map<String, String> cityMap = new HashMap<>();
+        cityMap.put("cn", "中国");
+        cityMap.put("cn_shanghai", "上海");
+        cityMap.put("cn_shanghai_shanghai", "上海");
+        region = ExtractUtil.translateRegion(region, cityMap);
         Object[] actualArr = getFiledsInfo(region).toArray();
 
         Region expected = new Region();
@@ -161,6 +165,11 @@ public class AppTest {
         IPUtil ipUtil = new IPUtil(System.getProperty("user.dir"));
         ipUtil.loadIpFile();
         Region region = ipUtil.analysisRegionFromIp(testIp);
+        Map<String, String> cityMap = new HashMap<>();
+        cityMap.put("cn", "中国");
+        cityMap.put("cn_shanghai", "上海");
+        cityMap.put("cn_shanghai_shanghai", "上海");
+        region = ExtractUtil.translateRegion(region, cityMap);
         Object[] actualArr = getFiledsInfo(region).toArray();
 
         Region expected = new Region();
@@ -181,12 +190,15 @@ public class AppTest {
         List<DynamicTest> dynamicTestList = new ArrayList<>();
 
         File file = new File("src/test/resources/urlpath_test.txt");
-
         List<String> urlList = Files.readAllLines(file.toPath());
 
+        ProjectSetting projectSetting = new ProjectSetting();
+        projectSetting.setExcludedUrlParams("r\ntime\nt\ntimestamp\nopen");
+        projectSetting.setUriPathRules("{OrderID},(?<=Order/)[\\d]+");
+        projectSetting.setPathRuleList(ExtractUtil.extractPathRule(projectSetting.getUriPathRules()));
         for (int i = 0; i < urlList.size(); i++) {
             String[] array = urlList.get(i).split(",", -1);
-            String parsed = ExtractUtil.parseUrlPath(array[0]);
+            String parsed = ExtractUtil.parseUrlPath(projectSetting, array[0]);
             dynamicTestList.add(dynamicTest("test" + i, () -> Assertions.assertEquals(array[1], parsed, "ok")));
         }
         return dynamicTestList;
