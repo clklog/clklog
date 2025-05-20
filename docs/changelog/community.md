@@ -12,7 +12,6 @@
 - 版本升级步骤说明
   - [升级步骤说明参考链接-github](https://github.com/clklog/clklog-deploy/tree/main/1.2.0)
   - [升级步骤说明参考链接-gitee](https://gitee.com/clklog/clklog-deploy/tree/main/1.2.0)
-  -
   
 ### 2024-03-15 docker安装步骤发布
 
