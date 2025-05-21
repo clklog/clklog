@@ -104,13 +104,15 @@ ClkLog是一款支持快速私有化部署的开源埋点分析系统。<br/>
 
 ## 项目组成
 
-- **处理脚本 【clklog-init】**：初始化服务，用于数据库初始化和定时脚本任务配置。
+- **初始化服务【clklog-init】**：初始化服务，用于数据库初始化和定时脚本任务配置。
 
-- **接收服务 【clklog-receiver】**：数据接收服务，接收客户端采集的日志数据并存入kafka。
+- **接收服务【clklog-receiver】**：数据接收服务，接收客户端采集的日志数据并存入kafka。
 
-- **处理服务  【clklog-processing】**：数据处理服务，依托flink，消费kafka数据并存入clickhouse。
-
-- **统计接口 【clklog-api】**：统计接口，提供前端各维度数据查询统计分析接口。
+- **处理服务【clklog-processing】**：数据处理服务，依托flink，消费kafka数据并存入clickhouse。
+  
+- **管理接口【clklog-manage】**：管理接口，提供clklog-ui前端项目管理、账号管理及数据清洗过滤配置相关接口。
+  
+- **统计接口【clklog-api】**：统计接口，提供前端各维度数据查询统计分析接口。
 
 - **统计展示 【clklog-ui】**：基于 vue-element-admin 实现的相关统计分析及系统相关功能配置的前端应用。
 
