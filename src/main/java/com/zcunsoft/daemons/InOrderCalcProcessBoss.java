@@ -77,7 +77,7 @@ public class InOrderCalcProcessBoss {
                 }
                 long left = setting.getSleepMillisecAfterOneRound() - (System.currentTimeMillis() - start);
                 if (left > 0) {
-                    logger.error("insert token left "+left);
+                    logger.info("insert token left "+left);
                     try {
                         Thread.sleep(left);
                     } catch (InterruptedException e) {
