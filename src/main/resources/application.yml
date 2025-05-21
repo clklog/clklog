@@ -13,7 +13,7 @@ spring:
       driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
       socket_timeout: 300000
 init:
-  log-db: default
+  log-db: clklog
   quartz-enabled: false
   event-session-across-day: 2
   quartz:
