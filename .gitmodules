@@ -13,3 +13,6 @@
 [submodule "init"]
 	path = init
 	url = ../clklog-init
+[submodule "manage"]
+	path = manage
+	url = ../clklog-manage.git
