@@ -186,7 +186,7 @@ sensors.track("newevent",{"prop1":"hello","prop2":"world"});
 
 Web JS自定义事件代码埋点集成方式参考神策官方集成方法，参考链接如下：
 
-[自定义事件集成文档（Web）](https://manual.sensorsdata.cn/sa/latest/zh_cn/web-7545023.html#id-%E9%9B%86%E6%88%90%E6%96%87%E6%A1%A3%EF%BC%88Web%EF%BC%89-%E4%BB%A3%E7%A0%81%E5%9F%8B%E7%82%B9%E8%BF%BD%E8%B8%AA%E4%BA%8B%E4%BB%B6)
+[自定义事件集成文档（Web）](https://manual.sensorsdata.cn/sa/docs/tech_sdk_client_web_use/v0300?search=1#%E4%BB%A3%E7%A0%81%E5%9F%8B%E7%82%B9%E8%BF%BD%E8%B8%AA%E4%BA%8B%E4%BB%B6)
 
 更多其他端（如Andriod、IOS、微信小程序等）自定义事件集成代码接入方式请参考<a href="https://manual.sensorsdata.cn/sa/latest/zh_cn/tech-1573416.html"  target="satechguide">神策官方SDK集成技术指南</a>。
 
