@@ -11,6 +11,8 @@ name: Java CI with Maven
 on:
   workflow_dispatch:
   push:
+    branches:
+      - 'main'
     tags:
       - 'v*'
 jobs:
@@ -38,7 +40,7 @@ jobs:
     - name: Set Release version env variable
       run: |
         echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-        
+
     # 上传文件并发布 Release
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
