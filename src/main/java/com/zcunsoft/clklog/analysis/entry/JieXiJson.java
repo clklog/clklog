@@ -41,10 +41,10 @@ public class JieXiJson {
         env.setParallelism(flinkParallelism);
         env.getConfig().setGlobalJobParameters(parameters);
         //checkpoint配置
-        env.enableCheckpointing(5000);
+        env.enableCheckpointing(parameters.getInt("flink.enable-checkpointing", 30000));
         env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
         env.getCheckpointConfig().setMinPauseBetweenCheckpoints(500);
-        env.getCheckpointConfig().setCheckpointTimeout(60000);
+        env.getCheckpointConfig().setCheckpointTimeout(parameters.getInt("flink.checkpoint.timeout", 300000));
         env.getCheckpointConfig().setMaxConcurrentCheckpoints(1);
         // 将检查点的元数据信息定期写入外部系统，如果job失败时，检查点不会被清除
         env.getCheckpointConfig().setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
