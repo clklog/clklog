@@ -40,13 +40,13 @@ ClkLog是一款支持快速私有化部署的开源埋点分析系统。<br/>
 
 **采集日志数据先存入kafka，经由flink处理后再存入clickhouse.**
 >
-![](assets/imgs/all-process1.png)
+![](assets/imgs/all-process2.png)
 
 #### **快速模式**
 
 **采集日志直接存入clickhouse.**
 
-![](assets/imgs/fast-process1.png)
+![](assets/imgs/fast-process2.png)
 
 <!-- tabs:end -->
 
@@ -104,7 +104,7 @@ ClkLog是一款支持快速私有化部署的开源埋点分析系统。<br/>
 
 ## 项目组成
 
-- **初始化服务【clklog-init】**：初始化服务，用于数据库初始化和定时脚本任务配置。
+- **初始化服务【clklog-init】**：初始化服务，用于clickhouse数据库初始化和定时脚本任务配置。
 
 - **接收服务【clklog-receiver】**：数据接收服务，接收客户端采集的日志数据并存入kafka。
 
@@ -115,6 +115,10 @@ ClkLog是一款支持快速私有化部署的开源埋点分析系统。<br/>
 - **统计接口【clklog-api】**：统计接口，提供前端各维度数据查询统计分析接口。
 
 - **统计展示 【clklog-ui】**：基于 vue-element-admin 实现的相关统计分析及系统相关功能配置的前端应用。
+
+- **SQL查询前端 【clklog-tabix】**：基于tabix二开的ClkLog自定义SQL查询前端项目，提供可视化的前端连接clickhouse数据库服务，可直接在线查看或手写SQL查询clickhouse中Clklog相关数据库表的结构和数据。 **[付费版]**
+  
+- **用户画像模块接口 【clklog-ups】**：用户画像相关接口，提供clklog-ui前端用户画像相关功能接口服务。 **[付费CDP版]**
 
 ## 示意图
 

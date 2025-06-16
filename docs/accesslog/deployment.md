@@ -3,14 +3,17 @@
 <!-- - Ubuntu SMP -->
 - Linux服务器（本文档以ubuntu为例）
 - JDK 1.8
+- docker 24+
+- docker compose 2.27.0
 - Nginx 1.18
 - Redis 3.2.4
 - Zookeeper 3.7.2
 - Kafka 2.12-3.3.1
+- Flink 1.16.3
 - Clickhouse 23.2.1
-- Flink 1.16.3 （可选）
 - nodejs >= 8.9
 - npm >=3.0.0
+- mysql 8.4
 
 [环境初始化步骤参考](/installation/preparation.md#初始化步骤参考)
 
