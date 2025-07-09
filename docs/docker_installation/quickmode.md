@@ -76,7 +76,7 @@
     docker compose -f docker-compose-clklog-simple.yml ps -a
     ```
 
-    ![image](../assets/imgs/simple_container.png)  
+    ![image](../assets/imgs/simple_container_1.png)  
 
 3. 验证镜像是否安装成功
 
@@ -86,6 +86,8 @@
    - 统计接口说明地址： <http://YOUR_DOMAIN/api/doc.html>
 
    - 埋点数据接收地址： <http://YOUR_DOMAIN/receiver/api/gp?project=clklogapp&token=5388ed7459ba4c4cad0c8693fb85630a>
+
+## [切换标准模式](/docker_installation/modetoggle.md#快速模式切换标准模式)
 
 ## 埋点代码接入
 

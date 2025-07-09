@@ -116,7 +116,7 @@ ClkLog是一款支持快速私有化部署的开源埋点分析系统。<br/>
 
 - **统计展示 【clklog-ui】**：基于 vue-element-admin 实现的相关统计分析及系统相关功能配置的前端应用。
 
-- **SQL查询前端 【clklog-tabix】**：基于tabix二开的ClkLog自定义SQL查询前端项目，提供可视化的前端连接clickhouse数据库服务，可直接在线查看或手写SQL查询clickhouse中Clklog相关数据库表的结构和数据。 **[付费版]**
+- **SQL查询 【clklog-tabix】**：基于tabix二开的ClkLog自定义SQL查询前端项目，提供可视化的前端连接clickhouse数据库服务，可直接在线查看或手写SQL查询clickhouse中Clklog相关数据库表的结构和数据。 **[付费版]**
   
 - **用户画像模块接口 【clklog-ups】**：用户画像相关接口，提供clklog-ui前端用户画像相关功能接口服务。 **[付费CDP版]**
 

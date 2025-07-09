@@ -76,7 +76,7 @@
     docker compose -f docker-compose-clklog-full.yml ps -a
     ```
 
-    ![image](../assets/imgs/full_container_status.png)  
+    ![image](../assets/imgs/full_container_1.png)  
 
 3. 验证镜像是否安装成功
 
@@ -89,6 +89,8 @@
    - flink后台地址： <http://YOUR_DOMAIN/flink/#/overview>，在flink后台查看job状态是否正常运行
 
    ![image](../assets/imgs/flink-status.png)  
+
+## [切换快速模式](/docker_installation/modetoggle.md#标准模式切换快速模式)
 
 ## 埋点代码接入
 

@@ -7,7 +7,7 @@
 * [版本介绍](/version.md)
 * [功能清单](/funclist.md)
 * [技术指南](#)
-  * [Docker安装](/docker_installation/preperation.md)
+  * [Docker安装](/docker_installation/introduce.md)
   * [步骤安装](/installation/preparation.md)
   * [集成方式](/integration/introduce.md)
   * [集成说明](/integration/method.md)

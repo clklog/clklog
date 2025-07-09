@@ -18,7 +18,7 @@
 
 - 1）确认`autotrack.js`中`sensorsdata.js`和`plugins/session-event/index.js`在实际项目中的引用路径。
 
-- 2）将`autotrack.js`中的`server_url` 接收服务地址配置信息修改为clklog数据采集地址，并调整参数`project`和`token`的配置。其中`project`名称默认为`clklogapp`，如果要修改`project`名称请注意调整`clklog-receiver`服务中`project-list`的相关配置。
+- 2）将`autotrack.js`中的`server_url` 接收服务地址配置信息修改为clklog数据采集地址，并调整参数`project`和`token`的配置。
 
     `autotrack.js`中的`server_url`参考配置如下：
 

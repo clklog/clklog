@@ -15,11 +15,12 @@
 
 - 安装说明
   - Docker安装
-    - [环境准备](/docker_installation/preperation.md)
     - [安装介绍](/docker_installation/introduce.md)
+    - [环境准备](/docker_installation/preperation.md)
     - [快速模式安装](/docker_installation/quickmode.md)
     - [标准模式安装](/docker_installation/standard.md)
     - [模式切换](/docker_installation/modetoggle.md)
+    - [技术指南](/docker_installation/tutorials.md)
   - 步骤安装
     - [环境准备](/installation/preparation.md)
     - [应用部署](/installation/deployment.md)
@@ -30,6 +31,7 @@
   - [集成说明](/integration/method.md)
   - [集成SDK及文档](/integration/document.md)
   - [集成测试参考](/integration/reference.md)
+  - [集成常见问题](/tutorials/faq.md)
   - [集成注意事项](/tutorials/notes.md)
   - [统计指标说明](/tutorials/statindicator.md)
   - [神策无全埋点的SDK集成方案](/tutorials/ClkViewIntegrated.md)
