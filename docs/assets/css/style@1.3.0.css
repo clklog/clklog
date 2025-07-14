@@ -15,6 +15,26 @@ body:not(.ready) .app-nav,
 body:not(.ready) > nav {
   display: none;
 }
+body[data-page='README.md'] .logo {
+  position: fixed;
+  top: 0;
+  z-index: 9999;
+  left: 5vw;
+}
+body[data-page='README.md'] .logo img {
+  margin: 10px;
+  height: 55px;
+}
+body[data-page='README.md'] .app-nav .active {
+  color: inherit !important;
+  border-bottom: none !important;
+}
+body[data-page='README.md'] .app-nav a[title='主页'] {
+  border-bottom: 2px solid #0074d9;
+  border-bottom: 2px solid var(--theme-color, #0074d9);
+  color: #0074d9;
+  color: var(--theme-color, #0074d9);
+}
 div#app {
   font-size: 30px;
   font-weight: lighter;
@@ -91,19 +111,21 @@ li input[type='checkbox'] {
   vertical-align: middle;
 }
 .app-nav {
-  padding: 25px 60px 0 0;
+  padding-top: 25px;
+  padding-right: 5vw;
   position: fixed;
   right: 0;
   text-align: right;
   z-index: 10;
   background: #fff;
   height: 84px;
-  left: 284px;
+  /* left: 284px; */
+  left: 0;
   top: 0;
   right: 0;
 }
 .app-nav.no-badge {
-  margin-right: 25px;
+  /* margin-right: 25px; */
 }
 .app-nav p {
   margin: 0;
@@ -112,6 +134,19 @@ li input[type='checkbox'] {
   margin: 0 1rem;
   padding: 5px 0;
 }
+.app-nav .logo,
+.sidebar .logo {
+  position: fixed;
+  top: 0;
+  z-index: 9999;
+  left: 10px;
+}
+.app-nav .logo img,
+.sidebar .logo img {
+  margin: 10px;
+  height: 55px;
+}
+
 .app-nav ul,
 .app-nav li {
   display: inline-block;
@@ -227,6 +262,7 @@ main.hidden {
   transition: transform 250ms ease-out;
   width: 300px;
   z-index: 20;
+  padding-top: 84px !important;
 }
 .sidebar > h1 {
   margin: 0 auto 1rem 15px;
@@ -439,91 +475,17 @@ body.close .content {
 .func-list-table .func-desc-td {
   display: table-cell;
 }
-@media screen and (max-width: 768px) {
-  .cover-main .features {
-    flex-direction: column;
-  }
-  .func-list-table .func-desc-td {
-    display: none;
-  }
 
-  .cover-main .feature {
-    max-width: 100% !important;
-    padding: 0 2.5rem;
-  }
-  .github-corner,
-  .sidebar-toggle,
-  .sidebar {
-    position: fixed;
-  }
-  .app-nav {
-    margin-top: 16px;
-  }
-  .app-nav li ul {
-    top: 30px;
-  }
-  main {
-    height: auto;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-  .sidebar {
-    left: -300px;
-    transition: transform 250ms ease-out;
-  }
-  .content {
-    left: 0;
-    max-width: 100vw;
-    position: static;
-    padding-top: 20px;
-    transition: transform 250ms ease;
-  }
-  .app-nav,
-  .github-corner {
-    transition: transform 250ms ease-out;
-  }
-  .sidebar-toggle {
-    background-color: transparent;
-    width: auto;
-    padding: 30px 30px 10px 10px;
-  }
-  body.close .sidebar {
-    transform: translateX(300px);
-  }
-  body.close .sidebar-toggle {
-    background-color: rgba(255, 255, 255, 0.8);
-    transition: 1s background-color;
-    width: 284px;
-    padding: 10px;
-  }
-  body.close .content {
-    transform: translateX(300px);
-  }
-  body.close .app-nav,
-  body.close .github-corner {
-    display: none;
-  }
-  .github-corner:hover .octo-arm {
-    animation: none;
-  }
-  .github-corner .octo-arm {
-    animation: octocat-wave 560ms ease-in-out;
-  }
+.cover-main .banner.pc {
+  display: block;
 }
-@keyframes octocat-wave {
-  0%,
-  100% {
-    transform: rotate(0);
-  }
-  20%,
-  60% {
-    transform: rotate(-25deg);
-  }
-  40%,
-  80% {
-    transform: rotate(10deg);
-  }
+.cover-main .banner.mobile {
+  display: none;
 }
+section.cover .cover-main {
+  margin: 60px auto;
+}
+
 section.cover {
   position: relative;
   align-items: center;
@@ -547,10 +509,11 @@ section.cover.has-mask .mask {
 }
 section.cover .cover-main {
   flex: 1;
-  margin: 100px auto;
+  /* margin: 60px auto; */
   text-align: center;
   position: relative;
-  max-width: 960px;
+  /* max-width: 960px; */
+  max-width: 90%;
 }
 section.cover a {
   color: inherit;
@@ -629,11 +592,13 @@ section.cover .cover-main .entry.demo li {
 section.cover .cover-main .entry.demo li a#demo {
   background-color: #5695ea;
   border: #5695ea;
+  width: 160px;
 }
 section.cover .cover-main .entry.demo li a#pro {
   background-color: #0074d9;
   border: #0074d9;
   line-height: 16px;
+  width: 160px;
 }
 section.cover .cover-main .entry a {
   border-color: #0074d9;
@@ -647,7 +612,7 @@ section.cover .cover-main .entry a {
   font-size: 1.05rem;
   letter-spacing: 0.1rem;
   margin: 0.5rem 1rem;
-  padding: 0.75em 2rem;
+  padding: 0.9em 2rem;
   text-decoration: none;
   transition: all 0.15s ease;
 }
@@ -704,6 +669,7 @@ section.cover .cover-main .feature {
   flex-basis: 30%;
   max-width: 30%;
   text-align: left;
+  padding-left: 10px;
 }
 
 section.cover blockquote > p > a {
@@ -1171,4 +1137,115 @@ main .content .copyright {
 }
 .cert.software .item.copy-right img {
   width: 61.5%;
+}
+@media screen and (max-width: 768px) {
+  .cover-main .banner.pc {
+    display: none;
+  }
+  .cover-main .banner.mobile {
+    display: block;
+  }
+  .cover-main .features {
+    flex-direction: column;
+  }
+  section.cover .cover-main {
+    margin: 10px auto;
+  }
+  section.cover .cover-main .entry a {
+    font-size: 0.95rem;
+    padding: 0.95em 2rem;
+  }
+
+  .func-list-table .func-desc-td {
+    display: none;
+  }
+
+  .cover-main .feature {
+    max-width: 100% !important;
+    padding: 0 2.5rem;
+  }
+  .github-corner,
+  .sidebar-toggle,
+  .sidebar {
+    position: fixed;
+  }
+  .app-nav {
+    margin-top: 16px;
+    display: none;
+  }
+  .app-nav li ul {
+    top: 30px;
+  }
+  .app-nav li a {
+    display: none;
+  }
+  .app-nav li a.logo {
+    display: block;
+  }
+  .app-nav .logo,
+  .sidebar .logo {
+    background-color: #ffffff;
+    width: 100%;
+  }
+  main {
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .sidebar {
+    left: -300px;
+    transition: transform 250ms ease-out;
+  }
+  .content {
+    left: 0;
+    max-width: 100vw;
+    position: static;
+    padding-top: 20px;
+    transition: transform 250ms ease;
+  }
+  .app-nav,
+  .github-corner {
+    transition: transform 250ms ease-out;
+  }
+  .sidebar-toggle {
+    background-color: transparent;
+    width: auto;
+    padding: 30px 30px 10px 10px;
+  }
+  body.close .sidebar {
+    transform: translateX(300px);
+  }
+  body.close .sidebar-toggle {
+    background-color: rgba(255, 255, 255, 0.8);
+    transition: 1s background-color;
+    width: 284px;
+    padding: 10px;
+  }
+  body.close .content {
+    transform: translateX(300px);
+  }
+  body.close .app-nav,
+  body.close .github-corner {
+    display: none;
+  }
+  .github-corner:hover .octo-arm {
+    animation: none;
+  }
+  .github-corner .octo-arm {
+    animation: octocat-wave 560ms ease-in-out;
+  }
+}
+@keyframes octocat-wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20%,
+  60% {
+    transform: rotate(-25deg);
+  }
+  40%,
+  80% {
+    transform: rotate(10deg);
+  }
 }

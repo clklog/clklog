@@ -21,12 +21,12 @@
     <link rel="apple-touch-icon" sizes="any" href="assets/imgs/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <link rel="stylesheet" href="assets/css/font.css" />
-    <link rel="stylesheet" href="assets/css/style@1.2.9.css" />
+    <link rel="stylesheet" href="assets/css/style@1.3.0.css" />
     <link rel="stylesheet" href="assets/plugins/sidebar/sidebar.min.css" />
     <script src="/assets/plugins/autotrack@2.6.js"></script>
     <script>
       window.$docsify = {
-        name: 'CLKLOG',
+        // name: 'CLKLOG',
         logo: '/assets/imgs/logo1.png',
         // repo: 'https://github.com/clklog',
         auto2top: true,
@@ -144,99 +144,107 @@
     </script>
   </head>
   <body>
-    <nav>
-      <a href="www.clklog.com"> </a>
-      <ul>
-        <li>
-          <p><a href="#/?id" title="主页">主页</a></p>
-        </li>
-        <li>
-          <p><a href="#/introduce" title="产品介绍">产品介绍</a></p>
-        </li>
-        <li>
-          <p><a href="#/version" title="版本介绍">版本介绍</a></p>
-        </li>
-        <li>
-          <p><a href="#/funclist" title="功能清单">功能清单</a></p>
-        </li>
-        <li>
-          <p><a href="#/version?id" title="技术指南">技术指南</a></p>
-          <ul>
-            <li><a href="#/docker_installation/preperation" title="Docker安装">Docker安装</a></li>
-            <li><a href="#/installation/preparation" title="步骤安装">步骤安装</a></li>
-            <li><a href="#/integration/introduce" title="集成方式">集成方式</a></li>
-            <li><a href="#/integration/method" title="集成说明">集成说明</a></li>
-            <li><a href="#/integration/document" title="集成SDK及文档">集成SDK及文档</a></li>
-            <li><a href="#/integration/reference" title="集成测试参考">集成测试参考</a></li>
-            <li><a href="#/tutorials/notes" title="集成注意事项">集成注意事项</a></li>
-            <li><a href="#/tutorials/statindicator" title="统计指标说明">统计指标说明</a></li>
-          </ul>
-        </li>
-        <li>
-          <p><a href="https://demo.clklog.com" target="_blank" rel="noopener" title="演示环境">演示环境</a></p>
-          <ul>
-            <li><a href="https://demo.clklog.com" target="_blank" rel="noopener" title="ClkLog 社区版">ClkLog 社区版</a></li>
-            <li>
-              <a href="https://pro.clklog.com" target="_blank" rel="noopener" title="ClkLog 付费版(pro+cdp)">ClkLog 付费版(pro+cdp)</a>
-            </li>
-            <li><a href="https://demo.access.clklog.com/" target="_blank" rel="noopener" title="AccessLog 社区版">AccessLog 社区版</a></li>
-          </ul>
-        </li>
-        <li>
-          <p><a href="https://demo.clklog.com/api/doc.html#/home" target="_blank" rel="noopener" title="API文档">API文档</a></p>
-        </li>
-        <li>
-          <p><a href="#/introduce?id" title="源码下载">源码下载</a></p>
-          <ul>
-            <li>
-              <a href="https://github.com/clklog" target="_clkloggithub" title="GitHub"
-                ><img src="/assets/imgs/export.png" height="10" />ClkLog in GitHub</a
-              >
-            </li>
-            <li>
-              <a href="https://gitee.com/clklog" target="_clkloggitee" title="Gitee"
-                ><img src="/assets/imgs/export.png" height="10" />ClkLog in Gitee</a
-              >
-            </li>
-            <li>
-              <a href="https://gitcode.com/clklog" target="_clkloggitcode" title="GitCode"
-                ><img src="/assets/imgs/export.png" height="10" />ClkLog in GitCode</a
-              >
-            </li>
-            <li>
-              <a href="https://github.com/accesslog" target="_accessloggithub" title="GitHub"
-                ><img src="/assets/imgs/export.png" height="10" />AccessLog in GitHub</a
-              >
-            </li>
-            <li>
-              <a href="https://gitee.com/accesslog" target="_accessloggitee" title="Gitee"
-                ><img src="/assets/imgs/export.png" height="10" />AccessLog in Gitee</a
-              >
-            </li>
-            <li>
-              <a href="https://gitcode.com/accesslog" target="_accessloggitcode" title="GitCode"
-                ><img src="/assets/imgs/export.png" height="10" />AccessLog in GitCode</a
-              >
-            </li>
-          </ul>
-        </li>
-        <li>
-          <p><a href="https://docs.clklog.com" target="_clklogdocs" title="文章库">文章库</a></p>
-        </li>
-        <li>
-          <p>关于我们</p>
-          <ul>
-            <li>
-              <a href="https://www.zcunsoft.com/index.html" target="_officalsite" title="公司官网"> 公司官网</a>
-            </li>
-            <li>
-              <a href="/#/certification.md" title="资质认证">资质认证</a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </nav>
-    <div id="app"></div>
+    <div id="app">
+      <nav>
+        <!-- <a href="www.clklog.com"> </a> -->
+        <ul>
+          <li>
+            <p>
+              <a href="#/" title="ClkLog" class="logo"><img title="" src="/assets/imgs/logo1.png" alt="" data-align="center" /></a>
+            </p>
+          </li>
+          <li>
+            <p><a href="#/?id" title="主页" class="active">主页</a></p>
+          </li>
+          <li>
+            <p><a href="#/introduce" title="产品介绍">产品介绍</a></p>
+          </li>
+          <li>
+            <p><a href="#/version" title="版本介绍">版本介绍</a></p>
+          </li>
+          <li>
+            <p><a href="#/funclist" title="功能清单">功能清单</a></p>
+          </li>
+          <li>
+            <p><a href="#/version?id" title="技术指南">技术指南</a></p>
+            <ul>
+              <li><a href="#/docker_installation/preperation" title="Docker安装">Docker安装</a></li>
+              <li><a href="#/installation/preparation" title="步骤安装">步骤安装</a></li>
+              <li><a href="#/integration/introduce" title="集成方式">集成方式</a></li>
+              <li><a href="#/integration/method" title="集成说明">集成说明</a></li>
+              <li><a href="#/integration/document" title="集成SDK及文档">集成SDK及文档</a></li>
+              <li><a href="#/integration/reference" title="集成测试参考">集成测试参考</a></li>
+              <li><a href="#/tutorials/notes" title="集成注意事项">集成注意事项</a></li>
+              <li><a href="#/tutorials/statindicator" title="统计指标说明">统计指标说明</a></li>
+            </ul>
+          </li>
+          <li>
+            <p><a href="https://demo.clklog.com" target="_blank" rel="noopener" title="演示环境">演示环境</a></p>
+            <ul>
+              <li><a href="https://demo.clklog.com" target="_blank" rel="noopener" title="ClkLog 社区版">ClkLog 社区版</a></li>
+              <li>
+                <a href="https://pro.clklog.com" target="_blank" rel="noopener" title="ClkLog 付费版(pro+cdp)">ClkLog 付费版(pro+cdp)</a>
+              </li>
+              <li>
+                <a href="https://demo.access.clklog.com/" target="_blank" rel="noopener" title="AccessLog 社区版">AccessLog 社区版</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <p><a href="https://demo.clklog.com/api/doc.html#/home" target="_blank" rel="noopener" title="API文档">API文档</a></p>
+          </li>
+          <li>
+            <p><a href="#/introduce?id" title="源码下载">源码下载</a></p>
+            <ul>
+              <li>
+                <a href="https://github.com/clklog" target="_clkloggithub" title="GitHub"
+                  ><img src="/assets/imgs/export.png" height="10" />ClkLog in GitHub</a
+                >
+              </li>
+              <li>
+                <a href="https://gitee.com/clklog" target="_clkloggitee" title="Gitee"
+                  ><img src="/assets/imgs/export.png" height="10" />ClkLog in Gitee</a
+                >
+              </li>
+              <li>
+                <a href="https://gitcode.com/clklog" target="_clkloggitcode" title="GitCode"
+                  ><img src="/assets/imgs/export.png" height="10" />ClkLog in GitCode</a
+                >
+              </li>
+              <li>
+                <a href="https://github.com/accesslog" target="_accessloggithub" title="GitHub"
+                  ><img src="/assets/imgs/export.png" height="10" />AccessLog in GitHub</a
+                >
+              </li>
+              <li>
+                <a href="https://gitee.com/accesslog" target="_accessloggitee" title="Gitee"
+                  ><img src="/assets/imgs/export.png" height="10" />AccessLog in Gitee</a
+                >
+              </li>
+              <li>
+                <a href="https://gitcode.com/accesslog" target="_accessloggitcode" title="GitCode"
+                  ><img src="/assets/imgs/export.png" height="10" />AccessLog in GitCode</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li>
+            <p><a href="https://docs.clklog.com" target="_clklogdocs" title="文章库">文章库</a></p>
+          </li>
+          <li>
+            <p>关于我们</p>
+            <ul>
+              <li>
+                <a href="https://www.zcunsoft.com/index.html" target="_officalsite" title="公司官网"> 公司官网</a>
+              </li>
+              <li>
+                <a href="/#/certification.md" title="资质认证">资质认证</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </div>
     <!-- Docsify v4 -->
     <script src="assets/plugins/docsify@4.js"></script>
     <script src="assets/plugins/search.min.js" rel="stylesheet"></script>

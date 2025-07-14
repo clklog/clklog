@@ -1,5 +1,7 @@
 
-* [主页](/#/)
+* <a href="/#/" class="logo"><img title="" src="/assets/imgs/logo1.png" alt="" data-align="center"></a>
+
+* [主页](/)
 * [产品介绍](/introduce.md)
   <!-- * [功能清单](/funclist.md)
   * [指标项说明](/indicator-desc.md)

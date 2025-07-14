@@ -8,7 +8,7 @@
   - [指标项说明](/indicator-desc.md)
   <!-- - [更新说明](/changelog.md) -->
   - 更新说明
-    - [CPD企业版](/changelog/cdp.md)
+    - [CDP企业版](/changelog/cdp.md)
     - [PRO专业版](/changelog/pro.md)
     - [鸿蒙SDK](/changelog/hmsdk.md)
     - [社区版](/changelog/community.md)
