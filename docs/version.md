@@ -14,7 +14,7 @@
 #### **服务说明**
 
 <div style="text-align:left;max-width:900px;">
-    <img src="/../assets/imgs/service1.png" style="max-width:900px;width:100%;">
+    <img src="/../assets/imgs/service2.png" style="max-width:900px;width:100%;">
 
 - **基础支持**：购买ClkLog产品后自动开启此服务。自首次交付之日起，用户按照 ClkLog 提供的《参考部署环境》进行产品部署时，ClkLog将在1个月内提供以上线支持服务：部署指导、集成支持、系统使用指导、功能可行性保障。基础支持到期后您可以选择增购专业支持或按次购买服务。
 
