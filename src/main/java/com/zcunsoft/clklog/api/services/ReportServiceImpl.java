@@ -465,7 +465,12 @@ public class ReportServiceImpl implements IReportService {
         GetAreaResponse response = new GetAreaResponse();
         GetAreaDetailRequest getAreaDetailRequest = new GetAreaDetailRequest();
         BeanUtils.copyProperties(getAreaRequest, getAreaDetailRequest);
-
+        if (getAreaRequest.getStartTime() != null) {
+            getAreaDetailRequest.setStartTime(yMdFORMAT.get().format(getAreaRequest.getStartTime()));
+        }
+        if (getAreaRequest.getEndTime() != null) {
+            getAreaDetailRequest.setEndTime(yMdFORMAT.get().format(getAreaRequest.getEndTime()));
+        }
         return getAreaDetailTop10(getAreaDetailRequest);
     }
 
