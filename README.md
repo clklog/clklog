@@ -28,11 +28,11 @@ ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功�
 
 # Screenshot Samples/示意图
 
-| ![](docs/assets/imgs/1.png) | ![](docs/assets/imgs/2.png) |
-| --------------------------- | --------------------------- |
-| ![](docs/assets/imgs/3.png) | ![](docs/assets/imgs/4.png) |
-| ![](docs/assets/imgs/5.png) | ![](docs/assets/imgs/6.png) |
-| ![](docs/assets/imgs/7.png) | ![](docs/assets/imgs/8.png) |
+| ![](https://clklog.com/assets/imgs/1.png) | ![](https://clklog.com/assets/imgs/2.png) |
+| ----------------------------------------- | ----------------------------------------- |
+| ![](https://clklog.com/assets/imgs/3.png) | ![](https://clklog.com/assets/imgs/4.png) |
+| ![](https://clklog.com/assets/imgs/5.png) | ![](https://clklog.com/assets/imgs/6.png) |
+| ![](https://clklog.com/assets/imgs/7.png) | ![](https://clklog.com/assets/imgs/8.png) |
 
 # Online Demo/在线体验
 
@@ -64,4 +64,4 @@ Official Documents/官方文档：<a href="https://clklog.com">https://clklog.co
 
 - Customer service WeChat/客服微信：opensoft66
 
-- Customer service QR Code/客服二维码：<img title="" src="docs/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top">
+- Customer service QR Code/客服二维码：<img title="" src="https://clklog.com/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top">
