@@ -9,7 +9,7 @@ const state = {
     },
   ],
   projectName:
-    getLocalStorage("projectList") &&
+    getLocalStorage("prejectCode") || getLocalStorage("projectList") &&
       getLocalStorage("projectList").length > 0
       ? getLocalStorage("projectList")[0].projectName
       : "clklogapp",

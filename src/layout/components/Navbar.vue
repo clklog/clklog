@@ -3,51 +3,29 @@
     <div class="burying_point">
       <div style="display: flex; align-items: center">
         <div class="logoFlag">
-          <img
-            class="imgLogo"
-            src="@/assets/images/logo.png"
-            @click="$router.push('/')"
-          />
-          <div
-            style="
+          <img class="imgLogo" src="@/assets/images/logo.png" @click="$router.push('/')" />
+          <div style="
               margin-left: 20px;
               font-size: 12px;
               color: rgba(76, 81, 86, 0.657);
               margin-top: 6px;
-            "
-          >
+            ">
             社区版
           </div>
         </div>
 
-        <el-select
-          v-show="projectIsNotShow"
-          v-model="prejectCode"
-          placeholder="请选择"
-          class="custom_select"
-          @change="handleChangeProject"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.projectName"
-            :label="item.projectDisplayName"
-            :value="item.projectName"
-          />
+        <el-select v-show="projectIsNotShow" v-model="prejectCode" placeholder="请选择" class="custom_select"
+          @change="handleChangeProject">
+          <el-option v-for="item in options" :key="item.projectName" :label="item.projectDisplayName"
+            :value="item.projectName" />
         </el-select>
       </div>
 
       <div class="right-menu">
         <div class="dataTime">{{ dateTime }}&nbsp;&nbsp;{{ dateWeek }}</div>
-        <el-dropdown
-          class="avatar-container right-menu-item hover-effect"
-          trigger="click"
-        >
+        <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
           <div class="avatar-wrapper">
-            <img
-              src="@/assets/images/avator.png"
-              class="user-avatar"
-              @click="clickImg"
-            />
+            <img src="@/assets/images/avator.png" class="user-avatar" @click="clickImg" />
             <i class="el-icon-caret-bottom" />
           </div>
 
@@ -106,11 +84,11 @@ export default {
         if (newVal && newVal.length > 0) {
           this.options = newVal;
           this.prejectCode = this.options[0].projectName;
+          this.$store.dispatch("tracking/setProject", this.prejectCode);
         } else {
           this.options = this.defaultProject;
           this.prejectCode = this.options[0].projectName;
         }
-        this.$store.dispatch("tracking/setProject", this.prejectCode);
       },
       deep: true,
     },
@@ -127,6 +105,8 @@ export default {
       this.options = this.defaultProject;
       this.prejectCode = this.options[0].projectName;
     }
+    console.log("缓存==>");
+    this.$store.dispatch("tracking/setProject", this.prejectCode);
     this.initDate();
     const _this = this;
     document.addEventListener("visibilitychange", function () {
@@ -185,7 +165,7 @@ export default {
       this.dateWeek = weekMap[date.getDay()];
       this.dateTime = year + "年" + month + "月" + day + "日";
     },
-    toggleSideBar() {},
+    toggleSideBar() { },
     async logout() {
       await this.$store.dispatch("user/logout");
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
@@ -195,7 +175,7 @@ export default {
         this.$bus.$emit("$subscription", "sub");
       });
     },
-    clickImg() {},
+    clickImg() { },
     handleChangeProject(val) {
       this.$store.dispatch("tracking/setProject", val);
     },
