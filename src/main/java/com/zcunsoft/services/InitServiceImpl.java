@@ -5,14 +5,12 @@ import com.zcunsoft.cfg.InitSetting;
 import com.zcunsoft.handlers.ConstsDataHolder;
 import com.zcunsoft.util.IOUtil;
 import com.zcunsoft.util.ObjectMapperUtil;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -65,7 +63,9 @@ public class InitServiceImpl implements IInitService {
                     sql = sql.replaceAll(":before_date_2", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000 * 2)));
                     sql = sql.replaceAll(":before_date_3", yMdFORMAT.get().format(new Timestamp(System.currentTimeMillis() - 86400000 * 3)));
                 }
-                logger.info(sql);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(sql);
+                }
                 clickHouseJdbcTemplate.execute(sql);
                 clickHouseJdbcTemplate.execute("optimize table " + setting.getLogDb() + "." + tableName + " FINAL SETTINGS optimize_skip_merged_partitions=1");
             }
@@ -80,8 +80,8 @@ public class InitServiceImpl implements IInitService {
 
         try {
 
-            String sql = FileUtils.readFileToString(new File(getResourcePath() + File.separator + "scripts" + File.separator
-                    + "init.sql"), Charset.forName("GB2312"));
+            String sql = IOUtil.readFile(getResourcePath() + File.separator + "scripts" + File.separator
+                    + "init.sql");
             sql = sql.replace("${CLKLOG_LOG_DB}", setting.getLogDb());
             clickHouseJdbcTemplate.execute(sql);
             isOk = true;
