@@ -58,15 +58,15 @@ FROM (
 				, if(url = ''
 					OR url = 'url的domain解析失败', 'N/A', url) AS url
 				, arraySort(groupUniqArray(stat_date)) AS stat_dates
-				, max(log_time) - min(log_time) AS diff
+				, sum(if(event in  ('$WebPageLeave','$MPPageLeave','$AppPageLeave'),event_duration, 0)) AS diff
 				, count(1) AS pv
-				, if(title = '', 'N/A', title) AS title
+                , coalesce(anyIf(title, event in  ('$WebPageLeave','$MPPageLeave','$AppPageLeave')), 'N/A') AS title
 				, if(url_path = '', 'N/A', url_path) AS url_path
 			FROM ${CLKLOG_LOG_DB}.log_analysis
 			WHERE stat_date <= ':cal_date'
 				AND stat_date >= ':previous_date'
 				AND event_session_id <> ''
-			GROUP BY event_session_id, lib, project_name, is_first_day, country, province, url, title, url_path
+			GROUP BY event_session_id, lib, project_name, is_first_day, country, province, url, url_path
 		) t3
 		WHERE indexOf(stat_dates, toDate(':cal_date')) = 1
 		GROUP BY lib, project_name, is_first_day, country, province, urlAndPathAndTitle WITH CUBE
