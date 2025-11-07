@@ -295,6 +295,12 @@ public class ExportReportServiceImpl implements IExportReportService {
             FlowDetail flowDetail = assemblyFlowDetail(visituriDetailbydate, visituriDetailbydate);
             flowDetail.setExitCount(visituriDetailbydate.getExitCount());
             flowDetail.setDownPvCount(visituriDetailbydate.getDownPvCount());
+            flowDetail.setAvgVisitTime(0f);
+            if (visituriDetailbydate.getPv() > 0) {
+                float avgVisitTime = visituriDetailbydate.getVisitTime() * 1.0f / visituriDetailbydate.getPv();
+                flowDetail.setAvgVisitTime(Float.parseFloat(decimalFormat.get().format(avgVisitTime)));
+
+            }
             return flowDetail;
         }
         return new FlowDetail();
@@ -338,6 +344,11 @@ public class ExportReportServiceImpl implements IExportReportService {
             flowDetail.setUri(visituriDetailbydate.getUri());
             flowDetail.setTitle(visituriDetailbydate.getTitle());
             flowDetail.setUriPath(visituriDetailbydate.getUriPath());
+            flowDetail.setAvgVisitTime(0);
+            if (visituriDetailbydate.getPv() > 0) {
+                float avgVisitTime = visituriDetailbydate.getVisitTime() * 1.0f / visituriDetailbydate.getPv();
+                flowDetail.setAvgVisitTime(Float.parseFloat(decimalFormat.get().format(avgVisitTime)));
+            }
             visitUriDetailList.add(flowDetail);
         }
         return visitUriDetailList;
