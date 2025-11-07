@@ -291,10 +291,17 @@ public class ReportServiceImpl implements IReportService {
             visitUriTotal.setPv(visituriDetailbydate.getPv());
             visitUriTotal.setExitCount(visituriDetailbydate.getExitCount());
             visitUriTotal.setDownPvCount(visituriDetailbydate.getDownPvCount());
-            FlowDetail flowDetail = assemblyFlowDetail(visituriDetailbydate, visituriDetailbydate);
-            visitUriTotal.setBounceRate(flowDetail.getBounceRate());
-            visitUriTotal.setAvgVisitTime(flowDetail.getAvgVisitTime());
-            ;
+            visitUriTotal.setBounceRate(0f);
+            if (visituriDetailbydate.getVisitCount() > 0) {
+                float bounceRate = visituriDetailbydate.getBounceCount() * 1.0f / visituriDetailbydate.getVisitCount();
+                visitUriTotal.setBounceRate(Float.parseFloat(decimalFormat.get().format(bounceRate)));
+            }
+            visitUriTotal.setAvgVisitTime(0f);
+            if (visituriDetailbydate.getPv() > 0) {
+                float avgVisitTime = visituriDetailbydate.getVisitTime() * 1.0f / visituriDetailbydate.getPv();
+                visitUriTotal.setAvgVisitTime(Float.parseFloat(decimalFormat.get().format(avgVisitTime)));
+
+            }
         }
 
         response.setData(visitUriTotal);
@@ -352,9 +359,12 @@ public class ReportServiceImpl implements IReportService {
         GetVisitUriDetailPageResponse response = new GetVisitUriDetailPageResponse();
         GetVisitUriDetailPageResponseData responseData = new GetVisitUriDetailPageResponseData();
         for (VisituriDetailbydate visituriDetailbydate : visitUriDetailbydateList) {
-            FlowDetail flowDetail = assemblyFlowDetail(visituriDetailbydate, visituriDetailbydate);
             VisitUriDetail visitUriDetail = new VisitUriDetail();
-            visitUriDetail.setAvgVisitTime(flowDetail.getAvgVisitTime());
+            visitUriDetail.setAvgVisitTime(0);
+            if (visituriDetailbydate.getPv() > 0) {
+                float avgVisitTime = visituriDetailbydate.getVisitTime() * 1.0f / visituriDetailbydate.getPv();
+                visitUriDetail.setAvgVisitTime(Float.parseFloat(decimalFormat.get().format(avgVisitTime)));
+            }
             visitUriDetail.setEntryCount(visituriDetailbydate.getEntryCount());
             visitUriDetail.setExitCount(visituriDetailbydate.getExitCount());
             if (visituriDetailbydate.getVisitCount() > 0) {
@@ -3446,9 +3456,13 @@ public class ReportServiceImpl implements IReportService {
         GetVisitUriPathTreeTotalResponse response = new GetVisitUriPathTreeTotalResponse();
 
         for (VisituriDetailbydate visituriDetailbydate : visitUriDetailbydateList) {
-            FlowDetail flowDetail = assemblyFlowDetail(visituriDetailbydate, visituriDetailbydate);
             VisitUriPathDetail visitUriDetail = new VisitUriPathDetail();
-            visitUriDetail.setAvgVisitTime(flowDetail.getAvgVisitTime());
+            visitUriDetail.setAvgVisitTime(0);
+            visitUriDetail.setVisitTime(visituriDetailbydate.getVisitTime());
+            if (visituriDetailbydate.getPv() > 0) {
+                float avgVisitTime = visituriDetailbydate.getVisitTime() * 1.0f / visituriDetailbydate.getPv();
+                visitUriDetail.setAvgVisitTime(Float.parseFloat(decimalFormat.get().format(avgVisitTime)));
+            }
             visitUriDetail.setEntryCount(visituriDetailbydate.getEntryCount());
             visitUriDetail.setExitCount(visituriDetailbydate.getExitCount());
             if (visituriDetailbydate.getVisitCount() > 0) {
@@ -3528,8 +3542,13 @@ public class ReportServiceImpl implements IReportService {
                 rootDetail.setExitCount(rootDetail.getExitCount() + leafUriStat.getExitCount());
                 rootDetail.setExitRate(rootDetail.getExitRate() + leafUriStat.getExitRate());
                 rootDetail.setEntryCount(rootDetail.getEntryCount() + leafUriStat.getEntryCount());
-                rootDetail
-                        .setAvgVisitTime(rootDetail.getAvgVisitTime() + leafUriStat.getAvgVisitTime());
+                rootDetail.setVisitTime(rootDetail.getVisitTime() + leafUriStat.getVisitTime());
+
+                if (rootDetail.getPv() > 0) {
+                    float avgVisitTime = rootDetail.getVisitTime() * 1.0f / rootDetail.getPv();
+                    rootDetail.setAvgVisitTime(Float.parseFloat(decimalFormat.get().format(avgVisitTime)));
+                }
+
                 rootDetail.setDownPvCount(rootDetail.getDownPvCount() + leafUriStat.getDownPvCount());
             }
 
@@ -3621,9 +3640,12 @@ public class ReportServiceImpl implements IReportService {
         GetVisitUriListOfUriPathResponse response = new GetVisitUriListOfUriPathResponse();
 
         for (VisituriDetailbydate visituriDetailbydate : visitUriDetailbydateList) {
-            FlowDetail flowDetail = assemblyFlowDetail(visituriDetailbydate, visituriDetailbydate);
             VisitUriDetail visitUriDetail = new VisitUriDetail();
-            visitUriDetail.setAvgVisitTime(flowDetail.getAvgVisitTime());
+
+            if (visituriDetailbydate.getPv() > 0) {
+                float avgVisitTime = visituriDetailbydate.getVisitTime() * 1.0f / visituriDetailbydate.getPv();
+                visitUriDetail.setAvgVisitTime(Float.parseFloat(decimalFormat.get().format(avgVisitTime)));
+            }
             visitUriDetail.setEntryCount(visituriDetailbydate.getEntryCount());
             visitUriDetail.setExitCount(visituriDetailbydate.getExitCount());
             if (visituriDetailbydate.getVisitCount() > 0) {

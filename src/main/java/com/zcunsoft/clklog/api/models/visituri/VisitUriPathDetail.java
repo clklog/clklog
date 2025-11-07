@@ -34,7 +34,10 @@ public class VisitUriPathDetail {
     @Schema(description = "入口页次数")
     private int entryCount;
 
-    @Schema(description = "平均访问时长")
+    @Schema(description = "页面浏览时长")
+    private float visitTime;
+
+    @Schema(description = "平均浏览时长")
     private float avgVisitTime;
 
     @Schema(description = "贡献下游流量")
