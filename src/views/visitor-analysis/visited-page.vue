@@ -4,7 +4,7 @@
     <div class="Overview public-hoverItem">
       <div class="public-firstHead">流量概览</div>
       <div class="bid-list-page">
-        <originView ref="originView" byVisitedPage></originView>
+        <originView ref="originView" byVisitedPage isUpdateDuration></originView>
       </div>
     </div>
     <visitedAnalysis
@@ -24,7 +24,6 @@ import { FilterBar } from "@/layout/components";
 import originView from "@/components/origin-view";
 import visitedAnalysis from "./chart-component/visited-page-analysis";
 import { copyObj } from "@/utils/copy";
-import { percentage } from "@/utils/percent";
 export default {
   components: {
     FilterBar,

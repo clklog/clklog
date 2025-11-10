@@ -96,12 +96,10 @@
                 userBaseInfo.pv
               }}个页面， 访问总耗时为{{
                 formatTimeData(userBaseInfo.visitTime)
-              }}。 <br />每次访问的平均访问页数为{{
-                userBaseInfo.avgPv
-              }}
-              页，平均访问时长为{{
+              }}。 <br />每次访问的平均访问时长为{{
                 formatTimeData(userBaseInfo.avgVisitTime)
-              }}。
+              }}，平均访问页数为{{ userBaseInfo.avgPv }}
+              页。
             </div>
             <div class="visit_Time">
               <div class="firstTime">

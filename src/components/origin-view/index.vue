@@ -560,8 +560,30 @@
           </el-popover>
           </div>
         </div>
-      
-        <div class="header-name w156">
+       <!-- 更新平均时长算法 -->
+        <div v-if="isUpdateDuration" class="header-name w156">
+          页面平均浏览时长
+          <div class="parentPosition">
+            <el-popover
+              placement="bottom-start"
+              width="200"
+              trigger="hover"
+              class="popImg"
+            >
+              <div
+                v-html="$sharedText.avgPageBrowseTime"
+                style="padding: 5px; font-size: 12px"
+              ></div>
+              <img
+                slot="reference"
+                class="icon-question"
+                src="@/assets/images/question.png"
+                alt=""
+              />
+            </el-popover>
+          </div>
+        </div>
+        <div v-else class="header-name w156">
             平均访问时长
             <div class="parentPosition">
             <el-popover
@@ -637,69 +659,72 @@
 </template>
 
 <script>
-import { percentage,averageRules } from "@/utils/percent";
+import { percentage, averageRules } from "@/utils/percent";
 import { formatTime } from "@/utils/format";
 export default {
   name: "originName",
   props: {
-    byChannel:{
-      type:Boolean,
-       default: false,
+    byChannel: {
+      type: Boolean,
+      default: false,
     },
-    byFlowView:{ 
-      type:Boolean,
-       default: false,
+    byFlowView: {
+      type: Boolean,
+      default: false,
     },
-    byAreaAnaly:{ 
-      type:Boolean,
-       default: false,
+    byAreaAnaly: {
+      type: Boolean,
+      default: false,
     },
     byVisit: {
       type: Boolean,
       default: false,
     },
-    byVisitedPage:{ 
-      type:Boolean,
-       default: false,
-    }
-    
-  },
-  data(){
-    return{
-        originData:null,
+    byVisitedPage: {
+      type: Boolean,
+      default: false,
+    },
+    isUpdateDuration: {
+      type: Boolean,
+      default: false,
     }
   },
-  methods:{
+  data() {
+    return {
+      originData: null,
+    };
+  },
+  methods: {
     averageRulesEvent(num) {
       return averageRules(num);
     },
-    formatTimeFun(val){
-      val =  Math.floor(val);
+    formatTimeFun(val) {
+      val = Math.floor(val);
       return formatTime(val);
     },
-    originEvent(val){
-        this.originData = val;
+    originEvent(val) {
+      this.originData = val;
     },
     percentageFun(val) {
       return percentage(val);
     },
-  }
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-::v-deep.setFontTop{
-    margin-top:5px;
+::v-deep.setFontTop {
+  margin-top: 5px;
+}
+.parentPosition {
+  position: relative;
+  .popImg {
+    position: absolute;
+    left: 0;
+    transform: translate(0, -50%); //左右上下
   }
-  .parentPosition{
-    position: relative;
-    .popImg{
-      position: absolute;
-      left:0;
-      transform: translate(0,-50%);//左右上下
-    }
-  }
-  
+}
+
 .bid-list-header {
   padding-bottom: 10px;
   padding-top: 15px;
@@ -711,7 +736,7 @@ export default {
     display: flex;
     align-items: center;
   }
- 
+
   .w156 {
     font-size: 15px;
     font-weight: 400;
@@ -726,25 +751,25 @@ export default {
   }
 }
 .bid-list-record {
-      display: flex;
-      .bid-list-item {
-        width: 14%;
-        justify-content: center;
-        height: 30px;
-        display: flex;
-        align-items: center;
-      }
-      .w157 {
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 14px;
-        color: #4d4d4d;
-      }
-      .w158 {
-        font-size: 16px;
-        font-weight: bold;
-        color: #2c7be5;
-        line-height: 17px;
-      }
-    }
+  display: flex;
+  .bid-list-item {
+    width: 14%;
+    justify-content: center;
+    height: 30px;
+    display: flex;
+    align-items: center;
+  }
+  .w157 {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    color: #4d4d4d;
+  }
+  .w158 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #2c7be5;
+    line-height: 17px;
+  }
+}
 </style>

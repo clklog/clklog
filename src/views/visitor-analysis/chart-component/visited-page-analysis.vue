@@ -61,7 +61,7 @@
           <el-checkbox label="entryCount">入口页次数</el-checkbox>
           <el-checkbox label="downPvCount">贡献下游浏览量</el-checkbox>
           <el-checkbox label="exitCount">退出页次数</el-checkbox>
-          <el-checkbox label="avgVisitTime">平均访问时长</el-checkbox>
+          <el-checkbox label="avgVisitTime">页面平均浏览时长</el-checkbox>
           <el-checkbox label="exitRate">退出率</el-checkbox>
         </el-checkbox-group>
       </div>
@@ -71,7 +71,9 @@
       <div class="public-Table-minHeight" v-show="!showTreeFlag">
         <el-table
           class="public-radius"
-          :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
+          :header-cell-style="{ background: '#f7fafe' }"
+          :header-cell-class-name="headerCellClass"
+           :cell-style="tableHeaderColor"
           :data="treeList"
           style="width: 100%"
           :row-key="getRowKeys"
@@ -162,15 +164,14 @@
                   {{ scope.row.segment ? scope.row.segment : "/" }}
                 </div>
               </div>
-
-             
             </template>
           </el-table-column>
 
           <el-table-column label="流量基础指标">
-            <el-table-column v-if="pv" prop="detail.pv" label="浏览量" />
-            <el-table-column v-if="uv" prop="detail.uv" label="访客数" />
+            <el-table-column align="center" v-if="pv" prop="detail.pv" label="浏览量" />
+            <el-table-column align="center" v-if="uv" prop="detail.uv" label="访客数" />
             <el-table-column
+              align="center"
               v-if="ipCount"
               prop="detail.ipCount"
               label="IP数"
@@ -178,30 +179,35 @@
           </el-table-column>
           <el-table-column prop="detail.date" label="流量质量指标">
             <el-table-column
+              align="center"
               v-if="entryCount"
               prop="detail.entryCount"
               label="入口页次数"
             />
             <el-table-column
+              align="center"
               v-if="downPvCount"
               prop="detail.downPvCount"
               label="贡献下游浏览量"
             />
             <el-table-column
+              align="center"
               v-if="exitCount"
               prop="detail.exitCount"
               label="退出页次数"
             />
             <el-table-column
+              align="center"
               v-if="avgVisitTime"
               prop="detail.avgVisitTime"
-              label="平均访问时长"
+              label="页面平均浏览时长"
             >
               <template slot-scope="{ row }" v-if="row.detail.title != '更多'">
                 {{ row.detail.avgVisitTime | formatTime }}
               </template>
             </el-table-column>
             <el-table-column
+              align="center"
               v-if="exitRate"
               prop="detail.exitRate"
               label="退出率"
@@ -212,116 +218,6 @@
             </el-table-column>
           </el-table-column>
         </el-table>
-
-        <!-- <el-table
-          :data="treeList"
-          style="width: 100%"
-          :row-key="getRowKeys"
-          :tree-props="{ children: 'leafUri', hasChildren: 'hasChildren' }"
-          border
-          lazy
-          ref="multipleTable"
-          :expand-row-keys="tableExpands"
-          @expand-change="expandChangeEvent"
-        >
-          <el-table-column
-            label="页面地址"
-            width="400px"
-            :show-overflow-tooltip="true"
-          >
-            <template slot-scope="scope" style="display: flex">
-              <div
-                v-if="
-                  scope.row.leafUri &&
-                  scope.row.leafUri.length == 0 &&
-                  !scope.row.firstFlag
-                "
-                class="tableName"
-                :style="{ 'padding-left': `${scope.row.level * 19}px` }"
-                @click="handleTree(scope.row, '')"
-              >
-                <img
-                  src="@/assets/images/add.png"
-                  style="
-                    width: 12px;
-                    height: 12px;
-                    object-fit: cover;
-                    margin-right: 10px;
-                    margin-top: 2px;
-                   
-                    box-sizing: border-box;
-                    cursor: pointer;
-                  "
-                />
-              </div>
-              <div v-if=" scope.row.secondFlag">
-                <div style=" margin-left:-12px;">{{ scope.row.title ? scope.row.title : "" }}</div>
-                <div style=" margin-left:-12px;" >{{ scope.row.segment ? scope.row.segment : "/" }}</div>
-              </div>
-              <div v-else>
-                <div style=" margin-left:5px;">{{ scope.row.title ? scope.row.title : "" }}</div>
-                <div>{{ scope.row.segment ? scope.row.segment : "/" }}</div>
-              </div>
-
-              <img
-                v-if="scope.row.leafUri.length > 0 && !scope.row.firstFlag"
-                style="
-                  position: absolute;
-                  right: 10px;
-                  top: 8px;
-                  cursor: pointer;
-                  width: 17px;
-                "
-                src="@/assets/images/showDialog.png"
-                @click="handleTree(scope.row, 'dialog')"
-              />
-            </template>
-          </el-table-column>
-          <el-table-column label="流量基础指标">
-            <el-table-column v-if="pv" prop="detail.pv" label="浏览量" />
-            <el-table-column v-if="uv" prop="detail.uv" label="访客数" />
-            <el-table-column
-              v-if="ipCount"
-              prop="detail.ipCount"
-              label="IP数"
-            />
-          </el-table-column>
-          <el-table-column prop="detail.date" label="流量质量指标">
-            <el-table-column
-              v-if="entryCount"
-              prop="detail.entryCount"
-              label="入口页次数"
-            />
-            <el-table-column
-              v-if="downPvCount"
-              prop="detail.downPvCount"
-              label="贡献下游浏览量"
-            />
-            <el-table-column
-              v-if="exitCount"
-              prop="detail.exitCount"
-              label="退出页次数"
-            />
-            <el-table-column
-              v-if="avgVisitTime"
-              prop="detail.avgVisitTime"
-              label="平均访问时长"
-            >
-              <template slot-scope="scope">
-                {{ formatTimeEvent(scope.row.detail.avgVisitTime) }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              v-if="exitRate"
-              prop="detail.exitRate"
-              label="退出率"
-            >
-              <template slot-scope="scope">
-                {{ percentageFun(scope.row.detail.exitRate) }}
-              </template>
-            </el-table-column>
-          </el-table-column>
-        </el-table> -->
       </div>
       <!-- 默认图表 -->
       <div v-show="showTreeFlag">
@@ -331,7 +227,8 @@
             border
             class="public-radius"
             style="width: 100%"
-            :header-cell-style="{ textAlign: 'center', background: '#f7fafe ' }"
+            :header-cell-style="{  background: '#f7fafe ' }"
+            :header-cell-class-name="headerCellClass"
             :cell-style="tableHeaderColor"
             @sort-change="sortChange($event)"
           >
@@ -357,18 +254,21 @@
             </el-table-column>
             <el-table-column label="流量基础指标">
               <el-table-column
+                align="center"
                 v-if="pv"
                 prop="pv"
                 label="浏览量"
                 sortable="custom"
               />
               <el-table-column
+                align="center"
                 v-if="uv"
                 prop="uv"
                 label="访客数"
                 sortable="custom"
               />
               <el-table-column
+                align="center"
                 v-if="ipCount"
                 prop="ipCount"
                 label="IP数"
@@ -377,30 +277,35 @@
             </el-table-column>
             <el-table-column prop="date" label="流量质量指标">
               <el-table-column
+                align="center"
                 v-if="entryCount"
                 prop="entryCount"
                 label="入口页次数"
                 sortable="custom"
               />
               <el-table-column
+                align="center"
                 v-if="downPvCount"
                 prop="downPvCount"
                 label="贡献下游浏览量"
                 sortable="custom"
               />
               <el-table-column
+                align="center"
                 v-if="exitCount"
                 prop="exitCount"
                 label="退出页次数"
                 sortable="custom"
               />
               <el-table-column
+                align="center"
                 v-if="avgVisitTime"
                 prop="avgVisitTime"
-                label="平均访问时长"
+                label="页面平均浏览时长"
                 sortable="custom"
               />
               <el-table-column
+                align="center"
                 v-if="exitRate"
                 prop="exitRate"
                 label="退出率"
@@ -430,10 +335,7 @@
 <script>
 import { blobDownloads } from "@/utils/localDownloadUtil.js";
 import { exportVisitUriDetailApi } from "@/api/trackingapi/download";
-import {
-  getVisitUriListOfUriPathApi,
-  getVisitUriDetailApi,
-} from "@/api/trackingapi/visituri";
+import { getVisitUriDetailApi } from "@/api/trackingapi/visituri";
 import flowPoint from "@/components/flowPoint/index";
 import vistedDialog from "./visted-dialog.vue";
 import { percentage } from "@/utils/percent";
@@ -521,7 +423,7 @@ export default {
         params.uriPath = scope.uri;
         this.$refs.vistedDialog.vistedApiEvent(params);
       } else {
-        this.dialogParams.uri = scope.uri; 
+        this.dialogParams.uri = scope.uri;
         this.isExpand = false;
         // 动态添加节点
         this.scopeEventApi(scope.uri, "", scope.detail.numRandom);
@@ -606,13 +508,14 @@ export default {
     handelTable(val) {
       this.showTreeFlag = val;
     },
-    tableHeaderColor({ row, column, rowIndex, columnIndex }) {
-      if (columnIndex === 1) {
-        return "text-align:left";
-      } else {
-        return "text-align:center";
+    // 表头动态对齐（保留 .cell 为 flex）
+    headerCellClass({ column }) {
+      if (column && column.label === "页面地址") {
+        return "align-center";
       }
+      return "align-center";
     },
+    
     // 分页
     getIndex($index) {
       return (this.currentPage - 1) * this.pageSize + $index + 1;
@@ -809,6 +712,13 @@ export default {
     font-size: 16px;
     background-size: 13px;
   }
+  /* 表头按列名动态对齐 */
+  .el-table__header th.align-left .cell {
+    justify-content: flex-start;
+  }
+  .el-table__header th.align-center .cell {
+    justify-content: center;
+  }
   //有子节点 且已展开
   .el-table__expand-icon--expanded {
     position: relative !important;
@@ -837,6 +747,20 @@ export default {
   @import "~@/styles/components/el-pagination.scss";
   .el-table .cell {
     display: flex;
+  }
+  /* 内容区按列对齐（align="center" 时，flex 居中） */
+  .el-table__body td.is-center .cell {
+    justify-content: center;
+  }
+  .el-table__body td.is-left .cell {
+    justify-content: flex-start;
+  }
+  /* 表头按列名动态对齐 */
+  .el-table__header th.align-left .cell {
+    justify-content: flex-start;
+  }
+  .el-table__header th.align-center .cell {
+    justify-content: center;
   }
   .el-table__header {
     // 使表格兼容safari，不错位,表头宽度较小

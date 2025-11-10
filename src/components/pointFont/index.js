@@ -6,6 +6,8 @@ export const sharedText = {
     bounceRate:'只浏览一个页面就离开或关闭应用的访问次数占总访问次数的百分比。<div style="margin-top:5px"></div><div style="margin-top:5px">跳出次数 / 总访问次数 * 100%</div>',
     avgPv:'选定时间段内访客访问页面数的平均值。<div style="margin-top:5px">访客的单次访问中，每打开一个页面被记录一次，同一页面打开多次访问页面数累计计算。</div> <div style="margin-top:5px">浏览量 / 访问次数</div>',
     avgVisitTime:'选定时间段内访客访问应用的平均时长。<div style="margin-top:5px">访客的单次访问中，访问的总时长为打开第一个页面到退出或关闭最后一个页面的时间差。</div><div style="margin-top:5px">访问总时长 / 访问次数</div>',
+    // 页面平均浏览时长
+    avgPageBrowseTime: '选定时间段内访客访问单个页面的平均停留时长。<div style="margin-top:5px">访客的单次访问中，页面停留的总时长为所有访问页面停留时长的总和。</div><div style="margin-top:5px">页面浏览总时长 / 页面浏览总量</div>',
     newUv:'首次访问应用的时间在选定时间段内的访客总数。',
     newUvRate:'选定时间段内的新访客在访客总数中的占比。<div style="margin-top:5px"></div><div style="margin-top:5px">新访客数 / 访客总数 * 100%</div>',
     oldUv:'首次访问应用的时间不在选定时间段内的访客总数。',
