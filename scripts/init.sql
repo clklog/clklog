@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS log_analysis
     `is_compress` String COMMENT '是否压缩',
     `client_ip` String COMMENT '客户端IP',
     `distinct_id` String COMMENT '访客ID',
-    `log_time` DateTime64(3) COMMENT '日志时间',
+    `log_time` DateTime COMMENT '日志时间',
     `stat_date` Date COMMENT '统计日期',
     `stat_hour` String COMMENT '统计时段',
     `flush_time` String COMMENT '采集刷新时间',
