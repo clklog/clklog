@@ -3,138 +3,79 @@
     <!-- pc端 -->
     <div v-if="device == 'desktop'" class="container-item">
       <div style="width: 60vw">
-        <img
-          src="@/assets/images/loginBg.png"
-          style="width: 60vw; height: 100vh; object-fit: contain"
-        />
+        <img src="@/assets/images/loginBg.png"
+          style="width: 60vw; height: 100%; object-fit: contain;flex-shrink: 0;overflow: hidden;" />
       </div>
-      <div
-        style="
+      <div style="
           width: 40vw;
+          height: 100%;
+          display: flex;
+          align-items: center;
           background-color: #f7faff;
-          padding: 171px 0;
           box-sizing: border-box;
-        "
-      >
-        <el-form
-          ref="loginForm"
-          :model="loginForm"
-          :rules="loginRules"
-          class="login-form"
-          autocomplete="on"
-          label-position="left"
-        >
+        ">
+        <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on"
+          label-position="left">
           <div class="title-container">
             <h3 class="title">
               <img class="logo_head" src="@/assets/images/logo.png" />
             </h3>
           </div>
-          <div
-            style="
+          <div style="
               font-size: 14px;
               font-weight: 400;
               line-height: 21px;
               color: #4d4d4d;
               margin-bottom: 8px;
-            "
-          >
+            ">
             账号
           </div>
           <el-form-item prop="username" style="margin-bottom: 25px">
-            <el-input
-              ref="username"
-              v-model="loginForm.username"
-              placeholder="请输入账号"
-              name="username"
-              type="text"
-              tabindex="1"
-              autocomplete="on"
-            />
+            <el-input ref="username" v-model="loginForm.username" placeholder="请输入账号" name="username" type="text"
+              tabindex="1" autocomplete="on" />
           </el-form-item>
-          <div
-            style="
+          <div style="
               font-size: 14px;
               font-weight: 400;
               line-height: 21px;
               color: #4d4d4d;
               margin-bottom: 8px;
-            "
-          >
+            ">
             密码
           </div>
-          <el-tooltip
-            v-model="capsTooltip"
-            content="Caps lock is On"
-            placement="right"
-            manual
-          >
+          <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
             <el-form-item prop="password" style="margin-bottom: 25px">
-              <el-input
-                :key="passwordType"
-                ref="password"
-                v-model="loginForm.password"
-                :type="passwordType"
-                placeholder="请输入密码"
-                name="password"
-                tabindex="2"
-                autocomplete="on"
-                @keyup.native="checkCapslock"
-                @blur="capsTooltip = false"
-                @keyup.enter.native="handleLogin"
-              />
+              <el-input :key="passwordType" ref="password" v-model="loginForm.password" :type="passwordType"
+                placeholder="请输入密码" name="password" tabindex="2" autocomplete="on" @keyup.native="checkCapslock"
+                @blur="capsTooltip = false" @keyup.enter.native="handleLogin" />
 
-              <span
-                style="cursor: pointer"
-                :class="
-                  passwordType === 'password'
-                    ? 'el-icon-lock'
-                    : 'el-icon-unlock'
-                "
-                @click="showPwd"
-              >
-                <svg-icon
-                  :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
-                />
+              <span style="cursor: pointer" :class="passwordType === 'password'
+                ? 'el-icon-lock'
+                : 'el-icon-unlock'
+                " @click="showPwd">
+                <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
               </span>
             </el-form-item>
           </el-tooltip>
-          <div
-            v-if="!is_clklog_demo_experience_account"
-            style="display: flex; justify-content: space-between"
-          >
-            <el-button
-              :loading="loading"
-              type="primary"
-              style="width: 100%; height: 46px; margin-bottom: 30px"
-              @click.native.prevent="handleLogin"
-              >登录</el-button
-            >
+          <div v-if="!is_clklog_demo_experience_account" style="display: flex; justify-content: space-between">
+            <el-button :loading="loading" type="primary" style="width: 100%; height: 46px; margin-bottom: 30px"
+              @click.native.prevent="handleLogin">登录</el-button>
           </div>
           <div v-else style="display: flex; justify-content: space-between">
-            <el-button
-              :loading="loading"
-              type="primary"
-              style="
+            <el-button :loading="loading" type="primary" style="
                 width: calc(50% - 10px);
                 height: 46px;
                 margin-bottom: 30px;
                 font-size: 16px;
-              "
-              @click.native.prevent="handleLogin"
-              >登录</el-button
-            >
-            <el-button
-              style="
+              " @click.native.prevent="handleLogin">登录</el-button>
+            <el-button style="
                 width: calc(50% - 10px);
                 height: 46px;
                 margin-bottom: 30px;
                 background-color: #fd9843;
                 color: #fff;
                 font-size: 16px;
-              "
-              @click="checkLoginEvent"
-              >获取体验账号</el-button
-            >
+              " @click="checkLoginEvent">获取体验账号</el-button>
           </div>
 
           <!-- <div style="display: flex; justify-content: space-between">
@@ -163,168 +104,97 @@
     </div>
     <!-- 移动端 -->
     <div class="container-item" v-else style="width: 100vw; height: 100vh">
-      <div
-        style="
+      <div style="
           background-color: #f7faff;
           box-sizing: border-box;
           width: 100%;
           height: 100%;
-        "
-      >
-        <el-form
-          ref="loginForm"
-          :model="loginForm"
-          :rules="loginRules"
-          class="login-form"
-          style="
+        ">
+        <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" style="
             height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             padding: 0;
-          "
-          autocomplete="on"
-          label-position="left"
-        >
+          " autocomplete="on" label-position="left">
           <div class="title-container">
             <h3 class="title">
               <img class="logo_head" src="@/assets/images/logo.png" />
             </h3>
           </div>
-          <div
-            style="
+          <div style="
               font-size: 14px;
               font-weight: 400;
               line-height: 21px;
               color: #4d4d4d;
               margin-bottom: 8px;
-            "
-          >
+            ">
             账号
           </div>
           <el-form-item prop="username" style="margin-bottom: 25px">
-            <el-input
-              ref="username"
-              v-model="loginForm.username"
-              placeholder="请输入账号"
-              name="username"
-              type="text"
-              tabindex="1"
-              autocomplete="on"
-            />
+            <el-input ref="username" v-model="loginForm.username" placeholder="请输入账号" name="username" type="text"
+              tabindex="1" autocomplete="on" />
           </el-form-item>
-          <div
-            style="
+          <div style="
               font-size: 14px;
               font-weight: 400;
               line-height: 21px;
               color: #4d4d4d;
               margin-bottom: 8px;
-            "
-          >
+            ">
             密码
           </div>
-          <el-tooltip
-            v-model="capsTooltip"
-            content="Caps lock is On"
-            placement="right"
-            manual
-          >
+          <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
             <el-form-item prop="password" style="margin-bottom: 25px">
-              <el-input
-                :key="passwordType"
-                ref="password"
-                v-model="loginForm.password"
-                :type="passwordType"
-                placeholder="请输入密码"
-                name="password"
-                tabindex="2"
-                autocomplete="on"
-                @keyup.native="checkCapslock"
-                @blur="capsTooltip = false"
-                @keyup.enter.native="handleLogin"
-              />
-              <span
-                style="cursor: pointer"
-                :class="
-                  passwordType === 'password'
-                    ? 'el-icon-lock'
-                    : 'el-icon-unlock'
-                "
-                @click="showPwd"
-              >
-                <svg-icon
-                  :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
-                />
+              <el-input :key="passwordType" ref="password" v-model="loginForm.password" :type="passwordType"
+                placeholder="请输入密码" name="password" tabindex="2" autocomplete="on" @keyup.native="checkCapslock"
+                @blur="capsTooltip = false" @keyup.enter.native="handleLogin" />
+              <span style="cursor: pointer" :class="passwordType === 'password'
+                ? 'el-icon-lock'
+                : 'el-icon-unlock'
+                " @click="showPwd">
+                <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
               </span>
             </el-form-item>
           </el-tooltip>
 
-          <div
-            v-if="!is_clklog_demo_experience_account"
-            style="display: flex; justify-content: space-between"
-          >
-            <el-button
-              :loading="loading"
-              type="primary"
-              style="width: 100%; height: 46px; margin-bottom: 30px"
-              @click.native.prevent="handleLogin"
-              >登录</el-button
-            >
+          <div v-if="!is_clklog_demo_experience_account" style="display: flex; justify-content: space-between">
+            <el-button :loading="loading" type="primary" style="width: 100%; height: 46px; margin-bottom: 30px"
+              @click.native.prevent="handleLogin">登录</el-button>
           </div>
           <div v-else style="display: flex; justify-content: space-between">
-            <el-button
-              :loading="loading"
-              type="primary"
-              style="
+            <el-button :loading="loading" type="primary" style="
                 width: calc(50% - 10px);
                 height: 46px;
                 margin-bottom: 30px;
                 font-size: 16px;
-              "
-              @click.native.prevent="handleLogin"
-              >登录</el-button
-            >
-            <el-button
-              style="
+              " @click.native.prevent="handleLogin">登录</el-button>
+            <el-button style="
                 width: calc(50% - 10px);
                 height: 46px;
                 margin-bottom: 30px;
                 background-color: #fd9843;
                 color: #fff;
                 font-size: 16px;
-              "
-              @click="checkLoginEvent"
-              >获取体验账号</el-button
-            >
+              " @click="checkLoginEvent">获取体验账号</el-button>
           </div>
         </el-form>
       </div>
     </div>
 
     <el-dialog :visible.sync="dialogVisible" width="400px" center>
-      <div
-        style="
+      <div style="
           display: flex;
           flex-direction: column;
           align-items: center;
           font-size: 15px;
           font-weight: 500;
-        "
-      >
+        ">
         <div>微信扫描下方二维码</div>
         <div style="margin: 20px 0">关注公众号获取体验账号</div>
-        <img
-          src="@/assets/images/qrcode.png"
-          style="width: 200px; height: 200px; object-fit: cover"
-        />
-        <el-button
-          :loading="loading"
-          type="primary"
-          style="width: 100px; height: 35px; margin-top: 40px"
-          @click.native.prevent="dialogVisible = false"
-          >确定</el-button
-        >
+        <img src="@/assets/images/qrcode.png" style="width: 200px; height: 200px; object-fit: cover" />
+        <el-button :loading="loading" type="primary" style="width: 100px; height: 35px; margin-top: 40px"
+          @click.native.prevent="dialogVisible = false">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -577,20 +447,17 @@ $light_gray: #eee;
   top: 14px !important;
 }
 
+.container {
+  height: 100vh;
+  overflow: hidden;
+}
+
 .container-item {
-  min-height: 100%;
+  height: 100%;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
   display: flex;
-
-  > div:last-child {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-    padding: 0 !important;
-  }
 
   // 登录注册
   .loginWarry {
@@ -655,9 +522,9 @@ $light_gray: #eee;
       font-weight: bold;
 
       .logo_head {
-        height: 66px;
-        width: 194px;
-        object-fit: cover;
+        height: 80px;
+        object-fit: contain;
+        flex-shrink: 0;
       }
     }
   }
