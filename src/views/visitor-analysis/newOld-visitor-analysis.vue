@@ -61,7 +61,8 @@ export default {
         if (res.code == 200) {
           this.visitorTotal = res.data;
           this.$nextTick(() => {
-            this.$refs.originView.originEvent(res.data);
+            this.$refs.originView &&
+              this.$refs.originView.originEvent(res.data);
           });
         }
       });
@@ -70,7 +71,8 @@ export default {
       getVisitorDetailApi(this.commonParams).then((res) => {
         if (res.code == 200) {
           this.$nextTick(() => {
-            this.$refs.newOldAnalysis.getVisitorDetail(res.data);
+            this.$refs.newOldAnalysis &&
+              this.$refs.newOldAnalysis.getVisitorDetail(res.data);
           });
         }
       });

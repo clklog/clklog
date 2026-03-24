@@ -403,7 +403,6 @@ export default {
   },
   created() {
     this.$bus.$on("$loginOpen", (res) => {
-      console.log(res, "loginOpen");
       this.initClklog(res);
     });
 
@@ -583,6 +582,15 @@ $light_gray: #eee;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
+  display: flex;
+
+  > div:last-child {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 !important;
+  }
 
   // 登录注册
   .loginWarry {
@@ -610,7 +618,8 @@ $light_gray: #eee;
   .login-form {
     position: relative;
     width: 80%;
-    padding: 103px 35px 0;
+    max-width: 500px;
+    padding: 0;
     margin: 0 auto;
     overflow: hidden;
   }

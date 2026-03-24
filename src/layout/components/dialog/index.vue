@@ -337,7 +337,6 @@ export default {
 
     // 触发点击接口事件内容
     toVisitHttp(val, index) {
-      // console.log(val, index, "触发事件1的接口");
       this.visitListUrl = null; //重新赋值
       this.getVisitorSessionUriList(val);
       this.clickIndex = index;

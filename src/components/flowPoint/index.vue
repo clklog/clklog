@@ -99,7 +99,6 @@ export default {
       params.projectName = this.$store.getters.projectName;
       params.cols = [...this.channelList, ...this.flowQuality];
       let path = this.$route.path;
-      console.log(path,"路径");
       switch (path) {
         case "/trendAnalysis/trend": {
           let regular = ["statTime"]

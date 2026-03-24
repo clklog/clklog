@@ -9,8 +9,6 @@
         <img src="@/assets/images/icon.png" alt="" width="10px" />
       </div>
     </div>
-    <!-- :header-cell-style="{ textAlign: 'center' }" -->
-    <!-- :header-cell-style="headerStyle" -->
 
     <div class="block-index-form">
       <el-table

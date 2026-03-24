@@ -46,7 +46,6 @@ export default {
   },
   methods: {
     getPercentData(val) {
-      console.log(val,"图表数据==》");
       const oldCount = (val && (val.oldUvCount ?? val.oldUv)) ? (val.oldUvCount ?? val.oldUv) : 0;
       const newCount = (val && (val.newUvCount ?? val.newUv)) ? (val.newUvCount ?? val.newUv) : 0;
 

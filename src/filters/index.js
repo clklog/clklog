@@ -32,9 +32,6 @@ export function getCurrentHour() {
 }
 // 流量概览统一展示数值方式
 export function filterOverview(val) {
-  // if (val == 0) {
-  //   return val;
-  // }
   if (!val) {
     return "--";
   } else {
@@ -102,7 +99,7 @@ export function timeStampFunc(timestamp) {
 // 时间戳转换为年月日时分秒
 export function formatDateHMS(timestamp) {
   if (!timestamp) {
-    return timestamp
+    return timestamp;
   }
   const date = new Date(timestamp);
   const year = date.getFullYear();
@@ -244,12 +241,14 @@ export function percenBracket(s) {
   return "--";
 }
 export function toFixedPoint(s) {
+  if (s == 100) return "100%";
   if (s) {
     return (s * 1).toFixed(2) + "%";
   }
   return 0 + "%";
 }
 export function percentage(s) {
+  if (s == 1) return "100%";
   if (s) {
     return (s * 100).toFixed(2) + "%";
   }
@@ -257,6 +256,7 @@ export function percentage(s) {
 }
 // 占比规则
 export function percenTable(s) {
+  if (s == 1) return "100%";
   if (s) {
     return (s * 100).toFixed(2) + "%";
   }
@@ -264,7 +264,8 @@ export function percenTable(s) {
 }
 
 export function percenTableNull(s) {
-  if (s || s == 0) {
+  if (s == 1) return "100%";
+  if (s) {
     return (s * 100).toFixed(2) + "%";
   }
   return "";

@@ -1,12 +1,6 @@
 <template>
-  <div
-    class="NewOldVisitors block-main public-hoverItem"
-    v-loading="loadingRefresh"
-  >
-    <div
-      class="block-head"
-      @click="$router.push('/visitorAnalysis/newoldVisitor')"
-    >
+  <div class="NewOldVisitors block-main public-hoverItem" v-loading="loadingRefresh">
+    <div class="block-head" @click="$router.push('/visitorAnalysis/newoldVisitor')">
       <div class="block-title">新老访客</div>
       <div class="block-head-icon">
         <img src="@/assets/images/icon.png" alt="" width="10px" />
@@ -109,12 +103,7 @@
         </div>
       </div>
       <div class="pieIcon">
-        <pieChart
-          id="charts2"
-          ref="charts2"
-          style="height: 350px"
-          width="100%"
-        />
+        <pieChart id="charts2" ref="charts2" style="height: 350px" width="100%" />
       </div>
     </div>
   </div>
@@ -174,8 +163,12 @@ export default {
           const newUv = (this.newVisitor && this.newVisitor.uv) ? this.newVisitor.uv : 0;
           const oldUv = (this.oldVisitor && this.oldVisitor.uv) ? this.oldVisitor.uv : 0;
           const total = newUv + oldUv;
-          this.newVistorPercent = total > 0 ? ((newUv / total) * 100).toFixed(2) + "%" : "";
-          this.oldVistorPercent = total > 0 ? ((oldUv / total) * 100).toFixed(2) + "%" : "";
+          // this.newVistorPercent = total > 0 ? ((newUv / total) * 100).toFixed(2) + "%" : "";
+          // this.oldVistorPercent = total > 0 ? ((oldUv / total) * 100).toFixed(2) + "%" : "";
+          const newPercent = (newUv / total) * 100;
+          const oldPercent = (oldUv / total) * 100;
+          this.newVistorPercent = total > 0 ? (newPercent == 100 ? "100%" : (newPercent == 0 ? "0%" : newPercent.toFixed(2) + " %")) : "";
+          this.oldVistorPercent = total > 0 ? (oldPercent == 100 ? "100%" : (oldPercent == 0 ? "0%" : oldPercent.toFixed(2) + " %")) : "";
           const payload = Object.assign(
             { newVistorPercent: this.newVistorPercent, oldVistorPercent: this.oldVistorPercent, newUvCount: newUv, oldUvCount: oldUv },
             this.commonParams
@@ -237,25 +230,31 @@ export default {
   // color: #9b9c9c;
   color: #fd7e14;
 }
+
 .w158 {
   color: #2c7be5;
   font-size: 17px;
   line-height: 17px;
   // font-weight: bold;
 }
+
 .NewOldVisitors {
   .pieShow {
     display: flex;
     width: 100%;
     height: calc(100% - 45px);
+
     .visitor {
       width: 60%;
+
       .bid-list-page {
         width: clas(100% -20px);
         display: flex;
         flex-direction: column;
+
         .bid-list-header {
           display: flex;
+
           .header-name {
             color: #4d4d4d;
             width: 33%;
@@ -264,16 +263,20 @@ export default {
             display: flex;
             align-items: center;
           }
+
           .w156 {
             font-size: 15px;
             color: #5f5e5e;
           }
         }
+
         .bid-list-record {
           .lettSpace {
             margin-top: 10px;
           }
+
           display: flex;
+
           .bid-list-item {
             width: 33%;
             justify-content: center;
@@ -281,12 +284,14 @@ export default {
             display: flex;
             align-items: center;
           }
+
           .w157 {
             // color: #252424;
             color: #4d4d4d;
             font-size: 13px;
             line-height: 14px;
           }
+
           .w159 {
             color: #252424;
             font-size: 13px;
@@ -296,6 +301,7 @@ export default {
         }
       }
     }
+
     .pieIcon {
       width: 40%;
       height: 100%;

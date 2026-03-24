@@ -1,6 +1,6 @@
 <template>
   <div class="TrendChart block-main public-hoverItem">
-    <div class="block-head"  @click="$router.push('/trendAnalysis/trend')">
+    <div class="block-head"  @click="navigateToTrend">
       <div class="block-title">趋势图</div>
       <el-select
         class="custom_select"
@@ -10,7 +10,6 @@
         style="margin-left: 20px; min-width: 280px"
         @change="handleCheckPointer"
       >
-      <!-- :disabled="disabledSelect.includes(item.value)" -->
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -100,6 +99,11 @@ export default {
     },
   },
   methods: {
+    navigateToTrend() {
+      console.log("趋势");
+      
+      this.$router.push('/trendAnalysis/trend');
+    },
     getFlowTrend() {
       getFlowTrendApi(this.params).then((res) => {
         if (res.code == 200) {

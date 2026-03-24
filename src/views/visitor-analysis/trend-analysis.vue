@@ -19,13 +19,7 @@ import originView from "@/components/origin-view";
 import { FilterBar } from "@/layout/components";
 import indicatorChart from "./chart-component/IndicatorChart.vue";
 import trendTable from "./chart-component/trend-table.vue";
-import {
-  getFlowTotalApi,
-  getFlowTrendApi,
-  getFlowDetailApi,
-  exportFlowTrendDetailApi,
-  getFlowTrendDetailApi,
-} from "@/api/trackingapi/flow";
+import { getFlowTotalApi, getFlowDetailApi } from "@/api/trackingapi/flow";
 import { copyObj } from "@/utils/copy";
 import { percentage } from "@/utils/percent";
 export default {
@@ -55,7 +49,6 @@ export default {
     commonParams(val) {
       this.getFlowTotalView();
       this.getFlowTrendDetail(val);
-      // this.getFlowEcharts();
     },
   },
   methods: {
@@ -65,7 +58,7 @@ export default {
     getFlowTotalView() {
       getFlowTotalApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.originView.originEvent(res.data);
+          this.$refs.originView && this.$refs.originView.originEvent(res.data);
         }
       });
     },

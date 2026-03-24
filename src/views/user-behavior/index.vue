@@ -59,7 +59,8 @@ export default {
     getVisitorChannel() {
       getVisitorChannelApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.analysisTable.getChannelList(res.data);
+          this.$refs.analysisTable &&
+            this.$refs.analysisTable.getChannelList(res.data);
         }
       });
     },
@@ -84,12 +85,13 @@ export default {
         newvalue.pageNum = this.pageNum;
         newvalue.pageSize = this.pageSize;
         newvalue.sortOrder = "desc";
-        this.$refs.analysisTable.initCurrentPage()
+        this.$refs.analysisTable && this.$refs.analysisTable.initCurrentPage();
       }
 
       getVisitorListApi(newvalue).then((res) => {
         if (res.code == 200) {
-          this.$refs.analysisTable.getUserListEvent(res.data);
+          this.$refs.analysisTable &&
+            this.$refs.analysisTable.getUserListEvent(res.data);
         }
       });
     },

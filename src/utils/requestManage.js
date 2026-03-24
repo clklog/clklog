@@ -37,7 +37,6 @@ service.interceptors.response.use(
   (response) => {
     const res = response.data;
     if (res.code == 403) {
-      console.log("循环测试==》");
       if (!isLoggingOut) { // 检查标志位
         isLoggingOut = true; // 设置标志位为 true
         store.dispatch("user/logout").then(() => {

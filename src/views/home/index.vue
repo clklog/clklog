@@ -79,7 +79,6 @@ export default {
     };
   },
   created(){
-    console.log(this.$route.path );
     if (this.$route.path == '/pro/clklog') {
       window.open(`https://clklog.com/#/introduce`);
     }

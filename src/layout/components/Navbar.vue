@@ -83,11 +83,15 @@ export default {
       handler: function (newVal, oldVal) {
         if (newVal && newVal.length > 0) {
           this.options = newVal;
-          this.prejectCode = this.options[0].projectName;
-          this.$store.dispatch("tracking/setProject", this.prejectCode);
+          if (!this.prejectCode || !newVal.some((item) => item.projectName === this.prejectCode)) {
+            this.prejectCode =
+              this.$store.getters.projectName || this.options[0].projectName;
+            this.$store.dispatch("tracking/setProject", this.prejectCode);
+          }
         } else {
           this.options = this.defaultProject;
           this.prejectCode = this.options[0].projectName;
+          this.$store.dispatch("tracking/setProject", this.prejectCode);
         }
       },
       deep: true,
@@ -99,13 +103,13 @@ export default {
   },
   created() {
     this.userName = JSON.parse(Cookies.get("userInfo")).username;
+    const savedProjectCode = this.$store.getters.projectName;
     if (this.options.length > 0) {
-      this.prejectCode = this.options[0].projectName;
+      this.prejectCode = savedProjectCode || this.options[0].projectName;
     } else {
       this.options = this.defaultProject;
-      this.prejectCode = this.options[0].projectName;
+      this.prejectCode = savedProjectCode || this.options[0].projectName;
     }
-    console.log("缓存==>");
     this.$store.dispatch("tracking/setProject", this.prejectCode);
     this.initDate();
     const _this = this;

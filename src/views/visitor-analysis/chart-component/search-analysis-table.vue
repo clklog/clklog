@@ -5,7 +5,7 @@
       <div class="public-Table-minHeight">
         <el-table
           class="public-radius"
-          :header-cell-style="{ background: '#f7fafe ' }"
+          :header-cell-style="{ textAlign:'center', background: '#f7fafe ' }"
           :cell-style="tableHeaderColor"
           :data="searchTableList"
           border
@@ -20,7 +20,6 @@
 
           <el-table-column
             prop="searchword"
-            align="left"
             :show-overflow-tooltip="true"
             label="搜索词"
             width="250"

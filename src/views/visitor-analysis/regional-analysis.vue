@@ -67,7 +67,8 @@ export default {
       getAreaDetailTotalApi(val).then((res) => {
         if (res.code == 200) {
           this.$nextTick(() => {
-            this.$refs.originView.originEvent(res.data);
+            this.$refs.originView &&
+              this.$refs.originView.originEvent(res.data);
           });
         }
       });
@@ -89,15 +90,18 @@ export default {
         newvalue.sortOrder = this.sortOrder;
         newvalue.pageNum = this.pageNum;
         newvalue.pageSize = this.pageSize;
-        this.$refs.regionalTable.initCurrentPage();
+        this.$refs.regionalTable &&
+          this.$refs.regionalTable.initCurrentPage();
       }
-      this.$refs.regionalTable.getDetailList(newvalue);
+      this.$refs.regionalTable &&
+        this.$refs.regionalTable.getDetailList(newvalue);
     },
     // map地图
     getArea() {
       getAreaApi(this.commonParams).then((res) => {
         if (res.code == 200) {
-          this.$refs.regionalShow.getAreaProvince(res.data);
+          this.$refs.regionalShow &&
+            this.$refs.regionalShow.getAreaProvince(res.data);
         }
       });
     },

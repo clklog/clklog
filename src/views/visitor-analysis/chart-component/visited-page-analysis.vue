@@ -411,6 +411,12 @@ export default {
     formatTimeEvent(val) {
       return formatTime(Math.floor(val));
     },
+    tableHeaderColor({ columnIndex }) {
+      if (columnIndex === 1) {
+        return "text-align:left";
+      }
+      return "text-align:center";
+    },
     getRowKeys(row) {
       let num = Math.random().toString();
       return row.detail.numRandom;
