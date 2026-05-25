@@ -1,110 +1,166 @@
-# 项目简介/Project Introduction
+<p align="center"><img src="https://clklog.com/assets/imgs/logo1.png" height="60"/> </p>
+<p align="center">开源 + 私有化部署的埋点用户行为分析系统  </p> <p align="center"> 支持多平台埋点采集、主流分析模型及国产化/信创环境适配 </p>
+<p align="center"><a href="https://clklog.com/" target="_blank">官网</a> | <a href="https://clklog.com/product/intro.html" target="_blank">产品介绍</a> | <a href="https://clklog.com/install/intro.html" target="_blank"> 技术指南</a>
+</p>
+<p align="center"> <img src="https://img.shields.io/github/stars/clklog/clklog?style=for-the-badge&color=ff6b6b"/>
+<img src="https://img.shields.io/github/forks/clklog/clklog?style=for-the-badge&color=4dabf7"/>
+<!-- <img src="https://img.shields.io/github/issues/clklog/clklog?style=for-the-badge&color=20c997"/> -->
+<img src="https://img.shields.io/github/license/clklog/clklog?style=for-the-badge"/> </p>
 
-ClkLog是一款记录并分析用户行为和画像的开源软件，技术人员可快速完成私有化部署。<br>
-ClkLog is an open-source system that records and analyzes user online behaviors to build a user profile. Technical personnel can quickly complete private deployment.<br><br>
+## ✨ ClkLog是什么
 
-ClkLog基于神策分析SDK，采用ClickHouse数据库对采集数据进行存储，使用前后端分离的方式来实现。在这里，你可以轻松看到用户访问网页、APP、小程序或业务系统的行为轨迹，同时也可以从时间、地域、渠道、用户访客类型等多维度了解用户的全方位信息。<br>
-ClkLog is based on the Sensors Analysis SDK. It uses the ClickHouse database to store collected data by using the front-end and back-end separation method. Here, you can easily see the users’ behavior track when they access the web pages, mobile apps, Wechat mini-programs or other business systems. You can also collect the users’ all-round information from multiple dimensions such as time, region, channel, visitor type, etc.<br><br>
-ClkLog在开源社区版本的基础上同时提供拥有更多高级分析功能的商业版本。<br>
-ClkLog also provides a commercial version with more advanced analysis functions based on the open-source community version.<br><br>
+ClkLog是一款轻量级埋点用户行为分析平台，支持私有化部署与源码交付，帮助企业快速构建完整、私有的用户行为分析体系。产品提供事件分析、漏斗分析、留存分析、路径分析、用户画像、用户分群等能力，支持 Web、App、小程序等多平台数据采集。
 
-# 核心功能/Core Functions
+ClkLog采用开源 + 商业版本的模式，所有版本都支持完整源码交付，目前包含社区版（AGPL-3.0 协议）以及商业授权的专业版、企业版和信创版本，并持续推进国产化与信创环境适配。
 
-- **数据采集**：支持网页、小程序、IOS、Android等多端数据采集<br>
-- **Data collection**: supports data collection from multiple channels such as web pages, Wechat mini-programs, IOS, Android, etc.<br><br>
+目前ClkLog已应用于汽车、电力、金融、保险、房产、物流等多个行业场景，帮助企业开展用户行为分析与数字化运营工作。
 
-- **流量概览**：提供流量渠道、设备、地域、访客类型多维度分析<br>
-- **Traffic overview**: provides multi-dimensional analysis from channels, devices, regions to visitor types.<br><br>
-- **用户画像**：解析用户唯一ID，定位追踪用户全生命周期画像<br>
-- **User Profile**: analyzes user unique IDs to locate and track full life cycle user profile.<br><br>
-- **数据下载**：支持各项汇总数据、明细数据的下载<br>
-- **Data Summary**: supports downloading of various summarized data and detailed data.
+## 🚀 核心优势
 
-# 技术栈选择/Technology Selection
+### 1. 私有化部署，数据自主可控
 
-- **后端/Backend**：Redis 、Zookeeper、Kafka 、Flink
+企业无需将数据上传第三方平台,支持本地部署、内网部署、混合部署、安全隔离环境, 企业自主可控，满足数据安全合规要求。
 
-- **前端/Frontend**：vue、vue-element-admin、element-ui 、echarts
+### 2. 多平台埋点采集
 
-- **数据/Database**：Clickhouse、mysql
+支持多端（Web/H5/App/小程序/鸿蒙）埋点数据采集，涵盖自定义事件、用户标识关联,实现统一用户行为数据体系。
 
-# 示意图/Screenshot Samples
+### 3. 主流分析模型开箱即用
 
-| ![](https://clklog.com/assets/imgs/1.png) | ![](https://clklog.com/assets/imgs/2.png) |
-| ----------------------------------------- | ----------------------------------------- |
-| ![](https://clklog.com/assets/imgs/3.png) | ![](https://clklog.com/assets/imgs/4.png) |
-| ![](https://clklog.com/assets/imgs/5.png) | ![](https://clklog.com/assets/imgs/6.png) |
-| ![](https://clklog.com/assets/imgs/7.png) | ![](https://clklog.com/assets/imgs/8.png) |
+内置访问分析、事件分析、漏斗分析、用户画像、标签体系、分群分析，无需自行开发分析引擎，可快速建立数据分析能力。
 
-# 在线体验/Online Demo
+### 4. 国产化 / 信创环境适配
 
-Demo address/演示地址：<a href="https://demo.clklog.com" target="_blank">https://demo.clklog.com</a>
+支持企业信创建设场景。适配国产 CPU、国产服务器、国产操作系统、国产数据库，适用于有信创需求的企业单位。
 
-# 快速接入/Quick Start Tutorial
+<!-- ## 🔥 核心功能
 
-官方文档/Official Documents<a href="https://clklog.com">https://clklog.com</a>
+基础访问分析：多维度掌握用户访问情况，快速洞察流量结构与用户行为。
+多维事件分析：围绕关键业务行为，灵活配置事件埋点，分析用户行为轨迹。
+用户画像分析：沉淀用户特征数据，支持标签、分群与用户行为细查，辅助私域运营。 -->
 
-# 协议许可​/License Agreement​
+## 📦版本体系
 
-## 开源协议/Open-source agreement：AGPLv3.0
+ClkLog 提供多版本能力体系，满足不同企业阶段需求。
 
-使用的组织或个人在复制、分发、转发或修改时请遵守相关条款。任何分发或通过网络提供服务的版本（包括衍生版本）必须开源，并保留原版权和协议信息。如有违反，ClkLog将保留对侵权者追究责任的权利。<br>
-Organizations or individuals using this software must comply with relevant terms when copying, distributing, ​​redistributing​​, or modifying it.Any distributed versions or versions provided as a network service (including derivative versions) must be open source with original copyright and license information preserved.ClkLog reserves the right to take legal action against infringers for any violations.<br><br>
+| 版本         | 定位                           |
+| ------------ | ------------------------------ |
+| 🟢 开源社区版 | 适合开发者 / 学习 / 小团队     |
+| 🔵 PRO专业版  | 适合用户访问行为分析与运营场景 |
+| 🟣 CDP企业版  | 适合用户画像与精细化运营场景   |
+| 🟡 信创版     | 适合政企信创国产私有化场景     |
 
-## ​​免费使用 | Free Usage​​
+### 🧩 版本能力对比
 
-**​​适用范围​​**：个人开发者、学术研究及非商业项目可免费使用<br>
+| 能力       | 社区版 | 专业版 | 企业版 | 信创版 |
+| ---------- | ------ | ------ | ------ | ------ |
+| 数据采集   | ✅      | ✅      | ✅      | ✅      |
+| 事件分析   | 基础   | 完整   | 完整   | 完整   |
+| 用户画像   | 基础   | 基础   | 完整   | 完整   |
+| 漏斗分析   | ❌      | ✅      | ✅      | ✅      |
+| 用户细查   | ❌      | ❌      | ✅      | ✅      |
+| 标签体系   | ❌      | ❌      | ✅      | ✅      |
+| 信创适配   | ❌      | ❌      | ❌      | ✅      |
+| 私有化部署 | ✅      | ✅      | ✅      | ✅      |
 
-**​​Scope​**​: Free for individual developers, academic research, and non-commercial projects.<br><br>
+## 🏗 系统架构
 
-**​​商业限制**​​：若将ClkLog集成到闭源商业产品中，任何修改、二开、集成须遵循 AGPLv3.0 协议开源衍生产品<br>
+ClkLog 采用分层式架构设计。
 
-**​​Commercial Restrictions​**​: If integrated into closed-source commercial products, ​​any modification, secondary development, or integration shall open-source derivative works​​ under AGPLv3.0.<br><br>
+```text
+SDK/埋点采集（Web/App/小程序）
+        │
+        ▼
+Receiver（数据接收）
+        │
+        ▼
+Kafka（消息缓冲）
+        │
+        ▼
+Processing（数据处理）
+        │
+        ▼
+ClickHouse / Doris（数据存储）
+        │
+        ▼
+API + 管理后台
+        │
+        ▼
+统计分析与可视化
+ 
+```
 
-**​​授权方式​**​：遵循 AGPLv3.0 协议<br>
+## 🧰 技术栈
 
-**​​Licensing Mode**​​: Subject to AGPLv3.0 license.<br><br>
+ClkLog 采用主流企业级技术架构，支持高并发与可扩展分析能力。
 
-## ​​商业授权 | Commercial License​​
+后端：Java / Redis / Kafka / Zookeeper
 
-**​​适用范围**​​：商业项目集成可闭源使用<br>
+前端：Vue / ElementUI / ECharts
 
-**​​Scope**​​: Permits closed-source integration for commercial projects.<br><br>
+数据库：ClickHouse / Apache Doris、MySQL / OpenGauss / OceanBase
 
-**​​授权方式​**​：需购买商业授权<br>
+## 系统示意图
 
-**​​Licensing Mode​​**: Requires purchasing a commercial license.<br><br>
+| ![](https://clklog.com/assets/imgs/preview/com/1.png) 社区版-数据概览     | ![](https://clklog.com/assets/imgs/preview/com/2.png) 社区版-趋势分析       | ![](https://clklog.com/assets/imgs/preview/com/3.png)  社区版- 地域分析       |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![](https://clklog.com/assets/imgs/preview/pro/10.png) PRO专业版-留存分析 | ![](https://clklog.com/assets/imgs/preview/pro/13.png) PRO专业版-自定义分析 | ![](https://clklog.com/assets/imgs/preview/pro/14.png) PRO专业版-漏斗分析     |
+| ![](https://clklog.com/assets/imgs/preview/cdp/2.png) CDP企业版-用户标签  | ![](https://clklog.com/assets/imgs/preview/cdp/8.png) CDP企业版-用户群画像  | ![](https://clklog.com/assets/imgs/preview/cdp/14.png) CDP企业版-用户行为细查 |
 
-## ​​特别提醒 | Special Notice
+## 社区支持
 
-​​在AGPL V3.0协议中​​，“衍生产品”是指：在 ClkLog 源代码基础上进行任何修改、扩展、适配、重构，或与其他软件、系统组合后形成的作品，包括但不限于：<br>
+欢迎：⭐ Star 🐞 Issue 🔧 PR 💬 交流建议
+________________________________________
 
-​​Under AGPLv3.0​​, ​​"Derivative Works"​​ refer to any works created through modification, extension, adaptation, refactoring of ClkLog source code, or combination with other software/systems, including but not limited to:<br>
+## License
 
-• 修改、删除或新增源代码的版本；<br>
+### 开源协议：AGPL V3.0
 
-• Versions with modified, deleted, or added source code;<br>
+• 使用 Clklog 的组织或个人在复制、分发、转发或修改时请遵守AGPL V3.0相关条款，不得移除ClkLog相关版权标识。任何分发或通过网络提供服务的版本（包括衍生版本）必须开源，并保留原版权和协议信息。如有违反，ClkLog将保留对侵权者追究责任的权利。
 
-• 增加功能模块、插件或集成接口的版本；<br>
+#### 免费使用
 
-• Versions adding functional modules, plugins, or integration interfaces;<br>
+• 适用范围：个人开发者、学术研究及非商业项目可免费使用
 
-• 将 ClkLog 嵌入或整合进其他产品、系统或服务的版本；<br>
+• 商业限制：若将ClkLog集成到闭源商业产品中，任何修改、二开、集成须遵循 AGPLv3.0 协议开源衍生产品
 
-• Versions embedding or integrating ClkLog into other products, systems, or services;<br>
+• 授权方式：遵循 AGPLv3.0 协议
 
-• 改变数据结构、接口协议或运行架构的版本。<br>
+#### 商业使用
 
-• Versions altering data structures, interface protocols, or runtime architectures.<br>
+• 适用范围：商业项目集成可闭源使用
 
-无论改动大小，只要衍生产品包含 ClkLog 的代码或核心逻辑，即视为衍生产品，并适用本协议的相关条款。<br>
+• 授权方式：需购买商业授权
 
-​​Regardless of modification scale, any work containing ClkLog's code or core logic shall constitute a Derivative Work and is subject to relevant terms of AGPLv3.0.​<br>
+### 特别提醒
 
-# 联系我们/Contact Us
+在AGPL V3.0协议中，“衍生产品”是指：在 ClkLog 源代码基础上进行任何修改、扩展、适配、重构，或与其他软件、系统组合后形成的作品，包括但不限于：
 
-- 客服手机/Customer service mobile：16621363853
+• 修改、删除或新增源代码的版本；
 
-- 客服微信/Customer service WeChat：opensoft66
+• 增加功能模块、插件或集成接口的版本；
 
-- 客服二维码/Customer service QR Code:<img title="" src="https://clklog.com/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top">
+• 将 ClkLog 嵌入或整合进其他产品、系统或服务的版本；
+
+• 改变数据结构、接口协议或运行架构的版本。
+
+无论改动大小，只要衍生产品包含 ClkLog 的代码或核心逻辑，即视为衍生产品，并适用本协议的相关条款。
+
+## 商业支持与合作
+
+如需了解完整产品能力、信创方案或商业版本合作方式，欢迎通过以下方式联系我们获取详细资料：
+
+- 联系电话：16621363853
+
+- 客服微信：opensoft66
+
+<ul style="width:100%; height:150px;clear:both; text-align:center;">
+    <li style="float:left; list-style:none;margin-right:25px; ">
+        <img title="" src="https://clklog.com/assets/imgs/qrcode_contact.png" alt="" data-align="center" width="80" style="vertical-align:top;width:120px; ">
+        <div>微信客服</div>
+    </li>
+    <li style="float:left; list-style:none;">
+        <img title="" src="https://clklog.com/assets/imgs/qrcode_gzh.png" alt="" data-align="center" width="80" style="vertical-align:top;width:120px; ">
+        <div>微信公众号</div>
+    </li>
+</ul>
