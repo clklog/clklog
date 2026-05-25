@@ -150,17 +150,10 @@ ________________________________________
 
 如需了解完整产品能力、信创方案或商业版本合作方式，欢迎通过以下方式联系我们获取详细资料：
 
-- 联系电话：16621363853
+- 联系电话：&nbsp;&nbsp; 16621363853
 
-- 客服微信：opensoft66
+- 客服微信：&nbsp;&nbsp; opensoft66
 
-<ul style="width:100%; height:150px;clear:both; text-align:center;">
-    <li style="float:left; list-style:none;margin-right:25px; ">
-        <img title="" src="https://clklog.com/assets/imgs/qrcode_contact.png" alt="" data-align="center" width="80" style="vertical-align:top;width:120px; ">
-        <div>微信客服</div>
-    </li>
-    <li style="float:left; list-style:none;">
-        <img title="" src="https://clklog.com/assets/imgs/qrcode_gzh.png" alt="" data-align="center" width="80" style="vertical-align:top;width:120px; ">
-        <div>微信公众号</div>
-    </li>
-</ul>
+- 微信客服: &nbsp;&nbsp;&nbsp;&nbsp; <img title="" src="https://clklog.com/assets/imgs/qrcode_contact.png" alt="" data-align="center" width="120" style="vertical-align:top">
+
+- 微信公众号:&nbsp;&nbsp;<img title="" src="https://clklog.com/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top">
