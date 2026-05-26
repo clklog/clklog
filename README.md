@@ -98,10 +98,10 @@ ClkLog 采用主流企业级技术架构，支持高并发与可扩展分析能�
 
 ## 系统示意图
 
-| ![](https://clklog.com/assets/imgs/preview/com/1.png) 社区版-数据概览     | ![](https://clklog.com/assets/imgs/preview/com/2.png) 社区版-趋势分析       | ![](https://clklog.com/assets/imgs/preview/com/3.png)  社区版- 地域分析       |
-| ------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| ![](https://clklog.com/assets/imgs/preview/pro/10.png) PRO专业版-留存分析 | ![](https://clklog.com/assets/imgs/preview/pro/13.png) PRO专业版-自定义分析 | ![](https://clklog.com/assets/imgs/preview/pro/14.png) PRO专业版-漏斗分析     |
-| ![](https://clklog.com/assets/imgs/preview/cdp/2.png) CDP企业版-用户标签  | ![](https://clklog.com/assets/imgs/preview/cdp/8.png) CDP企业版-用户群画像  | ![](https://clklog.com/assets/imgs/preview/cdp/14.png) CDP企业版-用户行为细查 |
+|     ![](https://clklog.com/assets/imgs/preview/com/1.png) 社区版-数据概览     |      ![](https://clklog.com/assets/imgs/preview/com/2.png) 社区版-趋势分析      |      ![](https://clklog.com/assets/imgs/preview/com/3.png)  社区版- 地域分析      |
+| :---------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
+| ![](https://clklog.com/assets/imgs/preview/pro/10.png) **PRO专业版-留存分析** | ![](https://clklog.com/assets/imgs/preview/pro/13.png) **PRO专业版-自定义分析** |   ![](https://clklog.com/assets/imgs/preview/pro/14.png) **PRO专业版-漏斗分析**   |
+| ![](https://clklog.com/assets/imgs/preview/cdp/2.png) **CDP企业版-用户标签**  | ![](https://clklog.com/assets/imgs/preview/cdp/8.png) **CDP企业版-用户群画像**  | ![](https://clklog.com/assets/imgs/preview/cdp/14.png) **CDP企业版-用户行为细查** |
 
 ## 社区支持
 
