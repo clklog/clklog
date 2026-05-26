@@ -2,10 +2,6 @@
 <p align="center">开源 + 私有化部署的埋点用户行为分析系统  </p> <p align="center"> 支持多平台埋点采集、主流分析模型及国产化/信创环境适配 </p>
 <p align="center"><a href="https://clklog.com/" target="_blank">官网</a> | <a href="https://clklog.com/product/intro.html" target="_blank">产品介绍</a> | <a href="https://clklog.com/install/intro.html" target="_blank"> 技术指南</a>
 </p>
-<p align="center"> <img src="https://img.shields.io/github/stars/clklog/clklog?style=for-the-badge&color=ff6b6b"/>
-<img src="https://img.shields.io/github/forks/clklog/clklog?style=for-the-badge&color=4dabf7"/>
-<!-- <img src="https://img.shields.io/github/issues/clklog/clklog?style=for-the-badge&color=20c997"/> -->
-<img src="https://img.shields.io/github/license/clklog/clklog?style=for-the-badge"/> </p>
 
 ## ✨ ClkLog是什么
 
