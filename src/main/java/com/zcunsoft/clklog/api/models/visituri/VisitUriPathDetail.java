@@ -49,4 +49,9 @@ public class VisitUriPathDetail {
 
     @JsonIgnore
     private int pathLength;
+
+    /**
+     * 访问次数.
+     */
+    Long visitCount;
 }

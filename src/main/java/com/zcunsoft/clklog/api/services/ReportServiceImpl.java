@@ -3459,6 +3459,7 @@ public class ReportServiceImpl implements IReportService {
             VisitUriPathDetail visitUriDetail = new VisitUriPathDetail();
             visitUriDetail.setAvgVisitTime(0);
             visitUriDetail.setVisitTime(visituriDetailbydate.getVisitTime());
+            visitUriDetail.setVisitCount(Long.valueOf(visituriDetailbydate.getVisitCount()));
             if (visituriDetailbydate.getPv() > 0) {
                 float avgVisitTime = visituriDetailbydate.getVisitTime() * 1.0f / visituriDetailbydate.getPv();
                 visitUriDetail.setAvgVisitTime(Float.parseFloat(decimalFormat.get().format(avgVisitTime)));
@@ -3535,21 +3536,26 @@ public class ReportServiceImpl implements IReportService {
             VisitUriPathDetail rootDetail = new VisitUriPathDetail();
             rootDetail.setUri(rootStatData.getUri());
             rootDetail.setHost(host);
+            rootDetail.setVisitCount(0L);
             for (VisitUriPathDetail leafUriStat : subList) {
                 rootDetail.setPv(rootDetail.getPv() + leafUriStat.getPv());
                 rootDetail.setUv(rootDetail.getUv() + leafUriStat.getUv());
                 rootDetail.setIpCount(rootDetail.getIpCount() + leafUriStat.getIpCount());
                 rootDetail.setExitCount(rootDetail.getExitCount() + leafUriStat.getExitCount());
-                rootDetail.setExitRate(rootDetail.getExitRate() + leafUriStat.getExitRate());
                 rootDetail.setEntryCount(rootDetail.getEntryCount() + leafUriStat.getEntryCount());
                 rootDetail.setVisitTime(rootDetail.getVisitTime() + leafUriStat.getVisitTime());
-
+                rootDetail.setVisitCount(rootDetail.getVisitCount() + leafUriStat.getVisitCount());
                 if (rootDetail.getPv() > 0) {
                     float avgVisitTime = rootDetail.getVisitTime() * 1.0f / rootDetail.getPv();
                     rootDetail.setAvgVisitTime(Float.parseFloat(decimalFormat.get().format(avgVisitTime)));
                 }
 
                 rootDetail.setDownPvCount(rootDetail.getDownPvCount() + leafUriStat.getDownPvCount());
+            }
+
+            if (rootDetail.getVisitCount() > 0) {
+                float exitRate = rootDetail.getExitCount() * 1.0f / rootDetail.getVisitCount();
+                rootDetail.setExitRate(Float.parseFloat(decimalFormat.get().format(exitRate)));
             }
 
             rootStatData.setDetail(rootDetail);
