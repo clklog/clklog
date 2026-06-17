@@ -61,6 +61,20 @@ public class TokenService {
     private ObjectMapperUtil objectMapper;
 
     /**
+     * API Key请求头名称
+     */
+    private static final String API_KEY_HEADER = "X-API-Key";
+
+
+    /**
+     * Redis Key前缀
+     */
+    private static final String API_KEY_PREFIX = "clklog:apikey:";
+
+    private final TypeReference<LoginUser> loginUserTypeReference = new TypeReference<LoginUser>() {
+    };
+
+    /**
      * 获取用户身份信息
      *
      * @param request http请求
@@ -197,5 +211,59 @@ public class TokenService {
 
     private String getTokenKey(String uuid) {
         return Constants.LOGIN_TOKEN_KEY + uuid;
+    }
+
+    public LoginUser getLoginUserByApiKey(HttpServletRequest request) {
+
+        LoginUser loginUser = null;
+        String apiKey = request.getHeader(API_KEY_HEADER);
+
+        // 如果请求头中没有API Key，直接放行，让后续过滤器处理
+        if (apiKey != null) {
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Received API Key authentication request: {}", maskApiKey(apiKey));
+            }
+            // 验证API Key（直接在过滤器中实现验证逻辑）
+            loginUser = validateApiKey(apiKey);
+        }
+        return loginUser;
+    }
+
+    private LoginUser validateApiKey(String apiKey) {
+        LoginUser loginUser = null;
+        if (apiKey == null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("API Key or Secret is null");
+            }
+        } else {
+            String key = API_KEY_PREFIX + apiKey;
+
+            // 获取缓存的API Key信息
+            String userInfo = queueRedisTemplate.opsForValue().get(key);
+            if (StringUtils.isBlank(userInfo)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("API Key cache is empty: {}", maskApiKey(apiKey));
+                }
+                return null;
+            }
+
+            try {
+                loginUser = objectMapper.readValue(userInfo, loginUserTypeReference);
+            } catch (JsonProcessingException e) {
+                logger.error("Failed to parse API Key user info: {}", maskApiKey(apiKey), e);
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("API Key validation successful: {}", maskApiKey(apiKey));
+            }
+        }
+        return loginUser;
+    }
+
+    private String maskApiKey(String apiKey) {
+        if (apiKey == null || apiKey.length() <= 6) {
+            return apiKey;
+        }
+        return apiKey.substring(0, 6) + "****";
     }
 }
