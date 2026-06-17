@@ -6,23 +6,23 @@ CREATE DATABASE IF NOT EXISTS clklog DEFAULT CHARSET utf8 COLLATE utf8_general_c
 use clklog;
 
 CREATE TABLE IF NOT EXISTS `tbl_project` (
-  `id` varchar(36) NOT NULL,
-  `project_name` varchar(40) DEFAULT NULL,
-  `project_display_name` varchar(40) DEFAULT NULL,
-  `excluded_ip` text,
-  `excluded_ua` text,
-  `excluded_url_params` text,
-  `searchword_category_key` text,
-  `searchword_key` text,
-  `root_urls` text,
-  `status` varchar(16) DEFAULT NULL,
-  `update_time` datetime(6) DEFAULT NULL,
-  `create_time` datetime(6) DEFAULT NULL,
-  `token` varchar(36) DEFAULT NULL,
+  `id` varchar(36) NOT NULL COMMENT '项目id',
+  `project_name` varchar(40) DEFAULT NULL COMMENT '项目编码',
+  `project_display_name` varchar(40) DEFAULT NULL COMMENT '项目显示名',
+  `excluded_ip` text COMMENT '排除的全局的IP地址',
+  `excluded_ua` text COMMENT '排除的全局的用户代理列表',
+  `excluded_url_params` text COMMENT '排除的全局的URL参数列表',
+  `searchword_category_key` text COMMENT '全局的站内搜索关键词参数',
+  `searchword_key` text COMMENT '全局的站内搜索关键词分类参数',
+  `root_urls` text COMMENT '埋点网站的根网址，含http或https',
+  `status` varchar(16) DEFAULT NULL COMMENT '状态',
+  `update_time` datetime(6) DEFAULT NULL COMMENT '更新时间',
+  `create_time` datetime(6) DEFAULT NULL COMMENT '创建时间',
+  `token` varchar(36) DEFAULT NULL COMMENT '凭据',
   PRIMARY KEY (`id`),
   KEY `i_status` (`status`),
   KEY `i_proj` (`project_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='项目表';
 
 
 LOCK TABLES `tbl_project` WRITE;
@@ -31,59 +31,76 @@ UNLOCK TABLES;
 
 
 CREATE TABLE IF NOT EXISTS `tbl_project_log_stat` (
-  `id` varchar(36) NOT NULL,
-  `project_name` varchar(40) NOT NULL,
-  `stat_date` datetime DEFAULT NULL,
-  `log_record_count` bigint(20) DEFAULT NULL,
-  `log_space_size` bigint(20) DEFAULT NULL,
-  `log_latest_time` datetime(6) DEFAULT NULL,
-  `update_time` datetime(6) DEFAULT NULL,
-  `db_first_time` datetime(6) DEFAULT NULL,
-  `db_latest_time` datetime(6) DEFAULT NULL,
-  `db_record_count` bigint(20) DEFAULT NULL,
+  `id` varchar(36) NOT NULL COMMENT '主键',
+  `project_name` varchar(40) NOT NULL COMMENT '项目编码',
+  `stat_date` datetime DEFAULT NULL COMMENT '统计日期',
+  `log_record_count` bigint(20) DEFAULT NULL COMMENT '日志记录数',
+  `log_space_size` bigint(20) DEFAULT NULL COMMENT '日志占用空间',
+  `log_latest_time` datetime(6) DEFAULT NULL COMMENT '日志最新时间',
+  `update_time` datetime(6) DEFAULT NULL COMMENT '统计更新时间',
+  `db_first_time` datetime(6) DEFAULT NULL COMMENT '数据库表第一条时间',
+  `db_latest_time` datetime(6) DEFAULT NULL COMMENT '数据库表最新时间',
+  `db_record_count` bigint(20) DEFAULT NULL COMMENT '数据库表记录数',
   PRIMARY KEY (`id`),
   KEY `i_a_s` (`project_name`,`stat_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='项目日志按日统计表';
 
 
 CREATE TABLE IF NOT EXISTS `tbl_project_stat` (
-  `project_name` varchar(40) NOT NULL,
-  `log_record_count` bigint(20) DEFAULT NULL,
-  `log_space_size` bigint(20) DEFAULT NULL,
-  `log_latest_time` datetime(6) DEFAULT NULL,
-  `db_record_count` bigint(20) DEFAULT NULL,
-  `db_space_size` bigint(20) DEFAULT NULL,
-  `update_time` datetime(6) DEFAULT NULL,
-  `log_days` int(11) DEFAULT NULL,
-  `db_first_time` datetime(6) DEFAULT NULL,
-  `db_latest_time` datetime(6) DEFAULT NULL,
+  `project_name` varchar(40) NOT NULL COMMENT '项目编码',
+  `log_record_count` bigint(20) DEFAULT NULL COMMENT '日志记录数',
+  `log_space_size` bigint(20) DEFAULT NULL COMMENT '日志占用空间',
+  `log_latest_time` datetime(6) DEFAULT NULL COMMENT '日志最新时间',
+  `db_record_count` bigint(20) DEFAULT NULL COMMENT '数据库表记录数',
+  `db_space_size` bigint(20) DEFAULT NULL COMMENT '数据库占用空间',
+  `update_time` datetime(6) DEFAULT NULL COMMENT '统计更新时间',
+  `log_days` int(11) DEFAULT NULL COMMENT '日志天数',
+  `db_first_time` datetime(6) DEFAULT NULL COMMENT '第一条项目日志入库时间',
+  `db_latest_time` datetime(6) DEFAULT NULL COMMENT '项目日志最后入库时间',
   PRIMARY KEY (`project_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='项目日志统计表';
 
 
 CREATE TABLE IF NOT EXISTS `tbl_global_setting` (
-  `id` varchar(36) NOT NULL,
-  `excluded_ip` text,
-  `excluded_ua` text,
-  `excluded_url_params` text,
-  `searchword_category_key` text,
-  `searchword_key` text,
-  `update_time` datetime(6) DEFAULT NULL,
+  `id` varchar(36) NOT NULL COMMENT '主键id',
+  `excluded_ip` text COMMENT '排除的全局的IP地址',
+  `excluded_ua` text COMMENT '排除的全局的用户代理列表',
+  `excluded_url_params` text COMMENT '排除的全局的URL参数列表',
+  `searchword_category_key` text COMMENT '全局的站内搜索关键词参数',
+  `searchword_key` text COMMENT '全局的站内搜索关键词分类参数',
+  `update_time` datetime(6) DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='全局设置表';
 
 
 LOCK TABLES `tbl_global_setting` WRITE;
 INSERT INTO `tbl_global_setting` VALUES ('9d1df3ce-e8a7-ecb6-30af-33585b069c8a',NULL,NULL,NULL,NULL,NULL,now());
 UNLOCK TABLES;
 
+CREATE TABLE IF NOT EXISTS `tbl_api_key` (
+  `id` varchar(36) NOT NULL COMMENT '主键ID',
+  `user_id` varchar(36) NOT NULL COMMENT '所属用户ID',
+  `username` varchar(50) NOT NULL COMMENT '所属用户名',
+  `api_key` varchar(64) NOT NULL COMMENT 'API密钥',
+  `display_name` varchar(100) NOT NULL COMMENT '密钥显示名称',
+  `status` varchar(16) NOT NULL DEFAULT 'enabled' COMMENT '状态: enabled/disabled',
+  `expires_at` datetime(6) DEFAULT NULL COMMENT '过期时间',
+  `created_at` datetime(6) NOT NULL COMMENT '创建时间',
+  `updated_at` datetime(6) NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `api_key` (`api_key`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_username` (`username`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='API密钥表';
+
 CREATE TABLE IF NOT EXISTS `sys_operrecord` (
-  `id` int NOT NULL,
-  `action` varchar(4000) DEFAULT NULL,
-  `opertime` datetime(6) DEFAULT NULL,
-  `user` varchar(255) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `action` varchar(4000) DEFAULT NULL COMMENT '操作动作',
+  `opertime` datetime(6) DEFAULT NULL COMMENT '操作时间',
+  `user` varchar(255) DEFAULT NULL COMMENT '操作用户',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='操作记录表';
 
 
 CREATE TABLE IF NOT EXISTS `sys_user` (
@@ -106,8 +123,8 @@ INSERT INTO `sys_user` VALUES ('00851690-cdc0-4702-a153-fea656d207a3','admin','�
 UNLOCK TABLES;
 
 CREATE TABLE IF NOT EXISTS `sys_userlogin` (
-  `token` varchar(200) NOT NULL,
-  `create_time` datetime(6) DEFAULT NULL,
-  `user_name` varchar(255) DEFAULT NULL,
+  `token` varchar(200) NOT NULL COMMENT 'token',
+  `create_time` datetime(6) DEFAULT NULL COMMENT '创建日期',
+  `user_name` varchar(255) DEFAULT NULL COMMENT '用户名',
   PRIMARY KEY (`token`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='用户登录表';
