@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM openjdk:8u342-jdk
 
 VOLUME /tmp
 ARG JAR_FILE
