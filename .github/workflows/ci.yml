@@ -7,7 +7,7 @@ on:
       - 'main'
       - 'demo'
     tags:
-      - 'v*'
+      - '*'
   pull_request:
     branches:
       - 'main'
@@ -71,5 +71,5 @@ jobs:
       - name: Push image to Aliyun Docker Registry
         run: |
           docker buildx imagetools create \
-            --tag registry.cn-shanghai.aliyuncs.com/clklog/ui:1.2.2 \
+            --tag registry.cn-shanghai.aliyuncs.com/clklog/ui:${{ github.ref_name }} \
             zcunsoft/clklog-frontend:${{ github.ref_name }}
