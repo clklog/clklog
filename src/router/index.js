@@ -86,6 +86,19 @@ export const asyncRoutes = [
   },
   systemManageRouter,
   {
+    path: "/apiKey",
+    component: Layout,
+    redirect: "/manage",
+    children: [
+      {
+        path: "manage",
+        component: () => import("@/views/sys-manage/api-key.vue"),
+        name: "manage",
+        meta: { title: "密钥管理", icon: "setting", affix: true },
+      },
+    ],
+  },
+  {
     path: "/pro",
     component: Layout,
     redirect: "/clklog",
