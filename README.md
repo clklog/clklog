@@ -1,63 +1,109 @@
 <p align="center"><img src="https://clklog.com/assets/imgs/logo1.png" height="60"/> </p>
-<p align="center">开源 + 私有化部署的埋点用户行为分析系统  </p> <p align="center"> 支持多平台埋点采集、主流分析模型及国产化/信创环境适配 </p>
-<p align="center"><a href="https://clklog.com/" target="_blank">官网</a> | <a href="https://clklog.com/product/intro.html" target="_blank">产品介绍</a> | <a href="https://clklog.com/install/intro.html" target="_blank"> 技术指南</a>
-</p>
+<p align="center">ClkLog|轻量级开源埋点用户行为分析平台  </p> <p align="center"> 支持 Web、App、小程序、HarmonyOS 等多平台数据采集，帮助企业构建自主可控的用户行为分析能力。 </p>
+<p align="center">全开源 · 私有化部署  · 企业级扩展</p>
+<!-- <p align="center"><a href="https://clklog.com/" target="_blank">官网</a> | <a href="https://clklog.com/product/intro.html" target="_blank">产品介绍</a> | <a href="https://clklog.com/install/intro.html" target="_blank"> 技术指南</a>
+</p> -->
+<p align="center">如果这个项目对您有帮助，欢迎点一个 ⭐ Star 支持我们！</p>
 
-## ✨ ClkLog是什么
+## ✨ 为什么会有ClkLog？
+**做用户行为分析已是必然趋势。越来越多企业开始重视用户行为数据，希望通过数据了解用户、优化产品、提升业务效率。**
 
-ClkLog是一款轻量级埋点用户行为分析平台，支持私有化部署与源码交付，帮助企业快速构建完整、私有的用户行为分析体系。产品提供事件分析、漏斗分析、留存分析、路径分析、用户画像、用户分群等能力，支持 Web、App、小程序等多平台数据采集。
+但实际落地过程中，经常面临：
+- SaaS 平台数据无法完全自主掌控；
+- 商业分析产品成本较高，扩展受限；
+- 自研用户行为分析平台周期长、维护成本高；
+- 部分开源项目功能不完整，难以真正投入生产使用。
 
-ClkLog采用开源 + 商业版本的模式，所有版本都支持完整源码交付，目前包含社区版（AGPL-3.0 协议）以及商业授权的专业版、企业版和信创版本，并持续推进国产化与信创环境适配。
+因此，我们创建了 ClkLog。
 
-目前ClkLog已应用于汽车、电力、金融、保险、房产、物流等多个行业场景，帮助企业开展用户行为分析与数字化运营工作。
+我们希望 ClkLog 开源社区版，不是精简试用版，而是一个真正能被部署和使用的完整方案。
 
-## 🚀 核心优势
+ClkLog 致力于提供一套轻量级、私有化、完整的开源用户行为分析平台：
 
-### 1. 私有化部署，数据自主可控
+- 支持多端数据采集
+- 提供完整的数据统计与分析能力
+- 支持私有化部署
+- 数据完全掌握在企业手中
 
-企业无需将数据上传第三方平台,支持本地部署、内网部署、混合部署、安全隔离环境, 企业自主可控，满足数据安全合规要求。
+让开发者和企业无需依赖第三方 SaaS，也能够快速构建属于自己的用户行为分析体系	
 
-### 2. 多平台埋点采集
 
-支持多端（Web/H5/App/小程序/鸿蒙）埋点数据采集，涵盖自定义事件、用户标识关联,实现统一用户行为数据体系。
+## ✨ ClkLog 可以帮助你什么？
+部署 ClkLog（最快10分钟） 后，你可以快速拥有：
 
-### 3. 主流分析模型开箱即用
+📥 数据采集
 
-内置访问分析、事件分析、漏斗分析、用户画像、标签体系、分群分析，无需自行开发分析引擎，可快速建立数据分析能力。
+  支持：
+- Web
+- Android
+- iOS
+- 微信小程序
+- uni-app
 
-### 4. 国产化 / 信创环境适配
+📊 数据分析
+- PV、UV、访客数、访问次数等基础指标
+- 趋势分析
+- 地域分析
+- 来源渠道分析
+- 页面访问分析
+- 设备与浏览器分析
+- 新老访客分析
+- 搜索词
+- APP 崩溃分析
 
-支持企业信创建设场景。适配国产 CPU、国产服务器、国产操作系统、国产数据库，适用于有信创需求的企业单位。
+👤 用户洞察
+- 基础用户画像
+- 用户忠诚度分析
 
-<!-- ## 🔥 核心功能
+⚙️ 管理
+- 项目管理
+- 账号管理
+- 密钥管理
+	
+让团队从"采集数据"到"理解用户"，快速搭建属于自己的用户行为分析平台。
 
-基础访问分析：多维度掌握用户访问情况，快速洞察流量结构与用户行为。
-多维事件分析：围绕关键业务行为，灵活配置事件埋点，分析用户行为轨迹。
-用户画像分析：沉淀用户特征数据，支持标签、分群与用户行为细查，辅助私域运营。 -->
+## 🚀 为什么选择 ClkLog？
+<span style="color:red">轻量 · 开放 · 灵活 · 快速</p>
+**数据自主可控**
 
-## 📦版本体系
+私有化部署、数据掌握在企业内部、无需依赖第三方 SaaS、支持企业长期自主维护
 
-ClkLog 提供多版本能力体系，满足不同企业阶段需求。
+**开放开源**
 
-| 版本         | 定位                           |
-| ------------ | ------------------------------ |
-| 🟢 开源社区版 | 适合开发者 / 学习 / 小团队     |
-| 🔵 PRO专业版  | 适合用户访问行为分析与运营场景 |
-| 🟣 CDP企业版  | 适合用户画像与精细化运营场景   |
-| 🟡 信创版     | 适合政企信创国产私有化场景     |
+社区版开放源码、遵循 AGPL v3.0、支持二次开发、构建开放的数据分析能力
 
-### 🧩 版本能力对比
+**灵活扩展**
 
-| 能力       | 社区版 | 专业版 | 企业版 | 信创版 |
-| ---------- | ------ | ------ | ------ | ------ |
-| 数据采集   | ✅      | ✅      | ✅      | ✅      |
-| 事件分析   | 基础   | 完整   | 完整   | 完整   |
-| 用户画像   | 基础   | 基础   | 完整   | 完整   |
-| 漏斗分析   | ❌      | ✅      | ✅      | ✅      |
-| 用户细查   | ❌      | ❌      | ✅      | ✅      |
-| 标签体系   | ❌      | ❌      | ✅      | ✅      |
-| 信创适配   | ❌      | ❌      | ❌      | ✅      |
-| 私有化部署 | ✅      | ✅      | ✅      | ✅      |
+支持源码扩展、支持业务系统集成、支持自定义开发、满足企业持续演进需求
+
+**快速落地**
+
+Docker 快速部署、多端 SDK 接入、开箱即用分析能力、快速构建用户行为分析平台
+
+
+## 产品预览
+
+|     ![](https://clklog.com/assets/imgs/preview/com/1.png) 社区版-数据概览     |      ![](https://clklog.com/assets/imgs/preview/com/2.png) 社区版-趋势分析      |      ![](https://clklog.com/assets/imgs/preview/com/3.png)  社区版- 地域分析      |
+| :---------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
+| ![](https://clklog.com/assets/imgs/preview/pro/10.png) **PRO专业版-留存分析** | ![](https://clklog.com/assets/imgs/preview/pro/13.png) **PRO专业版-自定义分析** |   ![](https://clklog.com/assets/imgs/preview/pro/14.png) **PRO专业版-漏斗分析**   |
+| ![](https://clklog.com/assets/imgs/preview/cdp/2.png) **CDP企业版-用户标签**  | ![](https://clklog.com/assets/imgs/preview/cdp/8.png) **CDP企业版-用户群画像**  | ![](https://clklog.com/assets/imgs/preview/cdp/14.png) **CDP企业版-用户行为细查** |
+
+## 立即体验
+
+社区版 Demo ：https://demo.clklog.com
+
+商业版 Demo ：https://pro.clklog.com
+
+
+## 快速部署
+ClkLog 支持多种部署方式，您可以根据实际环境选择适合的部署方案。
+
+- Docker 部署：https://clklog.com/install/docker/intro.html
+
+- 源码部署：https://clklog.com/install/source/preparation.html
+
+更多部署方式、配置说明及常见问题，请参考官方文档
+
 
 ## 🏗 系统架构
 
@@ -96,60 +142,139 @@ ClkLog 采用主流企业级技术架构，支持高并发与可扩展分析能�
 
 数据库：ClickHouse / Apache Doris、MySQL / OpenGauss / OceanBase
 
-## 系统示意图
+## ClkLog 持续成长						
+我们坚持长期维护 ClkLog						
+#### 已发布
 
-|     ![](https://clklog.com/assets/imgs/preview/com/1.png) 社区版-数据概览     |      ![](https://clklog.com/assets/imgs/preview/com/2.png) 社区版-趋势分析      |      ![](https://clklog.com/assets/imgs/preview/com/3.png)  社区版- 地域分析      |
-| :---------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
-| ![](https://clklog.com/assets/imgs/preview/pro/10.png) **PRO专业版-留存分析** | ![](https://clklog.com/assets/imgs/preview/pro/13.png) **PRO专业版-自定义分析** |   ![](https://clklog.com/assets/imgs/preview/pro/14.png) **PRO专业版-漏斗分析**   |
-| ![](https://clklog.com/assets/imgs/preview/cdp/2.png) **CDP企业版-用户标签**  | ![](https://clklog.com/assets/imgs/preview/cdp/8.png) **CDP企业版-用户群画像**  | ![](https://clklog.com/assets/imgs/preview/cdp/14.png) **CDP企业版-用户行为细查** |
+✅ 多平台 SDK
 
-## 社区支持
+✅ Docker 部署
 
-欢迎：⭐ Star 🐞 Issue 🔧 PR 💬 交流建议
-________________________________________
+✅ 用户行为分析
 
-## License
+✅ SQL 分析
 
-### 开源协议：AGPL V3.0
+✅ API 开放能力
 
-• 使用 Clklog 的组织或个人在复制、分发、转发或修改时请遵守AGPL V3.0相关条款，不得移除ClkLog相关版权标识。任何分发或通过网络提供服务的版本（包括衍生版本）必须开源，并保留原版权和协议信息。如有违反，ClkLog将保留对侵权者追究责任的权利。
+✅ 国产化适配
 
-#### 免费使用
+✅AI 数据助手（ AI Skill）	
 
-• 适用范围：个人开发者、学术研究及非商业项目可免费使用
+#### 持续规划
 
-• 商业限制：若将ClkLog集成到闭源商业产品中，任何修改、二开、集成须遵循 AGPLv3.0 协议开源衍生产品
+🚧 全域用户关联
 
-• 授权方式：遵循 AGPLv3.0 协议
+🚧 更多分析模型
 
-#### 商业使用
+🚧 更多 SDK
 
-• 适用范围：商业项目集成可闭源使用
+🚧 更多数据库支持
 
-• 授权方式：需购买商业授权
+🚧 更多开放 API
 
-### 特别提醒
+🚧 AI 数据助手持续升级
 
-在AGPL V3.0协议中，“衍生产品”是指：在 ClkLog 源代码基础上进行任何修改、扩展、适配、重构，或与其他软件、系统组合后形成的作品，包括但不限于：
+🚧 更多国产化适配						
 
-• 修改、删除或新增源代码的版本；
+## ClkLog 商业版本（PRO / CDP / 信创）
+除了社区版外，我们还提供更多商业版本，帮助企业构建更完整的数据分析体系。
 
-• 增加功能模块、插件或集成接口的版本；
+例如：
 
-• 将 ClkLog 嵌入或整合进其他产品、系统或服务的版本；
+🔹 用户关联（简易/全域）
 
-• 改变数据结构、接口协议或运行架构的版本。
+🔹 自定义事件分析
 
-无论改动大小，只要衍生产品包含 ClkLog 的代码或核心逻辑，即视为衍生产品，并适用本协议的相关条款。
+🔹 漏斗分析
 
-## 商业支持与合作
+🔹 用户细查
 
-如需了解完整产品能力、信创方案或商业版本合作方式，欢迎通过以下方式联系我们获取详细资料：
+🔹 标签体系
 
-- 联系电话：&nbsp;&nbsp; 16621363853
+🔹 用户分群
 
-- 客服微信：&nbsp;&nbsp; opensoft66
+🔹 国产数据库适配
 
-- 微信客服: &nbsp;&nbsp;&nbsp;&nbsp; <img title="" src="https://clklog.com/assets/imgs/qrcode_contact.png" alt="" data-align="center" width="120" style="vertical-align:top">
+🔹 专属技术支持
 
-- 微信公众号:&nbsp;&nbsp;<img title="" src="https://clklog.com/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top">
+更多能力请访问官网：https://clklog.com/
+
+## 社区
+官方网站：https://clklog.com
+
+技术支持文档：https://clklog.com/install/intro.html
+
+Gitee：https://gitee.com/clklog
+
+GitHub：https://github.com/clklog
+
+欢迎进入社群或了解更多ClkLog 的能力：
+- 客服邮箱：&nbsp;&nbsp;info@clklog.com
+
+- 客服手机：&nbsp;&nbsp;16621363853
+  
+- 微信客服: &nbsp;&nbsp;<img title="" src="https://clklog.com/assets/imgs/qrcode_contact.png" alt="" data-align="center" width="120" style="vertical-align:top">
+
+- 微信公众号:<img title="" src="https://clklog.com/assets/imgs/contactqrcode.jpg" alt="" data-align="center" width="120" style="vertical-align:top">
+
+
+
+## License				
+ClkLog 社区版采用 【AGPL v3.0】开源协议，并提供商业授权。
+
+**开源使用**：免费使用，需要遵守AGPL v3.0	
+
+**闭源使用**：购买商业授权		
+
+**社区版免费使用（AGPL v3.0 协议）**
+				
+任何组织或个人均可免费使用 ClkLog 社区版，包括但不限于：				
+- 个人学习与开发
+- 企业内部使用
+- 学术研究
+- 非商业项目
+- 商业项目				
+<p style="color:red">前提是必须遵守 AGPL v3.0 协议。</p>		
+
+如果您基于 ClkLog 进行修改、二次开发或集成，并将软件分发给第三方，或通过网络向第三方提供服务，应按照 AGPL v3.0 协议履行相应义务，包括公开对应版本的源代码，并保留原有版权声明及 License 信息。				
+				
+				
+				
+### 什么时候需要购买商业授权？				
+如果您希望在以下场景中使用 ClkLog，则建议购买商业授权：		
+
+将 ClkLog 集成到闭源商业产品中；
+
+对 ClkLog 进行二次开发，但不希望公开修改后的源代码；
+
+基于 ClkLog 向客户交付闭源软件或解决方案；
+
+基于 ClkLog 提供闭源 SaaS 或在线服务；	
+
+购买商业授权后，可在授权范围内合法闭源使用，无需按照 AGPL v3.0 协议公开相关源代码。				
+				
+### 什么属于衍生产品？				
+根据 AGPL v3.0 协议，基于 ClkLog 源代码形成的新作品通常属于衍生产品，包括但不限于：		
+- 修改、删除或新增 ClkLog 源代码；
+- 新增功能模块、插件或扩展能力；
+- 调整系统架构、数据结构、接口协议或运行方式；
+- 将 ClkLog 集成、嵌入或组合到其他软件、平台或业务系统中；
+- 基于 ClkLog 进行二次开发形成的新版本。	
+
+无论修改规模大小，只要最终产品包含 ClkLog 的源代码或基于其核心代码形成，通常都属于 AGPL v3.0 所约束的衍生产品，应遵守相应协议要求。				
+				
+### ClkLog提供商业授权				
+除了社区版外，ClkLog 还提供更多商业版本（PRO / CDP / 信创）的授权，可支持：		
+
+- 闭源商业使用；
+- 100% 源码交付；
+- 企业级功能；
+- 国产化 / 信创适配；
+
+官方技术支持与持续升级				
+如需了解商业授权方案，请访问 ClkLog 官方网站或联系我们获取详细信息。				
+				
+## 支持 ClkLog				
+如果您认可 ClkLog：
+
+欢迎⭐ Star 项目，帮助更多开发者发现项目，也帮助我们持续投入版本迭代、文档完善和社区建设。				
