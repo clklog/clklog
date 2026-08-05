@@ -7,167 +7,84 @@
       :close-on-press-escape="false"
       :show-close="false"
       center
-      width="800px"
-      style="min-height: 90vh; border-radius: 6px"
-      class="custom_warry"
+      width="700px"
+      class="custom_warry letter-dialog"
     >
-      <div class="custom-header">
-        <div
-          class="letter_h1"
-          style="
-            text-align: center;
-            position: relative;
-            line-height: 40px;
-            margin-bottom: 20px;
-            font-size: 18px;
-          "
-        >
-          <div class="cancleBtn" @click="closeDialog()">X</div>
-          感谢您对ClkLog的关注与支持！
-        </div>
-        <div style="text-align: center">
-          为了给您提供更好的服务与支持，请填写以下表单。
-        </div>
-      </div>
+      <div class="letter-wrap">
+        <div class="cancleBtn" @click="closeDialog()">×</div>
 
-      <div style="min-height: 700px;margin-top: 25px;">
-        <div>
-          <div class="letter_h1">是否愿意接收ClkLog后续更新提醒:</div>
-          <div style="margin-top: 20px; text-align: left">
-            <el-radio
-              v-model="ruleForm.receiveNotification"
-              style="margin-right: 50px"
-              :label="true"
-              >接收</el-radio
-            >
-            <el-radio v-model="ruleForm.receiveNotification" :label="false"
-              >不接收</el-radio
-            >
-          </div>
+        <div class="letter-title">感谢您选择 ClkLog</div>
+
+        <div class="star-box">
+          <div class="star-title">⭐ 支持 ClkLog 开源社区</div>
+          <p>ClkLog 是一个持续维护的开源用户行为分析平台。</p>
+          <p>如果 ClkLog 对您的项目有所帮助，</p>
+          <p>欢迎前往 Gitee 点亮 ⭐ Star 支持我们。</p>
+          <a
+            class="star-btn"
+            href="https://gitee.com/clklog/clklog"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ⭐ Star 支持 ClkLog
+          </a>
         </div>
 
-        <!-- info -->
-        <!-- <div class="letter_h1 setSpace">联系人信息:</div> -->
-        <el-form
-          :model="ruleForm"
-          :rules="rules"
-          ref="ruleForm"
-          label-width="120px"
-          class="demo-ruleForm"
-        >
-          <!-- <div class="letter_h1">是否愿意接收ClkLog后续更新提醒:</div>
-          <el-form-item>
-            <div>
-              <el-radio
-                v-model="ruleForm.receiveNotification"
-                style="margin-right: 50px"
-                :label="true"
-                >接收</el-radio
-              >
-              <el-radio v-model="ruleForm.receiveNotification" :label="false"
-                >不接收</el-radio
-              >
-            </div>
-          </el-form-item> -->
-
-          <div class="letter_h1 setSpace">联系人信息:</div>
-          <el-form-item label="公司名称:" prop="orgnizationName">
-            <el-input
-              v-model="ruleForm.orgnizationName"
-              placeholder=""
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="联系人:" prop="contact">
-            <el-input v-model="ruleForm.contact" placeholder=""></el-input>
-          </el-form-item>
-          <el-form-item label="联系邮箱:" prop="email">
-            <el-input v-model="ruleForm.email" placeholder=""></el-input>
-          </el-form-item>
-          <el-form-item label="联系电话:" prop="phone">
-            <el-input v-model="ruleForm.phone" placeholder=""></el-input>
-          </el-form-item>
-          <!-- 说明 -->
-          <div class="setSpace">
-            <span class="letter_h1"> ClkLog在您的项目中的使用场景: </span>
-            <div class="letter_h2 indent">
-              以下信息仅用于我们了解ClkLog在您的项目中的使用场景，
-              在后续产品迭代升级时考虑相关行业的特殊性，以提供更好的服务。
-            </div>
+        <div class="survey-section">
+          <div class="survey-title">参与 ClkLog 社区建设</div>
+          <div class="survey-desc">
+            为了帮助我们持续优化产品与社区服务，希望了解一下您的使用情况。
           </div>
 
-          <el-form-item
-            label="埋点项目类型:"
-            prop="projectType"
-            style="margin-top: 20px"
+          <el-form
+            :model="ruleForm"
+            :rules="rules"
+            ref="ruleForm"
+            class="demo-ruleForm"
+            label-position="top"
           >
-            <el-select
-              class="appli_select"
-              v-model="ruleForm.projectType"
-              placeholder="请选择项目类型"
-              style="width: 100%; height: 36px"
-            >
-              <el-option
-                v-for="(item, index) in typeList"
-                :key="index"
-                :label="item"
-                :value="item"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="埋点项目说明:" style="margin-left: 8px;">
-            <el-input
-              type="textarea"
-              maxlength="1000"
-              show-word-limit
-              v-model="ruleForm.remark"
-              placeholder=""
-              rows="4"
-            ></el-input>
-          </el-form-item>
-
-          <!-- <el-form-item>
-            <div
-              style="display: flex; justify-content: center; height: 35px;"
-            >
-              <el-button class="zc_btn" @click="confirm">确认</el-button>
-              <el-button
-                class="zc_btn_default"
-                @click="skipBtn"
-                style="margin-left: 50px"
-                >跳过</el-button
-              >
+            <div class="field-block">
+              <div class="field-label">您使用 ClkLog 的场景？</div>
+              <el-radio-group v-model="usageScenario" class="option-grid">
+                <el-radio v-for="item in usageList" :key="item" :label="item">{{
+                  item
+                }}</el-radio>
+              </el-radio-group>
             </div>
-          </el-form-item> -->
-        </el-form>
-        <div style="display: flex; justify-content: center; height: 35px">
-          <el-button class="zc_btn" @click="confirm">确认</el-button>
-          <el-button
-            class="zc_btn_default"
-            @click="skipBtn"
-            style="margin-left: 50px"
-            >跳过</el-button
-          >
-        </div>
 
-        <!-- <div
-          style="
-            display: flex;
-            justify-content:center;
-            height: 50px;
-            margin: 0 140px;
-          "
-        >
-          <el-button class="zc_btn" @click="confirm">确认</el-button>
-          <el-button
-            class="zc_btn_default"
-            @click="skipBtn"
-            style="margin-left: 50px"
+            <div class="field-block">
+              <div class="field-label">您的项目所属领域？</div>
+              <el-radio-group v-model="industry" class="option-grid">
+                <el-radio
+                  v-for="item in industryList"
+                  :key="item"
+                  :label="item"
+                  >{{ item }}</el-radio
+                >
+              </el-radio-group>
+            </div>
+
+            <div class="field-block email-block">
+              <div class="field-label">
+                如果您希望获取版本更新、社区活动等信息，可以留下邮箱。
+              </div>
+              <div class="email-desc">邮箱：</div>
+              <el-form-item prop="email">
+                <el-input v-model="ruleForm.email" placeholder=""></el-input>
+              </el-form-item>
+            </div>
+          </el-form>
+        </div>
+        <div class="footer-tip">
+          感谢每一个 ⭐ Star，支持 ClkLog 开源社区持续发展
+        </div>
+        <div class="btn-row">
+          <el-button class="zc_btn_default letter-btn" @click="skipBtn"
             >跳过</el-button
           >
-        </div> -->
+          <el-button class="zc_btn letter-btn" @click="confirm">确认</el-button>
+        </div>
       </div>
-      <!-- 确认事件 -->
     </el-dialog>
   </div>
 </template>
@@ -178,30 +95,34 @@ import {
   subscribeApi,
   subscribeActiveApi,
 } from "@/api/trackingapi/subscribe.js";
-const typedata = [
-  "电商",
-  "社交电商",
-  "游戏",
-  "泛互联网",
-  "品牌零售",
-  "互联网金融",
-  "证券",
-  "银行",
-  "企业服务",
-  "房产行业",
-  "汽车",
-  "保险",
-  "融合媒体",
-  "医疗服务",
-  "教育行业",
-  "文娱",
+
+const usageList = [
+  "企业内部系统用户行为分析",
+  "Web / APP / 小程序数据分析",
+  "SaaS 产品用户分析",
+  "替代商业分析平台",
+  "学习研究",
   "其他",
 ];
+
+const industryList = [
+  "政企数字化",
+  "金融证券",
+  "电商",
+  "教育",
+  "社交",
+  "游戏",
+  "其他",
+];
+
 export default {
   data() {
     return {
       DialogVisible: false,
-      typeList: typedata,
+      usageList,
+      industryList,
+      usageScenario: "",
+      industry: "",
       ruleForm: {
         receiveNotification: true,
         clientId: "",
@@ -218,40 +139,10 @@ export default {
         clientId: "",
       },
       rules: {
-        orgnizationName: [
-          { required: true, message: "公司名称不能为空", trigger: "blur" },
-        ],
-        contact: [
-          { required: true, message: "联系人不能为空", trigger: "blur" },
-        ],
         email: [
-          {
-            required: true,
-            message: "请输入邮箱地址",
-            trigger: ["blur", "change"],
-          },
           {
             pattern: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
             message: "邮箱格式不正确",
-            trigger: "blur",
-          },
-        ],
-        phone: [
-          {
-            required: true,
-            message: "请输电话",
-            trigger: ["blur", "change"],
-          },
-          {
-            pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
-            message: "电话格式不正确",
-            trigger: "blur",
-          },
-        ],
-        projectType: [
-          {
-            required: true,
-            message: "项目类型不能为空",
             trigger: "blur",
           },
         ],
@@ -278,17 +169,24 @@ export default {
       if (this.$refs.ruleForm) {
         this.$refs.ruleForm.resetFields();
       }
-      this.ruleForm = res;
+      this.ruleForm = Object.assign(this.getEmptyForm(), res || {});
       if (res.receiveNotification === false) {
         this.ruleForm.receiveNotification = false;
       } else {
         this.ruleForm.receiveNotification = true;
       }
       this.ruleForm.projectName = this.$store.getters.projectName;
+      // 回显：提交时 usageScenario → remark，industry → projectType
+      this.usageScenario = this.usageList.includes(res.remark)
+        ? res.remark
+        : "";
+      this.industry = this.industryList.includes(res.projectType)
+        ? res.projectType
+        : "";
       this.DialogVisible = true;
     },
-    clearData() {
-      this.ruleForm = {
+    getEmptyForm() {
+      return {
         receiveNotification: true,
         clientId: "",
         orgnizationName: "",
@@ -300,7 +198,11 @@ export default {
         remark: "",
       };
     },
-
+    clearData() {
+      this.usageScenario = "";
+      this.industry = "";
+      this.ruleForm = this.getEmptyForm();
+    },
     confirm() {
       this.formCollection();
     },
@@ -310,13 +212,13 @@ export default {
       };
       if (!this.openFLag.subscribed) {
         skipsubscriptionApi(params)
-          .then((res) => {
+          .then(() => {
             if (!this.openFLag.subscribed) {
               this.acitiveEvent();
             }
             this.DialogVisible = false;
           })
-          .catch((err) => {
+          .catch(() => {
             this.DialogVisible = false;
           });
       }
@@ -325,6 +227,8 @@ export default {
     formCollection() {
       this.$refs["ruleForm"].validate((valid) => {
         if (valid) {
+          this.ruleForm.remark = this.usageScenario;
+          this.ruleForm.projectType = this.industry;
           this.ruleForm.clientId = this.openFLag.clientId;
           subscribeApi(this.ruleForm).then((res) => {
             if (res.code == 200) {
@@ -336,7 +240,6 @@ export default {
         }
       });
     },
-    // 1537411672@qq.com
     acitiveEvent(val) {
       let params = {};
       if (val) {
@@ -359,70 +262,184 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep {
-  .el-dialog__body {
-    padding: 30px 120px;
+.letter-dialog {
+  ::v-deep .el-dialog {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  ::v-deep .el-dialog__header {
+    display: none;
+    padding: 0;
+  }
+
+  ::v-deep .el-dialog__body {
+    padding: 28px 36px 32px;
     box-sizing: border-box;
   }
-  .el-dialog__title {
-    font-size: 20px;
-  }
-  .el-radio__label {
-    font-size: 15px;
-  }
-  .el-form-item__label {
-    font-size: 15px;
-    font-weight: 400;
-    line-height: 36px;
-    text-align: left;
-    color: #4d4d4d;
-  }
-  .el-form-item {
-    margin: 20px 0;
+}
+
+.letter-wrap {
+  position: relative;
+  color: #333;
+}
+
+.cancleBtn {
+  position: absolute;
+  right: -8px;
+  top: -12px;
+  color: #99aab3;
+  font-size: 22px;
+  font-weight: 400;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    color: #296bef;
   }
 }
-.setSpace {
-  margin-top: 40px;
+
+.letter-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  line-height: 28px;
+  margin-bottom: 20px;
 }
-.custom_warry {
-  .letter_h1 {
-    font-size: 16px;
+
+.star-box {
+  background: #eef5ff;
+  border-radius: 6px;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+
+  .star-title {
+    font-size: 15px;
     font-weight: 600;
-    line-height: 25px;
-    color: #4d4d4d;
+    color: #2c7be5;
+    margin-bottom: 10px;
   }
-  .letter_h2 {
-    font-size: 14px;
-    font-weight: 400;
+
+  p {
+    margin: 0;
+    font-size: 13px;
     line-height: 22px;
     color: #4d4d4d;
   }
-  .skip {
-    cursor: pointer;
+
+  .star-btn {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #2c7be5;
+    border-radius: 4px;
+    text-decoration: none;
+    line-height: 1.4;
+
+    &:hover {
+      opacity: 0.9;
+    }
   }
-  .skip:hover {
-    color: #a9c4f9;
-  }
-  .indent {
-    text-indent: 2em;
-    margin-top: 10px;
+}
+
+.survey-section {
+  .survey-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    line-height: 24px;
+    margin-bottom: 6px;
   }
 
-  .custom-header {
-    font-size: 15px;
-    .cancleBtn {
-      position: absolute;
-      right: -90px;
-      top: -42px;
-      color: #99aab3;
-      font-size: 18px;
-      font-weight: 400;
-      width: 30px;
-      cursor: pointer;
-    }
-    .cancleBtn:hover {
-      color: #296bef !important;
-    }
+  .survey-desc {
+    font-size: 13px;
+    color: #666;
+    line-height: 20px;
+    margin-bottom: 18px;
+  }
+}
+
+.field-block {
+  margin-bottom: 18px;
+
+  .field-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    line-height: 22px;
+    margin-bottom: 12px;
+  }
+}
+
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 12px;
+  column-gap: 25px;
+
+  ::v-deep .el-radio {
+    margin-right: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  ::v-deep .el-radio__label {
+    font-size: 13px;
+    color: #4d4d4d;
+    padding-left: 8px;
+    white-space: normal;
+    line-height: 18px;
+  }
+}
+
+.email-block {
+  .email-desc {
+    font-size: 13px;
+    color: #666;
+    line-height: 20px;
+    margin-bottom: 12px;
+  }
+
+  ::v-deep .el-form-item {
+    margin-bottom: 0;
+  }
+
+  ::v-deep .el-input__inner {
+    height: 36px;
+    line-height: 36px;
+    border-radius: 4px;
+    border-color: #dcdfe6;
+  }
+}
+
+.footer-tip {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: #aeb1b4;
+  line-height: 22px;
+  margin: 4px 0 20px;
+  letter-spacing: 0.5px;
+}
+
+.btn-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+
+  .letter-btn {
+    min-width: 88px;
+    height: 34px;
+    border-radius: 4px;
+    font-size: 14px;
   }
 }
 </style>
