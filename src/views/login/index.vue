@@ -203,12 +203,12 @@
 <script>
 import SocialSign from "./components/SocialSignin";
 import { profileApi, subscribeApi } from "@/api/trackingapi/subscribe.js";
-import Cookies from "js-cookie";
 import { mapState } from "vuex";
 import ResizeMixin from "@/layout/mixin/ResizeHandler";
 import { login } from "@/api/user";
 import { getAppMyList } from "@/api/sysmanage/appmanage";
 import { setLocalStorage } from "@/utils/localStorage";
+import { getRememberedUsername, setRememberedUsername } from "@/utils/userInfo";
 export default {
   name: "Login",
   components: { SocialSign },
@@ -248,7 +248,6 @@ export default {
       showDialog: false,
       redirect: undefined,
       otherQuery: {},
-      validatePassword: this.$store.getters.password,
       clientId: "",
       subscribed: "",
       is_clklog_demo_experience_account: false,
@@ -280,10 +279,8 @@ export default {
       this.is_clklog_demo_experience_account =
         window.globalConfig.is_clklog_demo_experience_account;
     }
-    if (Cookies.get("userInfo")) {
-      let userInfo = JSON.parse(Cookies.get("userInfo"));
-      this.loginForm.username = userInfo.username;
-    }
+    // 仅回填用户名；密码需用户每次输入，不从本地恢复
+    this.loginForm.username = getRememberedUsername();
   },
   mounted() {
     if (this.loginForm.username === "") {
@@ -335,8 +332,8 @@ export default {
           throw new Error(response.message || "登录失败");
         }
 
-        // 保存用户信息到Cookie
-        Cookies.set("userInfo", JSON.stringify(this.loginForm));
+        // 只记住用户名，密码不落 Cookie / 本地存储
+        setRememberedUsername(this.loginForm.username.trim());
 
         // 执行登录操作
         await this.$store.dispatch("user/login", response);

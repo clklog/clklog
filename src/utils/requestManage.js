@@ -5,7 +5,7 @@ import Router from '@/router';
 import { getToken } from "@/utils/auth";
 const service = axios.create({
   baseURL: "",
-  timeout: 5000,
+  timeout: 10000,
 });
 service.interceptors.request.use(
   (config) => {

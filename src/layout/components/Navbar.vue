@@ -55,7 +55,7 @@ import ErrorLog from "@/components/ErrorLog";
 import Screenfull from "@/components/Screenfull";
 import SizeSelect from "@/components/SizeSelect";
 import Search from "@/components/HeaderSearch";
-import Cookies from "js-cookie";
+import { getRememberedUsername } from "@/utils/userInfo";
 export default {
   components: {
     ErrorLog,
@@ -102,7 +102,7 @@ export default {
     deep: true,
   },
   created() {
-    this.userName = JSON.parse(Cookies.get("userInfo")).username;
+    this.userName = getRememberedUsername();
     const savedProjectCode = this.$store.getters.projectName;
     if (this.options.length > 0) {
       this.prejectCode = savedProjectCode || this.options[0].projectName;

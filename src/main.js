@@ -29,17 +29,13 @@ import { sharedText } from '@/components/pointFont/index';
 Vue.prototype.$sharedText = sharedText;
 
 /**
- * If you don't want to use mock-server
- * you want to use MockJs for mock api
- * you can execute: mockXHR()
- *
- * Currently MockJs will be used in the production environment,
- * please remove it before going online ! ! !
+ * 仅开发/非生产环境启用 MockJs，生产构建不会执行。
+ * 若不需要可直接删除下方调用。
  */
-// if (process.env.NODE_ENV === 'production') {
-const { mockXHR } = require("../mock");
-mockXHR();
-// }
+if (process.env.NODE_ENV !== "production") {
+  const { mockXHR } = require("../mock");
+  mockXHR();
+}
 
 Vue.use(Element, {
   size: Cookies.get("size") || "medium", // set element-ui default size

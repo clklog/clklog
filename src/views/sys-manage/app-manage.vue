@@ -37,17 +37,23 @@
                 <div style="display: flex; white-space: nowrap">
                   <label style="font-weight: 400">Token&nbsp;</label>：
                   <div style="min-width: 300px">
-                    <span :id="'hide' + scope.row.projectName"
-                      >****************************************************</span
-                    >
+                    <span>{{
+                      scope.row._tokenVisible
+                        ? scope.row.token
+                        : "****************************************************"
+                    }}</span>
                   </div>
 
                   <i
                     :id="'i' + scope.row.projectName"
                     slot="suffix"
-                    class="icon-style el-icon-lock"
+                    :class="
+                      scope.row._tokenVisible
+                        ? 'icon-style el-icon-unlock'
+                        : 'icon-style el-icon-lock'
+                    "
                     style="cursor: pointer"
-                    @click="setPassword(scope.$index, scope.row)"
+                    @click="toggleTokenVisible(scope.row)"
                   />
                 </div>
               </div>
@@ -299,7 +305,7 @@ import {
   getAppMyList,
 } from "@/api/sysmanage/appmanage";
 import dialogPage from "./component/dialog";
-import Cookies from "js-cookie";
+import { getRememberedUsername } from "@/utils/userInfo";
 import { setLocalStorage } from "@/utils/localStorage";
 export default {
   name: "globalSetting",
@@ -346,16 +352,13 @@ export default {
     updateProjectList() {
       getAppMyList().then((res) => {
         let projectArray;
-        let adminNameList = ["admin", "clklog"];
-        let userInfo = Cookies.get("userInfo")
-          ? JSON.parse(Cookies.get("userInfo"))
-          : "";
-        if (userInfo.username) {
-          if (adminNameList.includes(userInfo.username.trim())) {
-            projectArray = res.data;
-            this.$store.dispatch("tracking/setProjectArray", projectArray);
-            setLocalStorage("projectList", projectArray);
-          }
+        // 业务约定：admin / clklog 为管理账号
+        const adminNameList = ["admin", "clklog"];
+        const username = getRememberedUsername();
+        if (username && adminNameList.includes(username.trim())) {
+          projectArray = res.data;
+          this.$store.dispatch("tracking/setProjectArray", projectArray);
+          setLocalStorage("projectList", projectArray);
         }
       });
     },
@@ -473,20 +476,10 @@ export default {
         .catch(() => {});
     },
     setPassword(index, row) {
-      var projectName = row.projectName;
-      var hideItem = document.getElementById("hide" + projectName);
-
-      var iItem = document.getElementById("i" + projectName);
-      if (hideItem.innerHTML.indexOf("*******") == -1) {
-        hideItem.innerHTML =
-          "****************************************************";
-        // iItem.setAttribute("class", "icon-style el-icon-minus");
-        iItem.setAttribute("class", "icon-style el-icon-lock");
-      } else {
-        hideItem.innerHTML = row.token;
-        // iItem.setAttribute("class", "icon-style el-icon-view");
-        iItem.setAttribute("class", "icon-style el-icon-unlock");
-      }
+      this.toggleTokenVisible(row);
+    },
+    toggleTokenVisible(row) {
+      this.$set(row, "_tokenVisible", !row._tokenVisible);
     },
     reset() {
       this.form = {

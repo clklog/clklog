@@ -93,10 +93,7 @@
           "
         >
           <div class="userLoyalty public-hoverItem" style="margin-top: 0px;">
-            <div
-              style="line-height: 17px"
-              v-html="filterReason(rowList.appCrashedReason)"
-            ></div>
+            <div class="crash-reason">{{ filterReason(rowList.appCrashedReason) }}</div>
           </div>
         </div>
       </div>
@@ -142,7 +139,14 @@ export default {
   },
   methods: {
     filterReason(str) {
-      return str ? str.replace(/\n/g, "<br/>") : "";
+      if (!str) return "";
+      // 字面量 \n 转为真换行，由 CSS white-space: pre-wrap 展示（不用 v-html）
+      return String(str)
+        .replace(/\\r\\n/g, "\n")
+        .replace(/\\n/g, "\n")
+        .replace(/\\r/g, "\n")
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n");
     },
     openErrorLog(row) {
       this.rowList = row;
@@ -205,5 +209,10 @@ export default {
   background: #fff;
   position: relative;
   border-radius: 6px !important;
+}
+.crash-reason {
+  line-height: 17px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 </style>
