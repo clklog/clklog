@@ -52,6 +52,8 @@ public class InitServiceImpl implements IInitService {
         try {
             // 入口白名单校验，杜绝 SQL 注入与路径遍历
             validateScriptName(script_name);
+            // 库名同样需白名单校验后再拼入 SQL（表名/库名无法参数化，只能白名单）
+            validateScriptName(setting.getLogDb());
 
             String tableName = script_name.replaceAll("-", "_");
             // 再次校验转换后的 tableName（防御性）
