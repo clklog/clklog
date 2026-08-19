@@ -1,29 +1,41 @@
 springdoc:
   swagger-ui:
-    enabled: true
+    enabled: false
     tagsSorter: alpha
   api-docs:
     path: /v3/api-docs
-    enabled: true
+    enabled: false
   group-configs:
     - group: 'default'
       paths-to-match: '/**'
       packages-to-scan: com.zcunsoft.clklog.api.controllers
 server:
   port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
 spring:
   application.name: clklog-api
+  security:
+    user:
+      name: ${SPRING_SECURITY_USER_NAME}
+      password: ${SPRING_SECURITY_USER_PASSWORD}
   datasource:
     clickhouse:
       jdbc-url: jdbc:clickhouse://localhost:8123/default
       username: default
-      password: 123456
+      password:
       driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
       connection-timeout: 20000
       socket-timeout: 60000
       maximum-pool-size: 5
   redis:
-    host: 10.10.220.37
+    host: localhost
     port: 6379
     database: 0
     password:
@@ -34,7 +46,7 @@ spring:
         max-active: 4
 token:
   header: Authorization
-  secret: c609737e578978eccc64cef4be680
+  secret: ${TOKEN_SECRET}
   expireTime: 300
 logging:
   file:

@@ -69,19 +69,24 @@ public class TokenService {
      * @return 用户信息
      */
     public LoginUser getLoginUser(HttpServletRequest request) {
-        // 获取请求携带的令牌
         String token = getToken(request);
         if (StringUtils.isNotBlank(token)) {
+            if (!isValidJwtToken(token)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Invalid JWT format: token does not contain exactly 2 period characters");
+                }
+                return null;
+            }
             try {
                 Claims claims = parseToken(token);
                 // 解析对应的权限以及用户信息
                 String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
                 String userKey = getTokenKey(uuid);
                 String userInfo = queueRedisTemplate.opsForValue().get(userKey);
-                TypeReference<LoginUser> loginUserTypeReference = new TypeReference<LoginUser>() {
-                };
-                LoginUser user = objectMapper.readValue(userInfo, loginUserTypeReference);
-                return user;
+                if (StringUtils.isNotEmpty(userInfo)) {
+                    LoginUser user = objectMapper.readValue(userInfo, loginUserTypeReference);
+                    return user;
+                }
             } catch (Exception e) {
                 logger.error("", e);
             }
@@ -144,6 +149,19 @@ public class TokenService {
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    private boolean isValidJwtToken(String token) {
+        if (StringUtils.isBlank(token)) {
+            return false;
+        }
+        int periodCount = 0;
+        for (char c : token.toCharArray()) {
+            if (c == '.') {
+                periodCount++;
+            }
+        }
+        return periodCount == 2;
     }
 
     /**
