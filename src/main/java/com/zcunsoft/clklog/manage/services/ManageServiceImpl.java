@@ -778,7 +778,9 @@ public class ManageServiceImpl implements IManageService {
         if (startDate == null && endDate == null) {
             List<ProjectStat> projectDbSizeList = new ArrayList<>();
             try {
-                projectDbSizeList = clickHouseJdbcTemplate.query("SELECT '" + constsDataHolder.getGlobalProjectCode() + "' as projectName, sum(data_uncompressed_bytes) AS dbSpaceSize FROM system.parts WHERE active  AND table = 'log_analysis'", new MapSqlParameterSource(), new BeanPropertyRowMapper<ProjectStat>(ProjectStat.class));
+                MapSqlParameterSource params = new MapSqlParameterSource();
+                params.addValue("projectName", constsDataHolder.getGlobalProjectCode());
+                projectDbSizeList = clickHouseJdbcTemplate.query("SELECT :projectName as projectName, sum(data_uncompressed_bytes) AS dbSpaceSize FROM system.parts WHERE active  AND table = 'log_analysis'", params, new BeanPropertyRowMapper<ProjectStat>(ProjectStat.class));
                 dbSpaceSizeStat = projectDbSizeList.get(0);
             } catch (Exception ex) {
                 this.logger.error("getDbSpace err", ex);
