@@ -2,28 +2,31 @@ package com.zcunsoft.services;
 
 
 import com.zcunsoft.cfg.InitSetting;
-import com.zcunsoft.handlers.ConstsDataHolder;
 import com.zcunsoft.util.IOUtil;
-import com.zcunsoft.util.ObjectMapperUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.regex.Pattern;
 
 
 @Service
 public class InitServiceImpl implements IInitService {
 
-    private final ConstsDataHolder constsDataHolder;
-
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final ObjectMapperUtil objectMapper;
+    /**
+     * 仅允许字母、数字、下划线，长度 1~64，防止路径遍历与 SQL 注入
+     */
+    private static final Pattern SCRIPT_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_]{1,64}$");
+
 
 
     private final JdbcTemplate clickHouseJdbcTemplate;
@@ -39,9 +42,7 @@ public class InitServiceImpl implements IInitService {
     };
 
 
-    public InitServiceImpl(ConstsDataHolder constsDataHolder, ObjectMapperUtil objectMapper, JdbcTemplate clickHouseJdbcTemplate, InitSetting setting) {
-        this.objectMapper = objectMapper;
-        this.constsDataHolder = constsDataHolder;
+    public InitServiceImpl(JdbcTemplate clickHouseJdbcTemplate, InitSetting setting) {
         this.clickHouseJdbcTemplate = clickHouseJdbcTemplate;
         this.setting = setting;
     }
@@ -49,9 +50,20 @@ public class InitServiceImpl implements IInitService {
     @Override
     public void calScript(String script_name) {
         try {
+            // 入口白名单校验，杜绝 SQL 注入与路径遍历
+            validateScriptName(script_name);
+
             String tableName = script_name.replaceAll("-", "_");
-            String sql = IOUtil.readFile(getResourcePath() + File.separator + "scripts" + File.separator
-                    + tableName + ".sql");
+            // 再次校验转换后的 tableName（防御性）
+            validateScriptName(tableName);
+
+            // 规范化路径，确保最终文件必须位于 scripts 目录内
+            Path baseDir = Paths.get(getResourcePath(), "scripts").normalize();
+            Path target = baseDir.resolve(tableName + ".sql").normalize();
+            if (!target.startsWith(baseDir)) {
+                throw new SecurityException("path traversal detected: " + target);
+            }
+            String sql = IOUtil.readFile(target.toString());
             sql = sql.replace("${CLKLOG_LOG_DB}", setting.getLogDb());
             if (!sql.isEmpty()) {
                 long now = System.currentTimeMillis();
@@ -67,6 +79,7 @@ public class InitServiceImpl implements IInitService {
                     logger.debug(sql);
                 }
                 clickHouseJdbcTemplate.execute(sql);
+                // tableName 已通过白名单校验，可安全拼接
                 clickHouseJdbcTemplate.execute("optimize table " + setting.getLogDb() + "." + tableName + " FINAL SETTINGS optimize_skip_merged_partitions=1");
             }
         } catch (Exception ex) {
@@ -79,6 +92,8 @@ public class InitServiceImpl implements IInitService {
         boolean isOk = false;
 
         try {
+            // 校验 logDb，防止配置被污染导致 SQL 注入
+            validateScriptName(setting.getLogDb());
 
             String sql = IOUtil.readFile(getResourcePath() + File.separator + "scripts" + File.separator
                     + "init.sql");
@@ -90,6 +105,16 @@ public class InitServiceImpl implements IInitService {
         }
 
         return isOk;
+    }
+
+    /**
+     * 校验标识符（脚本名/表名/库名）：仅允许字母、数字、下划线，长度 1~64。
+     * 用于阻断路径遍历与 SQL 标识符注入（表名/库名无法参数化，只能白名单）。
+     */
+    private void validateScriptName(String name) {
+        if (name == null || !SCRIPT_NAME_PATTERN.matcher(name).matches()) {
+            throw new IllegalArgumentException("invalid identifier: " + name);
+        }
     }
 
     private String getResourcePath() {
