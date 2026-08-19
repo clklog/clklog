@@ -162,7 +162,8 @@ public class ApiKeyService {
     public GetApiKeyResponse getApiKey(GetApiKeyRequest request) {
         GetApiKeyResponse response = new GetApiKeyResponse();
         try {
-            Optional<TblApiKey> optionalApiKey = apiKeyRepository.findById(request.getId());
+            // 数据访问层按ID与当前用户联合查询，防止越权访问他人密钥
+            Optional<TblApiKey> optionalApiKey = apiKeyRepository.findByIdAndUserId(request.getId(), SecurityUtils.getUserId());
             if (!optionalApiKey.isPresent()) {
                 response.setCode(500);
                 response.setMsg("密钥不存在");
@@ -185,7 +186,8 @@ public class ApiKeyService {
     public EditApiKeyResponse editApiKey(EditApiKeyRequest request) {
         EditApiKeyResponse response = new EditApiKeyResponse();
         try {
-            Optional<TblApiKey> optionalApiKey = apiKeyRepository.findById(request.getId());
+            // 数据访问层按ID与当前用户联合查询，防止越权修改他人密钥
+            Optional<TblApiKey> optionalApiKey = apiKeyRepository.findByIdAndUserId(request.getId(), SecurityUtils.getUserId());
             if (!optionalApiKey.isPresent()) {
                 response.setCode(500);
                 response.setMsg("密钥不存在");
@@ -224,7 +226,8 @@ public class ApiKeyService {
     public DeleteApiKeyResponse deleteApiKey(DeleteApiKeyRequest request) {
         DeleteApiKeyResponse response = new DeleteApiKeyResponse();
         try {
-            Optional<TblApiKey> optionalApiKey = apiKeyRepository.findById(request.getId());
+            // 数据访问层按ID与当前用户联合查询，防止越权删除他人密钥
+            Optional<TblApiKey> optionalApiKey = apiKeyRepository.findByIdAndUserId(request.getId(), SecurityUtils.getUserId());
             if (!optionalApiKey.isPresent()) {
                 response.setCode(500);
                 response.setMsg("密钥不存在");
