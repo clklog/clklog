@@ -20,4 +20,6 @@ public class QueryCriteria {
     private String clientIp;
 
     private String ua;
+
+    private String receiveTime;
 }

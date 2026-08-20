@@ -329,7 +329,8 @@ public class ExtractUtil {
                 if (properties.has("$track_signup_original_id")) {
                     logBean.setTrackSignupOriginalId(properties.get("$track_signup_original_id").asText());
                 }
-                if (properties.has("$user_agent")) {
+                logBean.setUserAgent(queryCriteria.getUa());
+                if (StringUtils.isBlank(queryCriteria.getUa()) && properties.has("$user_agent")) {
                     logBean.setUserAgent(properties.get("$user_agent").asText());
                 }
                 if (properties.has("$utm_campaign")) {
