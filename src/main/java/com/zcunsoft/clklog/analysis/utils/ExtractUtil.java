@@ -1,9 +1,6 @@
 package com.zcunsoft.clklog.analysis.utils;
 
-import com.zcunsoft.clklog.analysis.bean.LogBean;
-import com.zcunsoft.clklog.analysis.bean.PathRule;
-import com.zcunsoft.clklog.analysis.bean.ProjectSetting;
-import com.zcunsoft.clklog.analysis.bean.Region;
+import com.zcunsoft.clklog.analysis.bean.*;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import nl.basjes.parse.useragent.AgentField;
 import nl.basjes.parse.useragent.UserAgent;
@@ -52,17 +49,17 @@ public class ExtractUtil {
     private static final ThreadLocal<DateFormat> yMdHmsFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
 
-    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, ProjectSetting projectSetting, String[] logInfoArr) {
+    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, ProjectSetting projectSetting, QueryCriteria rawMessage) {
 
         LogBean logBean = null;
         try {
             logBean = new LogBean();
-            logBean.setKafkaDataTime(logInfoArr[0]);
-            logBean.setProjectName(logInfoArr[1]);
-            logBean.setProjectToken(logInfoArr[2]);
-            logBean.setCrc(logInfoArr[3]);
-            logBean.setIsCompress(logInfoArr[4]);
-            logBean.setClientIp(logInfoArr[5]);
+            logBean.setKafkaDataTime(rawMessage.getReceiveTime());
+            logBean.setProjectName(rawMessage.getProject());
+            logBean.setProjectToken(rawMessage.getToken());
+            logBean.setCrc(rawMessage.getCrc());
+            logBean.setIsCompress(rawMessage.getGzip());
+            logBean.setClientIp(rawMessage.getClientIp());
             logBean.setCreateTime(yMdHmsFormat.get().format(new Timestamp(System.currentTimeMillis())));
             if (json.has("distinct_id")) {
                 logBean.setDistinctId(json.get("distinct_id").asText());
@@ -330,7 +327,8 @@ public class ExtractUtil {
                 if (properties.has("$track_signup_original_id")) {
                     logBean.setTrackSignupOriginalId(properties.get("$track_signup_original_id").asText());
                 }
-                if (properties.has("$user_agent")) {
+                logBean.setUserAgent(rawMessage.getUa());
+                if (StringUtils.isBlank(rawMessage.getUa()) && properties.has("$user_agent")) {
                     logBean.setUserAgent(properties.get("$user_agent").asText());
                 }
                 if (properties.has("$utm_campaign")) {
@@ -466,40 +464,38 @@ public class ExtractUtil {
         return projectSetting;
     }
 
-    public static List<LogBean> extractToLogBeanList(String line, String globalAppCode, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, ProjectSetting> htProjectSetting) {
+    public static List<LogBean> extractToLogBeanList(QueryCriteria rawMessage, String globalAppCode, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, ProjectSetting> htProjectSetting) {
         List<LogBean> logBeanList = new ArrayList<>();
+        String data = "";
         try {
-            String[] arr = line.split(",", -1);
 
-            if (arr.length >= 7) {
-                String projectName = "clklogapp";
-                if (StringUtils.isNotBlank(arr[1])) {
-                    projectName = arr[1];
-                }
+            String projectName = rawMessage.getProject();
 
-                String jsonContext = line.substring(arr[0].length() + arr[1].length() + arr[2].length() + arr[3].length() + arr[4].length() + arr[5].length() + 6);
+            data = rawMessage.getData();
+            if (data == null) {
+                data = rawMessage.getData_list();
+            }
+            ObjectMapperUtil objectMapper = new ObjectMapperUtil();
+            JsonNode json = objectMapper.readTree(data);
+            ProjectSetting projectSetting = getProjectSetting(globalAppCode, projectName, htProjectSetting);
 
-                ObjectMapperUtil objectMapper = new ObjectMapperUtil();
-                JsonNode json = objectMapper.readTree(jsonContext);
-                ProjectSetting projectSetting = getProjectSetting(globalAppCode, projectName, htProjectSetting);
-
-                if (json instanceof ArrayNode) {
-                    ArrayNode arrayNode = (ArrayNode) json;
-                    for (int i = 0; i < arrayNode.size(); i++) {
-                        LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, projectSetting, arr);
-                        if (filterData(logBean, projectSetting)) {
-                            logBeanList.add(logBean);
-                        }
-                    }
-                } else {
-                    LogBean logBean = extractToLogBean(json, userAgentAnalyzer, projectSetting, arr);
+            if (json instanceof ArrayNode) {
+                ArrayNode arrayNode = (ArrayNode) json;
+                for (int i = 0; i < arrayNode.size(); i++) {
+                    LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, projectSetting, rawMessage);
                     if (filterData(logBean, projectSetting)) {
                         logBeanList.add(logBean);
                     }
                 }
+            } else {
+                LogBean logBean = extractToLogBean(json, userAgentAnalyzer, projectSetting, rawMessage);
+                if (filterData(logBean, projectSetting)) {
+                    logBeanList.add(logBean);
+                }
             }
+
         } catch (Exception e) {
-            logger.error("error data : " + line, e);
+            logger.error("error data : " + data, e);
         }
         return logBeanList;
     }

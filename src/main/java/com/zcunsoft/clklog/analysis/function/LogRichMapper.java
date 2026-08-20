@@ -1,9 +1,6 @@
 package com.zcunsoft.clklog.analysis.function;
 
-import com.zcunsoft.clklog.analysis.bean.LogBean;
-import com.zcunsoft.clklog.analysis.bean.LogBeanCollection;
-import com.zcunsoft.clklog.analysis.bean.ProjectSetting;
-import com.zcunsoft.clklog.analysis.bean.Region;
+import com.zcunsoft.clklog.analysis.bean.*;
 import com.zcunsoft.clklog.analysis.cfg.RedisSettings;
 import com.zcunsoft.clklog.analysis.utils.ExtractUtil;
 import com.zcunsoft.clklog.analysis.utils.IPUtil;
@@ -15,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,38 +56,90 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
 
     @Override
     public LogBeanCollection map(String line) {
-        List<LogBean> logBeanList = ExtractUtil.extractToLogBeanList(line, "clklog-global", userAgentAnalyzer, htProjectSetting);
-        if (!logBeanList.isEmpty()) {
-            List<String> clientIpList = logBeanList.stream().map(LogBean::getClientIp).distinct().collect(Collectors.toList());
-            List<String> ipInfoList = jedis.hmget("ClientIpRegionHash", clientIpList.toArray(new String[0]));
-            for (LogBean logBean : logBeanList) {
-                if (StringUtils.isNotBlank(logBean.getClientIp())) {
-                    Region region = null;
-                    int index = clientIpList.indexOf(logBean.getClientIp());
-                    String regionInfo = ipInfoList.get(index);
-                    if (StringUtils.isNotBlank(regionInfo)) {
-                        region = new Region();
-                        String[] regionArr = regionInfo.split(",", -1);
-                        if (regionArr.length == 4) {
-                            region.setCountry(regionArr[1]);
-                            region.setProvince(regionArr[2]);
-                            region.setCity(regionArr[3]);
-                        }
-                    } else {
-                        region = ipUtil.analysisRegionFromIp(logBean.getClientIp());
-                        region = ExtractUtil.translateRegion(region, cityMap);
-                        String sbRegion = region.getClientIp() + "," + region.getCountry() + "," + region.getProvince() + "," + region.getCity();
-                        jedis.hset("ClientIpRegionHash", region.getClientIp(), sbRegion);
-                    }
-                    logBean.setCountry(region.getCountry());
-                    logBean.setProvince(region.getProvince());
-                    logBean.setCity(region.getCity());
-                }
+
+        List<QueryCriteria> rawMessageList = new ArrayList<>();
+        ObjectMapperUtil objectMapper = new ObjectMapperUtil();
+        TypeReference<QueryCriteria> rawMessageTypeReference = new TypeReference<QueryCriteria>() {
+        };
+        if (line.startsWith("{")) {
+            QueryCriteria rawMessage = null;
+            try {
+                rawMessage = objectMapper.readValue(line, rawMessageTypeReference);
+            } catch (JsonProcessingException e) {
+
+            }
+            if (rawMessage != null) {
+                rawMessageList.add(rawMessage);
+            }
+        } else {
+            QueryCriteria rawMessage = extractRawMessageFromOldKafkaMessage(line);
+            if (rawMessage != null) {
+                rawMessageList.add(rawMessage);
             }
         }
         LogBeanCollection logBeanCollection = new LogBeanCollection();
-        logBeanCollection.setData(logBeanList);
+        logBeanCollection.setData(new ArrayList<>());
+        for (QueryCriteria rawMessage : rawMessageList) {
+
+            List<LogBean> logBeanList = ExtractUtil.extractToLogBeanList(rawMessage, "clklog-global", userAgentAnalyzer, htProjectSetting);
+            if (!logBeanList.isEmpty()) {
+                List<String> clientIpList = logBeanList.stream().map(LogBean::getClientIp).distinct().collect(Collectors.toList());
+                List<String> ipInfoList = jedis.hmget("ClientIpRegionHash", clientIpList.toArray(new String[0]));
+                for (LogBean logBean : logBeanList) {
+                    if (StringUtils.isNotBlank(logBean.getClientIp())) {
+                        Region region = null;
+                        int index = clientIpList.indexOf(logBean.getClientIp());
+                        String regionInfo = ipInfoList.get(index);
+                        if (StringUtils.isNotBlank(regionInfo)) {
+                            region = new Region();
+                            String[] regionArr = regionInfo.split(",", -1);
+                            if (regionArr.length == 4) {
+                                region.setCountry(regionArr[1]);
+                                region.setProvince(regionArr[2]);
+                                region.setCity(regionArr[3]);
+                            }
+                        } else {
+                            region = ipUtil.analysisRegionFromIp(logBean.getClientIp());
+                            region = ExtractUtil.translateRegion(region, cityMap);
+                            String sbRegion = region.getClientIp() + "," + region.getCountry() + "," + region.getProvince() + "," + region.getCity();
+                            jedis.hset("ClientIpRegionHash", region.getClientIp(), sbRegion);
+                        }
+                        logBean.setCountry(region.getCountry());
+                        logBean.setProvince(region.getProvince());
+                        logBean.setCity(region.getCity());
+                    }
+                }
+            }
+            logBeanCollection.getData().addAll(logBeanList);
+        }
         return logBeanCollection;
+    }
+
+    private QueryCriteria extractRawMessageFromOldKafkaMessage(String strRawMessage) {
+        QueryCriteria rawMessage = null;
+        try {
+            String[] pair = strRawMessage.split(",");
+            if (pair.length >= 6) {
+                rawMessage = new QueryCriteria();
+                rawMessage.setUa("");
+                rawMessage.setProject(pair[1]);
+                rawMessage.setToken(pair[2]);
+                rawMessage.setCrc(pair[3]);
+                rawMessage.setGzip(pair[4]);
+                rawMessage.setClientIp(pair[5]);
+                String content = strRawMessage.substring(pair[0].length() + pair[1].length() + pair[2].length()
+                        + pair[3].length() + pair[4].length() + pair[5].length() + 6);
+                if (content.startsWith("{")) {
+                    rawMessage.setData(content);
+                } else {
+                    rawMessage.setData_list(content);
+                }
+            }
+
+        } catch (Exception ex) {
+            rawMessage = null;
+        }
+        return rawMessage;
     }
 
     private HashMap<String, ProjectSetting> loadProjectSetting(Jedis jedis1) {

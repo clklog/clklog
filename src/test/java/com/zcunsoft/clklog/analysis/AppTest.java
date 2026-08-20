@@ -1,7 +1,8 @@
 package com.zcunsoft.clklog.analysis;
 
-import com.zcunsoft.clklog.analysis.bean.ProjectSetting;
 import com.zcunsoft.clklog.analysis.bean.LogBean;
+import com.zcunsoft.clklog.analysis.bean.ProjectSetting;
+import com.zcunsoft.clklog.analysis.bean.QueryCriteria;
 import com.zcunsoft.clklog.analysis.bean.Region;
 import com.zcunsoft.clklog.analysis.utils.ExtractUtil;
 import com.zcunsoft.clklog.analysis.utils.IPUtil;
@@ -30,7 +31,17 @@ public class AppTest {
 
     @TestFactory
     Collection<DynamicTest> dynamicTestExtractToLogBean() throws IOException {
-        String test1 = "1704532084140,clklogapp,123456,null,0,8.8.8.8,{\"identities\":{\"$identity_cookie_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\"},\"distinct_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\",\"lib\":{\"$lib\":\"js\",\"$lib_method\":\"code\",\"$lib_version\":\"1.25.6\"},\"properties\":{\"$timezone_offset\":-480,\"$screen_height\":780,\"$screen_width\":360,\"$viewport_height\":691,\"$viewport_width\":360,\"$lib\":\"js\",\"$lib_version\":\"1.25.6\",\"$latest_traffic_source_type\":\"直接流量\",\"$latest_search_keyword\":\"未取到值_直接打开\",\"$latest_referrer\":\"\",\"$title\":\"你好\",\"$url\":\"https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/all?tab=0\",\"$url_path\":\"/#/all\",\"$referrer_host\":\"app.clklogapp.com\",\"$referrer\":\"https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/detail/?id=8a7581c78cd2f117018cd3bf5b941c19\",\"$viewport_position\":0,\"event_duration\":2.12,\"$is_first_day\":false,\"$latest_referrer_host\":\"\",\"$event_session_id\":\"18cddfe8ce25c40ecd1936b62f5685773254d28080018cddfe8ce3435\",\"$user_agent\":\"Mozilla/5.0 (Linux; Android 12; ANA-AN00 Build/HUAWEIANA-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/99.0.4844.88 Mobile Safari/537.36 Kuang/2.2.3\"},\"anonymous_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\",\"type\":\"track\",\"event\":\"$WebPageLeave\",\"time\":1704532083862,\"_track_id\":473513880,\"_flush_time\":1704532083880}";
+
+        QueryCriteria rawMessage = new QueryCriteria();
+        rawMessage.setGzip("0");
+        rawMessage.setData_list("");
+        rawMessage.setData("{\"identities\":{\"$identity_cookie_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\"},\"distinct_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\",\"lib\":{\"$lib\":\"js\",\"$lib_method\":\"code\",\"$lib_version\":\"1.25.6\"},\"properties\":{\"$timezone_offset\":-480,\"$screen_height\":780,\"$screen_width\":360,\"$viewport_height\":691,\"$viewport_width\":360,\"$lib\":\"js\",\"$lib_version\":\"1.25.6\",\"$latest_traffic_source_type\":\"直接流量\",\"$latest_search_keyword\":\"未取到值_直接打开\",\"$latest_referrer\":\"\",\"$title\":\"你好\",\"$url\":\"https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/all?tab=0\",\"$url_path\":\"/#/all\",\"$referrer_host\":\"app.clklogapp.com\",\"$referrer\":\"https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/detail/?id=8a7581c78cd2f117018cd3bf5b941c19\",\"$viewport_position\":0,\"event_duration\":2.12,\"$is_first_day\":false,\"$latest_referrer_host\":\"\",\"$event_session_id\":\"18cddfe8ce25c40ecd1936b62f5685773254d28080018cddfe8ce3435\",\"$user_agent\":\"Mozilla/5.0 (Linux; Android 12; ANA-AN00 Build/HUAWEIANA-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/99.0.4844.88 Mobile Safari/537.36 Kuang/2.2.3\"},\"anonymous_id\":\"1a7cc28c-52e1-40bb-b506-d86cdcfd7361\",\"type\":\"track\",\"event\":\"$WebPageLeave\",\"time\":1704532083862,\"_track_id\":473513880,\"_flush_time\":1704532083880}");
+        rawMessage.setCrc("null");
+        rawMessage.setUa("Mozilla/5.0 (Linux; Android 12; ANA-AN00 Build/HUAWEIANA-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/99.0.4844.88 Mobile Safari/537.36 Kuang/2.2.3");
+        rawMessage.setProject("clklogapp");
+        rawMessage.setToken("123456");
+        rawMessage.setClientIp("8.8.8.8");
+        rawMessage.setReceiveTime("1704532084140");
 
         LogBean target1 = new LogBean();
         target1.setKafkaDataTime("1704532084140");
@@ -98,7 +109,7 @@ public class AppTest {
         ObjectMapperUtil mapper = new ObjectMapperUtil();
         HashMap<String, ProjectSetting> htProjectSetting = mapper.readValue(projectSettingContent, htProjectSettingTypeReference);
 
-        List<LogBean> logBeanList = ExtractUtil.extractToLogBeanList(test1, "clklog-global", userAgentAnalyzer, htProjectSetting);
+        List<LogBean> logBeanList = ExtractUtil.extractToLogBeanList(rawMessage, "clklog-global", userAgentAnalyzer, htProjectSetting);
         logBeanList.get(0).setCreateTime(target1.getCreateTime());
         Object[] expectedArr = getFiledsInfo(logBeanList.get(0)).toArray();
         dynamicTestList.add(dynamicTest("test1 extractToLogBean dynamic test", () -> Assertions.assertArrayEquals(actualArr, expectedArr, "ok")));
