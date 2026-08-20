@@ -168,7 +168,8 @@ public class ReceiveServiceImpl implements IReceiveService {
                     queryCriteria.setUa(ua);
                     queryCriteria.setData(dataFinal);
                     constsDataHolder.getLogQueue().put(queryCriteria);
-                    storeLogger.info(ip + "," + dataFinal);
+                    String strRawMessage = objectMapper.writeValueAsString(queryCriteria);
+                    storeLogger.info(strRawMessage);
                 }
             } catch (Exception e) {
                 String logData = queryCriteria.toString();
@@ -582,11 +583,8 @@ public class ReceiveServiceImpl implements IReceiveService {
             KafkaProducerUtil producerKafka = KafkaProducerUtil.getInstance(kafkaSetting);
 
             for (QueryCriteria queryCriteria : queryCriteriaList) {
-                String dataFinal = queryCriteria.getData();
-                if (dataFinal != null && !dataFinal.trim().isEmpty()) {
-                    String logData = String.valueOf(System.currentTimeMillis()) + ',' + queryCriteria.getProject() + ',' + queryCriteria.getToken() + ',' + queryCriteria.getCrc() + ',' + queryCriteria.getGzip() + ',' + queryCriteria.getClientIp() + ',' + dataFinal;
-                    producerKafka.sendMessgae(kafkaSetting.getProducer().getTopic(), logData);
-                }
+                String strRawMessage = objectMapper.writeValueAsString(queryCriteria);
+                producerKafka.sendMessgae(kafkaSetting.getProducer().getTopic(), strRawMessage);
             }
         } catch (Exception ex) {
             logger.error("enqueueKafka error", ex);
