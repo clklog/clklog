@@ -55,9 +55,15 @@ public class ExtractUtil {
         try {
             logBean = new LogBean();
             logBean.setKafkaDataTime(rawMessage.getReceiveTime());
+            if (logBean.getKafkaDataTime() == null) {
+                logBean.setKafkaDataTime(String.valueOf(System.currentTimeMillis() / 1000));
+            }
             logBean.setProjectName(rawMessage.getProject());
             logBean.setProjectToken(rawMessage.getToken());
             logBean.setCrc(rawMessage.getCrc());
+            if (logBean.getCrc() == null) {
+                logBean.setCrc("");
+            }
             logBean.setIsCompress(rawMessage.getGzip());
             logBean.setClientIp(rawMessage.getClientIp());
             logBean.setCreateTime(yMdHmsFormat.get().format(new Timestamp(System.currentTimeMillis())));
