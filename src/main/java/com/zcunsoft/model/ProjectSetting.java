@@ -43,4 +43,9 @@ public class ProjectSetting {
      * url路径清洗规则列表.
      */
     private List<PathRule> pathRuleList;
+
+    /**
+     * 项目凭据.
+     */
+    private String token;
 }

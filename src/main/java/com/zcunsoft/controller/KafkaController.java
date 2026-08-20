@@ -1,7 +1,7 @@
 package com.zcunsoft.controller;
 
 
-import com.zcunsoft.model.QueryCriteria;
+import com.zcunsoft.model.RawMessage;
 import com.zcunsoft.services.IReceiveService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +19,8 @@ public class KafkaController {
     private IReceiveService receiveService;
 
     @RequestMapping(value = "api/gp", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<String> gp(QueryCriteria queryCriteria, HttpServletRequest request) {
-        receiveService.extractLog(queryCriteria, request);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<String> gp(RawMessage rawMessage, HttpServletRequest request) {
+        String response = receiveService.extractLog(rawMessage, request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

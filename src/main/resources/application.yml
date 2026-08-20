@@ -7,7 +7,7 @@ spring:
   application.name: clklog-receiver
   redis:
     # 单机配置
-    host: 10.10.223.104
+    host: localhost
     port: 6379
   # password:
   # 哨兵配置
@@ -30,7 +30,7 @@ spring:
       ack-mode: MANUAL_IMMEDIATE
   datasource:
     clickhouse:
-      jdbc-url: jdbc:clickhouse://10.10.220.188:8123/default
+      jdbc-url: jdbc:clickhouse://localhost:8123/default
       username: default
       password:
 receiver:
@@ -39,4 +39,7 @@ receiver:
   resource-path:
   enable-simple-version: true
   access-control-allow-origin-patterns: "*"
+  # 单个请求上报数据（压缩后/原始数据）的最大字节数限制（默认 2MB）
+  max-request-size: 2097152
+  enable-check-project-token: false
 

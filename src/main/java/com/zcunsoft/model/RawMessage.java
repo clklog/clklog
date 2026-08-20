@@ -3,7 +3,7 @@ package com.zcunsoft.model;
 import lombok.Data;
 
 @Data
-public class QueryCriteria {
+public class RawMessage {
 
     private String data_list;
 
@@ -20,6 +20,8 @@ public class QueryCriteria {
     private String clientIp;
 
     private String ua;
+
+    private String ext;
 
     private String receiveTime;
 }

@@ -50,16 +50,16 @@ public class ExtractUtil {
     private static final ThreadLocal<DateFormat> yMdHmsFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
 
-    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, ProjectSetting projectSetting, Region region, QueryCriteria queryCriteria) {
+    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, ProjectSetting projectSetting, Region region, RawMessage rawMessage) {
 
         LogBean logBean = null;
         try {
             logBean = new LogBean();
             logBean.setKafkaDataTime(String.valueOf(System.currentTimeMillis() / 1000));
-            logBean.setProjectName(queryCriteria.getProject());
-            logBean.setProjectToken(queryCriteria.getToken());
-            logBean.setCrc(queryCriteria.getCrc());
-            logBean.setIsCompress(queryCriteria.getGzip());
+            logBean.setProjectName(rawMessage.getProject());
+            logBean.setProjectToken(rawMessage.getToken());
+            logBean.setCrc(rawMessage.getCrc());
+            logBean.setIsCompress(rawMessage.getGzip());
             logBean.setClientIp(region.getClientIp());
             logBean.setCreateTime(yMdHmsFormat.get().format(new Timestamp(System.currentTimeMillis())));
             if (json.has("distinct_id")) {
@@ -329,8 +329,8 @@ public class ExtractUtil {
                 if (properties.has("$track_signup_original_id")) {
                     logBean.setTrackSignupOriginalId(properties.get("$track_signup_original_id").asText());
                 }
-                logBean.setUserAgent(queryCriteria.getUa());
-                if (StringUtils.isBlank(queryCriteria.getUa()) && properties.has("$user_agent")) {
+                logBean.setUserAgent(rawMessage.getUa());
+                if (StringUtils.isBlank(rawMessage.getUa()) && properties.has("$user_agent")) {
                     logBean.setUserAgent(properties.get("$user_agent").asText());
                 }
                 if (properties.has("$utm_campaign")) {

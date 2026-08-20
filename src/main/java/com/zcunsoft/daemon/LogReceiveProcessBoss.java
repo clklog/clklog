@@ -2,7 +2,7 @@ package com.zcunsoft.daemon;
 
 import com.zcunsoft.cfg.ReceiverSetting;
 import com.zcunsoft.handlers.ConstsDataHolder;
-import com.zcunsoft.model.QueryCriteria;
+import com.zcunsoft.model.RawMessage;
 import com.zcunsoft.services.IReceiveService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,9 +55,9 @@ public class LogReceiveProcessBoss {
 
     private void work(int threadId) {
         while (running) {
-            BlockingQueue<QueryCriteria> queueForLog = constsDataHolder.getLogQueue();
+            BlockingQueue<RawMessage> queueForLog = constsDataHolder.getLogQueue();
 
-            QueryCriteria log;
+            RawMessage log;
             try {
                 log = queueForLog.take();
             } catch (InterruptedException e) {
@@ -65,7 +65,7 @@ public class LogReceiveProcessBoss {
             }
 
             int count = 0;
-            List<QueryCriteria> logList = new ArrayList<QueryCriteria>();
+            List<RawMessage> logList = new ArrayList<RawMessage>();
             logList.add(log);
             count++;
 
@@ -108,7 +108,7 @@ public class LogReceiveProcessBoss {
         }
     }
 
-    private void handle(List<QueryCriteria> logList) {
+    private void handle(List<RawMessage> logList) {
         if (serverSettings.isEnableSimpleVersion()) {
             ireceiveService.saveToClickHouse(logList);
         } else {

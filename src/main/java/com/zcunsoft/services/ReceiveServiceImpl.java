@@ -10,12 +10,10 @@ import com.zcunsoft.cfg.RedisConstsConfig;
 import com.zcunsoft.handlers.ConstsDataHolder;
 import com.zcunsoft.model.LogBean;
 import com.zcunsoft.model.ProjectSetting;
-import com.zcunsoft.model.QueryCriteria;
+import com.zcunsoft.model.RawMessage;
 import com.zcunsoft.model.Region;
-import com.zcunsoft.util.ExtractUtil;
-import com.zcunsoft.util.GZIPUtils;
-import com.zcunsoft.util.KafkaProducerUtil;
-import com.zcunsoft.util.ObjectMapperUtil;
+import com.zcunsoft.model.enums.ErrorType;
+import com.zcunsoft.util.*;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
@@ -67,22 +65,26 @@ public class ReceiveServiceImpl implements IReceiveService {
     private final TypeReference<HashMap<String, ProjectSetting>> htProjectSettingTypeReference = new TypeReference<HashMap<String, ProjectSetting>>() {
     };
 
-    private final ReceiverSetting serverSettings;
+    private final ReceiverSetting receiverSetting;
 
     private final KafkaSetting kafkaSetting;
+
+    private static final Pattern BASE64_PATTERN = Pattern.compile(".*\\+.*|.*\\/.*|.*=.*");
+
+    private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
 
     /**
      * redis常量配置.
      */
     private final RedisConstsConfig redisConstsConfig;
 
-    public ReceiveServiceImpl(ConstsDataHolder constsDataHolder, ObjectMapperUtil objectMapper, StringRedisTemplate queueRedisTemplate, AbstractUserAgentAnalyzer userAgentAnalyzer, JdbcTemplate clickHouseJdbcTemplate, ReceiverSetting serverSettings, KafkaSetting kafkaSetting, RedisConstsConfig redisConstsConfig) {
+    public ReceiveServiceImpl(ConstsDataHolder constsDataHolder, ObjectMapperUtil objectMapper, StringRedisTemplate queueRedisTemplate, AbstractUserAgentAnalyzer userAgentAnalyzer, JdbcTemplate clickHouseJdbcTemplate, ReceiverSetting receiverSetting, KafkaSetting kafkaSetting, RedisConstsConfig redisConstsConfig) {
         this.objectMapper = objectMapper;
         this.queueRedisTemplate = queueRedisTemplate;
         this.userAgentAnalyzer = userAgentAnalyzer;
         this.constsDataHolder = constsDataHolder;
         this.clickHouseJdbcTemplate = clickHouseJdbcTemplate;
-        this.serverSettings = serverSettings;
+        this.receiverSetting = receiverSetting;
         this.kafkaSetting = kafkaSetting;
         this.redisConstsConfig = redisConstsConfig;
         String binIpV4file = getResourcePath() + File.separator + "iplib" + File.separator + "IP2LOCATION-LITE-DB3.BIN";
@@ -102,82 +104,114 @@ public class ReceiveServiceImpl implements IReceiveService {
     }
 
     @Override
-    public void extractLog(QueryCriteria queryCriteria, HttpServletRequest request) {
-        if (queryCriteria.getProject() != null && constsDataHolder.getHtProjectSetting().containsKey(queryCriteria.getProject())) {
-            String bodyString = getBodyString(request);
-            String[] bodyStringList = bodyString.split("&");
-            if (bodyStringList.length == 1 && !bodyString.equals("")) {
-                try {
-                    JsonNode jsonNode = objectMapper.readTree(bodyString);
+    public String extractLog(RawMessage rawMessage, HttpServletRequest request) {
+        ErrorType type = ErrorType.Success;
+        String reason = "";
 
-                    queryCriteria.setGzip(jsonNode.get("gzip").asText());
-                    queryCriteria.setData_list(jsonNode.get("data_list").asText());
-                    queryCriteria.setData(jsonNode.get("data").asText());
-                    queryCriteria.setCrc(jsonNode.get("crc").asText());
-                } catch (Exception exception) {
-                }
-            }
-            for (String s : bodyStringList) {
-                String[] elm = s.split("=");
-                if (elm[0].equals("data_list")) {
-                    queryCriteria.setData_list(elm[1]);
-                } else if (elm[0].equals("data")) {
-                    queryCriteria.setData(elm[1]);
-                } else if (elm[0].equals("crc")) {
-                    queryCriteria.setCrc(elm[1]);
-                } else if (elm[0].equals("gzip")) {
-                    queryCriteria.setGzip(elm[1]);
-                }
-            }
-            if (queryCriteria.getCrc() == null) {
-                queryCriteria.setCrc("");
-            }
+        if (rawMessage == null) {
+            type = ErrorType.RAW_MESSAGE_EMPTY;
+        }
+        if (type.equals(ErrorType.Success)) {
+            rawMessage.setReceiveTime(String.valueOf(System.currentTimeMillis()));
             String ip = getIpAddr(request);
+            rawMessage.setClientIp(ip);
+            /* 判断请求中的项目编码是否在项目配置hash表 */
+            if (rawMessage.getProject() != null && constsDataHolder.getHtProjectSetting().containsKey(rawMessage.getProject())) {
+                if (receiverSetting.isEnableCheckProjectToken()) {
+                    if (rawMessage.getToken() == null || !rawMessage.getToken().equals(constsDataHolder.getHtProjectSetting().get(rawMessage.getProject()).getToken())) {
+                        type = ErrorType.PROJECT_TOKEN_ERROR;
+                    }
+                }
+            } else {
+                type = ErrorType.PROJECT_NOT_EXIST;
+            }
+        }
+
+        if (type.equals(ErrorType.Success)) {
+            String bodyString = getBodyString(request);
+            if (StringUtils.isNotBlank(bodyString)) {
+                String[] bodyStringList = bodyString.split("&");
+                /* 解析各参数值 */
+                for (String s : bodyStringList) {
+                    String[] elm = s.split("=");
+                    if (elm[0].equals("data_list")) {
+                        rawMessage.setData_list(elm[1]);
+                    } else if (elm[0].equals("data")) {
+                        rawMessage.setData(elm[1]);
+                    } else if (elm[0].equals("crc")) {
+                        rawMessage.setCrc(elm[1]);
+                    } else if (elm[0].equals("gzip")) {
+                        rawMessage.setGzip(elm[1]);
+                    } else if (elm[0].equals("ext")) {
+                        rawMessage.setExt(elm[1]);
+                    }
+                }
+            }
             try {
-                String dataFinal, decodedString = null;
-                if (queryCriteria.getData_list() != null) {
-                    if (Pattern.matches(".*\\+.*|.*\\/.*|.*=.*", queryCriteria.getData_list())) {
-                        decodedString = queryCriteria.getData_list();
-                    } else {
-                        decodedString = URLDecoder.decode(queryCriteria.getData_list());
+                /* 从额外信息中获取crc */
+                if (StringUtils.isNotBlank(rawMessage.getExt())) {
+                    String ext = URLDecoder.decode(rawMessage.getExt(), StandardCharsets.UTF_8.toString());
+                    String[] extArr = ext.split("&");
+                    for (String s : extArr) {
+                        String[] elm = s.split("=");
+                        if (elm[0].equals("crc")) {
+                            rawMessage.setCrc(elm[1]);
+                        }
                     }
-                } else if (queryCriteria.getData() != null) {
-                    if (Pattern.matches(".*\\+.*|.*\\/.*|.*=.*", queryCriteria.getData())) {
-                        decodedString = queryCriteria.getData();
-                    } else {
-                        decodedString = URLDecoder.decode(queryCriteria.getData());
-                    }
+                }
+                if (rawMessage.getCrc() == null) {
+                    rawMessage.setCrc("");
+                }
+                /* 从参数data_list或data中解码日志数据 */
+                if (rawMessage.getData_list() != null) {
+                    rawMessage.setData_list(extractData(rawMessage.getData_list(), rawMessage.getGzip()));
+                } else if (rawMessage.getData() != null) {
+                    rawMessage.setData(extractData(rawMessage.getData(), rawMessage.getGzip()));
                 } else {
                     logger.error("data为空");
+                    type = ErrorType.PARSE_DATA_FAILED;
+                    reason = "data或data_list为空";
                 }
-                if (decodedString != null) {
-                    Base64.Decoder decoder = Base64.getDecoder();
-                    byte[] byteArrayNEW = decoder.decode(decodedString);
-
-                    if (queryCriteria.getGzip().equals("1")) {
-                        dataFinal = GZIPUtils.uncompressToString(byteArrayNEW);
-                    } else {
-                        dataFinal = new String(byteArrayNEW);
-                    }
-                    queryCriteria.setData(dataFinal);
-                    queryCriteria.setClientIp(ip);
+                if (type.equals(ErrorType.Success)) {
+                    /* 获取UA */
                     String ua = request.getHeader("user-agent");
                     if (ua == null) {
                         ua = request.getHeader("User-Agent");
                     }
-                    queryCriteria.setUa(ua);
-                    queryCriteria.setData(dataFinal);
-                    queryCriteria.setReceiveTime(String.valueOf(System.currentTimeMillis() / 1000));
-                    constsDataHolder.getLogQueue().put(queryCriteria);
-                    String strRawMessage = objectMapper.writeValueAsString(queryCriteria);
+                    rawMessage.setUa(ua);
+
+                    constsDataHolder.getLogQueue().put(rawMessage);
+                    String strRawMessage = objectMapper.writeValueAsString(rawMessage);
                     storeLogger.info(strRawMessage);
                 }
             } catch (Exception e) {
-                String logData = queryCriteria.toString();
-                logger.error(logData, e);
+                String strRawMessage = rawMessage.toString();
+                logger.error(strRawMessage, e);
+                type = ErrorType.PARSE_DATA_FAILED;
             }
         }
 
+        return reason + type.getValue();
+
+    }
+
+    private String extractData(String rawString, String gzip) throws UnsupportedEncodingException {
+        String decodedString;
+        if (BASE64_PATTERN.matcher(rawString).matches()) {
+            decodedString = rawString;
+        } else {
+            decodedString = URLDecoder.decode(rawString, StandardCharsets.UTF_8.toString());
+        }
+
+        String data = null;
+        /* Base64解码日志数据 */
+        byte[] byteArrayNEW = BASE64_DECODER.decode(decodedString);
+        if ("1".equalsIgnoreCase(gzip)) {
+            data = GZIPUtils.uncompressToString(byteArrayNEW);
+        } else {
+            data = new String(byteArrayNEW);
+        }
+        return data;
     }
 
     private String getBodyString(HttpServletRequest request) {
@@ -186,13 +220,16 @@ public class ReceiveServiceImpl implements IReceiveService {
         BufferedReader reader = null;
         try {
             servletInputStream = request.getInputStream();
-            reader = new BufferedReader(new InputStreamReader((InputStream) servletInputStream, StandardCharsets.UTF_8));
+            // 用 LimitedInputStream 限制请求体读取字节数，防止超大请求体导致内存耗尽
+            LimitedInputStream limited = new LimitedInputStream(servletInputStream, receiverSetting.getMaxRequestSize());
+            reader = new BufferedReader(new InputStreamReader((InputStream) limited, StandardCharsets.UTF_8));
             String line = "";
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("读取请求体失败或请求体超过上限 " + receiverSetting.getMaxRequestSize() + " 字节", e);
+            return "";
         } finally {
             if (servletInputStream != null) {
                 try {
@@ -343,27 +380,32 @@ public class ReceiveServiceImpl implements IReceiveService {
     }
 
     @Override
-    public List<LogBean> analysisData(QueryCriteria queryCriteria) {
+    public List<LogBean> analysisData(RawMessage rawMessage) {
         List<LogBean> logBeanList = new ArrayList<>();
-        Region region = analysisRegionFromIp(queryCriteria.getClientIp());
-        String ua = queryCriteria.getUa();
+        Region region = analysisRegionFromIp(rawMessage.getClientIp());
+
         try {
-            JsonNode array = objectMapper.readTree(queryCriteria.getData());
+            String data = rawMessage.getData();
+            if (data == null) {
+                data = rawMessage.getData_list();
+            }
+
+            JsonNode array = objectMapper.readTree(data);
 
             ProjectSetting projectSetting = constsDataHolder.getHtProjectSetting().get("clklog-global");
-            if (constsDataHolder.getHtProjectSetting().containsKey(queryCriteria.getProject())) {
-                projectSetting = constsDataHolder.getHtProjectSetting().get(queryCriteria.getProject());
+            if (constsDataHolder.getHtProjectSetting().containsKey(rawMessage.getProject())) {
+                projectSetting = constsDataHolder.getHtProjectSetting().get(rawMessage.getProject());
             }
             if (array.isArray()) {
                 for (JsonNode jn : array) {
-                    LogBean logBean = ExtractUtil.extractToLogBean(jn, userAgentAnalyzer, projectSetting, region, queryCriteria);
+                    LogBean logBean = ExtractUtil.extractToLogBean(jn, userAgentAnalyzer, projectSetting, region, rawMessage);
                     if (ExtractUtil.filterData(logBean, projectSetting)) {
                         logBeanList.add(logBean);
                     }
                 }
 
             } else {
-                LogBean logBean = ExtractUtil.extractToLogBean(array, userAgentAnalyzer, projectSetting, region, queryCriteria);
+                LogBean logBean = ExtractUtil.extractToLogBean(array, userAgentAnalyzer, projectSetting, region, rawMessage);
                 if (ExtractUtil.filterData(logBean, projectSetting)) {
                     logBeanList.add(logBean);
                 }
@@ -376,10 +418,10 @@ public class ReceiveServiceImpl implements IReceiveService {
     }
 
     @Override
-    public void saveToClickHouse(List<QueryCriteria> queryCriteriaList) {
+    public void saveToClickHouse(List<RawMessage> rawMessageList) {
         List<LogBean> allList = new ArrayList<>();
-        for (QueryCriteria queryCriteria : queryCriteriaList) {
-            List<LogBean> logBeanList = analysisData(queryCriteria);
+        for (RawMessage rawMessage : rawMessageList) {
+            List<LogBean> logBeanList = analysisData(rawMessage);
             if (!logBeanList.isEmpty()) {
                 allList.addAll(logBeanList);
             }
@@ -579,12 +621,12 @@ public class ReceiveServiceImpl implements IReceiveService {
     }
 
     @Override
-    public void enqueueKafka(List<QueryCriteria> queryCriteriaList) {
+    public void enqueueKafka(List<RawMessage> rawMessageList) {
         try {
             KafkaProducerUtil producerKafka = KafkaProducerUtil.getInstance(kafkaSetting);
 
-            for (QueryCriteria queryCriteria : queryCriteriaList) {
-                String strRawMessage = objectMapper.writeValueAsString(queryCriteria);
+            for (RawMessage rawMessage : rawMessageList) {
+                String strRawMessage = objectMapper.writeValueAsString(rawMessage);
                 producerKafka.sendMessgae(kafkaSetting.getProducer().getTopic(), strRawMessage);
             }
         } catch (Exception ex) {
@@ -593,10 +635,10 @@ public class ReceiveServiceImpl implements IReceiveService {
     }
 
     private String getResourcePath() {
-        if (StringUtils.isBlank(serverSettings.getResourcePath())) {
+        if (StringUtils.isBlank(receiverSetting.getResourcePath())) {
             return System.getProperty("user.dir");
         } else {
-            return serverSettings.getResourcePath();
+            return receiverSetting.getResourcePath();
         }
     }
 }
