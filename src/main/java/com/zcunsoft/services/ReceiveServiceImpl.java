@@ -167,6 +167,7 @@ public class ReceiveServiceImpl implements IReceiveService {
                     }
                     queryCriteria.setUa(ua);
                     queryCriteria.setData(dataFinal);
+                    queryCriteria.setReceiveTime(String.valueOf(System.currentTimeMillis() / 1000));
                     constsDataHolder.getLogQueue().put(queryCriteria);
                     String strRawMessage = objectMapper.writeValueAsString(queryCriteria);
                     storeLogger.info(strRawMessage);
