@@ -62,21 +62,32 @@ public enum SortType {
 					if("statTime".equals(sortName)) {
 						sortName = "statDate";
 					}
-					return getSortSqlFormat(sortName,sortOrder);
+					return getSortSqlFormat(sortType, sortName,sortOrder);
 		    	}
-				return getSortSqlFormat(sortType.defaultSortName, sortType.defaultSortOrder);
+				return getSortSqlFormat(sortType, sortType.defaultSortName, sortType.defaultSortOrder);
 			default:
 				if(!sortType.getSortNames().contains(sortName)) {
 		    		sortName = sortType.defaultSortName;
 					sortOrder = sortType.defaultSortOrder;
 		    	}
-				return getSortSqlFormat(sortName, sortOrder);
+				return getSortSqlFormat(sortType, sortName, sortOrder);
 		}
     }
 
     
-    private static String getSortSqlFormat(String sortName,String sortOrder) {
-    	
+    private static String getSortSqlFormat(SortType sortType, String sortName,String sortOrder) {
+    	// 严格校验排序字段，仅允许该类型白名单内的 sortName，防止越权字段排序注入。
+    	// 非白名单值统一回退为默认排序字段，避免攻击者拼接任意列名。
+    	// 注：SearchWordDetail 中 statTime 会映射为 statDate，后者需视为合法字段放行。
+    	boolean allowed = sortType.getSortNames().contains(sortName)
+    			|| (SortType.SearchWordDetail.equals(sortType) && "statDate".equals(sortName));
+    	if (!allowed) {
+    		sortName = sortType.defaultSortName;
+    	}
+    	// 严格校验排序方向，仅允许 asc/desc（不区分大小写），防止 ORDER BY 注入。
+    	// 非白名单值统一回退为默认降序，避免攻击者拼接恶意 SQL。
+    	sortOrder = normalizeSortOrder(sortOrder);
+
     	if("avgPv".equals(sortName)) {
     		return " order by if(visit_count == 0 , 0 ,pv/visit_count) "+ sortOrder;
     	}
@@ -108,6 +119,19 @@ public enum SortType {
     		return " order by is_first_day "+ sortOrder;
     	}
     	return " order by "+StringUtils.toUnderScoreCase(sortName)+" "+ sortOrder;
+    }
+    
+    /**
+     * 归一化排序方向，仅允许 asc/desc，非法值回退为 desc.
+     *
+     * @param sortOrder 原始排序方向
+     * @return 安全的排序方向
+     */
+    private static String normalizeSortOrder(String sortOrder) {
+    	if ("asc".equalsIgnoreCase(sortOrder) || "desc".equalsIgnoreCase(sortOrder)) {
+    		return sortOrder.toLowerCase();
+    	}
+    	return "desc";
     }
     
     
