@@ -104,6 +104,12 @@ public class UserServiceImpl implements IUserService {
                 return new ResponseBase<CommonIdDTO>(code, codeService.getMessage(code), idDTO);
             }
 
+            // 校验密码强度，禁止创建弱密码账户
+            if (!StringUtils.isPasswordStandard(userAddModel.getPassword())) {
+                String msg = "必须包含大小写字母、数字、特殊字符（例如：!@#%&*.）且长度不得小于12位且不超过18位";
+                return new ResponseBase<CommonIdDTO>(code, msg, idDTO);
+            }
+
             Specification<User> spec = (root, query, cb) -> {
                 List<Predicate> predicates = new ArrayList<Predicate>();
                 predicates.add(cb.equal(root.get("userName"), userAddModel.getUserName()));
@@ -156,6 +162,12 @@ public class UserServiceImpl implements IUserService {
                     if (userEditModel.getOldpassword() == null || userEditModel.getOldpassword().isEmpty()) {
                         code = ErrorCode.WrongPassword;
                     } else {
+                        // 校验新密码强度，禁止设置为弱密码
+                        if (!StringUtils.isPasswordStandard(userEditModel.getPassword())) {
+                            code = ErrorCode.Failed;
+                            String msg = "必须包含大小写字母、数字、特殊字符（例如：!@#%&*.）且长度不得小于12位且不超过18位";
+                            return new ResponseBase<Boolean>(code, msg, isOk);
+                        }
                         if (SecurityUtils.matchesPassword(userEditModel.getOldpassword(), user.getPassword())) {
                             user.setPassword(SecurityUtils.encryptPassword(userEditModel.getPassword()));
                             user.setDisplayName(userEditModel.getDisplayName());
