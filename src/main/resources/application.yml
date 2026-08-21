@@ -7,15 +7,15 @@ spring:
   application.name: clklog-receiver
   redis:
     # 单机配置
-    host: localhost
-    port: 6379
-  # password:
-  # 哨兵配置
-  # sentinel:
-  #  master: gct
-  #  nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
+    host: ${redis_host}
+    port: ${redis_port}
+    database: 0
+  #    sentinel:
+  #      master: ${SPRING_REDIS_SENTINEL_MASTER:mymaster}
+  #      nodes: ${SPRING_REDIS_SENTINEL_NODES}
+  #      password: ${SPRING_REDIS_SENTINEL_PASSWORD:}
   kafka:
-    bootstrap-servers: 10.10.220.188:9092
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
     producer: # 生产者
       client-id: "clklog-producer-group"
       retries: 3 # 设置大于 0 的值，则客户端会将发送失败的记录重新发送
@@ -30,9 +30,9 @@ spring:
       ack-mode: MANUAL_IMMEDIATE
   datasource:
     clickhouse:
-      jdbc-url: jdbc:clickhouse://localhost:8123/default
-      username: default
-      password:
+      jdbc-url: jdbc:clickhouse://${clickhouse_host}:${clickhouse_port}/default
+      username: ${clickhouse_user}
+      password: ${clickhouse_pass}
 receiver:
   thread-count: 2
   project-list: clklogapp
@@ -42,4 +42,6 @@ receiver:
   # 单个请求上报数据（压缩后/原始数据）的最大字节数限制（默认 2MB）
   max-request-size: 2097152
   enable-check-project-token: false
+  # IP 地域缓存 Hash 的过期天数（默认 7 天，避免缓存长期堆积）
+  client-ip-region-expire-days: 7
 
