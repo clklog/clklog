@@ -12,32 +12,35 @@ springdoc:
 server:
   port: 8080
 spring:
+  config:
+    import:
+      - optional:dev.yml
   application.name: clklog-manage
   datasource:
     mysql:
-      jdbc-url: jdbc:mysql://10.10.223.231:3306/clklog?characterEncoding=UTF-8&useTimezone=true&serverTimezone=GMT%2B8
-      username: root
-      password: 123456
+      jdbc-url: jdbc:mysql://${mysql_host}:${mysql_port}/clklog?characterEncoding=UTF-8&useTimezone=true&serverTimezone=GMT%2B8
+      username: ${mysql_user}
+      password: ${mysql_pass}
       driver-class-name: com.mysql.cj.jdbc.Driver
     clickhouse:
-      jdbc-url: jdbc:clickhouse://10.10.220.188:8123/default
-      username: default
-      password:
+      jdbc-url: jdbc:clickhouse://${clickhouse_host}:${clickhouse_port}/default
+      username: ${clickhouse_user}
+      password: ${clickhouse_pass}
       driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
   redis:
     # 单机配置
-    host: 10.10.220.37
-    port: 6379
-  # password:
-  # 哨兵配置
-  # sentinel:
-  #  master: gct
-  #  nodes: 10.100.2.1:26379,10.100.2.2:26379,10.100.2.3:26379
+    host: ${redis_host}
+    port: ${redis_port}
+    database: 0
+#    sentinel:
+#      master: ${SPRING_REDIS_SENTINEL_MASTER:mymaster}
+#      nodes: ${SPRING_REDIS_SENTINEL_NODES}
+#      password: ${SPRING_REDIS_SENTINEL_PASSWORD:}
 token:
   # 令牌自定义标识
   header: Authorization
   # 令牌密钥
-  secret: c609737e578978eccc64cef4be680
+  secret: ${token_secret}
   # 令牌有效期（默认30分钟）
   expireTime: 300
 logging:
