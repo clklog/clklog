@@ -21,32 +21,34 @@ management:
       show-details: never
 spring:
   application.name: clklog-api
+  config:
+    import:
+      - optional:dev.yml
   security:
     user:
       name: ${SPRING_SECURITY_USER_NAME}
       password: ${SPRING_SECURITY_USER_PASSWORD}
   datasource:
     clickhouse:
-      jdbc-url: jdbc:clickhouse://localhost:8123/default
-      username: default
-      password:
+      jdbc-url: jdbc:clickhouse://${clickhouse_host}:${clickhouse_port}/default
+      username: ${clickhouse_user}
+      password: ${clickhouse_pass}
       driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
       connection-timeout: 20000
       socket-timeout: 60000
       maximum-pool-size: 5
   redis:
-    host: localhost
-    port: 6379
+    # 单机配置
+    host: ${redis_host}
+    port: ${redis_port}
     database: 0
-    password:
-    lettuce:
-      pool:
-        min-idle: 4
-        max-idle: 4
-        max-active: 4
+#    sentinel:
+#      master: ${SPRING_REDIS_SENTINEL_MASTER:mymaster}
+#      nodes: ${SPRING_REDIS_SENTINEL_NODES}
+#      password: ${SPRING_REDIS_SENTINEL_PASSWORD:}
 token:
   header: Authorization
-  secret: ${TOKEN_SECRET}
+  secret: ${token_secret}
   expireTime: 300
 logging:
   file:
