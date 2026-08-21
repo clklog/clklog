@@ -17,6 +17,7 @@ import com.zcunsoft.util.*;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
+import com.github.seancfoley.ipaddress.IPAddressString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -249,6 +250,16 @@ public class ReceiveServiceImpl implements IReceiveService {
         return sb.toString();
     }
 
+    /**
+     * 获取客户端 IP 地址.
+     *
+     * <p>优先从 X-Forwarded-For / Proxy-Client-IP / WL-Proxy-Client-IP 代理头获取，
+     * 均无有效值时使用 TCP 对端地址 remoteAddr；最终用 seancfoley/ipaddress 校验格式，
+     * 非法则置空串。</p>
+     *
+     * @param request HTTP 请求
+     * @return 客户端 IP 字符串；解析失败或格式非法时返回空串
+     */
     private String getIpAddr(HttpServletRequest request) {
         String ipAddress = null;
         try {
@@ -283,7 +294,25 @@ public class ReceiveServiceImpl implements IReceiveService {
             ipAddress = "";
         }
 
+        // 校验提取出的 IP 格式合法性（IPv4/IPv6），非法则置空串
+        if (ipAddress == null || !isValidIp(ipAddress)) {
+            ipAddress = "";
+        }
         return ipAddress;
+    }
+
+    /**
+     * 校验 IP 格式是否合法（仅判断 IPv4/IPv6 格式）.
+     *
+     * @param ip 待校验 IP
+     * @return 格式合法返回 true
+     */
+    private boolean isValidIp(String ip) {
+        if (ip == null || ip.isEmpty()) {
+            return false;
+        }
+        IPAddressString addressString = new IPAddressString(ip);
+        return addressString.isIPv4() || addressString.isIPv6();
     }
 
     /**
