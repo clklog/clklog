@@ -48,6 +48,12 @@ public class UserServiceImpl implements IUserService {
         UserDTO userInfo = null;
         ErrorCode code = ErrorCode.Failed;
         try {
+            // 仅管理员可查看用户信息
+            if (!SecurityUtils.isAdmin()) {
+                code = ErrorCode.Forbidden;
+                return new ResponseBase<UserDTO>(code, codeService.getMessage(code), userInfo);
+            }
+
             Optional<User> optUser = userRepository.findById(userId);
             if (optUser.isPresent()) {
                 User user = optUser.get();
@@ -92,6 +98,12 @@ public class UserServiceImpl implements IUserService {
         User m_user = null;
         ErrorCode code = ErrorCode.Failed;
         try {
+            // 仅管理员可添加用户，新账号默认不具有管理权限
+            if (!SecurityUtils.isAdmin()) {
+                code = ErrorCode.Forbidden;
+                return new ResponseBase<CommonIdDTO>(code, codeService.getMessage(code), idDTO);
+            }
+
             Specification<User> spec = (root, query, cb) -> {
                 List<Predicate> predicates = new ArrayList<Predicate>();
                 predicates.add(cb.equal(root.get("userName"), userAddModel.getUserName()));
@@ -107,6 +119,8 @@ public class UserServiceImpl implements IUserService {
                 m_user.setDisplayName(userAddModel.getDisplayName());
                 m_user.setUserName(userAddModel.getUserName());
                 m_user.setPassword(SecurityUtils.encryptPassword(userAddModel.getPassword()));
+                // 新添加账号默认非管理员
+                m_user.setIsAdmin(false);
                 userRepository.save(m_user);
                 idDTO.setId(m_user.getUserId());
                 code = ErrorCode.Success;
@@ -125,6 +139,12 @@ public class UserServiceImpl implements IUserService {
         ErrorCode code = ErrorCode.Failed;
 
         try {
+            // 仅管理员可编辑用户信息
+            if (!SecurityUtils.isAdmin()) {
+                code = ErrorCode.Forbidden;
+                return new ResponseBase<Boolean>(code, codeService.getMessage(code), isOk);
+            }
+
             Optional<User> optUser = userRepository.findById(userEditModel.getUserId());
 
             if (optUser.isPresent()) {
@@ -166,9 +186,15 @@ public class UserServiceImpl implements IUserService {
         boolean isOk = false;
         ErrorCode code = ErrorCode.Failed;
         try {
+            // 仅管理员可删除用户
+            if (!SecurityUtils.isAdmin()) {
+                code = ErrorCode.Forbidden;
+                return new ResponseBase<Boolean>(code, codeService.getMessage(code), isOk);
+            }
+
             Optional<User> optUser = userRepository.findById(userId);
-            Set<String> adminName = new HashSet<>(Arrays.asList("clklog", "admin"));
-            if (optUser.isPresent() && !adminName.contains(optUser.get().getUserName())) {
+            // 禁止删除管理员账号（基于 is_admin 字段，而非硬编码用户名）
+            if (optUser.isPresent() && !Boolean.TRUE.equals(optUser.get().getIsAdmin())) {
                 userRepository.delete(optUser.get());
                 isOk = true;
                 code = ErrorCode.Success;
@@ -185,6 +211,12 @@ public class UserServiceImpl implements IUserService {
         ErrorCode code = ErrorCode.Failed;
         ListWithTotalCount<UserDTO> list = null;
         try {
+            // 仅管理员可查看用户列表
+            if (!SecurityUtils.isAdmin()) {
+                code = ErrorCode.Forbidden;
+                return new ResponseBase<ListWithTotalCount<UserDTO>>(code, codeService.getMessage(code), list);
+            }
+
             Pageable pageable = PageRequest.of(queryReq.getPageIndex() - 1, queryReq.getPageSize(),
                     Sort.by(Direction.ASC, "userName"));
             Specification<User> spec = (root, query, cb) -> {
@@ -223,6 +255,14 @@ public class UserServiceImpl implements IUserService {
             return resp;
         }
         try {
+            // 仅管理员可重置他人密码
+            if (!SecurityUtils.isAdmin()) {
+                code = ErrorCode.Forbidden;
+                msg = "无权限";
+                ResponseBase<String> resp = new ResponseBase<String>(code, msg, null);
+                return resp;
+            }
+
             Optional<User> optUser = userRepository.findById(userModifyPasswordDTO.getUserId());
             if (optUser.isPresent()) {
                 User user = optUser.get();

@@ -59,4 +59,10 @@ public class UserDTO {
     @Schema(description = "最后登录时间")
     private Timestamp lastlogintime;
 
+    /**
+     * 是否为管理员
+     */
+    @Schema(description = "是否为管理员")
+    private Boolean isAdmin;
+
 }

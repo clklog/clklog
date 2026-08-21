@@ -70,4 +70,10 @@ public class User implements Serializable {
      */
     @Column(columnDefinition = "DATETIME(3)")
     private Timestamp lastlogintime;
+
+    /**
+     * 是否为管理员，具有最高管理权限.
+     */
+    @Column(name = "is_admin", columnDefinition = "tinyint(1) default 0")
+    private Boolean isAdmin;
 }

@@ -2,8 +2,8 @@ package com.zcunsoft.clklog.sysmgmt.aop;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zcunsoft.clklog.common.utils.ObjectMapperUtil;
+import com.zcunsoft.clklog.common.utils.SecurityUtils;
 import com.zcunsoft.clklog.sysmgmt.models.request.OperRecordAddModel;
-import com.zcunsoft.clklog.sysmgmt.services.IAuthService;
 import com.zcunsoft.clklog.sysmgmt.services.IOperRecordService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -30,9 +30,6 @@ public class ControllerInterceptor {
 
     @Resource
     IOperRecordService operRecordService;
-
-    @Resource
-    IAuthService authService;
 
     @Resource
     private ObjectMapperUtil objectMapper;
@@ -111,7 +108,14 @@ public class ControllerInterceptor {
             }
             OperRecordAddModel operrecord = new OperRecordAddModel();
             operrecord.setOpertime(ts);
-            operrecord.setUser("admin");
+            // 记录真实操作人，避免硬编码掩盖审计轨迹
+            String operator = "unknown";
+            try {
+                operator = SecurityUtils.getUsername();
+            } catch (Exception e) {
+                logger.warn("获取当前操作人失败，使用默认值 unknown.", e);
+            }
+            operrecord.setUser(operator);
             operrecord.setAction(String.format("%s;参数:%s;结果:%s", desc, para, resultContent));
             operRecordService.add(operrecord);
         }

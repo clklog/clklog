@@ -52,4 +52,9 @@ public class UserInfo implements Serializable {
      */
     private String modifyuser;
 
+    /**
+     * 是否为管理员
+     */
+    private Boolean isAdmin;
+
 }

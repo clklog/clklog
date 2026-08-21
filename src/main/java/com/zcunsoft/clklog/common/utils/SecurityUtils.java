@@ -51,6 +51,20 @@ public class SecurityUtils {
     }
 
     /**
+     * 判断当前登录用户是否为管理员
+     *
+     * @return true表示管理员，具有最高管理权限
+     */
+    public static boolean isAdmin() {
+        try {
+            Boolean isAdmin = getLoginUser().getUser().getIsAdmin();
+            return isAdmin != null && isAdmin;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
      * 获取Authentication
      *
      * @return {@link Authentication }

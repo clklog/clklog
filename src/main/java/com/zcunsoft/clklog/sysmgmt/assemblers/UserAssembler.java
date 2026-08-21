@@ -20,6 +20,7 @@ public class UserAssembler {
         userDto.setModifyuser(user.getModifyuser());
         userDto.setModifytime(user.getModifytime());
         userDto.setLastlogintime(user.getLastlogintime());
+        userDto.setIsAdmin(user.getIsAdmin());
         return userDto;
     }
 
