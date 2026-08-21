@@ -7,9 +7,9 @@ spring:
   application.name: clklog-init
   datasource:
     clickhouse:
-      jdbc-url: jdbc:clickhouse://localhost:8123/default
-      username: default
-      password:
+      jdbc-url: jdbc:clickhouse://${clickhouse_host}:${clickhouse_port}/default
+      username: ${clickhouse_user}
+      password: ${clickhouse_pass}
       driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
       socket_timeout: 300000
 init:
