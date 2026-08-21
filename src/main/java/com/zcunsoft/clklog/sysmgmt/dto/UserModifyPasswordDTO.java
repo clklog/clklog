@@ -18,7 +18,7 @@ public class UserModifyPasswordDTO {
     /**
      * 新密码
      */
-    @Schema(description = "新密码", required = true, example = "123456")
+    @Schema(description = "新密码", required = true, example = "")
     private String newPassword;
 
 }

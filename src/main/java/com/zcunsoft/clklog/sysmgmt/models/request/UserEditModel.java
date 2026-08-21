@@ -24,13 +24,13 @@ public class UserEditModel {
     /**
      * 密码
      */
-    @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
+    @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
     private String password;
 
     /**
      * 旧密码
      */
-    @Schema(description = "旧密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
+    @Schema(description = "旧密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
     private String oldpassword;
 
     /**

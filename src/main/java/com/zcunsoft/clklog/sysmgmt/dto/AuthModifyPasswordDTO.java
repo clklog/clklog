@@ -12,7 +12,7 @@ public class AuthModifyPasswordDTO {
     /**
      * 原密码
      */
-    @Schema(description = "原密码", required = true, example = "123456")
+    @Schema(description = "原密码", required = true, example = "")
     private String oldPassword;
 
     /**

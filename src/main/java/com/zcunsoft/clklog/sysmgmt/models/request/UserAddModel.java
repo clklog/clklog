@@ -18,7 +18,7 @@ public class UserAddModel {
     /**
      * 密码
      */
-    @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
+    @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "")
     private String password;
 
     /**
