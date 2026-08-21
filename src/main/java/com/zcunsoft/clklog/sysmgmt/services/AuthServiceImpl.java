@@ -69,9 +69,8 @@ public class AuthServiceImpl implements IAuthService {
             code = ErrorCode.Success;
         } catch (Exception e) {
             logger.error("", e);
-            if (e instanceof BadCredentialsException) {
-                code = ErrorCode.WrongPassword;
-            }
+            // 用户不存在与密码错误统一为同一错误码，避免通过错误码枚举有效用户名
+            code = ErrorCode.UserLoginFailed;
         }
         ResponseBase<UserInfoDTO> resp = new ResponseBase<UserInfoDTO>(code, codeService.getMessage(code), userInfo);
         return resp;

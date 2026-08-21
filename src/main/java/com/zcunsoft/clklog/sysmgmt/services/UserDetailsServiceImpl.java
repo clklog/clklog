@@ -28,8 +28,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.getByUserName(username);
         if (user == null) {
-            logger.info("登录用户：{} 不存在.", username);
-            throw new ServiceException("登录用户：" + username + " 不存在");
+            logger.info("登录失败.");
+            throw new ServiceException("登录失败");
         }
 
         return createLoginUser(user);
