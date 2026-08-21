@@ -77,7 +77,6 @@ public class OperRecordServiceImpl implements IOperRecordService {
         } catch (Exception e) {
             logger.error("", e);
             code = ErrorCode.Failed;
-            msg = e.getMessage();
         }
         ResponseBase<ListWithTotalCount<OperRecordDTO>> resp = new ResponseBase<ListWithTotalCount<OperRecordDTO>>(code,
                 msg, list);
