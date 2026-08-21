@@ -21,6 +21,7 @@ import com.zcunsoft.clklog.manage.repository.mysql.ProjectRepository;
 import com.zcunsoft.clklog.manage.repository.mysql.ProjectStatRepository;
 import com.zcunsoft.clklog.manage.utils.ExtensionFilter;
 import com.zcunsoft.clklog.manage.utils.IOUtil;
+import com.zcunsoft.clklog.manage.utils.SettingValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -114,6 +115,16 @@ public class ManageServiceImpl implements IManageService {
             globalSetting = new TblGlobalSetting();
             globalSetting.setId(UUID.randomUUID().toString());
         }
+        // 校验排除策略输入，防止非法/超大内容经 Redis 投毒
+        SettingValidationUtils.validateExcludedStrategy(
+                saveGlobalSettingRequest.getExcludedIp(),
+                saveGlobalSettingRequest.getExcludedUa(),
+                saveGlobalSettingRequest.getExcludedUrlParams());
+        // 校验站内搜索关键词参数（仅英文/数字/下划线/中杠）
+        SettingValidationUtils.validateSearchwordKey(
+                saveGlobalSettingRequest.getSearchwordKey(),
+                saveGlobalSettingRequest.getSearchwordCategoryKey());
+
         globalSetting.setExcludedIp(saveGlobalSettingRequest.getExcludedIp());
         globalSetting.setExcludedUa(saveGlobalSettingRequest.getExcludedUa());
         globalSetting.setExcludedUrlParams(saveGlobalSettingRequest.getExcludedUrlParams());
@@ -215,6 +226,17 @@ public class ManageServiceImpl implements IManageService {
                 tblProject.setId(UUID.randomUUID().toString());
                 tblProject.setProjectName(addProjectRequest.getProjectName());
                 tblProject.setProjectDisplayName(addProjectRequest.getProjectDisplayName());
+                // 校验排除策略输入，防止非法/超大内容经 Redis 投毒
+                SettingValidationUtils.validateExcludedStrategy(
+                        addProjectRequest.getExcludedIp(),
+                        addProjectRequest.getExcludedUa(),
+                        addProjectRequest.getExcludedUrlParams());
+                // 校验项目访问域名（域名或IP）与站内搜索关键词参数
+                SettingValidationUtils.validateRootUrls(addProjectRequest.getRootUrls());
+                SettingValidationUtils.validateSearchwordKey(
+                        addProjectRequest.getSearchwordKey(),
+                        addProjectRequest.getSearchwordCategoryKey());
+
                 tblProject.setExcludedIp(addProjectRequest.getExcludedIp());
                 tblProject.setExcludedUa(addProjectRequest.getExcludedUa());
                 tblProject.setExcludedUrlParams(addProjectRequest.getExcludedUrlParams());
@@ -232,6 +254,11 @@ public class ManageServiceImpl implements IManageService {
                 response.setCode(500);
                 response.setMsg(err);
             }
+        } catch (ServiceException ex) {
+            // 校验等可预期业务异常：透传具体错误信息给前端
+            logger.warn("add project error, {}", ex.getMessage());
+            response.setCode(ex.getCode() != null ? ex.getCode() : 500);
+            response.setMsg(ex.getMessage());
         } catch (Exception ex) {
             logger.error("add project error,", ex);
             response.setCode(500);
@@ -254,6 +281,17 @@ public class ManageServiceImpl implements IManageService {
                 .orElseThrow(() -> new ServiceException(editProjectRequest.getId() + "项目不存在", 500));
 
         tblProject.setProjectDisplayName(editProjectRequest.getProjectDisplayName());
+        // 校验排除策略输入，防止非法/超大内容经 Redis 投毒
+        SettingValidationUtils.validateExcludedStrategy(
+                editProjectRequest.getExcludedIp(),
+                editProjectRequest.getExcludedUa(),
+                editProjectRequest.getExcludedUrlParams());
+        // 校验项目访问域名（域名或IP）与站内搜索关键词参数
+        SettingValidationUtils.validateRootUrls(editProjectRequest.getRootUrls());
+        SettingValidationUtils.validateSearchwordKey(
+                editProjectRequest.getSearchwordKey(),
+                editProjectRequest.getSearchwordCategoryKey());
+
         tblProject.setExcludedIp(editProjectRequest.getExcludedIp());
         tblProject.setExcludedUa(editProjectRequest.getExcludedUa());
         tblProject.setExcludedUrlParams(editProjectRequest.getExcludedUrlParams());
