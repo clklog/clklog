@@ -93,14 +93,14 @@ public class ReceiveServiceImpl implements IReceiveService {
         try {
             locIpV4.Open(binIpV4file, true);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("open IP2LOCATION-LITE-DB1.BIN error", e);
         }
         String binIpV6file = getResourcePath() + File.separator + "iplib" + File.separator + "IP2LOCATION-LITE-DB3.IPV6.BIN";
 
         try {
             locIpV6.Open(binIpV6file, true);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("open IP2LOCATION-LITE-DB3.IPV6.BIN error", e);
         }
     }
 
@@ -236,14 +236,14 @@ public class ReceiveServiceImpl implements IReceiveService {
                 try {
                     servletInputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
         }
@@ -278,7 +278,7 @@ public class ReceiveServiceImpl implements IReceiveService {
                     try {
                         inet = InetAddress.getLocalHost();
                     } catch (UnknownHostException e) {
-                        e.printStackTrace();
+                        logger.error("getLocalHost error", e);
                     }
                     if (inet != null) {
                         ipAddress = inet.getHostAddress();
