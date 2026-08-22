@@ -7,6 +7,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 客户端工具类
@@ -15,6 +17,7 @@ import java.io.IOException;
  */
 public class ServletUtils
 {
+    private final static Logger logger = LoggerFactory.getLogger(ServletUtils.class);
     /**
      * 获取request
      *
@@ -60,7 +63,7 @@ public class ServletUtils
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            logger.error("渲染字符串到客户端失败", e);
         }
         return null;
     }

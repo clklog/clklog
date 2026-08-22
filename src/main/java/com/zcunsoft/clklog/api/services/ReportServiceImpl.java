@@ -1899,8 +1899,7 @@ public class ReportServiceImpl implements IReportService {
 	         Date date = calendar.getTime();
 	         String formattedDate = dateFormat.format(date);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("解析日期格式失败", e);
 		}
 		**/;
          where = buildChannelByAllFilter(getLogAnalysisListPageRequest.getChannel(), paramMap, where);

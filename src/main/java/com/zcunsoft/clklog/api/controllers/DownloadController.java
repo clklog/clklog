@@ -22,11 +22,15 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping(path = "download")
 @Tag(name = "下载", description = "下载")
 public class DownloadController {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
     IExportReportService exportReportService;
@@ -38,7 +42,7 @@ public class DownloadController {
     	try {
     		ExcelExportUtils.exportFlowTrendDetail(getFlowTrendDetailResponse.getData().getDetail(),getFlowTrendDetailResponse.getData().getTotal(),downloadRequest.getCols(), request,respones);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出下载文件失败", e);
         }
     }
     
@@ -49,7 +53,7 @@ public class DownloadController {
     	try {
     		ExcelExportUtils.exportSearchWordDetail(getSearchWordDetailResponse.getData().getRows(),downloadRequest.getCols(), request,respones);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出下载文件失败", e);
         }
     }
     
@@ -61,7 +65,7 @@ public class DownloadController {
     	try {
     		ExcelExportUtils.exportAreaDetail(areaDetailList,totalAreaDetail,downloadRequest.getCols(), request,respones);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出下载文件失败", e);
         }
     }
     
@@ -73,7 +77,7 @@ public class DownloadController {
     	try {
     		ExcelExportUtils.exportVisitUriDetail(dataList,totalData,downloadRequest.getCols(), request,respones);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出下载文件失败", e);
         }
     }
     
@@ -84,7 +88,7 @@ public class DownloadController {
     	try {
     		ExcelExportUtils.exportSourceWebSiteDetail(getSourceWebsiteDetailPageResponse.getData().getRows(),getSourceWebsiteDetailPageResponse.getData().getSummary(),downloadRequest.getCols(), request,respones);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出下载文件失败", e);
         }
     }
     
@@ -96,7 +100,7 @@ public class DownloadController {
     	try {
     		ExcelExportUtils.exportVisitorDetail(getVisitorDetailResponse.getData(),totalData,downloadRequest.getCols(), request,respones);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出下载文件失败", e);
         }
     }
     
@@ -107,7 +111,7 @@ public class DownloadController {
     	try {
     		ExcelExportUtils.exportDeviceDetail(getDeviceDetailResponse.getData(),downloadRequest.getCols(), request,respones);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出下载文件失败", e);
         }
     }
     
@@ -118,7 +122,7 @@ public class DownloadController {
     	try {
     		ExcelExportUtils.exportChannelDetail(getChannelDetailResponse.getData(),downloadRequest.getCols(), request,respones);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出下载文件失败", e);
         }
     }
     
@@ -130,7 +134,7 @@ public class DownloadController {
     	try {
     		ExcelExportUtils.exportVisitorList(detailList,total, downloadRequest.getCols(),request,respones);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出下载文件失败", e);
         }
     }
     
@@ -144,7 +148,7 @@ public class DownloadController {
     	try {
     		ExcelExportUtils.exportVisitorList(pvList,visitList,visitTimeList,request,respones);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("导出下载文件失败", e);
         }
     }
 }
