@@ -14,11 +14,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.sql.Timestamp;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 拦截器
@@ -35,6 +40,18 @@ public class ControllerInterceptor {
     private ObjectMapperUtil objectMapper;
 
     private final static String el = "execution(* com.zcunsoft.clklog.sysmgmt.controllers..*(..)) and @annotation(org.springframework.web.bind.annotation.RequestMapping)";
+
+    /**
+     * 需要脱敏的敏感字段名（大小写不敏感，含密码类与令牌类）
+     */
+    private final static Pattern SENSITIVE_KEY_PATTERN = Pattern.compile(
+            "\"((?i:password|passwd|pwd|newpassword|oldpassword|token|secret|apikey|api_key|authorization|cookie))\"\\s*:\\s*(\"(?:[^\"\\\\]|\\\\.)*\"|[^,\\}\\s]+)",
+            Pattern.CASE_INSENSITIVE);
+
+    /**
+     * 脱敏后的占位值
+     */
+    private final static String MASKED = "\"***\"";
 
     /**
      * 定义拦截规则：拦截com.zcunsoft.clklog.sysmgmt.controllers包下面的所有类中，有@RequestMapping注解的方法。
@@ -55,18 +72,20 @@ public class ControllerInterceptor {
 
         MethodSignature signature = (MethodSignature) pjp.getSignature();
         Method method = signature.getMethod(); // 获取被拦截的方法
-        String methodName = method.getName(); // 获取被拦截的方法名
-        String controllerName = signature.getDeclaringType().getSimpleName().replaceAll("Controller", "");
+
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                .getRequest();
 
         String para = "";
         Object result = null;
 
         Object[] args = pjp.getArgs();
+        // 对每个 @RequestBody 参数逐个序列化并脱敏敏感字段，避免明文记录密码/令牌
         for (int i = 0; i < method.getParameters().length; i++) {
             Parameter p = method.getParameters()[i];
             if (p.isAnnotationPresent(RequestBody.class)) {
                 try {
-                    para = objectMapper.writeValueAsString(args[i]);
+                    para = maskSensitive(objectMapper.writeValueAsString(args[i]));
                 } catch (JsonProcessingException e) {
                     logger.error("", e);
                 }
@@ -77,8 +96,8 @@ public class ControllerInterceptor {
         try {
             if (result == null) {
                 result = pjp.proceed();
-
-                resultContent = objectMapper.writeValueAsString(result);
+                // 响应结果同样脱敏，避免含敏感字段的返回体被写入审计日志
+                resultContent = maskSensitive(objectMapper.writeValueAsString(result));
             }
         } catch (Throwable e) {
             logger.error("", e);
@@ -87,38 +106,46 @@ public class ControllerInterceptor {
         long endTime = System.currentTimeMillis();
         Timestamp ts = new Timestamp(endTime);
 
-        String desc = "";
 
-        if (methodName.equalsIgnoreCase("add")) {
-            desc += "增加";
-        } else if (methodName.equalsIgnoreCase("edit")) {
-            desc += "编辑";
-        } else if (methodName.equalsIgnoreCase("delete")) {
-            desc += "删除";
-        } else if (methodName.equalsIgnoreCase("enable")) {
-            desc += "启用";
-        } else if (methodName.equalsIgnoreCase("audit")) {
-            desc += "审核";
-        } else if (methodName.equalsIgnoreCase("cancel")) {
-            desc += "撤回";
+        OperRecordAddModel operrecord = new OperRecordAddModel();
+        operrecord.setOpertime(ts);
+        // 记录真实操作人，避免硬编码掩盖审计轨迹
+        String operator = "unknown";
+        try {
+            operator = SecurityUtils.getUsername();
+        } catch (Exception e) {
+            logger.warn("获取当前操作人失败，使用默认值 unknown.", e);
         }
-        if (!desc.isEmpty()) {
-            if (controllerName.equalsIgnoreCase("User")) {
-                desc += "用户";
-            }
-            OperRecordAddModel operrecord = new OperRecordAddModel();
-            operrecord.setOpertime(ts);
-            // 记录真实操作人，避免硬编码掩盖审计轨迹
-            String operator = "unknown";
-            try {
-                operator = SecurityUtils.getUsername();
-            } catch (Exception e) {
-                logger.warn("获取当前操作人失败，使用默认值 unknown.", e);
-            }
-            operrecord.setUser(operator);
-            operrecord.setAction(String.format("%s;参数:%s;结果:%s", desc, para, resultContent));
-            operRecordService.add(operrecord);
-        }
+        operrecord.setUser(operator);
+        operrecord.setAction(String.format("访问:%s;参数:%s;结果:%s", request.getRequestURI(), para, resultContent));
+        operRecordService.add(operrecord);
+
         return result;
+    }
+
+    /**
+     * 对 JSON 字符串中的敏感字段值进行脱敏.
+     * 匹配 password/passwd/pwd/newpassword/oldpassword/token 等字段名，
+     * 将其值替换为 "***"，不修改其他字段，避免明文记录密码/令牌到审计日志。
+     * 该方式与 modifyPassword 等接口“敏感字段只入不出”的原则一致，统一应用于所有接口。
+     *
+     * @param json 序列化后的请求体或响应体 JSON
+     * @return 脱敏后的 JSON
+     */
+    private static String maskSensitive(String json) {
+        if (json == null || json.isEmpty()) {
+            return json;
+        }
+        Matcher matcher = SENSITIVE_KEY_PATTERN.matcher(json);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            // 保留字段名，仅替换值部分（分组2）为掩码
+            String replacement = matcher.group(1) != null
+                    ? "\"" + matcher.group(1) + "\":" + MASKED
+                    : matcher.group(0);
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 }
