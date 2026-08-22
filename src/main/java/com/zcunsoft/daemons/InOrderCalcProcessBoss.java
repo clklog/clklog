@@ -105,7 +105,7 @@ public class InOrderCalcProcessBoss {
         try {
             thread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("thread join interrupted", e);
         }
 
         if (logger.isInfoEnabled()) {

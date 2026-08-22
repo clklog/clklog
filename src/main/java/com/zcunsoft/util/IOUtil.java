@@ -11,6 +11,12 @@ public class IOUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(IOUtil.class);
 
+    /**
+     * 读取文件内容.
+     *
+     * @param filePath 文件路径
+     * @return 文件内容
+     */
     public static String readFile(String filePath) {
         StringBuilder fileContent = new StringBuilder();
 
@@ -46,7 +52,7 @@ public class IOUtil {
                 try {
                     inputStreamReader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
 
@@ -54,7 +60,7 @@ public class IOUtil {
                 try {
                     bomIn.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
 
@@ -62,7 +68,7 @@ public class IOUtil {
                 try {
                     fis.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
         }
