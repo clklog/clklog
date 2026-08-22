@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.validator.routines.InetAddressValidator;
 
 /**
  * IP网段工具类.
@@ -29,13 +30,26 @@ public class CIDRUtils {
             String addressPart = this.cidr.substring(0, index);
             String networkPart = this.cidr.substring(index + 1);
 
-            inetAddress = InetAddress.getByName(addressPart);
+            inetAddress = parseInetAddress(addressPart);
             prefixLength = Integer.parseInt(networkPart);
 
             calculate();
         } else {
             throw new IllegalArgumentException("not an valid CIDR format!");
         }
+    }
+
+    /**
+     * 将 IP 文本解析为 InetAddress，但不发起任何 DNS 解析。
+     * 仅接受合法的 IPv4/IPv6 字面量；传入域名等非字面量将抛出 UnknownHostException，
+     * 避免对用户可控的 IP 字段执行 DNS 查询（探测内网/阻塞线程）。
+     */
+    private static InetAddress parseInetAddress(String ip) throws UnknownHostException {
+        InetAddressValidator validator = InetAddressValidator.getInstance();
+        if (!validator.isValidInet4Address(ip) && !validator.isValidInet6Address(ip)) {
+            throw new UnknownHostException("not a valid IP literal: " + ip);
+        }
+        return InetAddress.getByName(ip);
     }
 
 
@@ -110,7 +124,7 @@ public class CIDRUtils {
      * @throws UnknownHostException UnknownHostException
      */
     public boolean isInRange(String ipAddress) throws UnknownHostException {
-        InetAddress address = InetAddress.getByName(ipAddress);
+        InetAddress address = parseInetAddress(ipAddress);
         BigInteger start = new BigInteger(1, this.startAddress.getAddress());
         BigInteger end = new BigInteger(1, this.endAddress.getAddress());
         BigInteger target = new BigInteger(1, address.getAddress());

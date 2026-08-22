@@ -470,6 +470,41 @@ public class ExtractUtil {
         return projectSetting;
     }
 
+    private static boolean filterData(LogBean logBean, ProjectSetting projectSetting) {
+        boolean isAdd = logBean != null;
+
+        if (isAdd) {
+            /* 过滤超时的数据 */
+            long diff = logBean.getFlushTime() - logBean.getTime();
+            if (diff > 60000 || logBean.getFlushTime() <= 0 || logBean.getTime() <= 0) {
+                isAdd = false;
+            }
+        }
+        if (isAdd) {
+            /* 过滤anonymouse_id或distinct_id字段为空的 */
+            if (StringUtils.isBlank(logBean.getAnonymousId()) || StringUtils.isBlank(logBean.getDistinctId())) {
+                isAdd = false;
+            }
+        }
+        if (isAdd) {
+            /* 过滤logTime字段为空的 */
+            if (logBean.getLogTime() == null) {
+                isAdd = false;
+            }
+        }
+        if (isAdd) {
+            if (projectSetting != null) {
+                if (isAdd && StringUtils.isNotBlank(projectSetting.getExcludedIp())) {
+                    isAdd = !checkIfIpInExcludedIpList(projectSetting.getExcludedIp(), logBean.getClientIp());
+                }
+                if (isAdd && StringUtils.isNotBlank(projectSetting.getExcludedUa())) {
+                    isAdd = !checkIfUaContainsExcludedUa(projectSetting.getExcludedUa(), logBean.getUserAgent());
+                }
+            }
+        }
+        return isAdd;
+    }
+
     public static List<LogBean> extractToLogBeanList(QueryCriteria rawMessage, String globalAppCode, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, ProjectSetting> htProjectSetting) {
         List<LogBean> logBeanList = new ArrayList<>();
         String data = "";
@@ -504,41 +539,6 @@ public class ExtractUtil {
             logger.error("error data : " + data, e);
         }
         return logBeanList;
-    }
-
-    private static boolean filterData(LogBean logBean, ProjectSetting projectSetting) {
-        boolean isAdd = logBean != null;
-
-        if (isAdd) {
-            /* 过滤超时的数据 */
-            long diff = logBean.getFlushTime() - logBean.getTime();
-            if (diff > 60000 || logBean.getFlushTime() <= 0 || logBean.getTime() <= 0) {
-                isAdd = false;
-            }
-        }
-        if (isAdd) {
-            /* 过滤anonymouse_id或distinct_id字段为空的 */
-            if (StringUtils.isBlank(logBean.getAnonymousId()) || StringUtils.isBlank(logBean.getDistinctId())) {
-                isAdd = false;
-            }
-        }
-        if (isAdd) {
-            /* 过滤logTime字段为空的 */
-            if (logBean.getLogTime() == null) {
-                isAdd = false;
-            }
-        }
-        if (isAdd) {
-            if (projectSetting != null) {
-                if (isAdd && StringUtils.isNotBlank(projectSetting.getExcludedIp())) {
-                    isAdd = !checkIfIpInExcludedIpList(projectSetting.getExcludedIp(), logBean.getClientIp());
-                }
-                if (isAdd && StringUtils.isNotBlank(projectSetting.getExcludedUa())) {
-                    isAdd = !checkIfUaContainsExcludedUa(projectSetting.getExcludedUa(), logBean.getUserAgent());
-                }
-            }
-        }
-        return isAdd;
     }
 
     public static String excludeParamFromUrl(String excludedParams, String rawurl) {
