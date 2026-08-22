@@ -57,7 +57,7 @@ public class IOUtil {
                 try {
                     inputStreamReader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
 
@@ -65,7 +65,7 @@ public class IOUtil {
                 try {
                     bomIn.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
 
@@ -73,7 +73,7 @@ public class IOUtil {
                 try {
                     fis.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
         }
@@ -118,7 +118,7 @@ public class IOUtil {
                 try {
                     bfr.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
 
@@ -126,7 +126,7 @@ public class IOUtil {
                 try {
                     inputStreamReader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
 
@@ -134,7 +134,7 @@ public class IOUtil {
                 try {
                     bomIn.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
 
@@ -142,7 +142,7 @@ public class IOUtil {
                 try {
                     fis.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("close stream error", e);
                 }
             }
         }

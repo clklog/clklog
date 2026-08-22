@@ -160,7 +160,7 @@ public class TokenService {
             userInfo = objectMapper.writeValueAsString(loginUser);
             queueRedisTemplate.opsForValue().set(userKey, userInfo, expireTime, TimeUnit.MINUTES);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("refreshToken err", e);
         }
     }
 

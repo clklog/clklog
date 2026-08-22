@@ -844,7 +844,7 @@ public class ManageServiceImpl implements IManageService {
                 lineNumberReader.close();
                 return lines;
             } catch (IOException e) {
-                e.printStackTrace();
+                this.logger.error("统计文件行数失败", e);
             }
         }
         return 0;
