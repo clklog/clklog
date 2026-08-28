@@ -1,4 +1,4 @@
-image: openjdk:8-slim
+image: openjdk:8u342-jdk
 
 variables:
   MAVEN_CLI_OPTS: "-s $CI_PROJECT_DIR/.m2/settings.xml --batch-mode"
