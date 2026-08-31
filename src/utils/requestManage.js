@@ -32,6 +32,7 @@ service.interceptors.request.use(
 );
 
 let isLoggingOut = false; // 添加标志位，防止死循环
+let isNoPermission = false; // 无项目权限跳转标志位，防止并发请求重复跳转
 
 service.interceptors.response.use(
   (response) => {
@@ -47,6 +48,19 @@ service.interceptors.response.use(
       return; // 直接返回，避免继续处理
     }
     if (res.code !== 200) {
+      // code = 423：无该项目的数据访问权限，跳转到无权限页面
+      if (res.code == 423) {
+        if (!isNoPermission) {
+          isNoPermission = true;
+          Router.replace("/NoProjectPermission").then(() => {
+            isNoPermission = false; // 导航完成后重置，便于下次（如切换项目后）再次跳转
+          }).catch(() => {
+            isNoPermission = false;
+          });
+        }
+        return; // 直接返回，不弹错误提示
+      }
+
       Message({
         message: res.message || res.msg || "Error",
         type: "error",

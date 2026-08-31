@@ -1,7 +1,7 @@
 <template>
   <div :class="classObj" class="app-wrapper">
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
-    <sidebar class="sidebar-container" />
+    <sidebar v-if="!hideSidebarRoute" class="sidebar-container" />
     <div class="main-container">
     <!-- <div :class="{hasTagsView:needTagsView}" class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
@@ -47,12 +47,17 @@ export default {
       needTagsView: state => state.settings.tagsView,
       fixedHeader: state => state.settings.fixedHeader
     }),
+    hideSidebarRoute() {
+      // 通过路由 meta 控制是否隐藏左侧菜单栏（如：无项目权限页）
+      return this.$route.meta && this.$route.meta.hideSidebar === true
+    },
     classObj() {
       return {
         hideSidebar: !this.sidebar.opened,
         openSidebar: this.sidebar.opened,
         withoutAnimation: this.sidebar.withoutAnimation,
-        mobile: this.device === 'mobile'
+        mobile: this.device === 'mobile',
+        noSidebar: this.hideSidebarRoute
       }
     }
   },
@@ -97,6 +102,13 @@ export default {
     &.mobile.openSidebar {
       position: fixed;
       top: 0;
+    }
+
+    // 隐藏侧边栏时主内容区占满全屏（用于无项目权限页）
+    &.noSidebar {
+      .main-container {
+        margin-left: 0 !important;
+      }
     }
   }
 

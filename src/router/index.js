@@ -38,6 +38,20 @@ export const constantRoutes = [
     component: () => import("@/views/error-page/401"),
     hidden: true,
   },
+  // 没有项目数据访问权限（接口返回 code=423 时跳转）
+  {
+    path: "/NoProjectPermission",
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: "",
+        name: "NoProjectPermission",
+        component: () => import("@/views/error-page/NoProjectPermission"),
+        meta: { hideSidebar: true },
+      },
+    ],
+  },
   {
     path: "/",
     component: Layout,
