@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 返回错误码枚举类
  */
 public enum ErrorCode {
-    Success(200), Forbidden(403), UserLoginFailed(501), WrongPassword(502),
+    Success(200), Forbidden(403), ResourceLock(423), UserLoginFailed(501), WrongPassword(502),
 
     Failed(500);
 

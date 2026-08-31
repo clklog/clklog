@@ -3,7 +3,9 @@ package com.zcunsoft.clklog.sysmgmt.aop;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zcunsoft.clklog.common.utils.ObjectMapperUtil;
 import com.zcunsoft.clklog.common.utils.SecurityUtils;
+import com.zcunsoft.clklog.sysmgmt.models.enums.ErrorCode;
 import com.zcunsoft.clklog.sysmgmt.models.request.OperRecordAddModel;
+import com.zcunsoft.clklog.sysmgmt.models.response.ResponseBase;
 import com.zcunsoft.clklog.sysmgmt.services.IOperRecordService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -72,9 +74,15 @@ public class ControllerInterceptor {
 
         MethodSignature signature = (MethodSignature) pjp.getSignature();
         Method method = signature.getMethod(); // 获取被拦截的方法
+        String controllerName = signature.getDeclaringType().getSimpleName().replaceAll("Controller", "");
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
                 .getRequest();
+
+        // 用户管理接口仅允许管理员访问：非管理员拦截，但仍记录审计日志
+        ResponseBase<?> deniedResponse = ("User".equalsIgnoreCase(controllerName) && !SecurityUtils.isAdmin())
+                ? new ResponseBase<>(ErrorCode.ResourceLock, "资源不可用", null)
+                : null;
 
         String para = "";
         Object result = null;
@@ -95,7 +103,12 @@ public class ControllerInterceptor {
         String resultContent = "";
         try {
             if (result == null) {
-                result = pjp.proceed();
+                if (deniedResponse != null) {
+                    // 无权限：不执行业务逻辑，直接构造锁定响应（仍记录审计）
+                    result = deniedResponse;
+                } else {
+                    result = pjp.proceed();
+                }
                 // 响应结果同样脱敏，避免含敏感字段的返回体被写入审计日志
                 resultContent = maskSensitive(objectMapper.writeValueAsString(result));
             }
