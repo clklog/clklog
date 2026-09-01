@@ -258,7 +258,8 @@ export default {
       handler: function (route) {
         const query = route.query;
         if (query) {
-          this.redirect = query.redirect;
+          // 防止把 NoPermission 错误页作为登录后回跳目标
+          this.redirect = query.redirect === '/NoPermission' ? undefined : query.redirect;
           this.otherQuery = this.getOtherQuery(query);
         }
       },

@@ -15,7 +15,7 @@
         <div class="base-info">
           <div class="nopermission-mobile-oops">Oops!</div>
           <div class="tips-list">
-           <div>您没有该项目的数据访问权限，请联系管理员分配项目权限后再访问！</div>
+            <div>您没有该项目的数据访问权限，请联系管理员分配项目权限后再访问！</div>
           </div>
         </div>
       </div>
@@ -26,7 +26,7 @@
 <script>
 
 export default {
-  name: 'NoProjectPermission',
+  name: 'NoPermission',
   computed: {
     message() {
       return '请确认当前账号是否分配项目权限'

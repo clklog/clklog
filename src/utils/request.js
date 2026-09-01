@@ -55,7 +55,6 @@ service.interceptors.request.use(
   }
 );
 let isLoggingOut = false; // 添加标志位，防止死循环
-let isNoPermission = false; // 无项目权限跳转标志位，防止并发请求重复跳转
 // response interceptor
 service.interceptors.response.use(
   /**
@@ -70,7 +69,6 @@ service.interceptors.response.use(
    */
   (response) => {
     const res = response.data;
-
     // if the custom code is not 200, it is judged as an error.
     if (res.code !== 200) {
       if (response.config.url.includes("info/subscribe")) {
@@ -81,30 +79,29 @@ service.interceptors.response.use(
         });
         return;
       }
-
+     
       if (res.code == 403) {
         if (!isLoggingOut) {
           // 检查标志位
           isLoggingOut = true; // 设置标志位为 true
-          store.dispatch("user/logout").then(() => {        
+          store.dispatch("user/logout").then(() => {
             Router.push({ path: "/login" });
+            isLoggingOut = false; // 重置标志位
+          }).catch(() => {
             isLoggingOut = false; // 重置标志位
           });
         }
-        return; // 直接返回，避免继续处理
+        return new Promise(() => {}); // 挂起当前请求，避免业务 then 执行导致报错
       }
 
       // code = 423：无该项目的数据访问权限，跳转到无权限页面
+      // 注意：vue-router 3.0.x 的 replace 不返回 Promise，不能链式 .then/.catch，
+      // 否则同步抛 TypeError 导致标志位永不复位。这里改为无状态判断：仅在不在该页时才跳转。
       if (res.code == 423) {
-        if (!isNoPermission) {
-          isNoPermission = true;
-          Router.replace("/NoProjectPermission").then(() => {
-            isNoPermission = false; // 导航完成后重置，便于下次（如切换项目后）再次跳转
-          }).catch(() => {
-            isNoPermission = false;
-          });
+        if (Router.currentRoute.path !== "/NoPermission") {
+          Router.replace("/NoPermission");
         }
-        return; // 直接返回，不弹错误提示
+        return new Promise(() => {}); // 挂起当前请求，避免业务 then 执行导致报错
       }
 
       Message({
