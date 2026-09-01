@@ -6,7 +6,8 @@
         <div class="bullshit__oops">Oops!</div>
       </div>
       <div class="tips-list" style="">
-        <div>您没有该项目的数据访问权限，请联系管理员分配项目权限后再访问！</div>
+        <div>访问出错了！</div>
+        <div>请检查您的路径输入是否无误或者是否有输入页面的访问权限!</div>
       </div>
     </div>
     <div class="nopermission-mobile">
@@ -15,7 +16,8 @@
         <div class="base-info">
           <div class="nopermission-mobile-oops">Oops!</div>
           <div class="tips-list">
-            <div>您没有该项目的数据访问权限，请联系管理员分配项目权限后再访问！</div>
+            <div>访问出错了！</div>
+            <div>请检查您的路径输入是否无误或者是否有输入页面的访问权限!</div>
           </div>
         </div>
       </div>
