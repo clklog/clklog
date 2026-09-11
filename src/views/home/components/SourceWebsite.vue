@@ -1,5 +1,5 @@
 <template>
-  <div class="SourceWebsite block-main public-hoverItem">
+  <div v-loading="loadingRefresh" class="SourceWebsite block-main public-hoverItem">
     <div class="block-head" @click="$router.push('/visitorAnalysis/sourceWeb')">
       <div class="block-title">Top10来源网站</div>
       <div
@@ -48,6 +48,7 @@ export default {
   data() {
     return {
       SourceWebsitelist: null,
+      loadingRefresh: false,
     };
   },
   computed: {
@@ -65,9 +66,15 @@ export default {
       }
     },
     getSourceWebsite() {
-      getSourceWebsiteApi(this.params).then((res) => {
-        this.SourceWebsitelist = res.data;
-      });
+      this.loadingRefresh = true;
+      getSourceWebsiteApi(this.params)
+        .then((res) => {
+          this.loadingRefresh = false;
+          this.SourceWebsitelist = res.data;
+        })
+        .catch(() => {
+          this.loadingRefresh = false;
+        });
     },
     percentageFun(val) {
       return percentage(val);

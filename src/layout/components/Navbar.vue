@@ -84,12 +84,18 @@ export default {
         if (newVal && newVal.length > 0) {
           this.options = newVal;
           if (!this.prejectCode || !newVal.some((item) => item.projectName === this.prejectCode)) {
-            this.prejectCode =
-              this.$store.getters.projectName || this.options[0].projectName;
+            const preferred = this.$store.getters.projectName;
+            const exists = newVal.some((item) => item.projectName === preferred);
+            this.prejectCode = exists ? preferred : this.options[0].projectName;
             this.$store.dispatch("tracking/setProject", this.prejectCode);
           }
         } else {
           this.options = this.defaultProject;
+          // 退出登录后列表被清空时，不要回写默认项目到本地缓存
+          if (!this.$store.getters.token) {
+            this.prejectCode = "";
+            return;
+          }
           this.prejectCode = this.options[0].projectName;
           this.$store.dispatch("tracking/setProject", this.prejectCode);
         }
@@ -105,7 +111,12 @@ export default {
     this.userName = getRememberedUsername();
     const savedProjectCode = this.$store.getters.projectName;
     if (this.options.length > 0) {
-      this.prejectCode = savedProjectCode || this.options[0].projectName;
+      const exists = this.options.some(
+        (item) => item.projectName === savedProjectCode
+      );
+      this.prejectCode = exists
+        ? savedProjectCode
+        : this.options[0].projectName;
     } else {
       this.options = this.defaultProject;
       this.prejectCode = savedProjectCode || this.options[0].projectName;

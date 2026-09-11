@@ -1,5 +1,8 @@
 <template>
-  <div class="documentation-container block-main public-hoverItem">
+  <div
+    v-loading="loadingRefresh"
+    class="documentation-container block-main public-hoverItem"
+  >
     <div class="block-head" @click="$router.push('/visitorAnalysis/regional')">
       <div class="block-title" >地域分布</div>
       <div
@@ -24,6 +27,7 @@ export default {
   data() {
     return {
       getAreaList: null,
+      loadingRefresh: false,
     };
   },
   computed: {
@@ -34,10 +38,16 @@ export default {
   watch: {},
   methods: {
     getArea() {
-      getAreaApi(this.params).then((res) => {
-        this.getAreaList = res.data;
-        this.$refs.mapArea.getMapChartsData(res.data);
-      });
+      this.loadingRefresh = true;
+      getAreaApi(this.params)
+        .then((res) => {
+          this.loadingRefresh = false;
+          this.getAreaList = res.data;
+          this.$refs.mapArea.getMapChartsData(res.data);
+        })
+        .catch(() => {
+          this.loadingRefresh = false;
+        });
     },
   },
 };

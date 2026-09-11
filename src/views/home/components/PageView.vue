@@ -1,5 +1,5 @@
 <template>
-  <div class="PageView block-main public-hoverItem">
+  <div v-loading="loadingRefresh" class="PageView block-main public-hoverItem">
     <div
       class="block-head"
       @click="$router.push('/access/visitedPage')"
@@ -50,6 +50,7 @@ export default {
   data() {
     return {
       getVisitList: null,
+      loadingRefresh: false,
     };
   },
   computed: {
@@ -68,9 +69,15 @@ export default {
       }
     },
     getVisitUri() {
-      getVisitUriApi(this.params).then((res) => {
-        this.getVisitList = res.data;
-      });
+      this.loadingRefresh = true;
+      getVisitUriApi(this.params)
+        .then((res) => {
+          this.loadingRefresh = false;
+          this.getVisitList = res.data;
+        })
+        .catch(() => {
+          this.loadingRefresh = false;
+        });
     },
     percentageFun(val) {
       return percentage(val);

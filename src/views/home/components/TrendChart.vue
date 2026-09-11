@@ -1,5 +1,5 @@
 <template>
-  <div class="TrendChart block-main public-hoverItem">
+  <div class="TrendChart block-main public-hoverItem" v-loading="loadingRefresh">
     <div class="block-head"  @click="navigateToTrend">
       <div class="block-title">趋势图</div>
       <el-select
@@ -85,6 +85,7 @@ export default {
       specificTTime: "time",
       headLege: ["IP数","访问次数",],
       disabledSelect: [],
+      loadingRefresh: false,
     };
   },
   created() {},
@@ -105,13 +106,19 @@ export default {
       this.$router.push('/trendAnalysis/trend');
     },
     getFlowTrend() {
-      getFlowTrendApi(this.params).then((res) => {
-        if (res.code == 200) {
-          this.flowTrendList = res.data;
-          this.flag = true;
-          this.$refs.trendChartRef.getApiTrendList(res.data,this.headLege);
-        }
-      });
+      this.loadingRefresh = true;
+      getFlowTrendApi(this.params)
+        .then((res) => {
+          this.loadingRefresh = false;
+          if (res.code == 200) {
+            this.flowTrendList = res.data;
+            this.flag = true;
+            this.$refs.trendChartRef.getApiTrendList(res.data, this.headLege);
+          }
+        })
+        .catch(() => {
+          this.loadingRefresh = false;
+        });
     },
     handleCheckPointer(e) {
       let result = [];

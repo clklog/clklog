@@ -1,5 +1,5 @@
 <template>
-  <div class="SearchWord block-main public-hoverItem">
+  <div v-loading="loadingRefresh" class="SearchWord block-main public-hoverItem">
     <div
       class="block-head"
       @click="$router.push('/access/search')"
@@ -50,6 +50,7 @@ export default {
   data() {
     return {
       searchWordList: null,
+      loadingRefresh: false,
     };
   },
   computed: {
@@ -75,11 +76,17 @@ export default {
     },
     // 关键词搜索
     getSearchWord() {
-      getSearchWordApi(this.params).then((res) => {
-        if (res.code == 200) {
-          this.searchWordList = res.data;
-        }
-      });
+      this.loadingRefresh = true;
+      getSearchWordApi(this.params)
+        .then((res) => {
+          this.loadingRefresh = false;
+          if (res.code == 200) {
+            this.searchWordList = res.data;
+          }
+        })
+        .catch(() => {
+          this.loadingRefresh = false;
+        });
     },
     percentageFun(val) {
       return percentage(val);

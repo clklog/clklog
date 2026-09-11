@@ -1,5 +1,5 @@
 <template>
-  <div class="FlowView block-main public-hoverItem">
+  <div v-loading="loadingRefresh" class="FlowView block-main public-hoverItem">
     <div class="block-head" style="margin-bottom: 0px">
       <div class="block-title">流量概览</div>
     </div>
@@ -594,6 +594,7 @@ export default {
       iconShow: true,
       flowData: null, //流量概览
       timeType: "",
+      loadingRefresh: false,
     };
   },
   computed: {
@@ -641,9 +642,15 @@ export default {
     },
     getFlow() {
       this.timeType = this.timeTypeFlag;
-      getFlowApi(this.params).then((res) => {
-        this.flowData = res.data;
-      });
+      this.loadingRefresh = true;
+      getFlowApi(this.params)
+        .then((res) => {
+          this.loadingRefresh = false;
+          this.flowData = res.data;
+        })
+        .catch(() => {
+          this.loadingRefresh = false;
+        });
     },
     huanbi(c, p) {
       if (c && p) {

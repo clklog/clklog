@@ -1,6 +1,6 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { clearLocalStorage } from '@/utils/localStorage'
+import { removeLocalStorage } from '@/utils/localStorage'
 import router, { resetRouter } from '@/router'
 
 const state = {
@@ -64,19 +64,35 @@ const actions = {
 
   // user logout
   logout({ commit, state, dispatch }) {
-    return new Promise((resolve, reject) => {
-      
-      logout(state.token).then(() => {
+    return new Promise((resolve) => {
+      const clearLoginData = () => {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
-        clearLocalStorage()
+        // 只清项目相关缓存，不影响用户名 Cookie、token Cookie、其他本地配置
+        removeLocalStorage('prejectCode')
+        removeLocalStorage('projectList')
+        commit('tracking/SET_PROJECT', '', { root: true })
+        commit('tracking/SET_PROJECTARRAY', [], { root: true })
+        // Navbar watch 可能异步回写默认项目，下一拍再清一次
+        Promise.resolve().then(() => {
+          removeLocalStorage('prejectCode')
+          removeLocalStorage('projectList')
+        })
         resetRouter()
         dispatch('tagsView/delAllViews', null, { root: true })
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
+      }
+
+      logout(state.token)
+        .then(() => {
+          clearLoginData()
+          resolve()
+        })
+        .catch(() => {
+          // 退出接口失败也要清本地登录态和项目缓存
+          clearLoginData()
+          resolve()
+        })
     })
   },
 
@@ -86,6 +102,14 @@ const actions = {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
       removeToken()
+      removeLocalStorage('prejectCode')
+      removeLocalStorage('projectList')
+      commit('tracking/SET_PROJECT', '', { root: true })
+      commit('tracking/SET_PROJECTARRAY', [], { root: true })
+      Promise.resolve().then(() => {
+        removeLocalStorage('prejectCode')
+        removeLocalStorage('projectList')
+      })
       resolve()
     })
   },
