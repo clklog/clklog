@@ -60,7 +60,7 @@
       x.src = scriptURLs[index];
       x.setAttribute('charset', 'UTF-8')
       x.onload = function () {
-        console.log("Script loaded: ", scriptURLs[index]);
+        console.log("Script load success --->: ", scriptURLs[index]);
         loadScript(index + 1);
       }
       y.parentNode.insertBefore(x, y);
@@ -80,7 +80,7 @@
   show_log: false,
   is_track_single_page: true,
   send_type:'beacon',
-  server_url: '', //请修改接收地址为clklog_receiver 的接收服务地址，必须传入project和token参数
+  server_url: (window.globalConfig && window.globalConfig.server_url) || '', //请修改接收地址为clklog_receiver 的接收服务地址，必须传入project和token参数（配置见 config.js）
   heatmap: {
     clickmap: 'default',
     scroll_notice_map: 'default',
