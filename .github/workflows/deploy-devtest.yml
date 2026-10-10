@@ -2,7 +2,9 @@ name: "DEVTEST (开发测试环境 · 自动构建 + 宿主机部署)"
 
 on:
   push:
-    branches: [develop, feature/*, devtest]
+    # 任意含 dev 的分支都触发（覆盖原 develop / devtest，并新增 dev、dev-*、feature/*dev* 等）
+    # 通配符 * 可跨越 '/'，因此 feature/xxx-dev 之类同样命中
+    branches: ['*dev*']
   workflow_dispatch:
     inputs:
       skip_build:
