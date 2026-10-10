@@ -1,0 +1,656 @@
+<template>
+  <div class="container">
+    <!-- pc端 -->
+    <div v-if="device == 'desktop'" class="container-item">
+      <div style="width: 60vw">
+        <img src="@/assets/images/loginBg.png"
+          style="width: 60vw; height: 100%; object-fit: contain;flex-shrink: 0;overflow: hidden;" />
+      </div>
+      <div class="login-panel">
+        <el-form
+          ref="loginForm"
+          :model="loginForm"
+          :rules="loginRules"
+          class="login-form"
+          :class="{ 'has-star': is_clklog_demo_environment }"
+          autocomplete="on"
+          label-position="left"
+        >
+          <div class="login-form-body">
+            <div class="title-container">
+              <h3 class="title">
+                <img class="logo_head" src="@/assets/images/logo.png" />
+              </h3>
+            </div>
+            <div class="account-label-row">
+              <span class="field-label">账号</span>
+              <span
+                class="get-experience-account"
+                @click="checkLoginEvent"
+              >没有账号？点击此处</span>
+            </div>
+            <el-form-item prop="username" style="margin-bottom: 25px">
+              <el-input ref="username" v-model="loginForm.username" placeholder="请输入账号" name="username" type="text"
+                tabindex="1" autocomplete="on" />
+            </el-form-item>
+            <div class="field-label" style="margin-bottom: 8px">
+              密码
+            </div>
+            <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
+              <el-form-item prop="password" style="margin-bottom: 25px">
+                <el-input :key="passwordType" ref="password" v-model="loginForm.password" :type="passwordType"
+                  placeholder="请输入密码" name="password" tabindex="2" autocomplete="on" @keyup.native="checkCapslock"
+                  @blur="capsTooltip = false" @keyup.enter.native="handleLogin" />
+
+                <span style="cursor: pointer" :class="passwordType === 'password'
+                  ? 'el-icon-lock'
+                  : 'el-icon-unlock'
+                  " @click="showPwd">
+                  <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+                </span>
+              </el-form-item>
+            </el-tooltip>
+            <div v-if="!is_clklog_demo_environment" style="display: flex; justify-content: space-between">
+              <el-button :loading="loading" type="primary" style="width: 100%; height: 46px"
+                @click.native.prevent="handleLogin">登录</el-button>
+            </div>
+            <div v-else style="display: flex; justify-content: space-between">
+              <el-button :loading="loading" type="primary" style="
+                  width: calc(50% - 10px);
+                  height: 46px;
+                  font-size: 16px;
+                " @click.native.prevent="handleLogin">登录</el-button>
+              <el-button style="
+                  width: calc(50% - 10px);
+                  height: 46px;
+                  background-color: #fd9843;
+                  color: #fff;
+                  font-size: 16px;
+                " @click="checkLoginEvent">获取体验账号</el-button>
+            </div>
+          </div>
+
+          <div v-if="is_clklog_demo_environment" class="gitee-star-area">
+            <div class="gitee-star-box">
+              <div class="gitee-star-title">支持 ClkLog 开源社区</div>
+              <p>如果 ClkLog 对您的项目有所帮助，欢迎在 Gitee 点亮 ⭐ Star 支持我们。</p>
+              <a
+                class="gitee-star-link"
+                href="https://gitee.com/clklog/clklog"
+                target="_blank"
+                rel="noopener noreferrer"
+              >👉 前往 Gitee Star ClkLog</a>
+            </div>
+          </div>
+        </el-form>
+      </div>
+    </div>
+    <!-- 移动端 -->
+    <div class="container-item" v-else style="width: 100vw; height: 100vh">
+      <div style="
+          background-color: #f7faff;
+          box-sizing: border-box;
+          width: 100%;
+          height: 100%;
+        ">
+        <el-form
+          ref="loginForm"
+          :model="loginForm"
+          :rules="loginRules"
+          class="login-form"
+          :class="{ 'has-star': is_clklog_demo_environment }"
+          style="height: 100vh; padding: 0;"
+          autocomplete="on"
+          label-position="left"
+        >
+          <div class="login-form-body">
+            <div class="title-container">
+              <h3 class="title">
+                <img class="logo_head" src="@/assets/images/logo.png" />
+              </h3>
+            </div>
+            <div class="account-label-row">
+              <span class="field-label">账号</span>
+              <span
+                v-if="is_clklog_demo_environment"
+                class="get-experience-account"
+                @click="checkLoginEvent"
+              >获取体验账号</span>
+            </div>
+            <el-form-item prop="username" style="margin-bottom: 25px">
+              <el-input ref="username" v-model="loginForm.username" placeholder="请输入账号" name="username" type="text"
+                tabindex="1" autocomplete="on" />
+            </el-form-item>
+            <div class="field-label" style="margin-bottom: 8px">
+              密码
+            </div>
+            <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
+              <el-form-item prop="password" style="margin-bottom: 25px">
+                <el-input :key="passwordType" ref="password" v-model="loginForm.password" :type="passwordType"
+                  placeholder="请输入密码" name="password" tabindex="2" autocomplete="on" @keyup.native="checkCapslock"
+                  @blur="capsTooltip = false" @keyup.enter.native="handleLogin" />
+                <span style="cursor: pointer" :class="passwordType === 'password'
+                  ? 'el-icon-lock'
+                  : 'el-icon-unlock'
+                  " @click="showPwd">
+                  <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+                </span>
+              </el-form-item>
+            </el-tooltip>
+
+            <div v-if="!is_clklog_demo_environment" style="display: flex; justify-content: space-between">
+              <el-button :loading="loading" type="primary" style="width: 100%; height: 46px"
+                @click.native.prevent="handleLogin">登录</el-button>
+            </div>
+            <div v-else style="display: flex; justify-content: space-between">
+              <el-button :loading="loading" type="primary" style="
+                  width: calc(50% - 10px);
+                  height: 46px;
+                  font-size: 16px;
+                " @click.native.prevent="handleLogin">登录</el-button>
+              <el-button style="
+                  width: calc(50% - 10px);
+                  height: 46px;
+                  background-color: #fd9843;
+                  color: #fff;
+                  font-size: 16px;
+                " @click="checkLoginEvent">获取体验账号</el-button>
+            </div>
+          </div>
+
+          <div v-if="is_clklog_demo_environment" class="gitee-star-area">
+            <div class="gitee-star-box">
+              <div class="gitee-star-title">支持 ClkLog 开源社区</div>
+              <p>如果 ClkLog 对您的项目有所帮助，欢迎在 Gitee 点亮 ⭐ Star 支持我们。</p>
+              <a
+                class="gitee-star-link"
+                href="https://gitee.com/clklog/clklog"
+                target="_blank"
+                rel="noopener noreferrer"
+              >👉 前往 Gitee Star ClkLog</a>
+            </div>
+          </div>
+        </el-form>
+      </div>
+    </div>
+
+    <el-dialog :visible.sync="dialogVisible" width="400px" center>
+      <div style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          font-size: 15px;
+          font-weight: 500;
+        ">
+        <div>微信扫描下方二维码</div>
+        <div style="margin: 20px 0">关注公众号获取体验账号</div>
+        <img src="@/assets/images/qrcode.png" style="width: 200px; height: 200px; object-fit: cover" />
+        <el-button :loading="loading" type="primary" style="width: 100px; height: 35px; margin-top: 40px"
+          @click.native.prevent="dialogVisible = false">确定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import SocialSign from "./components/SocialSignin";
+import { profileApi, subscribeApi } from "@/api/trackingapi/subscribe.js";
+import { mapState } from "vuex";
+import ResizeMixin from "@/layout/mixin/ResizeHandler";
+import { login } from "@/api/user";
+import { getAppMyList } from "@/api/sysmanage/appmanage";
+import { setLocalStorage } from "@/utils/localStorage";
+import { getRememberedUsername, setRememberedUsername } from "@/utils/userInfo";
+export default {
+  name: "Login",
+  components: { SocialSign },
+  mixins: [ResizeMixin],
+  data() {
+    const validateUsername = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error("请输入账号"));
+      } else {
+        callback();
+      }
+    };
+    const validatePassword = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error("请输入密码"));
+      } else {
+        callback();
+      }
+    };
+    return {
+      loginForm: {
+        username: "",
+        password: "",
+      },
+      dialogVisible: false,
+      loginRules: {
+        username: [
+          { required: true, trigger: "blur", validator: validateUsername },
+        ],
+        password: [
+          { required: true, trigger: "blur", validator: validatePassword },
+        ],
+      },
+      passwordType: "password",
+      capsTooltip: false,
+      loading: false,
+      showDialog: false,
+      redirect: undefined,
+      otherQuery: {},
+      clientId: "",
+      subscribed: "",
+      is_clklog_demo_environment: false,
+    };
+  },
+  watch: {
+    $route: {
+      handler: function (route) {
+        const query = route.query;
+        if (query) {
+          // 防止把 NoPermission 错误页作为登录后回跳目标
+          this.redirect = query.redirect === '/NoPermission' ? undefined : query.redirect;
+          this.otherQuery = this.getOtherQuery(query);
+        }
+      },
+      immediate: true,
+    },
+  },
+  computed: {
+    ...mapState({
+      device: (state) => state.app.device,
+    }),
+  },
+  created() {
+    this.$bus.$on("$loginOpen", (res) => {
+      this.initClklog(res);
+    });
+
+    if (window.globalConfig.is_clklog_demo_environment) {
+      this.is_clklog_demo_environment =
+        window.globalConfig.is_clklog_demo_environment;
+    }
+    // 仅回填用户名；密码需用户每次输入，不从本地恢复
+    this.loginForm.username = getRememberedUsername();
+  },
+  mounted() {
+    if (this.loginForm.username === "") {
+      this.$refs.username.focus();
+    } else if (this.loginForm.password === "") {
+      this.$refs.password.focus();
+    }
+  },
+  methods: {
+    openShow() {
+      this.initClklog("sub");
+    },
+    checkLoginEvent() {
+      console.log("执行了操作");
+
+      this.dialogVisible = true;
+    },
+    checkCapslock(e) {
+      const { key } = e;
+      this.capsTooltip = key && key.length === 1 && key >= "A" && key <= "Z";
+    },
+    showPwd() {
+      if (this.passwordType === "password") {
+        this.passwordType = "";
+      } else {
+        this.passwordType = "password";
+      }
+      this.$nextTick(() => {
+        this.$refs.password.focus();
+      });
+    },
+    async handleLogin() {
+      try {
+        const valid = await this.$refs.loginForm.validate();
+        if (!valid) {
+          console.log("表单验证失败");
+          return false;
+        }
+
+        this.loading = true;
+
+        // 调用登录接口
+        const response = await login({
+          username: this.loginForm.username.trim(),
+          password: this.loginForm.password,
+        });
+
+        if (response.code !== 200) {
+          throw new Error(response.message || "登录失败");
+        }
+
+        // 只记住用户名，密码不落 Cookie / 本地存储
+        setRememberedUsername(this.loginForm.username.trim());
+
+        // 执行登录操作
+        await this.$store.dispatch("user/login", response);
+
+        // 根据设备类型跳转不同页面
+        if (this.device === "desktop") {
+          await this.$router.push({
+            path: this.redirect || "/",
+            query: this.otherQuery,
+          });
+        } else {
+          await this.$router.push("/record/summary");
+        }
+
+        // 获取应用列表
+        const appListResponse = await getAppMyList();
+        if (appListResponse.code === 200) {
+          let projectArray = appListResponse.data || [];
+          // 初始化clklog
+          await this.initClklog();
+          // 将项目列表存储到 Vuex store
+          this.$store.dispatch("tracking/setProjectArray", projectArray);
+          // 将项目列表存储到 localStorage
+          setLocalStorage("projectList", projectArray);
+        }
+      } catch (error) {
+        console.error("登录失败:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    initClklog(flag) {
+      profileApi().then((res) => {
+        if (res.code == 200) {
+          this.clientId = res.data;
+          // 订阅
+          // res.data.subscribed = false;
+          if (!res.data.subscribed) {
+            setTimeout(() => {
+              this.$nextTick(() => {
+                this.$bus.$emit("$letter", res.data);
+              });
+            }, 500);
+          }
+        }
+      });
+    },
+    getOtherQuery(query) {
+      return Object.keys(query).reduce((acc, cur) => {
+        if (cur !== "redirect") {
+          acc[cur] = query[cur];
+        }
+        return acc;
+      }, {});
+    },
+  },
+};
+</script>
+
+<style lang="scss">
+$bg: #fff;
+$light_gray: #7b7a7b;
+$cursor: #7b7a7b;
+@supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
+  .container-item .el-input input {
+    color: #7b7a7b;
+  }
+}
+
+.container-item {
+  display: flex;
+
+  .el-input {
+    display: inline-block;
+    height: 46px;
+    width: 85%;
+
+    input {
+      background: transparent;
+      border: 0px;
+      -webkit-appearance: none;
+      border-radius: 0px;
+      padding: 12px 5px 12px 14px;
+      color: $light_gray;
+      height: 46px;
+      caret-color: $cursor;
+    }
+  }
+
+  .el-form-item {
+    border: 1px solid #ddeafb;
+    background: #fff !important;
+    border-radius: 6px;
+    color: #454545;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+$bg: #fff;
+$dark_gray: #889aa4;
+$light_gray: #eee;
+
+.el-dialog__body {
+  padding: 0 30px 30px;
+}
+
+.el-dialog__headerbtn {
+  top: 14px !important;
+}
+
+.container {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.container-item {
+  height: 100%;
+  width: 100%;
+  background-color: $bg;
+  overflow: hidden;
+  display: flex;
+
+  // 登录注册
+  .loginWarry {
+    width: 85%;
+    padding: 35px 0;
+    margin: 0 auto;
+    text-align: center;
+
+    .colFont {
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 20px;
+      color: #4d4d4d;
+    }
+
+    .registration {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 22px;
+      color: #2c7be5;
+      cursor: pointer;
+    }
+  }
+
+  .login-panel {
+    width: 40vw;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+    background-color: #f7faff;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .login-form {
+    position: relative;
+    width: 80%;
+    max-width: 500px;
+    min-height: 100%;
+    height: auto;
+    padding: 0;
+    margin: 0 auto;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+
+    &::before {
+      content: "";
+      flex: 1 1 0;
+      min-height: 24px;
+    }
+
+    &:not(.has-star)::after {
+      content: "";
+      flex: 1 1 0;
+      min-height: 24px;
+    }
+  }
+
+  .login-form-body {
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  .account-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .field-label {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 21px;
+    color: #4d4d4d;
+  }
+
+  .get-experience-account {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 21px;
+    color: #2c7be5;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .gitee-star-area {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 32px;
+    padding-bottom: 40px;
+    box-sizing: border-box;
+  }
+
+  .tips {
+    font-size: 14px;
+    color: #7b7a7b;
+    margin-bottom: 10px;
+
+    span {
+      &:first-of-type {
+        margin-right: 16px;
+      }
+    }
+  }
+
+  .svg-container {
+    padding: 6px 5px 6px 0px;
+    color: $dark_gray;
+    vertical-align: middle;
+    // width: 30px;
+    display: inline-block;
+  }
+
+  .title-container {
+    position: relative;
+
+    .title {
+      font-size: 26px;
+      color: $light_gray;
+      margin: 0px auto 40px auto;
+      text-align: center;
+      font-weight: bold;
+
+      .logo_head {
+        height: 80px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .el-icon-view {
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .show-pwd {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+    font-size: 16px;
+    color: $dark_gray;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .thirdparty-button {
+    position: absolute;
+    right: 0;
+    bottom: 6px;
+  }
+
+  .gitee-star-box {
+    width: 100%;
+    margin-top: auto;
+    margin-bottom: auto;
+    background: #eef5ff;
+    border-radius: 6px;
+    padding: 14px 16px;
+    box-sizing: border-box;
+
+    .gitee-star-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2c7be5;
+      line-height: 22px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin: 0 0 10px;
+      font-size: 13px;
+      line-height: 20px;
+      color: #4d4d4d;
+    }
+
+    .gitee-star-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2c7be5;
+      text-decoration: none;
+      line-height: 20px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 470px) {
+    .thirdparty-button {
+      display: none;
+    }
+  }
+}
+</style>

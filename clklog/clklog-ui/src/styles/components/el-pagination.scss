@@ -1,0 +1,25 @@
+  .el-pagination {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .el-pagination__total{
+    position: absolute;
+    left: 0px;
+  }
+  .block {
+    margin: 15px 0 0;
+  }
+ // .el-pagination {
+  //   position: relative;
+  //   width: 100%;
+  //   display: flex;
+  //   justify-content: flex-end;
+  // }
+  // .el-pagination__jump {
+  //   position: absolute;
+  //   left: 0;
+  // }
+  
+ 

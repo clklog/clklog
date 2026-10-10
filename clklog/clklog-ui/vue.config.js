@@ -1,0 +1,141 @@
+"use strict";
+require("babel-polyfill");
+const path = require("path");
+const defaultSettings = require("./src/settings.js");
+
+function resolve(dir) {
+  return path.join(__dirname, dir);
+}
+
+let MANAGE, DEVAPI;
+// 配置代理地本地代理地址
+function setProxy(env) {
+  // ******** 生产环境 ********
+  if (env === "prod") {  
+    MANAGE = "https:/http://YOUR_DOMAIN/manage"; //clklog-manage-api接口应用路径
+    DEVAPI = "http://YOUR_DOMAIN/api"; //clklog-api接口应用路径
+  } else {  
+    // ******* 测试环境 ********
+    MANAGE = "http://YOUR_DOMAIN/manage";
+    DEVAPI = "http://YOUR_DOMAIN/api";
+  }
+}
+//切换环境
+setProxy("dev");
+
+const name = defaultSettings.title || "ClkLog"; // page title
+const port = process.env.port || process.env.npm_config_port || 9527; // dev port
+
+module.exports = {
+  publicPath: "/",
+  outputDir: "dist",
+  assetsDir: "static",
+  lintOnSave: false,
+  productionSourceMap: false,
+  devServer: {
+    port: port,
+    open: true,
+    overlay: {
+      warnings: false,
+      errors: true,
+    },
+    proxy: {
+      "/DEV-API-MANAGE": {
+        target: MANAGE,
+        changeOrigin: true,
+        pathRewrite: {
+          "^/DEV-API-MANAGE": "",
+        },
+      },
+      "/DEV-API": {
+        target: DEVAPI, // 配置基础api代理地址
+        changeOrigin: true, // 是否支持跨域
+        pathRewrite: {
+          "^/DEV-API": "", // 重写路径：去掉路径中开头的 '/api'
+        },
+      },    
+      "/DEV-APISUB": {
+        target: "https://support.clklog.com/public",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/DEV-APISUB": "",
+        },
+      },
+    },
+  },
+  configureWebpack: {
+    // provide the app's title in webpack's name field, so that
+    // it can be accessed in index.html to inject the correct title.
+    name: name,
+    resolve: {
+      alias: {
+        "@": resolve("src"),
+      },
+    },
+  },
+  chainWebpack(config) {
+    config.plugin("preload").tap(() => [
+      {
+        rel: "preload",
+        fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
+        include: "initial",
+      },
+    ]);
+
+    // when there are many pages, it will cause too many meaningless requests
+    config.plugins.delete("prefetch");
+
+    // set svg-sprite-loader
+    config.module.rule("svg").exclude.add(resolve("src/icons")).end();
+    config.module
+      .rule("icons")
+      .test(/\.svg$/)
+      .include.add(resolve("src/icons"))
+      .end()
+      .use("svg-sprite-loader")
+      .loader("svg-sprite-loader")
+      .options({
+        symbolId: "icon-[name]",
+      })
+      .end();
+
+    config.when(process.env.NODE_ENV !== "development", (config) => {
+      config
+        .plugin("ScriptExtHtmlWebpackPlugin")
+        .after("html")
+        .use("script-ext-html-webpack-plugin", [
+          {
+            // `runtime` must same as runtimeChunk name. default is `runtime`
+            inline: /runtime\..*\.js$/,
+          },
+        ])
+        .end();
+      config.optimization.splitChunks({
+        chunks: "all",
+        cacheGroups: {
+          libs: {
+            name: "chunk-libs",
+            test: /[\\/]node_modules[\\/]/,
+            priority: 10,
+            chunks: "initial", // only package third parties that are initially dependent
+          },
+          elementUI: {
+            name: "chunk-elementUI", // split elementUI into a single package
+            priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
+            test: /[\\/]node_modules[\\/]_?element-ui(.*)/, // in order to adapt to cnpm
+          },
+          commons: {
+            name: "chunk-commons",
+            test: resolve("src/components"), // can customize your rules
+            minChunks: 3, //  minimum common number
+            priority: 5,
+            reuseExistingChunk: true,
+          },
+        },
+      });
+      // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
+      config.optimization.runtimeChunk("single");
+    });
+  },
+  transpileDependencies: process.env.NODE_ENV === "development" ? ["*"] : [],
+};

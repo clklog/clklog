@@ -1,0 +1,20 @@
+.radio-com {
+  background-color: #ffffff;
+  margin-left: 20px;
+  height: 30px;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  display: flex;
+  align-items: center;
+}
+
+.radio-com .radio-com-label {
+  font-size: 13px;
+  padding: 0 10px;
+  color: #697195;
+  line-height: 30px;
+}
+
+.radio-com .radio-com-el {
+  padding-right: 10px;
+}

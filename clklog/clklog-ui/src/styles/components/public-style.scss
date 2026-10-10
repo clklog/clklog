@@ -1,0 +1,51 @@
+.public-block {
+  margin: 20px;
+  box-sizing: border-box;
+}
+.public-radius {
+  border-radius: 6px;
+}
+
+.public-table-block {
+  box-sizing: border-box;
+  margin: 20px 0;
+  padding: 22px;
+  background: #fff;
+}
+.public-Table-minHeight {
+  margin-top: 15px;
+  box-sizing: border-box;
+}
+
+.public-echart-block {
+  margin: 20px 0;
+  width: 100%;
+  min-height: 300px;
+}
+
+.public-firstHead {
+  font-size: 15px;
+  font-weight: 600;
+  // line-height: 31px;
+  line-height: 25px;
+  color: #4d4d4d;
+  // padding-bottom: 5px;
+}
+// page every block
+.public-hoverItem {
+  border-radius: 6px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+.public-hoverItem:hover {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+}
+// page 概览间距整体调整
+.Overview {
+  min-height: 118px;
+  background-color: #fff;
+  padding: 15px;
+}
+.public-visited-echarts {
+  font-size: 15px;
+  padding: 40px 20px 0;
+}
