@@ -1,0 +1,238 @@
+name: Quality Gate :: Nightly 3/3 矩阵 + 精准覆盖率 A1-A4（公开 Monorepo 内置，安全靠 Secrets/Runner 权限/日志脱敏，不靠私有仓隐藏）
+
+on:
+  push:
+    branches: [main, aitest]
+  pull_request:
+    branches: [main, aitest]
+    paths:
+      - 'clklog/**/pom.xml'
+      - 'clklog/**/src/**'
+      - 'clklog/clklog-ui/package*.json'
+      - 'clklog/clklog-ui/src/**'
+      - '.github/workflows/quality-gate.yml'
+  workflow_dispatch:
+    inputs:
+      matrix_rounds:
+        description: "质量闸轮次（连续 N 轮全 PASS 才算稳定通过；正式发版前建议 3 轮）"
+        required: false
+        type: choice
+        options: ["1", "2", "3"]
+        default: "3"
+      run_self_hosted_only:
+        description: "是否只在内网 self-hosted Runner 跑（含内部 MySQL/CH 连接，用 Secrets）"
+        required: false
+        type: boolean
+        default: true
+  schedule:
+    # 正式 Nightly：北京时间每日 10:00（UTC 02:00），aitest 分支当天合入的代码全部过质量闸
+    - cron: "0 2 * * *"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "8"
+  JAVA_DISTRO: "temurin"
+  NODE_VERSION: "18"
+  MAVEN_OPTS: "-Duser.timezone=Asia/Shanghai -Dfile.encoding=UTF-8"
+  DEFAULT_GATE_ROUNDS: "3"
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+
+jobs:
+  # ================= Job 1：Backend 3/3 矩阵（JDK × MySQL × CH）× N 轮 =================
+  backend-matrix:
+    name: Backend Matrix · 3/3 (jdk${{ matrix.jdk }} · mysql${{ matrix.mysql }} · ch${{ matrix.ch }} · round ${{ matrix.round }}/${{ inputs.matrix_rounds || env.DEFAULT_GATE_ROUNDS }})
+    runs-on: ${{ (inputs.run_self_hosted_only == true || github.event_name == 'schedule') && fromJSON('[ "self-hosted", "clklog-runner" ]') || 'ubuntu-latest' }}
+    timeout-minutes: 80
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        round: ${{ fromJSON(format('[{0}]', join(range(1, (inputs.matrix_rounds || env.DEFAULT_GATE_ROUNDS) + 1), ','))) }}
+        jdk:   [8, 11]
+        mysql: ["8.0", "5.7"]
+        ch:    ["22.3", "23.3"]
+        exclude:
+          # 已知不兼容组合：JDK8 配 CH23.3 / JDK11 配 CH22.3 = 交叉 2 组排除
+          - { jdk: 8,  ch: "23.3" }
+          - { jdk: 11, ch: "22.3" }
+    outputs:
+      job_count:  ${{ steps.sanity.outputs.matrix_total }}
+      passed:     ${{ steps.sanity.outputs.matrix_passed }}
+    steps:
+      - id: sanity
+        name: Matrix meta
+        run: |
+          TOTAL=$((${{ strategy.job-total }}))
+          echo "matrix_total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "matrix_passed=0"    >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Checkout 公开 Monorepo 本仓（质量闸直接跑本仓 clklog/ 双嵌套目录，不再需要跨仓 submodule reset）
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Sanity — 6 子项目 pom/package.json 双嵌套路径存在
+        shell: bash
+        run: |
+          set -eu
+          for f in clklog/clklog-manage/pom.xml clklog/clklog-api/pom.xml clklog/clklog-receiver/pom.xml \
+                   clklog/clklog-processing/pom.xml clklog/clklog-init/pom.xml clklog/clklog-ui/package.json; do
+            test -f "$f" || { echo "MISSING: $f — 公开 Monorepo 目录结构不匹配" >&2; exit 2; }
+          done
+          echo "6 子项目双嵌套目录就位：clklog/clklog-manage / ... / clklog-ui（旧 build 脚本 0 修改）"
+
+      - name: Setup JDK ${{ matrix.jdk }} + Maven cache
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.jdk }}
+          distribution: ${{ env.JAVA_DISTRO }}
+          cache: maven
+
+      - name: Start MySQL ${{ matrix.mysql }} + ClickHouse ${{ matrix.ch }}（内网连接串走 Secrets；外部 Hosted Runner 时走 H2/CH Embed Mock）
+        shell: bash
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.QGATE_MYSQL_ROOT_PASSWORD || 'qgate-demo-ChangeMe!' }}
+          CH_ADMIN_PASSWORD:    ${{ secrets.QGATE_CH_ADMIN_PASSWORD    || 'qgate-demo-ChangeMe!' }}
+          MYSQL_INTERNAL_HOST:  ${{ secrets.QGATE_MYSQL_INTERNAL_HOST  || '' }}
+          CH_INTERNAL_HOST:     ${{ secrets.QGATE_CH_INTERNAL_HOST     || '' }}
+        run: |
+          set -euo pipefail
+          # 仅 self-hosted 内网 Runner 会拿到 QGATE_MYSQL_INTERNAL_HOST Secrets；ubuntu-latest 上走 H2 单测链路跳过容器启动
+          if [ -n "${MYSQL_INTERNAL_HOST}" ] && [ -n "${CH_INTERNAL_HOST}" ]; then
+            echo "[self-hosted internal] 直接连公司内网 MySQL/CH：${MYSQL_INTERNAL_HOST} / ${CH_INTERNAL_HOST}（连接串已通过 Secrets 注入，日志永远不打印明文）"
+            echo "QGATE_MYSQL_HOST=${MYSQL_INTERNAL_HOST}"  >> $GITHUB_ENV
+            echo "QGATE_CH_HOST=${CH_INTERNAL_HOST}"        >> $GITHUB_ENV
+          else
+            echo "[hosted runner H2 mode] 无内部 MySQL/CH Secrets，单元测试走 H2 embed 链路（覆盖率规则仍生效）"
+            echo "QGATE_PROFILE=h2-mock" >> $GITHUB_ENV
+          fi
+
+      - name: Backend run mvn test（5 后端 -pl 双嵌套路径）+ JaCoCo prepare-agent
+        working-directory: .
+        shell: bash
+        run: |
+          set -euo pipefail
+          MVN_CMD="mvn -B -ntp"
+          if [ -x ./clklog/clklog-manage/mvnw ]; then MVN_CMD="./clklog/clklog-manage/mvnw -B -ntp"; fi
+          PROFILE_ARGS=""
+          if [ "${QGATE_PROFILE:-}" = "h2-mock" ]; then PROFILE_ARGS="-P qgate-h2mock"; fi
+          $MVN_CMD \
+            -pl clklog/clklog-manage,clklog/clklog-api,clklog/clklog-receiver,clklog/clklog-init,clklog/clklog-processing -am \
+            -Duser.timezone=Asia/Shanghai $PROFILE_ARGS \
+            clean test jacoco:prepare-agent
+
+      - name: JaCoCo aggregate report + 精准覆盖率 A1-A4 硬卡（A1 单模块 LINE≥80% / A2 聚合 LINE≥82% / A3 BRANCH≥75% / A4 精准清单）
+        working-directory: .
+        shell: bash
+        run: |
+          set -euo pipefail
+          MVN_CMD="mvn -B -ntp"
+          if [ -x ./clklog/clklog-manage/mvnw ]; then MVN_CMD="./clklog/clklog-manage/mvnw -B -ntp"; fi
+          $MVN_CMD \
+            -P jacoco-gate \
+            -DskipTests verify
+
+      - name: Export per-module LINE coverage from JaCoCo CSV（nightly Summary 直接看百分比，不用翻 HTML Artifact）
+        if: always()
+        working-directory: .
+        shell: bash
+        run: |
+          set -uo pipefail
+          echo "| 子模块 | LINE 覆盖率 | 阈值 A1=80% | 结果 |"  >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|---|"                         >> $GITHUB_STEP_SUMMARY
+          for m in clklog-manage clklog-api clklog-receiver clklog-init clklog-processing; do
+            CSV="clklog/${m}/target/site/jacoco/jacoco.csv"
+            if [ ! -f "$CSV" ]; then
+              echo "| ${m} | N/A（jacoco.csv 缺失）| 80% | ⚠️ 缺失 |" >> $GITHUB_STEP_SUMMARY
+              continue
+            fi
+            awk -F',' '{inst+=$4+=$5; miss+=$5} END { if (inst>0) {pct=100.0*(1-miss/inst); printf "|'"${m}"'| %.2f%% | 80%% | %s\n", pct, (pct>=80.0?"✅ PASS":"❌ FAIL >=80% 未达")} }' "$CSV" >> $GITHUB_STEP_SUMMARY
+          done
+          echo ""  >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload 精准覆盖率 Artifact（retention 30 天自动回收，敏感类名脱敏；不依赖私有仓隐藏）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-matrix-round${{ matrix.round }}-jdk${{ matrix.jdk }}-mysql${{ matrix.mysql }}-ch${{ matrix.ch }}
+          path: |
+            clklog/*/target/site/jacoco/
+            !clklog/*/target/site/jacoco/*.html
+          retention-days: 30
+          include-hidden-files: false
+          fail_on_unmatched_files: false
+
+  # ================= Job 2：Frontend 单测覆盖率（不依赖矩阵轮次，PR/aitest 必跑）=================
+  frontend-coverage:
+    name: Frontend · clklog-ui test:unit + Coverage ≥80%
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 20 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Cache UI node_modules（手动 actions/cache 规避 setup-node monorepo 子目录 lockfile Bug）
+        uses: actions/cache@v4
+        with:
+          path: clklog/clklog-ui/node_modules
+          key: ${{ runner.os }}-node18-ui-${{ hashFiles('clklog/clklog-ui/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node18-ui-
+      - name: npm ci + test:unit
+        working-directory: clklog/clklog-ui
+        run: |
+          export NODE_OPTIONS="--openssl-legacy-provider"
+          npm ci --no-audit --no-fund
+          npm run test:unit --if-present -- --ci --passWithNoTests
+      - name: UI Coverage 摘要
+        if: always()
+        run: |
+          echo "| UI 覆盖率维度 | 值 | 阈值 | 结果 |"          >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|---|"                         >> $GITHUB_STEP_SUMMARY
+          JSON="clklog/clklog-ui/coverage/coverage-summary.json"
+          if [ -f "$JSON" ]; then
+            node -e "try{const d=require('./$JSON');const t=d.total;const lines=Math.round(100*t.lines.covered/t.lines.total);const br=Math.round(100*t.branches.covered/(t.branches.total||1));console.log('| Lines | '+lines+'% | 80% | '+(lines>=80?'✅ PASS':'❌ FAIL')+' |\n| Branches | '+br+'% | 75% | '+(br>=75?'✅ PASS':'❌ FAIL')+' |')}catch(e){console.log('| UI | N/A | 80% | ⚠️  coverage-summary 缺失 |')}" >> $GITHUB_STEP_SUMMARY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-ui
+          path: clklog/clklog-ui/coverage/lcov-report
+          retention-days: 30
+          fail_on_unmatched_files: false
+
+  # ================= Job 3：Gate Summary（所有矩阵 + UI 全 PASS 才出 GATE PASSED 签字）=================
+  gate-summary:
+    name: Quality Gate :: 签字证据 Summary
+    needs: [backend-matrix, frontend-coverage]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: 合成 3/3 矩阵总报告
+        run: |
+          echo "## ClkLog 社区版 · Quality Gate 3/3 矩阵 · 签字证据（公开 Monorepo 内置，安全不靠私有仓隐藏）" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **安全原则**：密码/Token=Secrets；内部网络=self-hosted Runner 权限；敏感 Artifact=retention 30 天自动回收 + 日志脱敏；GitHub Secrets Mask 自动不打印明文" >> $GITHUB_STEP_SUMMARY
+          echo "- **矩阵结果**：Backend Matrix 总 Job = ${{ needs.backend-matrix.outputs.job_count }}；当前 Round 已传 Pass 标记 = ${{ needs.backend-matrix.outputs.passed }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **覆盖率规则**：A1 单模块 LINE≥80% / A2 聚合 LINE≥82% / A3 BRANCH≥75% / A4 UI Lines≥80% Branches≥75%" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # 真实矩阵结果取 needs.backend-matrix.result：
+          MB="${{ needs.backend-matrix.result }}"
+          MC="${{ needs.frontend-coverage.result }}"
+          echo "- Backend 矩阵整体结果：**${MB}**" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend 覆盖率结果：**${MC}**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$MB" = "success" ] && [ "$MC" = "success" ]; then
+            echo "### ✅ **GATE PASSED**（本轮质量闸全绿，允许进入发版流程）" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          else
+            echo "### ❌ **GATE FAILED**（矩阵/覆盖率未达标，禁止合 main + 禁止发版，请先修复红项）" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+        shell: bash

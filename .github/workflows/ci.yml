@@ -1,0 +1,146 @@
+name: CI (公开 Monorepo · 构建验证 · 仓库级零凭据 · 仅 release.yml 通过 release-prod Environment 审批后允许 Push)
+
+on:
+  push:
+    branches: [main, aitest]
+  pull_request:
+    branches: [main, aitest]
+    paths:
+      - 'clklog/clklog-{api,init,manage,processing,receiver,ui}/**'
+      - '.github/workflows/ci.yml'
+      - '.gitignore'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "8"
+  JAVA_DISTRO: "temurin"
+  NODE_VERSION: "18"
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+
+jobs:
+  build-matrix:
+    name: build-${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      sha_short: ${{ steps.sha.outputs.sha_short }}
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        include:
+          - { name: clklog-manage,     dir: clklog/clklog-manage,     lang: java, jar_suffix: "" }
+          - { name: clklog-api,        dir: clklog/clklog-api,        lang: java, jar_suffix: "" }
+          - { name: clklog-receiver,   dir: clklog/clklog-receiver,   lang: java, jar_suffix: "" }
+          - { name: clklog-processing, dir: clklog/clklog-processing, lang: java, jar_suffix: "-jar-with-dependencies" }
+          - { name: clklog-init,       dir: clklog/clklog-init,       lang: java, jar_suffix: "" }
+          - { name: clklog-ui,         dir: clklog/clklog-ui,         lang: node, jar_suffix: "" }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 输出短 SHA
+        id: sha
+        run: echo "sha_short=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Setup JDK 8 + Maven cache
+        if: matrix.lang == 'java'
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+          cache: maven
+
+      - name: Setup Node 18
+        if: matrix.lang == 'node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache Node Modules（monorepo 子目录 lockfile → actions/cache 手动处理，绕开 setup-node cache-dependency-path 顺序 bug）
+        if: matrix.lang == 'node'
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.dir }}/node_modules
+          key: ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package-lock.json', matrix.dir)) }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package.json', matrix.dir)) }}-
+            ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-
+
+      - name: Build Java (clean verify · 子 pom 自带 jacoco LINE≥80% 硬卡生效)
+        if: matrix.lang == 'java'
+        working-directory: ${{ matrix.dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x mvnw mvnw.cmd 2>/dev/null || true
+          if [ -x ./mvnw ]; then
+            ./mvnw -B -ntp clean verify -DskipITs
+          else
+            mvn -B -ntp clean verify -DskipITs
+          fi
+
+      - name: 导出当前 Java 子项目实际 POM version
+        id: pom_ver
+        if: matrix.lang == 'java'
+        working-directory: ${{ matrix.dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          V=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f pom.xml)
+          echo "pom_ver=$V" >> $GITHUB_OUTPUT
+          echo "detected ${{ matrix.name }} pom version = $V"
+
+      - name: Build Node (npm ci → test:unit → build dist)
+        if: matrix.lang == 'node'
+        working-directory: ${{ matrix.dir }}
+        run: |
+          export NODE_OPTIONS="--openssl-legacy-provider"
+          npm ci
+          npm run test:unit --if-present -- --ci --passWithNoTests
+          npm run build --if-present
+
+      - name: 修复 Dockerfile Base Image（仅 Runner 内存修改，不入库；Docker Hub openjdk:8 已 2023 起废弃移除，替换为 Official Temurin 8 JDK）
+        if: matrix.lang == 'java' && matrix.name != 'clklog-processing'
+        working-directory: ${{ matrix.dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -la Dockerfile
+          ORIG="$(head -1 Dockerfile)"
+          sed -i -E 's/^FROM openjdk:8(u[0-9]+-[a-z]+)?$/FROM eclipse-temurin:8u422-b05-jdk/' Dockerfile
+          NEW="$(head -1 Dockerfile)"
+          echo "FROM line: [$ORIG] -> [$NEW]"
+
+      - name: Dockerfile 构建验证 (Public 仓仓库级零凭据 · push=false 永久兜底 · Registry Push 仅 release-prod Environment 审批通过后允许)
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.dir }}
+          file: ${{ matrix.dir }}/Dockerfile
+          push: false
+          build-args: |
+            ${{ matrix.lang == 'java' && format('JAR_FILE=target/{0}-{1}{2}.jar', matrix.name, steps.pom_ver.outputs.pom_ver, matrix.jar_suffix) || '' }}
+            ${{ matrix.lang == 'node' && 'HTML_DIR=dist' || '' }}
+          tags: local/${{ matrix.name }}:ci-${{ steps.sha.outputs.sha_short }}
+
+      - name: 上传 JaCoCo 报告 (Java · 公开仓粗览 · 精确覆盖率由 quality-gate 承担)
+        if: matrix.lang == 'java' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-${{ matrix.name }}-${{ steps.sha.outputs.sha_short }}
+          path: ${{ matrix.dir }}/target/site/jacoco/**
+          retention-days: 14
+
+      - name: 上传 Jest 报告 (UI)
+        if: matrix.lang == 'node' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-${{ matrix.name }}-${{ steps.sha.outputs.sha_short }}
+          path: |
+            ${{ matrix.dir }}/junit.xml
+            ${{ matrix.dir }}/coverage/**
+          retention-days: 14
+          if-no-files-found: warn

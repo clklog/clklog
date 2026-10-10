@@ -1,0 +1,29 @@
+<clickhouse>
+    <logger>
+        <level>notice</level>
+    </logger>
+    <query_log>
+        <ttl>event_date + INTERVAL 3 DAY</ttl>
+    </query_log>
+    <trace_log>
+        <ttl>event_date + INTERVAL 3 DAY</ttl>
+    </trace_log>
+    <query_thread_log>
+        <ttl>event_date + INTERVAL 3 DAY</ttl>
+    </query_thread_log>
+    <query_views_log>
+        <ttl>event_date + INTERVAL 3 DAY</ttl>
+    </query_views_log>
+    <part_log>
+        <ttl>event_date + INTERVAL 3 DAY</ttl>
+    </part_log>
+    <text_log>
+        <ttl>event_date + INTERVAL 3 DAY</ttl>
+    </text_log>
+    <metric_log>
+        <ttl>event_date + INTERVAL 3 DAY</ttl>
+    </metric_log>
+    <asynchronous_metric_log>
+        <ttl>event_date + INTERVAL 3 DAY</ttl>
+    </asynchronous_metric_log>
+</clickhouse>

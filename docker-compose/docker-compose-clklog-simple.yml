@@ -1,0 +1,190 @@
+﻿include:
+  - path: ./docker-compose-clklog-simple-base.yml
+
+version: "3"
+
+services:
+  gateway:
+    image: "registry.cn-shanghai.aliyuncs.com/clklog/nginx:1.23"
+    restart: "always"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./clklog_dc_config/gateway/simple:/etc/nginx/conf.d:rw
+    depends_on:
+      - clklog-ui
+      - clklog-receiver
+      - clklog-api
+      - clklog-manage
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/index.html"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  clklog-ui:
+    image: "registry.cn-shanghai.aliyuncs.com/clklog/ui:${CLKLOG_VER}"
+    restart: "always"
+    environment:
+      - TZ=Asia/Shanghai
+    expose:
+      - "80"
+    volumes:
+      # config.js内配置接口地址
+      - ./clklog_dc_config/ui/config.js:/usr/share/nginx/html/config.js
+    networks:
+      - frontend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 50M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  clklog-receiver:
+    image: "registry.cn-shanghai.aliyuncs.com/clklog/receiver:${CLKLOG_VER}"
+    restart: "always"
+    depends_on:
+      - clickhouse
+      - redis
+    volumes:
+      # 挂载采集的日志
+      - ./clklog_dc_data/receiver/:/log
+    environment:
+      - TZ=Asia/Shanghai
+      - SERVER_PORT=8080
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_DATASOURCE_CLICKHOUSE_JDBC_URL=jdbc:clickhouse://clickhouse/${CLKLOG_LOG_DB}
+      - SPRING_DATASOURCE_CLICKHOUSE_USERNAME=${CK_USER_NAME}
+      - SPRING_DATASOURCE_CLICKHOUSE_PASSWORD=${CK_USER_PWD}
+      - RECEIVER_RESOURCE_PATH=
+      - RECEIVER_ENABLE_SIMPLE_VERSION=true
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 1024M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  clklog-api:
+    image: "registry.cn-shanghai.aliyuncs.com/clklog/api:${CLKLOG_VER}"
+    restart: "always"
+    depends_on:
+      - clickhouse
+      - redis
+    environment:
+      - SPRINGDOC_API_DOCS_PATH=/api/v3/api-docs
+      - TZ=Asia/Shanghai
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_CLICKHOUSE_JDBC_URL=jdbc:clickhouse://clickhouse/${CLKLOG_LOG_DB}
+      - SPRING_DATASOURCE_CLICKHOUSE_USERNAME=${CK_USER_NAME}
+      - SPRING_DATASOURCE_CLICKHOUSE_PASSWORD=${CK_USER_PWD}
+      - CLKLOG_COMMON_ACCESS_CONTROL_ALLOW_ORIGIN_PATTERNS=*
+      - CLKLOG_API_PROJECT_NAME=${PROJECT_NAME}
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1024M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  clklog-manage:
+    image: "registry.cn-shanghai.aliyuncs.com/clklog/manage:${CLKLOG_VER}"
+    restart: "always"
+    depends_on:
+      - mysql
+      - clickhouse
+      - redis
+    volumes:
+      # 挂载receiver的采集日志到/receiverlog,以便manage服务读取
+      - ./clklog_dc_data/receiver/:/receiverlog
+      # 挂载配置文件,包括国家、城市中英文对照表、移动设备型号与品牌对照表
+      - ./clklog_dc_config/manage/:/setting
+    environment:
+      - SPRINGDOC_API_DOCS_PATH=/api/v3/api-docs
+      - TZ=Asia/Shanghai
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_FLYWAY_ENABLED=false
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_CLICKHOUSE_JDBC_URL=jdbc:clickhouse://clickhouse/${CLKLOG_LOG_DB}
+      - SPRING_DATASOURCE_CLICKHOUSE_USERNAME=${CK_USER_NAME}
+      - SPRING_DATASOURCE_CLICKHOUSE_PASSWORD=${CK_USER_PWD}
+      - SPRING_DATASOURCE_MYSQL_JDBC_URL=jdbc:mysql://mysql/clklog?characterEncoding=UTF-8&useTimezone=true&serverTimezone=GMT%2B8
+      - SPRING_DATASOURCE_MYSQL_USERNAME=root
+      - SPRING_DATASOURCE_MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - CLKLOG_COMMON_ACCESS_CONTROL_ALLOW_ORIGIN_PATTERNS=*
+      - CLKLOG_COMMON_ANONYMOUS_METHOD_LIST=/auth/login
+      - CLKLOG_MANAGE_LOG_STORE_PATH=/receiverlog
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2048M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  clklog-init:
+    image: "registry.cn-shanghai.aliyuncs.com/clklog/init:${CLKLOG_VER}"
+    restart: "always"
+    depends_on:
+      - clickhouse
+    volumes:
+      # 挂载日志文件
+      - ./clklog_dc_data/initlog/:/log
+    environment:
+      - TZ=Asia/Shanghai
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_CLICKHOUSE_JDBC_URL=jdbc:clickhouse://clickhouse/default
+      - SPRING_DATASOURCE_CLICKHOUSE_USERNAME=${CK_USER_NAME}
+      - SPRING_DATASOURCE_CLICKHOUSE_PASSWORD=${CK_USER_PWD}
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+#networks:
+#  frontend: {}
+#  backend: {}

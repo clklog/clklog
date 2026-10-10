@@ -1,0 +1,82 @@
+version: "3"
+
+services:
+  redis:
+    image: "registry.cn-shanghai.aliyuncs.com/clklog/redis:7.0"
+    restart: "always"
+    environment:
+      - TZ=Asia/Shanghai
+    command: redis-server /etc/redis/redis.conf
+    privileged: true
+    volumes:
+      - ./clklog_dc_config/redis/redis.conf:/etc/redis/redis.conf
+      - ./clklog_dc_data/redis:/redisdata
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 200M
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  clickhouse:
+    image: "registry.cn-shanghai.aliyuncs.com/clklog/clickhouse_clickhouse-server:23.2.1"
+    restart: "always"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./clklog_dc_config/clickhouse/config.d/default-config.xml:/etc/clickhouse-server/config.d/default-config.xml:rw
+      - ./clklog_dc_config/clickhouse/users.d/default-password.xml:/etc/clickhouse-server/users.d/default-password.xml:rw
+      - ./clklog_dc_data/clickhouse/log:/var/log/clickhouse-server
+      - ./clklog_dc_data/clickhouse:/var/lib/clickhouse:rw
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 8G
+        reservations:
+          cpus: '0.5'
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8123/ping" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  mysql:
+    image: registry.cn-shanghai.aliyuncs.com/clklog/mysql:8.4
+    restart: always
+    ports:
+      - "3306:3306"
+    command: --init-file /data/application/init.sql
+    volumes:
+      - ./clklog_dc_data/mysql/data:/var/lib/mysql
+      - ./clklog_dc_config/init/mysql_clklog.sql:/data/application/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 500M
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  frontend: {}
+  backend: {}

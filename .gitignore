@@ -1,0 +1,93 @@
+# ============================================================
+# Build Tools · 5 后端 Java / Maven
+# ============================================================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ============================================================
+# Build Tools · clklog-ui (Vue2 / npm)
+# ============================================================
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+yarn.lock
+
+# ============================================================
+# 覆盖率 / 测试报告
+# ============================================================
+clklog/*/target/site/jacoco/**
+clklog/*/target/jacoco.exec
+clklog/clklog-ui/coverage/**
+clklog/clklog-ui/junit.xml
+tests/**/coverage/
+tests/e2e/reports
+selenium-debug.log
+
+# ============================================================
+# IDE & 编辑器
+# ============================================================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.idea
+.vscode
+*.iws
+*.iml
+*.ipr
+rebel.xml
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+*~
+
+# ============================================================
+# 真实环境配置 / 密码文件永远不入库
+# ============================================================
+.env.local
+.env.local.*
+.env.production*
+.env.development*
+.env.staging*
+release/docker-compose/.env.local
+release/docker-compose/.env.local.*
+release/docker-compose/docker-compose.override*.yml
+clklog_dc_data/
+*.db
+*.sqlite
+
+# ============================================================
+# 日志 & 系统
+# ============================================================
+*.log
+.DS_Store
+Thumbs.db
+
+# ============================================================
+# 临时目录（workflow artifact 下载临时目录）
+# ============================================================
+_artifacts/
+_public_src/
+monorepo-output/

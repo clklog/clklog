@@ -1,0 +1,47 @@
+name: DEBUG-self-hosted-connectivity
+run-name: DEBUG self-hosted 连通性测试 #${{ github.run_number }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      with_ce_label:
+        description: 是否带 clklog-ce-runner 标签（true=和 deploy-test.yml 同选择器；false=仅默认 self-hosted）
+        type: boolean
+        default: true
+
+jobs:
+  t1-ce-label:
+    name: t1-ce-label [self-hosted, clklog-ce-runner]
+    if: ${{ inputs.with_ce_label }}
+    runs-on: [self-hosted, clklog-ce-runner]
+    timeout-minutes: 5
+    steps:
+      - name: 主机信息 / Docker / Compose 版本
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "--- hostname ---"; hostname
+          echo "--- uname -a ---"; uname -a
+          echo "--- whoami ---"; whoami
+          echo "--- pwd ---"; pwd
+          echo "--- docker version ---"; docker version || true
+          echo "--- docker compose version ---"; docker compose version || true
+          echo "--- home ---"; ls -la "$HOME" || true
+          echo "✅ t1-ce-label picked up by $(hostname) at $(date -Iseconds)"
+
+      - name: Runner / GitHub 环境变量
+        shell: bash
+        run: env | sort | grep -iE '^(RUNNER|GITHUB)_' || true
+
+  t2-default-self-hosted:
+    name: t2-only-self-hosted [仅默认 self-hosted]
+    if: ${{ ! inputs.with_ce_label }}
+    runs-on: self-hosted
+    timeout-minutes: 5
+    steps:
+      - name: 主机信息
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "✅ t2-default-self-hosted picked up by $(hostname) at $(date -Iseconds)"
+          echo "whoami=$(whoami) pwd=$(pwd)"

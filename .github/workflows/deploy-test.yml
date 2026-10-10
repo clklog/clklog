@@ -1,0 +1,358 @@
+name: Deploy Test Environment (aitest 分支专用 · self-hosted clklog-runner · 无 Registry Push 权限)
+
+on:
+  push:
+    branches: [aitest]
+    paths:
+      - 'clklog/clklog-{api,init,manage,processing,receiver,ui}/**'
+      - '.github/workflows/deploy-test.yml'
+  pull_request:
+    branches: [aitest]
+    paths:
+      - 'clklog/clklog-{api,init,manage,processing,receiver,ui}/**'
+      - '.github/workflows/deploy-test.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-test-aitest
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "8"
+  JAVA_DISTRO: "temurin"
+  NODE_VERSION: "18"
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+  # compose 三件套模板已直接在公开仓 docker-compose/ 目录维护（VER_PLACEHOLDER + 非真实密码）
+  # 本工作流 yq 就地修改 simple.yml 追加 build.context，Runner 结束自动清理工作目录，改动永不入库
+
+jobs:
+  # ============================================================
+  # Job 1：build-matrix（PR/aitest push 均触发 · 纯构建验证 + 上传构建产物 artifact）
+  # ============================================================
+  build-matrix:
+    name: build-${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      sha_short: ${{ steps.sha.outputs.sha_short }}
+      # 5 后端各子项目的 pom version 传到 Job2，避免 Job2 再跑一遍 mvn evaluate 重复耗时
+      ver_manage: ${{ steps.vers.outputs.ver_manage }}
+      ver_api: ${{ steps.vers.outputs.ver_api }}
+      ver_receiver: ${{ steps.vers.outputs.ver_receiver }}
+      ver_processing: ${{ steps.vers.outputs.ver_processing }}
+      ver_init: ${{ steps.vers.outputs.ver_init }}
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        include:
+          - { name: clklog-manage,     dir: clklog/clklog-manage,     lang: java, jar_suffix: "",                short: manage }
+          - { name: clklog-api,        dir: clklog/clklog-api,        lang: java, jar_suffix: "",                short: api }
+          - { name: clklog-receiver,   dir: clklog/clklog-receiver,   lang: java, jar_suffix: "",                short: receiver }
+          - { name: clklog-processing, dir: clklog/clklog-processing, lang: java, jar_suffix: "-jar-with-dependencies", short: processing }
+          - { name: clklog-init,       dir: clklog/clklog-init,       lang: java, jar_suffix: "",                short: init }
+          - { name: clklog-ui,         dir: clklog/clklog-ui,         lang: node, jar_suffix: "",                short: ui }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 输出短 SHA
+        id: sha
+        run: echo "sha_short=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Setup JDK 8 + Maven cache
+        if: matrix.lang == 'java'
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+          cache: maven
+
+      - name: Setup Node 18
+        if: matrix.lang == 'node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache Node Modules（monorepo 子目录 lockfile → actions/cache 手动处理，绕开 setup-node cache-dependency-path 顺序 bug）
+        if: matrix.lang == 'node'
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.dir }}/node_modules
+          key: ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package-lock.json', matrix.dir)) }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package.json', matrix.dir)) }}-
+            ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-
+
+      - name: Build Java (clean verify · 子 pom 自带 jacoco LINE≥80% 硬卡生效)
+        if: matrix.lang == 'java'
+        working-directory: ${{ matrix.dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x mvnw mvnw.cmd 2>/dev/null || true
+          if [ -x ./mvnw ]; then
+            ./mvnw -B -ntp clean verify -DskipITs
+          else
+            mvn -B -ntp clean verify -DskipITs
+          fi
+
+      - name: Build Node (npm ci → test:unit → build dist)
+        if: matrix.lang == 'node'
+        working-directory: ${{ matrix.dir }}
+        run: |
+          export NODE_OPTIONS="--openssl-legacy-provider"
+          npm ci
+          npm run test:unit --if-present -- --ci --passWithNoTests
+          npm run build --if-present
+
+      - name: 导出 Java 子项目实际 POM version
+        if: matrix.lang == 'java'
+        id: vers
+        working-directory: ${{ matrix.dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          V=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f pom.xml)
+          echo "detected pom version = $V (service=${{matrix.name}})"
+          case "${{matrix.name}}" in
+            clklog-manage)     echo "ver_manage=$V"     >> $GITHUB_OUTPUT ;;
+            clklog-api)        echo "ver_api=$V"        >> $GITHUB_OUTPUT ;;
+            clklog-receiver)   echo "ver_receiver=$V"   >> $GITHUB_OUTPUT ;;
+            clklog-processing) echo "ver_processing=$V" >> $GITHUB_OUTPUT ;;
+            clklog-init)       echo "ver_init=$V"       >> $GITHUB_OUTPUT ;;
+          esac
+
+      - name: 修复 Dockerfile Base Image（仅 Runner 内存修改，不入库；Docker Hub openjdk:8 已 2023 起废弃移除，替换为 Official Temurin 8 JDK）
+        if: matrix.lang == 'java' && matrix.name != 'clklog-processing'
+        working-directory: ${{ matrix.dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -la Dockerfile
+          ORIG="$(head -1 Dockerfile)"
+          sed -i -E 's/^FROM openjdk:8(u[0-9]+-[a-z]+)?$/FROM eclipse-temurin:8u422-b05-jdk/' Dockerfile
+          NEW="$(head -1 Dockerfile)"
+          echo "FROM line: [$ORIG] -> [$NEW]"
+
+      - name: Dockerfile 构建验证 (push=false · Public 仓永久不推镜像)
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.dir }}
+          file: ${{ matrix.dir }}/Dockerfile
+          push: false
+          build-args: |
+            ${{ matrix.lang == 'java' && format('JAR_FILE=target/{0}-{1}{2}.jar', matrix.name, steps.vers.outputs[format('ver_{0}', matrix.short)], matrix.jar_suffix) || '' }}
+            ${{ matrix.lang == 'node' && 'HTML_DIR=dist' || '' }}
+          tags: local/${{ matrix.name }}:aitest-${{ steps.sha.outputs.sha_short }}
+
+      - name: 上传构建产物 jar/dist（供 self-hosted runner 本地部署直接复用，不重复 build）
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.name }}-${{ steps.sha.outputs.sha_short }}
+          path: |
+            ${{ matrix.lang == 'java' && format('{0}/target/*.jar', matrix.dir) || '' }}
+            ${{ matrix.lang == 'node' && format('{0}/dist/**', matrix.dir) || '' }}
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: 上传 JaCoCo 报告 (Java · 公开仓粗览 · 精确覆盖率由 quality-gate 承担)
+        if: matrix.lang == 'java' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-${{ matrix.name }}-${{ steps.sha.outputs.sha_short }}
+          path: ${{ matrix.dir }}/target/site/jacoco/**
+          retention-days: 14
+
+      - name: 上传 Jest 报告 (UI)
+        if: matrix.lang == 'node' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-${{ matrix.name }}-${{ steps.sha.outputs.sha_short }}
+          path: |
+            ${{ matrix.dir }}/junit.xml
+            ${{ matrix.dir }}/coverage/**
+          retention-days: 14
+          if-no-files-found: warn
+
+  # ============================================================
+  # Job 2：deploy-test-smoke（仅 push aitest 分支触发，PR 不部署）
+  # runs-on: self-hosted clklog-runner（内网测试机 10.10.222.66）
+  # Public 仓仓库级 Secrets 零 REGISTRY 凭据；Registry Push 仅 release.yml 通过 release-prod Environment 人工审批通过后允许
+  deploy-test-smoke:
+    name: deploy-test-smoke-aitest
+    needs: build-matrix
+    if: github.event_name == 'push' && github.ref == 'refs/heads/aitest'
+    runs-on: [self-hosted, clklog-runner]
+    timeout-minutes: 180
+    env:
+      SHA: ${{ needs.build-matrix.outputs.sha_short }}
+      LOCAL_TAG: local-aitest-${{ needs.build-matrix.outputs.sha_short }}
+    steps:
+      - name: Runner 环境信息
+        run: |
+          echo "Runner: $RUNNER_NAME"
+          hostname
+          uname -a
+          whoami
+          echo "SHA7=${SHA}，LOCAL_TAG=${LOCAL_TAG}"
+          command -v yq >/dev/null 2>&1 || { echo "❌ FATAL：Runner 未安装 yq 4.x，执行 `wget https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64 -O /usr/local/bin/yq && chmod +x /usr/local/bin/yq` 后重试"; exit 1; }
+
+      - uses: actions/checkout@v4
+
+      - name: 下载 6 项目构建产物 artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: 还原 jar/dist 到子项目的 target/dist 目录
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=$(pwd)
+          SHA="${SHA}"
+          for sub in manage api receiver processing init; do
+            glob="${BASE}/_artifacts/build-clklog-${sub}-${SHA}/target/*.jar"
+            # shellcheck disable=SC2086
+            jar=$(ls $glob 2>/dev/null | head -1) || true
+            if [ -n "$jar" ]; then
+              dest="${BASE}/clklog/clklog-${sub}/target"
+              mkdir -p "$dest"
+              cp "$jar" "$dest/"
+              echo "✅ clklog-${sub} jar -> $dest/$(basename "$jar")"
+            else
+              echo "⚠️  未找到 clklog-${sub} jar，稍后会在 Runner 本机 mvn rebuild"
+            fi
+          done
+          if [ -d "${BASE}/_artifacts/build-clklog-ui-${SHA}/dist" ]; then
+            cp -r "${BASE}/_artifacts/build-clklog-ui-${SHA}/dist" "${BASE}/clklog/clklog-ui/dist"
+            echo "✅ clklog-ui dist -> clklog/clklog-ui/dist"
+          else
+            echo "⚠️  未找到 clklog-ui dist，稍后会在 Runner 本机 npm rebuild"
+          fi
+
+      - name: Docker Compose 本地构建 + Quick 模式部署 + Smoke 5 URL
+        working-directory: docker-compose
+        shell: bash
+        env:
+          VER_MANAGE:     ${{ needs.build-matrix.outputs.ver_manage }}
+          VER_API:        ${{ needs.build-matrix.outputs.ver_api }}
+          VER_RECEIVER:   ${{ needs.build-matrix.outputs.ver_receiver }}
+          VER_PROCESSING: ${{ needs.build-matrix.outputs.ver_processing }}
+          VER_INIT:       ${{ needs.build-matrix.outputs.ver_init }}
+        run: |
+          set -euo pipefail
+          BASE=$(pwd)
+          SRC_ROOT="${BASE}/.."   # 公开仓 checkout 根（= ./docker-compose 的上一级）
+
+          # ── 准备本地 env（不修改仓库 .env 模板）
+          cp .env .env.local.test
+          export COMPOSE_PROJECT_NAME="clklog-aitest-${SHA}"
+
+          # 直接 yq 修改 simple.yml，给 5 后端 + UI 追加 build 字段；clklog-processing 在 simple 模式下是 Flink Jar Job，不在 services 里单列
+          WORK_YML="docker-compose-clklog-simple.yml"
+          cp "${WORK_YML}" "${WORK_YML}.bak-aitest-${SHA}"   # 失败时方便 diff 回查
+
+          yq eval '.services.clklog-manage.image     = "local/clklog-manage:'${LOCAL_TAG}'"
+                | .services.clklog-manage.build.context = "'"${SRC_ROOT}/clklog/clklog-manage"'"
+                | .services.clklog-manage.build.dockerfile = "Dockerfile"
+                | .services.clklog-manage.build.args.JAR_FILE = "target/clklog-manage-'"${VER_MANAGE}"'.jar"
+
+                | .services.clklog-api.image        = "local/clklog-api:'${LOCAL_TAG}'"
+                | .services.clklog-api.build.context = "'"${SRC_ROOT}/clklog/clklog-api"'"
+                | .services.clklog-api.build.dockerfile = "Dockerfile"
+                | .services.clklog-api.build.args.JAR_FILE = "target/clklog-api-'"${VER_API}"'.jar"
+
+                | .services.clklog-receiver.image   = "local/clklog-receiver:'${LOCAL_TAG}'"
+                | .services.clklog-receiver.build.context = "'"${SRC_ROOT}/clklog/clklog-receiver"'"
+                | .services.clklog-receiver.build.dockerfile = "Dockerfile"
+                | .services.clklog-receiver.build.args.JAR_FILE = "target/clklog-receiver-'"${VER_RECEIVER}"'.jar"
+
+                | .services.clklog-init.image       = "local/clklog-init:'${LOCAL_TAG}'"
+                | .services.clklog-init.build.context = "'"${SRC_ROOT}/clklog/clklog-init"'"
+                | .services.clklog-init.build.dockerfile = "Dockerfile"
+                | .services.clklog-init.build.args.JAR_FILE = "target/clklog-init-'"${VER_INIT}"'.jar"
+
+                | .services.clklog-ui.image         = "local/clklog-ui:'${LOCAL_TAG}'"
+                | .services.clklog-ui.build.context = "'"${SRC_ROOT}/clklog/clklog-ui"'"
+                | .services.clklog-ui.build.dockerfile = "Dockerfile"
+                | .services.clklog-ui.build.args.HTML_DIR = "dist"
+                ' -i "${WORK_YML}"
+
+          echo "========== yq 追加 build 后的 services 片段 =========="
+          yq '.services | {clklog-ui, clklog-receiver, clklog-api, clklog-manage, clklog-init}' "${WORK_YML}"
+
+          # ── 先清理旧的项目容器
+          echo "========== 清理旧容器（项目名=${COMPOSE_PROJECT_NAME}）=========="
+          docker compose -f "${WORK_YML}" --env-file .env.local.test \
+                         down -v --remove-orphans 2>/dev/null || true
+
+          echo "========== docker compose build 5 后端 + UI（本地，不需要 Registry Push）=========="
+          docker compose -f "${WORK_YML}" --env-file .env.local.test \
+                         build --no-cache clklog-manage clklog-api clklog-receiver clklog-init clklog-ui
+
+          echo "========== docker compose up -d Quick 模式 =========="
+          docker compose -f "${WORK_YML}" --env-file .env.local.test up -d
+
+          echo "========== 等待 180 秒健康检查 =========="
+          sleep 180
+          echo "========== 容器状态 =========="
+          docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+
+          # 5 条 Smoke：走 simple.yml gateway 80 + gateway/simple/default.conf 路由前缀
+          #   /        → UI (clklog-ui:80)
+          #   /manage  → clklog-manage:8080
+          #   /api     → clklog-api:8080
+          #   /receiver→ clklog-receiver:8080
+          # init 没有网关路由，健康检查用 docker inspect 状态
+          echo "========== 5 条 Smoke（aitest 本地验证 · 对齐网关路由）=========="
+          HOST_IP=$(hostname -I | awk '{print $1}')
+          fail=0
+          # Smoke-1：UI 登录页（Gateway 根路由 80 端口）
+          URL1="http://${HOST_IP}/"
+          DESC1="UI 首页 (Gateway / → UI:80)"
+          CODE1=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL1" || echo "000")
+          if echo "$CODE1" | grep -qE '^200$|^302$'; then echo "✅ PASS HTTP $CODE1 ($DESC1)"; else echo "❌ FAIL HTTP $CODE1 ($DESC1) → $URL1"; fail=1; fi
+
+          # Smoke-2：manage /actuator/health（Gateway /manage/ 前缀 → manage:8080）
+          URL2="http://${HOST_IP}/manage/actuator/health"
+          DESC2="manage /manage/actuator/health"
+          CODE2=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL2" || echo "000")
+          if [ "$CODE2" = "200" ]; then echo "✅ PASS HTTP $CODE2 ($DESC2)"; else echo "❌ FAIL HTTP $CODE2 ($DESC2) → $URL2"; fail=1; fi
+
+          # Smoke-3：api /actuator/health（Gateway /api/ 前缀 → api:8080）
+          URL3="http://${HOST_IP}/api/actuator/health"
+          DESC3="api /api/actuator/health"
+          CODE3=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL3" || echo "000")
+          if [ "$CODE3" = "200" ]; then echo "✅ PASS HTTP $CODE3 ($DESC3)"; else echo "❌ FAIL HTTP $CODE3 ($DESC3) → $URL3"; fail=1; fi
+
+          # Smoke-4：receiver /actuator/health（Gateway /receiver/ 前缀 → receiver:8080）
+          URL4="http://${HOST_IP}/receiver/actuator/health"
+          DESC4="receiver /receiver/actuator/health"
+          CODE4=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL4" || echo "000")
+          if [ "$CODE4" = "200" ]; then echo "✅ PASS HTTP $CODE4 ($DESC4)"; else echo "❌ FAIL HTTP $CODE4 ($DESC4) → $URL4"; fail=1; fi
+
+          # Smoke-5：init 容器状态 healthy（init 没有网关路由；用 docker inspect 健康检查状态）
+          INIT_CONT=$(docker ps --format '{{.Names}}' | grep clklog-init | head -1)
+          if [ -z "$INIT_CONT" ]; then
+            echo "❌ FAIL：未找到 clklog-init 容器"
+            fail=1
+          else
+            INIT_STATUS=$(docker inspect -f '{{.State.Health.Status}}' "$INIT_CONT" 2>/dev/null || echo "unknown")
+            if [ "$INIT_STATUS" = "healthy" ]; then echo "✅ PASS init container = $INIT_STATUS ($INIT_CONT)"; else echo "❌ FAIL init container = $INIT_STATUS"; fail=1; fi
+          fi
+
+          if [ "$fail" -ne 0 ]; then
+            echo "===== SMOKE FAILED — dump 5 业务容器 logs 尾 200 行 ====="
+            docker compose -f "${WORK_YML}" --env-file .env.local.test \
+                           logs --tail=200 clklog-manage clklog-api clklog-receiver clklog-init clklog-ui 2>&1 || true
+            echo "===== 失败快照保留（Runner 临时文件，不入库）====="
+            echo "COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME"
+            echo "WORK_YML 修改快照已保存在：$(pwd)/docker-compose-clklog-simple.yml.bak-aitest-${SHA}"
+            echo ".env.local.test 内容（脱敏）:"
+            sed -E 's/(PASS.*=|TOKEN.*=|SECRET.*=).*/\1***MASKED***/g' .env.local.test
+            exit 1
+          fi
+
+          echo "============================================================"
+          echo " aitest 分支 SHA=$SHA 本地部署 + Smoke 5/5 全绿 ✅"
+          echo "============================================================"
