@@ -1,4 +1,4 @@
-name: Quality Gate :: Nightly 3/3 矩阵 + 精准覆盖率 A1-A4（公开 Monorepo 内置，安全靠 Secrets/Runner 权限/日志脱敏，不靠私有仓隐藏）
+name: Quality Gate · Nightly 3/3 矩阵 + 精准覆盖率 A1-A4（公开 Monorepo 内置，安全靠 Secrets/Runner 权限/日志脱敏，不靠私有仓隐藏）
 
 on:
   push:
@@ -209,7 +209,7 @@ jobs:
 
   # ================= Job 3：Gate Summary（所有矩阵 + UI 全 PASS 才出 GATE PASSED 签字）=================
   gate-summary:
-    name: Quality Gate :: 签字证据 Summary
+    name: Quality Gate · 签字证据 Summary
     needs: [backend-matrix, frontend-coverage]
     if: always()
     runs-on: ubuntu-latest
