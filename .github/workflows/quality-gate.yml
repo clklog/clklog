@@ -44,7 +44,7 @@ jobs:
   # ================= Job 1：Backend 3/3 矩阵（JDK × MySQL × CH）× N 轮 =================
   backend-matrix:
     name: Backend Matrix · 3/3 (jdk${{ matrix.jdk }} · mysql${{ matrix.mysql }} · ch${{ matrix.ch }} · round ${{ matrix.round }}/${{ inputs.matrix_rounds || env.DEFAULT_GATE_ROUNDS }})
-    runs-on: ${{ (inputs.run_self_hosted_only == true || github.event_name == 'schedule') && fromJSON('[ "self-hosted", "clklog-runner" ]') || 'ubuntu-latest' }}
+    runs-on: ${{ (inputs.run_self_hosted_only == true || github.event_name == 'schedule') && fromJSON('[ "self-hosted", "clklog-ce-runner" ]') || 'ubuntu-latest' }}
     timeout-minutes: 80
     strategy:
       fail-fast: false
