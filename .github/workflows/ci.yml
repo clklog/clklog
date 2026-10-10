@@ -24,21 +24,22 @@ env:
 jobs:
   build-matrix:
     name: build-${{ matrix.name }}
+    # 方案 Z：直接 push aitest 分支时跳过 CI 构建，交给 deploy-test.yml 专属流水线跑 build+deploy 全链路（0 重复构建）
+    # PR 到 aitest / 所有 main 行为 / 手动触发 → 正常跑 build-matrix 做构建验证
+    if: "! (github.event_name == 'push' && github.ref == 'refs/heads/aitest')"
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    outputs:
-      sha_short: ${{ steps.sha.outputs.sha_short }}
     strategy:
       fail-fast: false
       max-parallel: 6
       matrix:
         include:
-          - { name: clklog-manage,     dir: clklog/clklog-manage,     lang: java, jar_suffix: "" }
-          - { name: clklog-api,        dir: clklog/clklog-api,        lang: java, jar_suffix: "" }
-          - { name: clklog-receiver,   dir: clklog/clklog-receiver,   lang: java, jar_suffix: "" }
-          - { name: clklog-processing, dir: clklog/clklog-processing, lang: java, jar_suffix: "-jar-with-dependencies" }
-          - { name: clklog-init,       dir: clklog/clklog-init,       lang: java, jar_suffix: "" }
-          - { name: clklog-ui,         dir: clklog/clklog-ui,         lang: node, jar_suffix: "" }
+          - { name: clklog-manage,     dir: clklog/clklog-manage,     lang: java, jar_suffix: "",                short: manage }
+          - { name: clklog-api,        dir: clklog/clklog-api,        lang: java, jar_suffix: "",                short: api }
+          - { name: clklog-receiver,   dir: clklog/clklog-receiver,   lang: java, jar_suffix: "",                short: receiver }
+          - { name: clklog-processing, dir: clklog/clklog-processing, lang: java, jar_suffix: "-jar-with-dependencies", short: processing }
+          - { name: clklog-init,       dir: clklog/clklog-init,       lang: java, jar_suffix: "",                short: init }
+          - { name: clklog-ui,         dir: clklog/clklog-ui,         lang: node, jar_suffix: "",                short: ui }
     steps:
       - uses: actions/checkout@v4
 
@@ -71,6 +72,7 @@ jobs:
             ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-
 
       - name: Build Java (clean verify · 子 pom 自带 jacoco LINE≥80% 硬卡生效)
+        id: build_java
         if: matrix.lang == 'java'
         working-directory: ${{ matrix.dir }}
         shell: bash
@@ -82,17 +84,9 @@ jobs:
           else
             mvn -B -ntp clean verify -DskipITs
           fi
-
-      - name: 导出当前 Java 子项目实际 POM version
-        id: pom_ver
-        if: matrix.lang == 'java'
-        working-directory: ${{ matrix.dir }}
-        shell: bash
-        run: |
-          set -euo pipefail
           V=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f pom.xml)
           echo "pom_ver=$V" >> $GITHUB_OUTPUT
-          echo "detected ${{ matrix.name }} pom version = $V"
+          echo "detected pom version = $V (service=${{matrix.name}})"
 
       - name: Build Node (npm ci → test:unit → build dist)
         if: matrix.lang == 'node'
@@ -122,7 +116,7 @@ jobs:
           file: ${{ matrix.dir }}/Dockerfile
           push: false
           build-args: |
-            ${{ matrix.lang == 'java' && format('JAR_FILE=target/{0}-{1}{2}.jar', matrix.name, steps.pom_ver.outputs.pom_ver, matrix.jar_suffix) || '' }}
+            ${{ matrix.lang == 'java' && format('JAR_FILE=target/{0}-{1}{2}.jar', matrix.name, steps.build_java.outputs.pom_ver, matrix.jar_suffix) || '' }}
             ${{ matrix.lang == 'node' && 'HTML_DIR=dist' || '' }}
           tags: local/${{ matrix.name }}:ci-${{ steps.sha.outputs.sha_short }}
 

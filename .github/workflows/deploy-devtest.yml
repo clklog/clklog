@@ -1,0 +1,185 @@
+name: "DEVTEST (开发测试环境 · 自动构建 + 宿主机部署)"
+
+on:
+  push:
+    branches: [develop, feature/*, devtest]
+  workflow_dispatch:
+    inputs:
+      skip_build:
+        description: "跳过重新构建（仅重启服务）"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-devtest-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "8"
+  JAVA_DISTRO: "temurin"
+  NODE_VERSION: "18"
+
+jobs:
+  build-and-deploy:
+    name: devtest-build-deploy
+    runs-on: [self-hosted, clklog-ce-runner]
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 设置 Java 环境
+        if: ${{ github.event.inputs.skip_build != 'true' }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+
+      - name: 设置 Node 环境
+        if: ${{ github.event.inputs.skip_build != 'true' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 构建后端 JAR
+        if: ${{ github.event.inputs.skip_build != 'true' }}
+        run: |
+          for module in api manage receiver processing init; do
+            echo "Building clklog-${module}..."
+            cd "clklog/clklog-${module}"
+            rm -f mvnw mvnw.cmd 2>/dev/null || true
+            chmod -x mvnw 2>/dev/null || true
+            mvn -B -ntp clean package -DskipTests -DskipITs
+            ls -la target/*.jar | head -5
+            cd ../../
+          done
+
+      - name: 构建前端
+        if: ${{ github.event.inputs.skip_build != 'true' }}
+        working-directory: clklog/clklog-ui
+        run: |
+          export NODE_OPTIONS="--openssl-legacy-provider"
+          npm ci
+          npm run build --if-present
+          ls -la dist/ | head -10
+
+      - name: 部署到开发测试环境
+        env:
+          DEVTEST_HOST: clklog-ce-test.servers.zcunsoft.com
+          DEVTEST_USER: wuyue
+          DEVTEST_SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          
+          SHA=$(git rev-parse --short HEAD)
+          DEPLOY_DIR="/mnt/data/testing/devtest/versions/${SHA}"
+          
+          echo "[deploy] 部署版本: ${SHA}"
+          echo "[deploy] 目标目录: ${DEPLOY_DIR}"
+          
+          # 配置 SSH
+          mkdir -p ~/.ssh
+          echo "${DEVTEST_SSH_KEY}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${DEVTEST_HOST}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          
+          # 创建远程目录并上传文件
+          ssh "${DEVTEST_USER}@${DEVTEST_HOST}" "mkdir -p ${DEPLOY_DIR}/jars ${DEPLOY_DIR}/ui"
+          
+          # 上传 JAR 文件
+          for module in api manage receiver processing init; do
+            jar_file=$(ls -1 "clklog/clklog-${module}/target/"*.jar | grep -v -E 'sources|javadoc|tests|original' | head -1)
+            if [ -n "${jar_file}" ]; then
+              echo "[deploy] 上传 ${module}: ${jar_file}"
+              scp "${jar_file}" "${DEVTEST_USER}@${DEVTEST_HOST}:${DEPLOY_DIR}/jars/clklog-${module}.jar"
+            fi
+          done
+          
+          # 上传前端静态文件
+          echo "[deploy] 上传前端静态文件..."
+          scp -r "clklog/clklog-ui/dist/"* "${DEVTEST_USER}@${DEVTEST_HOST}:${DEPLOY_DIR}/ui/"
+          
+          # 执行远程部署脚本
+          echo "[deploy] 执行远程部署脚本..."
+          ssh "${DEVTEST_USER}@${DEVTEST_HOST}" "
+            set -e
+            DEPLOY_DIR='${DEPLOY_DIR}'
+            HOST_DIR='/mnt/data/clklog/clklog-dev-host'
+            
+            echo '[remote] 备份当前版本...'
+            if [ -d '\${HOST_DIR}/jars' ]; then
+              BACKUP_DIR='/mnt/data/testing/devtest/backup/\$(date +%Y%m%d_%H%M%S)'
+              mkdir -p '\${BACKUP_DIR}'
+              cp -r '\${HOST_DIR}/jars/'* '\${BACKUP_DIR}/' 2>/dev/null || true
+              echo '[remote] 备份完成: \${BACKUP_DIR}'
+            fi
+            
+            echo '[remote] 更新 JAR 文件...'
+            mkdir -p '\${HOST_DIR}/jars'
+            cp '\${DEPLOY_DIR}/jars/'* '\${HOST_DIR}/jars/'
+            
+            echo '[remote] 更新前端文件...'
+            mkdir -p '\${HOST_DIR}/ui'
+            cp -r '\${DEPLOY_DIR}/ui/'* '\${HOST_DIR}/ui/'
+            
+            echo '[remote] 重启服务...'
+            sudo systemctl restart clklog-dev-api || true
+            sudo systemctl restart clklog-dev-manage || true
+            sudo systemctl restart clklog-dev-receiver || true
+            
+            sleep 5
+            
+            echo '[remote] 检查服务状态...'
+            sudo systemctl status clklog-dev-api --no-pager || true
+            sudo systemctl status clklog-dev-manage --no-pager || true
+            sudo systemctl status clklog-dev-receiver --no-pager || true
+            
+            echo '[remote] 部署完成！'
+          "
+          
+          echo "[deploy] 部署完成！"
+
+      - name: 健康检查
+        run: |
+          echo "[health] 等待服务启动..."
+          sleep 10
+          
+          HOST="http://clklog-ce-test.servers.zcunsoft.com:28080"
+          
+          # 检查网关
+          echo "[health] 检查网关..."
+          curl -sSf "${HOST}/" -o /dev/null && echo "✅ 网关正常" || echo "❌ 网关异常"
+          
+          # 检查 manage 登录
+          echo "[health] 检查 manage 服务..."
+          curl -sSf "${HOST}/manage/auth/login" -X POST -H "Content-Type: application/json" -d '{"username":"admin","password":"clklog"}' -o /dev/null && echo "✅ manage 正常" || echo "❌ manage 异常"
+          
+          # 检查 api
+          echo "[health] 检查 api 服务..."
+          curl -sSf "${HOST}/api/doc.html" -o /dev/null && echo "✅ api 正常" || echo "⚠️ api 文档可能未启用"
+
+      - name: 归档测试结果
+        if: ${{ always() }}
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          RESULTS_DIR="/mnt/data/testing/devtest/versions/${SHA}"
+          
+          echo "[archive] 归档测试结果到 ${RESULTS_DIR}"
+          
+          # 创建结果目录（如果部署步骤未完成）
+          mkdir -p "${RESULTS_DIR}/test-results"
+          
+          # 保存构建信息
+          echo "SHA=${SHA}" > "${RESULTS_DIR}/test-results/build_info.txt"
+          echo "BUILD_TIME=$(date -Iseconds)" >> "${RESULTS_DIR}/test-results/build_info.txt"
+          echo "STATUS=${{ job.status }}" >> "${RESULTS_DIR}/test-results/build_info.txt"
+          
+          # 更新 current 软链接
+          if [ "${{ job.status }}" = "success" ]; then
+            ln -sfn "${RESULTS_DIR}" /mnt/data/testing/devtest/current
+            echo "[archive] 已更新 current 软链接"
+          fi
+          
+          echo "[archive] 归档完成"
