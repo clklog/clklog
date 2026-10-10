@@ -1,0 +1,36 @@
+server:
+  port: 8080
+logging:
+  file:
+    path: log
+spring:
+  application.name: clklog-init
+  datasource:
+    clickhouse:
+      jdbc-url: jdbc:clickhouse://${clickhouse_host}:${clickhouse_port}/default
+      username: ${clickhouse_user}
+      password: ${clickhouse_pass}
+      driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+      socket_timeout: 300000
+init:
+  log-db: clklog
+  quartz-enabled: false
+  event-session-across-day: 2
+  quartz:
+    area_detail_bydate: '0 */1 * * * ?'
+    visituri_summary_bydate: '0 */1 * * * ?'
+    flow_trend_bydate: '0 */1 * * * ?'
+    flow_trend_byhour: '0 */1 * * * ?'
+    searchword_detail_bydate: '0 */1 * * * ?'
+    channel_detail_bydate: '0 */1 * * * ?'
+    device_detail_bydate: '0 */1 * * * ?'
+    sourcesite_detail_bydate: '0 */1 * * * ?'
+    crashed_detail_bydate: '0 */1 * * * ?'
+    user_pv_bydate: '0 */1 * * * ?'
+    user_visit_bydate: '0 */1 * * * ?'
+    user_visittime_bydate: '0 */1 * * * ?'
+    visitor_detail_bydate: '0 */1 * * * ?'
+    visitor_life_bydate: '0 */1 * * * ?'
+    visituri_detail_bydate: '0 */1 * * * ?'
+    visitor_detail_byinfo: '0 */1 * * * ?'
+    visitor_detail_bysession: '0 */1 * * * ?'
