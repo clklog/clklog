@@ -1,0 +1,5 @@
+https://app.a.com/?r=0.31232#/?timestamp=123432432,/#/
+https://app.a.com/?r=0.4543532143#/publish?msgType=1,/#/publish
+https://h5.a.com/?wechatShare=/detail/?id=123#/detail/?id=543#/,/#/
+https://h5.a.com/?time=1697517229298&&event=bdstore#/,/#/
+https://www.a.com/auctions.html,/auctions.html
