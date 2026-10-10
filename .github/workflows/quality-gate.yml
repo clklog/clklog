@@ -1,4 +1,4 @@
-name: Quality Gate · Nightly 3/3 矩阵 + 精准覆盖率 A1-A4（公开 Monorepo 内置，安全靠 Secrets/Runner 权限/日志脱敏，不靠私有仓隐藏）
+name: Quality Gate · 3/3 矩阵 + 精准覆盖率 A1-A4（公开 Monorepo 内置，安全靠 Secrets/Runner 权限/日志脱敏，不靠私有仓隐藏）
 
 on:
   push:
@@ -24,9 +24,6 @@ on:
         required: false
         type: boolean
         default: true
-  schedule:
-    # 正式 Nightly：北京时间每日 10:00（UTC 02:00），aitest 分支当天合入的代码全部过质量闸
-    - cron: "0 2 * * *"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
@@ -44,7 +41,7 @@ jobs:
   # ================= Job 1：Backend 3/3 矩阵（JDK × MySQL × CH）× N 轮 =================
   backend-matrix:
     name: Backend Matrix · 3/3 (jdk${{ matrix.jdk }} · mysql${{ matrix.mysql }} · ch${{ matrix.ch }} · round ${{ matrix.round }}/${{ inputs.matrix_rounds || '3' }})
-    runs-on: ${{ (inputs.run_self_hosted_only == true || github.event_name == 'schedule') && fromJSON('[ "self-hosted", "clklog-ce-runner" ]') || 'ubuntu-latest' }}
+    runs-on: ${{ inputs.run_self_hosted_only == true && fromJSON('[ "self-hosted", "clklog-ce-runner" ]') || 'ubuntu-latest' }}
     timeout-minutes: 80
     strategy:
       fail-fast: false
@@ -154,7 +151,7 @@ jobs:
           echo "（覆盖率硬卡待补齐 jacoco 插件后生效；本步骤当前仅做存在性提示，不阻断构建）"
           exit 0
 
-      - name: Export per-module LINE coverage from JaCoCo CSV（nightly Summary 直接看百分比，不用翻 HTML Artifact）
+      - name: Export per-module LINE coverage from JaCoCo CSV（Summary 直接看百分比，不用翻 HTML Artifact）
         if: always()
         working-directory: .
         shell: bash
