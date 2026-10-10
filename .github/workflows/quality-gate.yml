@@ -43,14 +43,17 @@ env:
 jobs:
   # ================= Job 1：Backend 3/3 矩阵（JDK × MySQL × CH）× N 轮 =================
   backend-matrix:
-    name: Backend Matrix · 3/3 (jdk${{ matrix.jdk }} · mysql${{ matrix.mysql }} · ch${{ matrix.ch }} · round ${{ matrix.round }}/${{ inputs.matrix_rounds || env.DEFAULT_GATE_ROUNDS }})
+    name: Backend Matrix · 3/3 (jdk${{ matrix.jdk }} · mysql${{ matrix.mysql }} · ch${{ matrix.ch }} · round ${{ matrix.round }}/${{ inputs.matrix_rounds || '3' }})
     runs-on: ${{ (inputs.run_self_hosted_only == true || github.event_name == 'schedule') && fromJSON('[ "self-hosted", "clklog-ce-runner" ]') || 'ubuntu-latest' }}
     timeout-minutes: 80
     strategy:
       fail-fast: false
       max-parallel: 3
       matrix:
-        round: ${{ fromJSON(format('[{0}]', join(range(1, (inputs.matrix_rounds || env.DEFAULT_GATE_ROUNDS) + 1), ','))) }}
+        # 轮次固定为静态数组：GitHub Actions 表达式不支持算术运算符（原 range(...)+1 写法非法），
+        # 且 job 级 if/name 都不允许引用 env 与 matrix 上下文；
+        # matrix_rounds 输入改为在每个 job 末尾的 gate 步骤内做数值比较来控制（见下方"轮次闸"）。
+        round: [1, 2, 3]
         jdk:   [8, 11]
         mysql: ["8.0", "5.7"]
         ch:    ["22.3", "23.3"]
@@ -165,6 +168,22 @@ jobs:
           retention-days: 30
           include-hidden-files: false
           fail_on_unmatched_files: false
+
+      # matrix_rounds 输入闸：本轮 > 期望轮次则判失败。continue-on-error 让 job 级结论仍为
+      # success，从而使 gate-summary 的 needs.*.result 汇总与"期望轮次"保持一致。
+      - name: 轮次闸（round ${{ matrix.round }} vs 期望 ${{ inputs.matrix_rounds || '3' }}）
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROUND="${{ matrix.round }}"
+          WANT="${{ inputs.matrix_rounds || '3' }}"
+          echo "round=$ROUND  expected=$WANT"
+          if [ "$ROUND" -gt "$WANT" ]; then
+            echo "::error::round ${ROUND} 超出期望轮次 ${WANT}（matrix_rounds=${WANT}），本轮不计入质量闸"
+            exit 1
+          fi
+          echo "round ${ROUND} 在期望轮次 ${WANT} 之内，正常计入质量闸"
 
   # ================= Job 2：Frontend 单测覆盖率（不依赖矩阵轮次，PR/aitest 必跑）=================
   frontend-coverage:
