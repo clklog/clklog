@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean
+            class="com.zcunsoft.clklog.api.entity.ck.AppCrashNativeQuery">
+        <property name="queryByDate">
+            <value><![CDATA[
+			select sum(visit_count) as visit_count,sum(ip_count) as ip_count,sum(crashed_count) as crashed_count,sum(uv) as uv,sum(crashed_uv) as crashed_uv,COUNTDistinct(model) as model_count
+			from crashed_detail_bydate t
+			where t.stat_date >= :after and t.stat_date <= :before and t.project_name = :projectName
+			and ((:channel) is null or t.lib in (:channel))
+			]]></value>
+        </property>
+
+        <property name="trendByDimension">
+            <value><![CDATA[
+			select "%1$s" as dimension, sum(visit_count) as visit_count,sum(ip_count) as ip_count,sum(crashed_count) as crashed_count,sum(uv) as uv,sum(crashed_uv) as crashed_uv,COUNTDistinct(model) as model_count from (
+			select stat_date as "day", toYear(stat_date)*100 + toWeek(stat_date, 9) as "week", toYear(stat_date)*100 +toMonth(stat_date) as "month", visit_count, ip_count, crashed_count, uv, crashed_uv, model
+			from crashed_detail_bydate t
+			where t.stat_date >= :after and t.stat_date <= :before
+			and ((:channel) is null or t.lib in (:channel))
+			and t.project_name = :projectName
+			) v
+			group by "%1$s";
+			]]></value>
+        </property>
+
+        <property name="groupedByLibAndVersion">
+            <value><![CDATA[
+			select * from (
+			select app_version, lib as lib, sum(visit_count) as visit_count,sum(ip_count) as ip_count,sum(crashed_count) as crashed_count,sum(uv) as uv,sum(crashed_uv) as crashed_uv,COUNTDistinct(model) as model_count
+			from crashed_detail_bydate t
+			where t.stat_date >= :after and t.stat_date <= :before
+			and ((:channel) is null or t.lib in (:channel)) and (:version is null or t.app_version = :version)
+			and t.project_name = :projectName
+			and t.crashed_count > 0
+			group by app_version, lib
+			) g order by g.lib, g.app_version
+			]]></value>
+        </property>
+
+        <property name="countStatByLibVersionAndModel">
+            <value><![CDATA[
+			select count(0) from (
+			select app_version, lib as lib,model, sum(visit_count) as visit_count,sum(ip_count) as ip_count,sum(crashed_count) as crashed_count,sum(uv) as uv,sum(crashed_uv) as crashed_uv,COUNTDistinct(model) as model_count
+			from crashed_detail_bydate t
+			where t.stat_date >= :after and t.stat_date <= :before
+			and ((:channel) is null or t.lib in (:channel)) and (:version is null or t.app_version = :version)
+			and (:model is null or t.model = :model)
+			and t.project_name = :projectName
+			and t.crashed_count > 0
+			group by app_version, lib, model
+			) g
+			]]></value>
+        </property>
+
+        <property name="pageStatByLibVersionAndModel">
+            <value><![CDATA[
+			select * from (
+			select app_version, lib as lib,model, sum(visit_count) as visit_count,sum(ip_count) as ip_count,sum(crashed_count) as crashed_count,sum(uv) as uv,sum(crashed_uv) as crashed_uv,COUNTDistinct(model) as model_count
+			from crashed_detail_bydate t
+			where t.stat_date >= :after and t.stat_date <= :before
+			and ((:channel) is null or t.lib in (:channel)) and (:version is null or t.app_version = :version)
+			and (:model is null or t.model = :model)
+			and t.project_name = :projectName
+			and t.crashed_count > 0
+			group by app_version, lib, model
+			) g order by g.lib, g.app_version, model offset :offset rows fetch next :fetch rows only
+			]]></value>
+        </property>
+
+    </bean>
+</beans>

@@ -1,0 +1,70 @@
+springdoc:
+  swagger-ui:
+    enabled: false
+    tagsSorter: alpha
+  api-docs:
+    path: /v3/api-docs
+    enabled: false
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.zcunsoft.clklog.api.controllers
+server:
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+spring:
+  application.name: clklog-api
+  config:
+    import:
+      - optional:dev.yml
+  security:
+    user:
+      name: ${SPRING_SECURITY_USER_NAME}
+      password: ${SPRING_SECURITY_USER_PASSWORD}
+  datasource:
+    clickhouse:
+      jdbc-url: jdbc:clickhouse://${clickhouse_host}:${clickhouse_port}/default
+      username: ${clickhouse_user}
+      password: ${clickhouse_pass}
+      driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+      connection-timeout: 20000
+      socket-timeout: 60000
+      maximum-pool-size: 5
+  redis:
+    # 单机配置
+    host: ${redis_host}
+    port: ${redis_port}
+    database: 0
+#    sentinel:
+#      master: ${SPRING_REDIS_SENTINEL_MASTER:mymaster}
+#      nodes: ${SPRING_REDIS_SENTINEL_NODES}
+#      password: ${SPRING_REDIS_SENTINEL_PASSWORD:}
+token:
+  header: Authorization
+  secret: ${token_secret}
+  expireTime: 300
+logging:
+  file:
+    path: log
+clklog-common:
+  access-control-allow-origin-patterns: "*"
+clklog-api:
+  project-name: clklogapp
+  lib-type-map:
+    all: all,全部
+    android: Android,安卓
+    ios: iOS,苹果
+    js: js,网站
+    miniprogram: MiniProgram,微信小程序
+    harmonyos: HarmonyOS,鸿蒙
+    dotnet: DotNET,DotNET
+    cpp: cpp,cpp
+    java: Java,Java
+    python: Python,Python
