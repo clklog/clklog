@@ -104,6 +104,9 @@ services:
       - SPRING_DATASOURCE_CLICKHOUSE_PASSWORD=${CK_USER_PWD}
       - CLKLOG_COMMON_ACCESS_CONTROL_ALLOW_ORIGIN_PATTERNS=*
       - CLKLOG_API_PROJECT_NAME=${PROJECT_NAME}
+      - SPRING_SECURITY_USER_NAME=${SPRING_SECURITY_USER_NAME}
+      - SPRING_SECURITY_USER_PASSWORD=${SPRING_SECURITY_USER_PASSWORD}
+      - TOKEN_SECRET=${TOKEN_SECRET}
     networks:
       - backend
     deploy:
@@ -112,7 +115,7 @@ services:
           cpus: '0.5'
           memory: 1024M
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      test: ["CMD", "curl", "-f", "-u", "${SPRING_SECURITY_USER_NAME}:${SPRING_SECURITY_USER_PASSWORD}", "http://localhost:8080/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -145,6 +148,7 @@ services:
       - CLKLOG_COMMON_ACCESS_CONTROL_ALLOW_ORIGIN_PATTERNS=*
       - CLKLOG_COMMON_ANONYMOUS_METHOD_LIST=/auth/login
       - CLKLOG_MANAGE_LOG_STORE_PATH=/receiverlog
+      - TOKEN_SECRET=${TOKEN_SECRET}
     networks:
       - backend
     deploy:
