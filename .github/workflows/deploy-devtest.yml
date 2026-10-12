@@ -25,6 +25,8 @@ env:
 jobs:
   build-and-deploy:
     name: devtest-build-deploy
+    # SSH_PRIVATE_KEY 取自 Environment devtest（环境级），仓库级 Secrets 保持 0 凭据
+    environment: devtest
     runs-on: [self-hosted, clklog-ce-runner]
     timeout-minutes: 120
     steps:
