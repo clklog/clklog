@@ -49,7 +49,7 @@ jobs:
           SHORT_SHA="${GITHUB_SHA:0:7}"
           echo "CLKLOG_SHORT_SHA=${SHORT_SHA}" >> "${GITHUB_ENV}"
           echo "GITHUB_SHA=${GITHUB_SHA}  SHORT_SHA=${SHORT_SHA}"
-          echo "::notice::Release Assets 不需要的 Source code (zip)/(tar.gz)：请在仓库 Settings → General → Releases 取消勾选『Automatically include source code downloads on releases』（Git tag 推送后 GitHub 后台立刻生成，CI 侧 API 无法删除）"
+          echo "::notice::Source code (zip)/(tar.gz) 是 GitHub 针对 tag 自动生成的仓库快照：GitHub 不提供删除/禁用开关（Settings 中也无相关选项），它不属于 release assets，CI 侧 API 无法删除；无需处理。"
 
       - name: 设置 Java 8 + Maven cache
         uses: actions/setup-java@v4
@@ -387,6 +387,13 @@ jobs:
           tag_name: ${{ env.CLKLOG_VERSION }}
           generate_release_notes: false
           body: |
+            > **资产说明**
+            > - 部署请使用 clklog-docker-compose-${{ env.CLKLOG_VERSION }}.tar.gz
+            > - 源码请使用 clklog-source-${{ env.CLKLOG_VERSION }}.tar.gz（仅含 clklog/ 源码，已剔除 node_modules/target/dist）
+            > - 文档请使用 clklog-docs-${{ env.CLKLOG_VERSION }}.tar.gz
+            >
+            > 下方由 GitHub 自动生成的 Source code (zip) / Source code (tar.gz) 是 tag 对应的全仓库快照，请勿用于部署；GitHub 不提供删除或关闭它们的选项。
+
             Full Changelog: ${{ github.server_url }}/${{ github.repository }}/commits/${{ env.CLKLOG_VERSION }}
           files: |
             ${{ env.OUTPUT_DIR }}/clklog-source-${{ env.CLKLOG_VERSION }}_g${{ env.CLKLOG_SHORT_SHA }}.tar.gz
@@ -448,8 +455,13 @@ jobs:
           BODY="$(gh release view "${TAG}" --json body --jq '.body' || true)"
           echo "当前 body（去重前）："
           printf "%s\n" "${BODY}"
-          CLEAN_BODY="$(printf "%s\n" "${BODY}" | sed 's/`//g' | awk '/^Full Changelog: / { if (!seen) { print; seen=1 } } END { if (!seen) exit 1 }' || true)"
-          if [ -z "${CLEAN_BODY}" ]; then CLEAN_BODY="${TARGET}"; fi
+          # 仅对 Full Changelog 行去重，保留资产说明等其余非空行（否则说明会被整段覆盖掉）
+          CLEAN_BODY="$(printf "%s\n" "${BODY}" | sed 's/`//g' | awk '/^Full Changelog: / { if (!seen) { print; seen=1 }; next } NF { print }')"
+          if [ -z "${CLEAN_BODY}" ]; then
+            CLEAN_BODY="${TARGET}"
+          elif ! printf "%s\n" "${CLEAN_BODY}" | grep -q '^Full Changelog: '; then
+            CLEAN_BODY="${CLEAN_BODY}"$'\n\n'"${TARGET}"
+          fi
           echo "清洗后 body："
           printf "%s\n" "${CLEAN_BODY}"
           set +e
