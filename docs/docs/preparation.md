@@ -1,17 +1,25 @@
+# ClkLog 源码安装环境准备
+
+| **版权所有**     | ClkLog     |
+| :--------------- | :--------- |
+| **产品型号**     | 社区版   |
+| **代码版本号**   | v1.4.0    |
+| **版本发布时间** | 2026-10-23 |
+
 
 ## 环境准备
 <!-- - Ubuntu SMP -->
 - Linux服务器（本文档以ubuntu为例）
 - JDK 1.8
 - Nginx 1.18
-- Redis 3.2.4
+- Redis 7.0.0
 - Zookeeper 3.7.2
 - Kafka 2.12-3.3.1
 - Flink 1.14.6
 - Clickhouse 23.2.1
 - nodejs >= 8.9
 - npm >=3.0.0
-- mysql
+- mysql 8.0
 
 ## 初始化步骤参考
 
@@ -53,12 +61,12 @@ systemctl start nginx
 
 - #### [nginx安装注意事项](https://clklog.com/#installation/question.md#nginx安装注意事项)
 
-### Redis 3.2.4 安装参考
+### Redis 7.0.0 安装参考
 
 1. 从 Redis 官网下载安装包
 
     ```
-    wget https://download.redis.io/releases/redis-3.2.4.tar.gz
+    wget https://download.redis.io/releases/redis-7.0.0.tar.gz
     ```
 
 2. 解压
@@ -67,8 +75,8 @@ systemctl start nginx
 
     ```
     cd /usr/local/services/
-    tar xzf redis-3.2.4.tar.gz
-    cd redis-3.2.4
+    tar xzf redis-7.0.0.tar.gz
+    cd redis-7.0.0
     ```
 
 3. 安装make与gcc
