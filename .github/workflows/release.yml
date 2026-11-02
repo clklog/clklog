@@ -608,6 +608,7 @@ jobs:
         if: steps.cfg.outputs.enabled == 'true' && env.GITEE_PUSH_TAG == 'true'
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref }}
           fetch-depth: 1
 
       - name: 拉取 GitHub Release 元数据（标题 / 描述 / 资产清单）
@@ -630,7 +631,8 @@ jobs:
         run: |
           set -euo pipefail
           git remote add gitee "https://${GITEE_OWNER}:${GITEE_TOKEN}@gitee.com/${GITEE_OWNER}/${GITEE_REPO}.git" 2>/dev/null || true
-          git fetch --unshallow || true
+          # 只拉取该 tag（避免 --unshallow 拉全量历史，monorepo 下极慢）；失败再退化为 unshallow
+          git fetch origin "+refs/tags/${TAG}:refs/tags/${TAG}" 2>/dev/null || git fetch --unshallow || true
           if git push gitee "refs/tags/${TAG}"; then
             echo "已推送 tag ${TAG} 到 Gitee"
           else
@@ -668,33 +670,38 @@ jobs:
           echo "release_id=$RID" >> "$GITHUB_OUTPUT"
           echo "Gitee Release id=$RID"
 
-      - name: 下载 GitHub 资产并上传到 Gitee（去重 + 100MB 限流）
+      - name: 下载 GitHub 资产并并行上传到 Gitee（去重 + 100MB 限流，3 路并发）
         if: steps.cfg.outputs.enabled == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          shopt -s nullglob
           TOKEN="$GITEE_TOKEN"; OWNER="$GITEE_OWNER"; REPO="$GITEE_REPO"; API="$GITEE_API"
           RID="${{ steps.gitee_rel.outputs.release_id }}"
           mkdir -p /tmp/gitee_assets
           gh release download "$TAG" -R "${GITHUB_REPOSITORY}" --dir /tmp/gitee_assets --pattern 'clklog-*.tar.gz'
           EXISTING_NAMES=$(curl -s "${API}/repos/${OWNER}/${REPO}/releases/${RID}?access_token=${TOKEN}" | jq -r '[.assets[].name] | join("\n")')
-          for f in /tmp/gitee_assets/*; do
-            [ -e "$f" ] || continue
+          # 3 路并发上传：GitHub Runner 在境外、Gitee 在境内，串行单次长连接很慢，并发显著缩短墙钟时间
+          upload_one() {
+            local f="$1" FN SIZE
             FN="$(basename "$f")"
             if printf '%s\n' "$EXISTING_NAMES" | grep -qx "$FN"; then
-              echo "跳过已存在附件：$FN"
-              continue
+              echo "跳过已存在附件：$FN"; return 0
             fi
             SIZE=$(stat -c%s "$f")
             if [ "$SIZE" -gt 104857600 ]; then
-              echo "::warning::$FN 体积 $((SIZE/1024/1024))MB 超过 Gitee 单文件 100MB 上限，跳过"
-              continue
+              echo "::warning::$FN 体积 $((SIZE/1024/1024))MB 超过 Gitee 单文件 100MB 上限，跳过"; return 0
             fi
             echo "上传 $FN ..."
             curl -s -X POST "${API}/repos/${OWNER}/${REPO}/releases/${RID}/attach_files" \
-              -F "access_token=${TOKEN}" -F "file=@${f}" | jq -r '.id // "upload-no-id"' | sed 's/^/  attach_id=/'
-          done
+              -F "access_token=${TOKEN}" -F "file=@${f}" \
+              | jq -r '.id // "upload-no-id"' | sed 's/^/  attach_id=/'
+            return 0
+          }
+          export -f upload_one
+          export EXISTING_NAMES TOKEN OWNER REPO API RID
+          printf '%s\0' /tmp/gitee_assets/* | xargs -0 -P 3 -I{} bash -c 'upload_one "$@"' _ {}
           echo "Gitee 同步完成：https://gitee.com/${OWNER}/${REPO}/releases/${TAG}"
 
   # ─────────────────────────────────────────────────────────────
@@ -746,6 +753,7 @@ jobs:
         if: steps.cfg.outputs.enabled == 'true' && env.GITCODE_PUSH_TAG == 'true'
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref }}
           fetch-depth: 1
 
       - name: 拉取 GitHub Release 元数据（标题 / 描述 / 资产清单）
@@ -768,7 +776,8 @@ jobs:
         run: |
           set -euo pipefail
           git remote add gitcode "https://${GITCODE_OWNER}:${GITCODE_TOKEN}@gitcode.com/${GITCODE_OWNER}/${GITCODE_REPO}.git" 2>/dev/null || true
-          git fetch --unshallow || true
+          # 只拉取该 tag（避免 --unshallow 拉全量历史，monorepo 下极慢）；失败再退化为 unshallow
+          git fetch origin "+refs/tags/${TAG}:refs/tags/${TAG}" 2>/dev/null || git fetch --unshallow || true
           if git push gitcode "refs/tags/${TAG}"; then
             echo "已推送 tag ${TAG} 到 GitCode"
           else
@@ -810,37 +819,36 @@ jobs:
           fi
           echo "existed=${EXISTED}" >> "$GITHUB_OUTPUT"
 
-      - name: 下载 GitHub 资产并上传到 GitCode（去重 + 100MB 限流）
+      - name: 下载 GitHub 资产并并行上传到 GitCode（去重 + 100MB 限流，3 路并发）
         if: steps.cfg.outputs.enabled == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          shopt -s nullglob
           TOKEN="$GITCODE_TOKEN"; OWNER="$GITCODE_OWNER"; REPO="$GITCODE_REPO"; API="$GITCODE_API"
           TAG="$TAG"
           mkdir -p /tmp/gitcode_assets
           gh release download "$TAG" -R "${GITHUB_REPOSITORY}" --dir /tmp/gitcode_assets --pattern 'clklog-*.tar.gz'
           # 现有附件名（去重用，避免重复上传）
           EXISTING_NAMES=$(curl -s "${API}/repos/${OWNER}/${REPO}/releases/tags/${TAG}?access_token=${TOKEN}" | jq -r '[.assets[]?.name] | join("\n")')
-          for f in /tmp/gitcode_assets/*; do
-            [ -e "$f" ] || continue
+          # 3 路并发上传：直传华为云 OBS（华南），境外 Runner → 境内 OBS 单流很慢，并发显著缩短墙钟时间
+          upload_gc() {
+            local f="$1" FN SIZE UP URL HDR_ARGS h HTTP tmp
             FN="$(basename "$f")"
             if printf '%s\n' "$EXISTING_NAMES" | grep -qx "$FN"; then
-              echo "跳过已存在附件：$FN"
-              continue
+              echo "跳过已存在附件：$FN"; return 0
             fi
             SIZE=$(stat -c%s "$f")
             if [ "$SIZE" -gt 104857600 ]; then
-              echo "::warning::$FN 体积 $((SIZE/1024/1024))MB 超过保护阈值 100MB，跳过（GitCode OBS 上限未知，沿用保守保护）"
-              continue
+              echo "::warning::$FN 体积 $((SIZE/1024/1024))MB 超过保护阈值 100MB，跳过（GitCode OBS 上限未知，沿用保守保护）"; return 0
             fi
             echo "上传 $FN ..."
             # 1) 获取预签名上传地址与所需请求头（OBS 两步式）
             UP=$(curl -s "${API}/repos/${OWNER}/${REPO}/releases/${TAG}/upload_url?access_token=${TOKEN}&file_name=${FN}")
             URL="$(echo "$UP" | jq -r '.url // empty')"
             if [ -z "$URL" ]; then
-              echo "::warning::获取 GitCode 上传地址失败：$(echo "$UP" | head -c 200)"
-              continue
+              echo "::warning::获取 GitCode 上传地址失败：$(echo "$UP" | head -c 200)"; return 0
             fi
             # 2) 将 headers 对象转成 curl -H 参数
             HDR_ARGS=()
@@ -848,11 +856,17 @@ jobs:
               [ -n "$h" ] && HDR_ARGS+=( -H "$h" )
             done < <(echo "$UP" | jq -r '.headers | to_entries[]? | "\(.key): \(.value)"')
             # 3) PUT 直传文件二进制（--data-binary 保留原始字节）
-            HTTP=$(curl -s -o /tmp/gc_up.json -w "%{http_code}" -X PUT "${URL}" "${HDR_ARGS[@]}" --data-binary "@${f}")
+            tmp="$(mktemp)"
+            HTTP=$(curl -s -o "$tmp" -w "%{http_code}" -X PUT "${URL}" "${HDR_ARGS[@]}" --data-binary "@${f}")
             if [ "$HTTP" = "200" ] || [ "$HTTP" = "201" ]; then
               echo "  上传成功 ($FN, HTTP=$HTTP)"
             else
-              echo "::warning::$FN 上传返回 HTTP=${HTTP}：$(head -c 200 /tmp/gc_up.json)"
+              echo "::warning::$FN 上传返回 HTTP=${HTTP}：$(head -c 200 "$tmp")"
             fi
-          done
+            rm -f "$tmp"
+            return 0
+          }
+          export -f upload_gc
+          export EXISTING_NAMES TOKEN OWNER REPO API TAG
+          printf '%s\0' /tmp/gitcode_assets/* | xargs -0 -P 3 -I{} bash -c 'upload_gc "$@"' _ {}
           echo "GitCode 同步完成：https://gitcode.com/${OWNER}/${REPO}/releases/${TAG}"
