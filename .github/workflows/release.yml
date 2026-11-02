@@ -367,10 +367,15 @@ jobs:
           if [ "$PUSH_ALI" = "1" ]; then
             # 原生 buildx --push：buildkit 直接把 manifest+config+layers 完整推到 ACR，
             # 避免「本地加载再 docker push」导致控制台镜像ID/大小为空的元数据缺失问题。
+            # --provenance=false --sbom=false：关闭 buildx 默认附带的 attestation/SBOM 清单，
+            # 否则会生成 application/vnd.oci.empty.v1+json 这类 manifest class，阿里云 ACR 不识别会报
+            # "denied: unknown manifest class for application/vnd.oci.empty.v1+json" 并拒绝推送。
             echo "========== buildx --push ${name} → Aliyun ACR（${ali_tag} + ${ali_latest}）=========="
             docker buildx build "${BUILD_ARGS[@]}" \
               --platform "linux/amd64" \
               --push \
+              --provenance=false \
+              --sbom=false \
               -t "${ali_tag}" \
               -t "${ali_latest}" \
               -f "${df}" .
