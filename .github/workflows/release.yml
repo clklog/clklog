@@ -87,8 +87,8 @@ jobs:
             SELECTED="$(printf '%s' "$SERVICES" | jq --arg s "$SVC" 'map(select(.short==$s or .name==$s))')"
             FULL="false"
           fi
-          BUILD_M="$(printf '%s' "$SELECTED" | jq -c 'map(del(.ali))')"
-          DOCKER_M="$(printf '%s' "$SELECTED" | jq -c '.')"
+          BUILD_M="$(printf '%s' "$SELECTED" | jq -c '{include: map(del(.ali))}')"
+          DOCKER_M="$(printf '%s' "$SELECTED" | jq -c '{include: .}')"
           {
             echo "build_matrix=$BUILD_M"
             echo "docker_matrix=$DOCKER_M"
@@ -569,7 +569,8 @@ jobs:
       GITEE_REPO: ${{ secrets.GITEE_REPO || 'clklog' }}
       GITEE_PUSH_TAG: ${{ secrets.GITEE_PUSH_TAG || 'true' }}
       GITEE_API: ${{ secrets.GITEE_API || 'https://gitee.com/api/v5' }}
-      TAG: ${{ env.CLKLOG_VERSION }}
+      # 顶层 CLKLOG_VERSION 即 github.ref_name；job 级 env 不可用 env 上下文，此处直接用 github 上下文
+      TAG: ${{ github.ref_name }}
     steps:
       - name: 判定 Gitee 同步开关（缺 Token 则跳过）
         id: cfg

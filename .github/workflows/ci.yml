@@ -3,6 +3,12 @@ name: CI (公开 Monorepo · 构建验证 · 仓库级零凭据 · 仅 release.y
 on:
   push:
     branches: [main, aitest]
+    # 与 pull_request 的 paths 过滤保持一致：仅子项目代码 / CI 自身 / .gitignore 变更才触发构建验证，
+    # 纯文档（docs/、README）、compose 等提交不再触发全量 6 构建
+    paths:
+      - 'clklog/clklog-{api,init,manage,processing,receiver,ui}/**'
+      - '.github/workflows/ci.yml'
+      - '.gitignore'
   pull_request:
     branches: [main, aitest]
     paths:
@@ -64,7 +70,7 @@ jobs:
           else
             SELECTED="$(printf '%s' "$SERVICES" | jq --arg s "$SVC" 'map(select(.short==$s or .name==$s))')"
           fi
-          BUILD_M="$(printf '%s' "$SELECTED" | jq -c '.')"
+          BUILD_M="$(printf '%s' "$SELECTED" | jq -c '{include: .}')"
           echo "build_matrix=$BUILD_M" >> "$GITHUB_OUTPUT"
           echo "selected services:"; printf '%s' "$SELECTED" | jq -r '.[].short | "  - "+.'
 
