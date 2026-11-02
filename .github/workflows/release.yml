@@ -581,7 +581,7 @@ jobs:
       needs.release.result == 'success' &&
       (github.event.inputs.test_mode || 'false') != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 120
     permissions:
       contents: read
     env:
@@ -691,10 +691,10 @@ jobs:
             fi
             SIZE=$(stat -c%s "$f")
             if [ "$SIZE" -gt 104857600 ]; then
-              echo "::warning::$FN 体积 $((SIZE/1024/1024))MB 超过 Gitee 单文件 100MB 上限，跳过"; return 0
+              echo "::error::$FN 体积 $((SIZE/1024/1024))MB 超过 Gitee 单文件 100MB 硬上限，且 source 必须同步——请改用分卷/外链或调整打包，终止本次同步"; return 1
             fi
             echo "上传 $FN ..."
-            curl -s -X POST "${API}/repos/${OWNER}/${REPO}/releases/${RID}/attach_files" \
+            curl -s --retry 5 --retry-delay 10 --retry-all-errors --connect-timeout 30 --max-time 1800 -X POST "${API}/repos/${OWNER}/${REPO}/releases/${RID}/attach_files" \
               -F "access_token=${TOKEN}" -F "file=@${f}" \
               | jq -r '.id // "upload-no-id"' | sed 's/^/  attach_id=/'
             return 0
@@ -726,7 +726,7 @@ jobs:
       needs.release.result == 'success' &&
       (github.event.inputs.test_mode || 'false') != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 240
     permissions:
       contents: read
     env:
@@ -840,8 +840,8 @@ jobs:
               echo "跳过已存在附件：$FN"; return 0
             fi
             SIZE=$(stat -c%s "$f")
-            if [ "$SIZE" -gt 104857600 ]; then
-              echo "::warning::$FN 体积 $((SIZE/1024/1024))MB 超过保护阈值 100MB，跳过（GitCode OBS 上限未知，沿用保守保护）"; return 0
+            if [ "$SIZE" -gt 536870912 ]; then
+              echo "::error::$FN 体积 $((SIZE/1024/1024))MB 超过 GitCode 同步保护阈值 512MB，且 source 必须同步——请检查打包产物是否异常膨胀，终止本次同步"; return 1
             fi
             echo "上传 $FN ..."
             # 1) 获取预签名上传地址与所需请求头（OBS 两步式）
@@ -857,7 +857,7 @@ jobs:
             done < <(echo "$UP" | jq -r '.headers | to_entries[]? | "\(.key): \(.value)"')
             # 3) PUT 直传文件二进制（--data-binary 保留原始字节）
             tmp="$(mktemp)"
-            HTTP=$(curl -s -o "$tmp" -w "%{http_code}" -X PUT "${URL}" "${HDR_ARGS[@]}" --data-binary "@${f}")
+            HTTP=$(curl -s -o "$tmp" -w "%{http_code}" --retry 5 --retry-delay 10 --retry-all-errors --connect-timeout 30 --max-time 3600 -X PUT "${URL}" "${HDR_ARGS[@]}" --data-binary "@${f}")
             if [ "$HTTP" = "200" ] || [ "$HTTP" = "201" ]; then
               echo "  上传成功 ($FN, HTTP=$HTTP)"
             else
