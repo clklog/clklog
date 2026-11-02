@@ -46,11 +46,12 @@ env:
 # 拆分后的 Job DAG：
 #   setup（解析矩阵 + service 输入）─┬─► build (matrix×N, 无需审批) ──► docker (matrix×N, 无需审批)
 #                                   └─► package (仅 checkout, 无需审批) ─┐
-#                                                                       └─► release (无需审批) ──► sync-gitee (release-prod 审批门)
-#   （docker 与 package 互不依赖、可并行；release 等二者；sync 等 release）
-#   特权边界：仅「同步到 Gitee」属于特权操作，需 release-prod Environment 审批；阿里云 ACR push 与 GitHub Release 发布均无需审批。
+#                                                                       └─► release (无需审批) ──┬─► sync-gitee   (release-prod 审批门，并行)
+#                                                                                            └─► sync-gitcode (release-prod 审批门，并行)
+#   （docker 与 package 互不依赖、可并行；release 等二者；sync-gitee 与 sync-gitcode 同 needs release、同时被审批门放行、互不影响、并行执行）
+#   特权边界：仅「同步到 Gitee / GitCode」属于特权操作，需 release-prod Environment 审批；阿里云 ACR push 与 GitHub Release 发布均无需审批。
 #   单服务重建：workflow_dispatch 选 service≠all 时，full_release=false → 只跑 build+docker（仅重建 + push 该镜像），
-#              自动跳过 package / release / sync-gitee（不重建 Release、不同步 Gitee）。
+#              自动跳过 package / release / sync-gitee / sync-gitcode（不重建 Release、不同步外部平台）。
 #   说明：原单 job 内「6 个子项目平铺到根目录」已移除，docker 直接用 clklog/clklog-<short> 作 build context（与 ci.yml 一致）。
 #   矩阵单一事实源：6 个子服务的 name/dir/lang/jar_suffix/short(及 docker 的 ali) 由 setup job 统一定义，与 ci.yml 对齐。
 
@@ -461,10 +462,10 @@ jobs:
           body: |
             > **资产说明**
             > - 部署请使用 clklog-docker-compose-${{ env.CLKLOG_VERSION }}.tar.gz
-            > - 源码请使用 clklog-source-${{ env.CLKLOG_VERSION }}.tar.gz（仅含 clklog/ 源码，已剔除 node_modules/target/dist）
+            > - 源码请使用 clklog-source-${{ env.CLKLOG_VERSION }}.tar.gz
             > - 文档请使用 clklog-docs-${{ env.CLKLOG_VERSION }}.tar.gz
             >
-            > 下方由 GitHub 自动生成的 Source code (zip) / Source code (tar.gz) 是 tag 对应的全仓库快照，请勿用于部署；GitHub 不提供删除或关闭它们的选项。
+            > 下方的 Source code (zip) / Source code (tar.gz) 是 tag 对应的全仓库快照，请勿用于部署；代码仓不提供删除或关闭它们的选项。
 
             Full Changelog: ${{ github.server_url }}/${{ github.repository }}/commits/${{ env.CLKLOG_VERSION }}
           files: |
@@ -681,3 +682,158 @@ jobs:
               -F "access_token=${TOKEN}" -F "file=@${f}" | jq -r '.id // "upload-no-id"' | sed 's/^/  attach_id=/'
           done
           echo "Gitee 同步完成：https://gitee.com/${OWNER}/${REPO}/releases/${TAG}"
+
+  # ─────────────────────────────────────────────────────────────
+  # 6) GitCode 镜像：把 GitHub Release 的「标题 / 描述 / 打包资源」同步到 GitCode（特权操作，需 release-prod 审批）
+  #    与 sync-gitee 同 needs release、同审批门，二者并行执行、互不影响。
+  # 依赖仓库 Secrets（缺 GITCODE_TOKEN 则本 job 自动跳过，不影响已发布的 GitHub Release）：
+  #   GITCODE_TOKEN     【必填】GitCode 私人令牌（Personal Access Token，需 repo 权限）
+  #   GITCODE_OWNER     【可选，默认 clklog】GitCode 仓库所属空间地址；仅同步到非官方仓库时才需覆盖
+  #   GITCODE_REPO      【可选，默认 clklog】GitCode 仓库名；仅同步到非官方仓库时才需覆盖
+  #                     → 默认即同步至 https://gitcode.net/clklog/clklog
+  #   GITCODE_PUSH_TAG  (可选，默认 true) true = 把 tag 推到 GitCode（Release 指向正确 commit）
+  #                                        false = Release 指向 GitCode 默认分支 HEAD（不推送代码）
+  #   GITCODE_API       (可选，默认 https://api.gitcode.com/api/v5) 企业版/私有部署可覆盖
+  # 注意：GitCode 附件走「获取预签名上传地址 → PUT 直传」两步式（OBS 对象存储），与 Gitee 的 attach_files 不同；
+  #       GitCode 单文件上限未知，沿用 100MB 保守保护，超出自动跳过并告警。
+  # ─────────────────────────────────────────────────────────────
+  sync-gitcode:
+    name: 同步 GitHub Release → GitCode
+    needs: release
+    environment: release-prod
+    if: >-
+      needs.release.result == 'success' &&
+      (github.event.inputs.test_mode || 'false') != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    env:
+      GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
+      # 默认同步至官方 GitCode 仓库 clklog/clklog；如需同步到其它 GitCode 仓库，用 Secret 覆盖即可
+      GITCODE_OWNER: ${{ secrets.GITCODE_OWNER || 'clklog' }}
+      GITCODE_REPO: ${{ secrets.GITCODE_REPO || 'clklog' }}
+      GITCODE_PUSH_TAG: ${{ secrets.GITCODE_PUSH_TAG || 'true' }}
+      GITCODE_API: ${{ secrets.GITCODE_API || 'https://api.gitcode.com/api/v5' }}
+      # 顶层 CLKLOG_VERSION 即 github.ref_name；job 级 env 不可用 env 上下文，此处直接用 github 上下文
+      TAG: ${{ github.ref_name }}
+    steps:
+      - name: 判定 GitCode 同步开关（缺 Token 则跳过）
+        id: cfg
+        run: |
+          if [ -z "${GITCODE_TOKEN:-}" ]; then
+            echo "未配置 GITCODE_TOKEN，跳过 GitCode 同步（owner/repo 已默认 clklog/clklog）"
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout（仅 GITCODE_PUSH_TAG=true 时需要，用于推送 tag）
+        if: steps.cfg.outputs.enabled == 'true' && env.GITCODE_PUSH_TAG == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 拉取 GitHub Release 元数据（标题 / 描述 / 资产清单）
+        id: meta
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release view "${TAG}" -R "${GITHUB_REPOSITORY}" --json tagName,name,body,assets \
+            --jq '{tag:.tagName, name:.name, body:.body, assets:[.assets[]|{name,url}]}' > /tmp/gh_release.json
+          echo "tag=$(jq -r .tag /tmp/gh_release.json)"   >> "$GITHUB_OUTPUT"
+          echo "name=$(jq -r .name /tmp/gh_release.json)" >> "$GITHUB_OUTPUT"
+          jq -r .body /tmp/gh_release.json > /tmp/release_body.md
+          echo "GitHub Release 资产清单："
+          jq -r '.assets[] | "  - \(.name)"' /tmp/gh_release.json
+
+      - name: (可选) 推送 tag 到 GitCode
+        if: steps.cfg.outputs.enabled == 'true' && env.GITCODE_PUSH_TAG == 'true'
+        run: |
+          set -euo pipefail
+          git remote add gitcode "https://${GITCODE_OWNER}:${GITCODE_TOKEN}@gitcode.net/${GITCODE_OWNER}/${GITCODE_REPO}.git" 2>/dev/null || true
+          git fetch --unshallow || true
+          if git push gitcode "refs/tags/${TAG}"; then
+            echo "已推送 tag ${TAG} 到 GitCode"
+          else
+            echo "::warning::推送 tag 到 GitCode 失败（可能已存在 / 历史分叉 / 需完整历史），Release 将退化为指向默认分支 HEAD"
+          fi
+
+      - name: 创建 / 复用 GitCode Release（标题 + 描述）
+        id: gc_rel
+        if: steps.cfg.outputs.enabled == 'true'
+        run: |
+          set -euo pipefail
+          TOKEN="$GITCODE_TOKEN"; OWNER="$GITCODE_OWNER"; REPO="$GITCODE_REPO"; API="$GITCODE_API"
+          TAG="$TAG"; NAME="${{ steps.meta.outputs.name }}"
+          BODY="$(cat /tmp/release_body.md)"
+          [ -z "$BODY" ] && BODY="Release ${TAG}（由 GitHub Actions 自动同步）"
+          # 已存在则复用，避免重复 Release
+          HTTP=$(curl -s -o /tmp/gc_exist.json -w "%{http_code}" "${API}/repos/${OWNER}/${REPO}/releases/tags/${TAG}?access_token=${TOKEN}")
+          EXISTED=false
+          if [ "$HTTP" = "200" ]; then
+            echo "GitCode 已存在该 tag 的 Release，复用"
+            EXISTED=true
+          else
+            DEF=$(curl -s "${API}/repos/${OWNER}/${REPO}?access_token=${TOKEN}" | jq -r '.default_branch // "master"')
+            PAYLOAD=$(jq -n --arg tag "$TAG" --arg name "$NAME" --arg body "$BODY" --arg tc "$DEF" \
+              '{tag_name:$tag, name:$name, body:$body, target_commitish:$tc, release_status:"latest"}')
+            HTTP=$(curl -s -o /tmp/gc_create.json -w "%{http_code}" -X POST "${API}/repos/${OWNER}/${REPO}/releases" \
+              -H "Content-Type: application/json" -H "Accept: application/json" -d "$PAYLOAD")
+            if [ "$HTTP" = "200" ] || [ "$HTTP" = "201" ]; then
+              echo "GitCode Release 创建成功"
+            else
+              echo "::warning::创建 GitCode Release 返回 HTTP=${HTTP}：$(head -c 300 /tmp/gc_create.json)"
+              exit 1
+            fi
+          fi
+          echo "existed=${EXISTED}" >> "$GITHUB_OUTPUT"
+
+      - name: 下载 GitHub 资产并上传到 GitCode（去重 + 100MB 限流）
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TOKEN="$GITCODE_TOKEN"; OWNER="$GITCODE_OWNER"; REPO="$GITCODE_REPO"; API="$GITCODE_API"
+          TAG="$TAG"
+          mkdir -p /tmp/gitcode_assets
+          gh release download "$TAG" -R "${GITHUB_REPOSITORY}" --dir /tmp/gitcode_assets --pattern 'clklog-*.tar.gz'
+          # 现有附件名（去重用，避免重复上传）
+          EXISTING_NAMES=$(curl -s "${API}/repos/${OWNER}/${REPO}/releases/tags/${TAG}?access_token=${TOKEN}" | jq -r '[.assets[]?.name] | join("\n")')
+          for f in /tmp/gitcode_assets/*; do
+            [ -e "$f" ] || continue
+            FN="$(basename "$f")"
+            if printf '%s\n' "$EXISTING_NAMES" | grep -qx "$FN"; then
+              echo "跳过已存在附件：$FN"
+              continue
+            fi
+            SIZE=$(stat -c%s "$f")
+            if [ "$SIZE" -gt 104857600 ]; then
+              echo "::warning::$FN 体积 $((SIZE/1024/1024))MB 超过保护阈值 100MB，跳过（GitCode OBS 上限未知，沿用保守保护）"
+              continue
+            fi
+            echo "上传 $FN ..."
+            # 1) 获取预签名上传地址与所需请求头（OBS 两步式）
+            UP=$(curl -s "${API}/repos/${OWNER}/${REPO}/releases/${TAG}/upload_url?access_token=${TOKEN}&file_name=${FN}")
+            URL="$(echo "$UP" | jq -r '.url // empty')"
+            if [ -z "$URL" ]; then
+              echo "::warning::获取 GitCode 上传地址失败：$(echo "$UP" | head -c 200)"
+              continue
+            fi
+            # 2) 将 headers 对象转成 curl -H 参数
+            HDR_ARGS=()
+            while IFS= read -r h; do
+              [ -n "$h" ] && HDR_ARGS+=( -H "$h" )
+            done < <(echo "$UP" | jq -r '.headers | to_entries[]? | "\(.key): \(.value)"')
+            # 3) PUT 直传文件二进制（--data-binary 保留原始字节）
+            HTTP=$(curl -s -o /tmp/gc_up.json -w "%{http_code}" -X PUT "${URL}" "${HDR_ARGS[@]}" --data-binary "@${f}")
+            if [ "$HTTP" = "200" ] || [ "$HTTP" = "201" ]; then
+              echo "  上传成功 ($FN, HTTP=$HTTP)"
+            else
+              echo "::warning::$FN 上传返回 HTTP=${HTTP}：$(head -c 200 /tmp/gc_up.json)"
+            fi
+          done
+          echo "GitCode 同步完成：https://gitcode.net/${OWNER}/${REPO}/releases/${TAG}"
