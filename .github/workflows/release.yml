@@ -413,11 +413,13 @@ jobs:
           set -euo pipefail
           echo "CLKLOG_SHORT_SHA=${GITHUB_SHA:0:7}" >> "${GITHUB_ENV}"
 
-      - name: 下载打包资源产物（3 个 tar）
+      # 注意：package 上传 release-assets 用的是单目录（path: release-output），artifact 根=该目录本身，
+      # 3 个 tar.gz 平铺在 artifact 根；此处解压到 OUTPUT_DIR 子目录，保持下方 files: 的 OUTPUT_DIR/ 前缀成立。
+      - name: 下载打包资源产物（3 个 tar · 解压到 OUTPUT_DIR 子目录）
         uses: actions/download-artifact@v4
         with:
           name: release-assets
-          path: ${{ github.workspace }}
+          path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}
 
       - name: 上传前清空旧 Release（Git tag 保留，不删 tag）
         env:
