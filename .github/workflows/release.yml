@@ -371,11 +371,16 @@ jobs:
             # 否则会生成 application/vnd.oci.empty.v1+json 这类 manifest class，阿里云 ACR 不识别会报
             # "denied: unknown manifest class for application/vnd.oci.empty.v1+json" 并拒绝推送。
             echo "========== buildx --push ${name} → Aliyun ACR（${ali_tag} + ${ali_latest}）=========="
+            # 关键补充：oci-mediatypes=false —— 让 buildx 写出「经典 Docker Manifest V2」媒体类型，
+            # 而非默认的 OCI 媒体类型。阿里云 ACR 控制台对 OCI 格式镜像的 size 计算存在兼容缺陷，
+            # 仅加 --provenance=false 仍会保留 OCI 媒体类型，导致镜像大小显示为“-”。
+            # 说明：--push 等价于 --output type=image,push=true，二者不能共存，
+            # 因此这里改用完整 --output 写法以附加 oci-mediatypes=false（标签仍用 -t 指定）。
             docker buildx build "${BUILD_ARGS[@]}" \
               --platform "linux/amd64" \
-              --push \
               --provenance=false \
               --sbom=false \
+              --output "type=image,push=true,oci-mediatypes=false" \
               -t "${ali_tag}" \
               -t "${ali_latest}" \
               -f "${df}" .
