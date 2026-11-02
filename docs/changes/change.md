@@ -3,16 +3,16 @@
 | **版权所有**     | ClkLog     |
 | :--------------- | :--------- |
 | **产品型号**     | 社区版   |
-| **代码版本号**   | v1.4.0    |
-| **版本发布时间** | 2026-10-23 |
+| **代码版本号**   | v1.4.1    |
+| **版本发布时间** | 2026-11-02 |
 | **升级前版本号：** |v1.3.1
  
 
 # 升级说明
 
-V1.4.0 的主要变化是**镜像版本号改为从 `.env` 读取**，另外前端 UI 有更新；后端代码与数据库结构均无变更。
+v1.4.1 的主要变化是**镜像版本号改为从 `.env` 读取**，另外前端 UI 有更新；后端代码与数据库结构均无变更。
 
-> ⚠️ **必读**：升级时必须在你现有的 `.env` 中补一行 `CLKLOG_VER=v1.4.0`。
+> ⚠️ **必读**：升级时必须在你现有的 `.env` 中补一行 `CLKLOG_VER=v1.4.1`。
 > 漏掉会导致镜像 tag 为空（如 `.../clklog/ui:`），启动报 `invalid reference format`。
 
 # 升级内容
@@ -29,7 +29,7 @@ V1.4.0 的主要变化是**镜像版本号改为从 `.env` 读取**，另外前�
 
 | 文件 | 变更 |
 | --- | --- |
-| `.env` | 新增 `CLKLOG_VER=v1.4.0` |
+| `.env` | 新增 `CLKLOG_VER=v1.4.1` |
 | `docker-compose-clklog-simple.yml` | 5 处业务镜像 `:1.3.1` → `:${CLKLOG_VER}`；gateway `nginx:1.29-alpine` → `nginx:1.23` |
 | `docker-compose-clklog-full.yml` | 7 处业务镜像 `:1.3.1` → `:${CLKLOG_VER}` |
 
@@ -63,7 +63,7 @@ docker compose -f docker-compose-clklog-simple.yml down
 ## 3. 替换编排文件（保留 `.env`）
 
 ```bash
-tar -zxvf clklog-docker-compose-v1.4.0.tar.gz -C /tmp
+tar -zxvf clklog-docker-compose-v1.4.1.tar.gz -C /tmp
 PKG=/tmp/clklog-docker-compose
 
 cp -f  $PKG/docker-compose-clklog-*.yml .
@@ -74,8 +74,8 @@ cp -rf $PKG/clklog_dc_config/. ./clklog_dc_config/     # 注意：不要覆盖 .
 ## 4. 补充版本号（关键）
 
 ```bash
-grep -q '^CLKLOG_VER=' .env || sed -i '/^PROJECT_NAME=/a CLKLOG_VER=v1.4.0' .env
-grep '^CLKLOG_VER=' .env          # 必须输出 CLKLOG_VER=v1.4.0
+grep -q '^CLKLOG_VER=' .env || sed -i '/^PROJECT_NAME=/a CLKLOG_VER=v1.4.1' .env
+grep '^CLKLOG_VER=' .env          # 必须输出 CLKLOG_VER=v1.4.1
 ```
 
 ## 5. 拉取镜像并启动
@@ -91,14 +91,14 @@ docker compose -f docker-compose-clklog-simple.yml up -d
 docker compose -f docker-compose-clklog-simple.yml config | grep 'image:'
 ```
 
-业务镜像 tag 应全部为 `v1.4.0`；若出现 `.../api:`（tag 为空），说明第 4 步未生效：
+业务镜像 tag 应全部为 `v1.4.1`；若出现 `.../api:`（tag 为空），说明第 4 步未生效：
 
 ```
-image: registry.cn-shanghai.aliyuncs.com/clklog/api:v1.4.0
-image: registry.cn-shanghai.aliyuncs.com/clklog/init:v1.4.0
-image: registry.cn-shanghai.aliyuncs.com/clklog/manage:v1.4.0
-image: registry.cn-shanghai.aliyuncs.com/clklog/receiver:v1.4.0
-image: registry.cn-shanghai.aliyuncs.com/clklog/ui:v1.4.0
+image: registry.cn-shanghai.aliyuncs.com/clklog/api:v1.4.1
+image: registry.cn-shanghai.aliyuncs.com/clklog/init:v1.4.1
+image: registry.cn-shanghai.aliyuncs.com/clklog/manage:v1.4.1
+image: registry.cn-shanghai.aliyuncs.com/clklog/receiver:v1.4.1
+image: registry.cn-shanghai.aliyuncs.com/clklog/ui:v1.4.1
 image: registry.cn-shanghai.aliyuncs.com/clklog/nginx:1.23
 ```
 

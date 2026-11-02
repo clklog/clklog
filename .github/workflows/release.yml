@@ -475,9 +475,9 @@ jobs:
           generate_release_notes: false
           body: |
             > **资产说明**
-            > - 部署请使用 clklog-docker-compose-${{ env.CLKLOG_VERSION }}.tar.gz
-            > - 源码请使用 clklog-source-${{ env.CLKLOG_VERSION }}.tar.gz
-            > - 文档请使用 clklog-docs-${{ env.CLKLOG_VERSION }}.tar.gz
+            > - 部署请使用：clklog-docker-compose-${{ env.CLKLOG_VERSION }}.tar.gz
+            > - 源码请使用：clklog-source-${{ env.CLKLOG_VERSION }}.tar.gz
+            > - 文档请参考：clklog-docs-${{ env.CLKLOG_VERSION }}.tar.gz
             >
             > 下方的 Source code (zip) / Source code (tar.gz) 是 tag 对应的全仓库快照，请勿用于部署；代码仓不提供删除或关闭它们的选项。
 
