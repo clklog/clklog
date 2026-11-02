@@ -45,14 +45,21 @@
 - github 镜像下载
 
     ```
-   curl -O https://github.com/clklog/clklog-deploy/raw/refs/heads/main/releases/clklog-docker-compose-1.3.1.tar.gz
+   curl -O https://github.com/clklog/clklog/releases/download/v1.4.1/clklog-docker-compose-v1.4.1.tar.gz
     ```
 
 - gitee 镜像下载
 
     ```
-   curl -O https://gitee.com/clklog/clklog-deploy/raw/main/releases/clklog-docker-compose-1.3.1.tar.gz
+   curl -O https://gitee.com/clklog/clklog/releases/download/v1.4.1/clklog-docker-compose-v1.4.1.tar.gz
     ```
+
+- gitcode 镜像下载
+
+    ```
+   curl -O https://gitcode.com/clklog/clklog/releases/download/v1.4.1/clklog-docker-compose-v1.4.1.tar.gz
+    ```
+
 
 2. 拷贝镜像,并解压镜像文件，参考代码如下：
 
@@ -118,13 +125,13 @@
 - github 镜像下载
 
     ```
-   curl -O https://github.com/clklog/clklog-deploy/raw/refs/heads/main/releases/clklog-docker-compose-1.3.1.tar.gz
+   curl -O https://github.com/clklog/clklog-deploy/raw/refs/heads/main/releases/clklog-docker-compose-v1.4.1.tar.gz
     ```
 
 - gitee 镜像下载
 
     ```
-   curl -O https://gitee.com/clklog/clklog-deploy/raw/main/releases/clklog-docker-compose-1.3.1.tar.gz
+   curl -O https://gitee.com/clklog/clklog-deploy/raw/main/releases/clklog-docker-compose-v1.4.1.tar.gz
     ```
 
 2. 拷贝镜像,并解压镜像文件，参考代码如下：
