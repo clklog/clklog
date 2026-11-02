@@ -213,6 +213,7 @@ jobs:
           set -euo pipefail
           BASE="$(pwd)"
           TAG="${CLKLOG_VERSION}"
+          mkdir -p "${BASE}/${OUTPUT_DIR}"
           cp -R "${BASE}/docker-compose" "${BASE}/${OUTPUT_DIR}/__compose_env_pack"
           sed -i "s/VER_PLACEHOLDER/${TAG}/g" "${BASE}/${OUTPUT_DIR}/__compose_env_pack/.env"
 
@@ -289,7 +290,10 @@ jobs:
       max-parallel: 6
       matrix: ${{ fromJSON(needs.setup.outputs.docker_matrix) }}
     steps:
-      - name: 下载 build 产物（jar/dist + Dockerfile + 版本号）
+      # 注意：build job 上传的是单目录（path: clklog/clklog-<short>），upload-artifact v4
+      # 对单目录的 artifact 根=该目录本身，故下载后 Dockerfile/version.txt/target|dist 平铺于 workspace 根；
+      # 本 job 无 checkout，所有构建操作直接在 workspace 根进行（不可用 matrix.dir，该目录不存在）。
+      - name: 下载 build 产物（Dockerfile/version.txt/target|dist 平铺于 workspace 根）
         uses: actions/download-artifact@v4
         with:
           name: svc-${{ matrix.short }}
@@ -335,8 +339,7 @@ jobs:
         if: steps.check_push_ok.outputs.push_aliyun_ok == 'true'
         run: echo "login_ok=true" >> $GITHUB_OUTPUT
 
-      - name: Build + Push 单镜像（仅阿里云 ACR）
-        working-directory: ${{ matrix.dir }}
+      - name: Build + Push 单镜像（仅阿里云 ACR · workspace 根，artifact 已平铺）
         env:
           ALIYUN_REGISTRY_SECRET: ${{ secrets.ALIYUN_REGISTRY }}
           ALIYUN_USERNAME_SECRET: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
