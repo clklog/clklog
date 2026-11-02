@@ -347,7 +347,6 @@ jobs:
           ALIYUN_PASSWORD_SECRET: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
         run: |
           set -euo pipefail
-          BASE="$(pwd)"
           ALIYUN_NS_SUFFIX="${ALIYUN_NS_SUFFIX}"
           TAG="${DOCKER_TAG}"
           ALIYUN_REG="${ALIYUN_REGISTRY_SECRET:-}"
@@ -365,21 +364,26 @@ jobs:
           ali_short="${{ matrix.ali }}"
           ali_tag="${ALIYUN_REG}/${ALIYUN_NS_SUFFIX}/${ali_short}:${TAG}"
           ali_latest="${ALIYUN_REG}/${ALIYUN_NS_SUFFIX}/${ali_short}:latest"
-          placeholder_tag="ghcr.io/clklog/placeholder-${name}:${TAG}"
-          echo "========== build placeholder（验证 COPY JAR/HTML_DIR）${name} =========="
-          docker buildx build "${BUILD_ARGS[@]}" \
-            --platform "linux/amd64" \
-            --output "type=docker" \
-            -t "${placeholder_tag}" \
-            -f "${df}" .
           if [ "$PUSH_ALI" = "1" ]; then
-            echo "========== retag ${name} → Aliyun ACR（2 tags）=========="
-            docker tag "${placeholder_tag}" "${ali_tag}"
-            docker tag "${placeholder_tag}" "${ali_latest}"
-            echo "========== push Aliyun ACR ${ali_tag} + ${ali_latest} =========="
-            docker push "${ali_tag}"
-            docker push "${ali_latest}"
+            # 原生 buildx --push：buildkit 直接把 manifest+config+layers 完整推到 ACR，
+            # 避免「本地加载再 docker push」导致控制台镜像ID/大小为空的元数据缺失问题。
+            echo "========== buildx --push ${name} → Aliyun ACR（${ali_tag} + ${ali_latest}）=========="
+            docker buildx build "${BUILD_ARGS[@]}" \
+              --platform "linux/amd64" \
+              --push \
+              -t "${ali_tag}" \
+              -t "${ali_latest}" \
+              -f "${df}" .
+            echo "已推送：${ali_tag}"
+            echo "已推送：${ali_latest}"
           else
+            # 非推送场景（test_mode / 缺 Secret）：仅本地 --output type=docker 校验 COPY JAR/HTML_DIR，不推送
+            echo "========== buildx 本地校验 ${name}（不推送）=========="
+            docker buildx build "${BUILD_ARGS[@]}" \
+              --platform "linux/amd64" \
+              --output "type=docker" \
+              -t "ghcr.io/clklog/placeholder-${name}:${TAG}" \
+              -f "${df}" .
             echo "${name} ALIYUN ACR PUSH SKIPPED（test_mode 或 Secrets 未配齐）"
           fi
 
@@ -690,7 +694,7 @@ jobs:
   #   GITCODE_TOKEN     【必填】GitCode 私人令牌（Personal Access Token，需 repo 权限）
   #   GITCODE_OWNER     【可选，默认 clklog】GitCode 仓库所属空间地址；仅同步到非官方仓库时才需覆盖
   #   GITCODE_REPO      【可选，默认 clklog】GitCode 仓库名；仅同步到非官方仓库时才需覆盖
-  #                     → 默认即同步至 https://gitcode.net/clklog/clklog
+  #                     → 默认即同步至 https://gitcode.com/clklog/clklog
   #   GITCODE_PUSH_TAG  (可选，默认 true) true = 把 tag 推到 GitCode（Release 指向正确 commit）
   #                                        false = Release 指向 GitCode 默认分支 HEAD（不推送代码）
   #   GITCODE_API       (可选，默认 https://api.gitcode.com/api/v5) 企业版/私有部署可覆盖
@@ -753,7 +757,7 @@ jobs:
         if: steps.cfg.outputs.enabled == 'true' && env.GITCODE_PUSH_TAG == 'true'
         run: |
           set -euo pipefail
-          git remote add gitcode "https://${GITCODE_OWNER}:${GITCODE_TOKEN}@gitcode.net/${GITCODE_OWNER}/${GITCODE_REPO}.git" 2>/dev/null || true
+          git remote add gitcode "https://${GITCODE_OWNER}:${GITCODE_TOKEN}@gitcode.com/${GITCODE_OWNER}/${GITCODE_REPO}.git" 2>/dev/null || true
           git fetch --unshallow || true
           if git push gitcode "refs/tags/${TAG}"; then
             echo "已推送 tag ${TAG} 到 GitCode"
@@ -770,8 +774,12 @@ jobs:
           TAG="$TAG"; NAME="${{ steps.meta.outputs.name }}"
           BODY="$(cat /tmp/release_body.md)"
           [ -z "$BODY" ] && BODY="Release ${TAG}（由 GitHub Actions 自动同步）"
-          # 已存在则复用，避免重复 Release
+          # 第一次 API 调用即校验 token：401 = token 无效/过期/无权限（GitCode 文档明确定义）
           HTTP=$(curl -s -o /tmp/gc_exist.json -w "%{http_code}" "${API}/repos/${OWNER}/${REPO}/releases/tags/${TAG}?access_token=${TOKEN}")
+          if [ "$HTTP" = "401" ]; then
+            echo "::error::GitCode 鉴权失败（HTTP 401）。请检查 GITCODE_TOKEN：① 是否过期/无效；② 是否具备 ${OWNER}/${REPO} 仓库的写入权限（需 write_repository 作用域）；③ 粘贴 Secret 时是否带入首尾空格或换行。注意 GitCode 与 Gitee/GitHub 是不同平台，必须是在 gitcode.com 创建的私人令牌。"
+            exit 1
+          fi
           EXISTED=false
           if [ "$HTTP" = "200" ]; then
             echo "GitCode 已存在该 tag 的 Release，复用"
@@ -780,12 +788,13 @@ jobs:
             DEF=$(curl -s "${API}/repos/${OWNER}/${REPO}?access_token=${TOKEN}" | jq -r '.default_branch // "master"')
             PAYLOAD=$(jq -n --arg tag "$TAG" --arg name "$NAME" --arg body "$BODY" --arg tc "$DEF" \
               '{tag_name:$tag, name:$name, body:$body, target_commitish:$tc, release_status:"latest"}')
-            HTTP=$(curl -s -o /tmp/gc_create.json -w "%{http_code}" -X POST "${API}/repos/${OWNER}/${REPO}/releases" \
+            # GitCode 文档：access_token 是 POST 的必填 query 参数（不同于 Gitee 放 body）
+            HTTP=$(curl -s -o /tmp/gc_create.json -w "%{http_code}" -X POST "${API}/repos/${OWNER}/${REPO}/releases?access_token=${TOKEN}" \
               -H "Content-Type: application/json" -H "Accept: application/json" -d "$PAYLOAD")
             if [ "$HTTP" = "200" ] || [ "$HTTP" = "201" ]; then
               echo "GitCode Release 创建成功"
             else
-              echo "::warning::创建 GitCode Release 返回 HTTP=${HTTP}：$(head -c 300 /tmp/gc_create.json)"
+              echo "::error::创建 GitCode Release 返回 HTTP=${HTTP}：$(head -c 300 /tmp/gc_create.json)"
               exit 1
             fi
           fi
@@ -836,4 +845,4 @@ jobs:
               echo "::warning::$FN 上传返回 HTTP=${HTTP}：$(head -c 200 /tmp/gc_up.json)"
             fi
           done
-          echo "GitCode 同步完成：https://gitcode.net/${OWNER}/${REPO}/releases/${TAG}"
+          echo "GitCode 同步完成：https://gitcode.com/${OWNER}/${REPO}/releases/${TAG}"
