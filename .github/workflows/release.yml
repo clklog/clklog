@@ -13,10 +13,19 @@ on:
         options:
           - "false"
           - "true"
-
-permissions:
-  contents: write
-  packages: write
+      service:
+        description: "仅重建单个服务（默认 all = 全量发布流程；指定单服务则只 rebuild + push 镜像，不重建 Release / 不同步 Gitee）"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - "all"
+          - "manage"
+          - "api"
+          - "receiver"
+          - "processing"
+          - "init"
+          - "ui"
 
 concurrency:
   group: release-${{ github.ref }}
@@ -34,101 +43,257 @@ env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
   CLKLOG_SHORT_SHA: ""
 
+# 拆分后的 Job DAG：
+#   setup（解析矩阵 + service 输入）─┬─► build (matrix×N, 无需审批) ──► docker (matrix×N, 无需审批)
+#                                   └─► package (仅 checkout, 无需审批) ─┐
+#                                                                       └─► release (无需审批) ──► sync-gitee (release-prod 审批门)
+#   （docker 与 package 互不依赖、可并行；release 等二者；sync 等 release）
+#   特权边界：仅「同步到 Gitee」属于特权操作，需 release-prod Environment 审批；阿里云 ACR push 与 GitHub Release 发布均无需审批。
+#   单服务重建：workflow_dispatch 选 service≠all 时，full_release=false → 只跑 build+docker（仅重建 + push 该镜像），
+#              自动跳过 package / release / sync-gitee（不重建 Release、不同步 Gitee）。
+#   说明：原单 job 内「6 个子项目平铺到根目录」已移除，docker 直接用 clklog/clklog-<short> 作 build context（与 ci.yml 一致）。
+#   矩阵单一事实源：6 个子服务的 name/dir/lang/jar_suffix/short(及 docker 的 ali) 由 setup job 统一定义，与 ci.yml 对齐。
+
 jobs:
-  build-and-release:
-    name: build + release
-    environment: release-prod
+  # ─────────────────────────────────────────────────────────────
+  # 0) setup：单一事实源，定义 6 个子服务的构建矩阵（字段与 ci.yml build-matrix 对齐），
+  #    并依据 workflow_dispatch 的 service 输入决定 full_release（全量发布 / 单服务重建）
+  # ─────────────────────────────────────────────────────────────
+  setup:
+    name: 解析构建矩阵 / 发布模式
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    outputs:
+      build_matrix: ${{ steps.set.outputs.build_matrix }}
+      docker_matrix: ${{ steps.set.outputs.docker_matrix }}
+      full_release: ${{ steps.set.outputs.full_release }}
+    steps:
+      - id: set
+        shell: bash
+        run: |
+          set -euo pipefail
+          SVC="${{ github.event.inputs.service || 'all' }}"
+          SERVICES='[
+            {"name":"clklog-manage","dir":"clklog/clklog-manage","lang":"java","jar_suffix":"","short":"manage","ali":"manage"},
+            {"name":"clklog-api","dir":"clklog/clklog-api","lang":"java","jar_suffix":"","short":"api","ali":"api"},
+            {"name":"clklog-receiver","dir":"clklog/clklog-receiver","lang":"java","jar_suffix":"","short":"receiver","ali":"receiver"},
+            {"name":"clklog-processing","dir":"clklog/clklog-processing","lang":"java","jar_suffix":"-jar-with-dependencies","short":"processing","ali":"processing"},
+            {"name":"clklog-init","dir":"clklog/clklog-init","lang":"java","jar_suffix":"","short":"init","ali":"init"},
+            {"name":"clklog-ui","dir":"clklog/clklog-ui","lang":"node","jar_suffix":"","short":"ui","ali":"ui"}
+          ]'
+          if [ "$SVC" = "all" ] || [ -z "$SVC" ]; then
+            SELECTED="$SERVICES"
+            FULL="true"
+          else
+            SELECTED="$(printf '%s' "$SERVICES" | jq --arg s "$SVC" 'map(select(.short==$s or .name==$s))')"
+            FULL="false"
+          fi
+          BUILD_M="$(printf '%s' "$SELECTED" | jq -c 'map(del(.ali))')"
+          DOCKER_M="$(printf '%s' "$SELECTED" | jq -c '.')"
+          {
+            echo "build_matrix=$BUILD_M"
+            echo "docker_matrix=$DOCKER_M"
+            echo "full_release=$FULL"
+          } >> "$GITHUB_OUTPUT"
+          echo "selected services:"; printf '%s' "$SELECTED" | jq -r '.[].short | "  - "+.'
+          echo "full_release=$FULL"
+
+  # ─────────────────────────────────────────────────────────────
+  # 1) build：并行构建 N 个子项目（Java verify / Node build），
+  #    产出 jar/dist + 已修正的 Dockerfile + 版本号，供 docker job 使用
+  # ─────────────────────────────────────────────────────────────
+  build:
+    name: build-${{ matrix.short }}
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix: ${{ fromJSON(needs.setup.outputs.build_matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK 8 + Maven cache
+        if: matrix.lang == 'java'
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+          cache: maven
+
+      - name: Setup Node 18
+        if: matrix.lang == 'node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache Node Modules
+        if: matrix.lang == 'node'
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.dir }}/node_modules
+          key: ${{ runner.os }}-release-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package-lock.json', matrix.dir)) }}
+          restore-keys: |
+            ${{ runner.os }}-release-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package.json', matrix.dir)) }}-
+            ${{ runner.os }}-release-node-modules-${{ env.NODE_VERSION }}-
+
+      - name: Build Java (clean verify · jacoco LINE≥80% 由 quality-gate 承担)
+        id: build_java
+        if: matrix.lang == 'java'
+        working-directory: ${{ matrix.dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x mvnw mvnw.cmd 2>/dev/null || true
+          if [ -x ./mvnw ]; then
+            ./mvnw -B -ntp clean verify -DskipITs
+          else
+            mvn -B -ntp clean verify -DskipITs
+          fi
+          V=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f pom.xml)
+          echo "ver=$V" >> $GITHUB_OUTPUT
+          echo "$V" > version.txt
+          echo "detected pom version = $V (service=${{matrix.name}})"
+
+      - name: Build Node (npm ci → test:unit → build dist)
+        if: matrix.lang == 'node'
+        working-directory: ${{ matrix.dir }}
+        run: |
+          export NODE_OPTIONS="--openssl-legacy-provider"
+          npm ci
+          npm run test:unit --if-present -- --ci --passWithNoTests
+          npm run build --if-present
+
+      - name: 修复 Dockerfile Base Image（java 非 processing · 仅 Runner 内存修改，不入库）
+        if: matrix.lang == 'java' && matrix.name != 'clklog-processing'
+        working-directory: ${{ matrix.dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -la Dockerfile
+          ORIG="$(head -1 Dockerfile)"
+          sed -i -E 's/^FROM openjdk:8(u[0-9]+-[a-z]+)?$/FROM eclipse-temurin:8u422-b05-jdk/' Dockerfile
+          NEW="$(head -1 Dockerfile)"
+          echo "FROM line: [$ORIG] -> [$NEW]"
+
+      - name: 上传服务产物（jar/dist + Dockerfile + 版本号，供 docker job 使用）
+        uses: actions/upload-artifact@v4
+        with:
+          name: svc-${{ matrix.short }}
+          path: ${{ matrix.dir }}
+          exclude: |
+            ${{ matrix.dir }}/node_modules/**
+            ${{ matrix.dir }}/.git/**
+            **/*.log
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────
+  # 2) package：仅 checkout，打 compose / source / docs 三个 tar（与 build 并行）
+  # ─────────────────────────────────────────────────────────────
+  package:
+    name: package-assets
+    needs: [setup]
+    if: needs.setup.outputs.full_release == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
       - name: 计算 SHORT_SHA（7 位）
+        id: sha
         run: |
           set -euo pipefail
           SHORT_SHA="${GITHUB_SHA:0:7}"
           echo "CLKLOG_SHORT_SHA=${SHORT_SHA}" >> "${GITHUB_ENV}"
           echo "GITHUB_SHA=${GITHUB_SHA}  SHORT_SHA=${SHORT_SHA}"
-          echo "::notice::Source code (zip)/(tar.gz) 是 GitHub 针对 tag 自动生成的仓库快照：GitHub 不提供删除/禁用开关（Settings 中也无相关选项），它不属于 release assets，CI 侧 API 无法删除；无需处理。"
+          echo "::notice::Source code (zip)/(tar.gz) 是 GitHub 针对 tag 自动生成的仓库快照：GitHub 不提供删除/禁用开关，它不属于 release assets，CI 侧 API 无法删除；无需处理。"
 
-      - name: 设置 Java 8 + Maven cache
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: "temurin"
-          cache: maven
-
-      - name: 设置 Node.js 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Cache Node Modules（UI build 复用）
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.UI_DIR }}/node_modules
-          key: ${{ runner.os }}-release-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package-lock.json', env.UI_DIR)) }}
-          restore-keys: |
-            ${{ runner.os }}-release-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package.json', env.UI_DIR)) }}-
-            ${{ runner.os }}-release-node-modules-${{ env.NODE_VERSION }}-
-
-      - name: 构建 5 个 Java 子项目（verify + jacoco）
+      - name: 替换 compose .env VER_PLACEHOLDER → 当前 tag（仅 Runner 内存副本，不入库）
         run: |
           set -euo pipefail
           BASE="$(pwd)"
-          for dir in clklog/clklog-manage clklog/clklog-api clklog/clklog-receiver clklog/clklog-processing clklog/clklog-init; do
-            echo "========== build $dir =========="
-            (cd "$dir" && chmod +x mvnw mvnw.cmd 2>/dev/null || true)
-            if [ -x "$dir/mvnw" ]; then (cd "$dir" && ./mvnw -B -ntp clean verify -DskipITs)
-            else (cd "$dir" && mvn -B -ntp clean verify -DskipITs); fi
-          done
-          if [ -f pom.xml ] && grep -q jacoco-aggregate pom.xml 2>/dev/null; then
-            mvn -B -ntp -N jacoco:report-aggregate
-            ls -la "target/site/jacoco-aggregate" || true
+          TAG="${CLKLOG_VERSION}"
+          cp -R "${BASE}/docker-compose" "${BASE}/${OUTPUT_DIR}/__compose_env_pack"
+          sed -i "s/VER_PLACEHOLDER/${TAG}/g" "${BASE}/${OUTPUT_DIR}/__compose_env_pack/.env"
+
+      - name: Pack compose tar（临时 _g${SHORT_SHA} 后缀，上传后改名回友好名）
+        run: |
+          set -euo pipefail
+          BASE="$(pwd)"
+          TAG="${CLKLOG_VERSION}"
+          SHA="${CLKLOG_SHORT_SHA}"
+          COMPOSE_BASENAME="clklog-docker-compose"
+          COMPOSE_DIR="${BASE}/${OUTPUT_DIR}/${COMPOSE_BASENAME}"
+          mkdir -p "${COMPOSE_DIR}"
+          SRC_DC="${BASE}/${OUTPUT_DIR}/__compose_env_pack"
+          cp -v "${SRC_DC}/docker-compose-clklog-simple.yml" \
+                "${SRC_DC}/docker-compose-clklog-simple-base.yml" \
+                "${SRC_DC}/docker-compose-clklog-full.yml" \
+                "${SRC_DC}/docker-compose-clklog-full-base.yml" \
+                "${SRC_DC}/.env" \
+                "${SRC_DC}/clklog_init.sh" \
+                -t "${COMPOSE_DIR}/"
+          cp -R "${SRC_DC}/clklog_dc_config" "${COMPOSE_DIR}/"
+          cd "${BASE}/${OUTPUT_DIR}"
+          tar --exclude='clklog_dc_data' \
+              --exclude='*.log' \
+              -czf "${COMPOSE_BASENAME}-${TAG}_g${SHA}.tar.gz" "${COMPOSE_BASENAME}"
+          if tar tzf "${COMPOSE_BASENAME}-${TAG}_g${SHA}.tar.gz" | grep -q "clklog_dc_data"; then
+            echo "::error::compose tar 包含数据卷 clklog_dc_data，打包失败"; exit 1
           fi
-          mkdir -p "${BASE}/aggregated-coverage/java"
-          for dir in clklog/clklog-manage clklog/clklog-api clklog/clklog-receiver clklog/clklog-processing clklog/clklog-init; do
-            name=$(basename "$dir")
-            if [ -d "$dir/target/site/jacoco" ]; then
-              cp -R "$dir/target/site/jacoco" "${BASE}/aggregated-coverage/java/${name}"
-            fi
-          done
 
-      - name: 构建 clklog-ui（npm → test → build dist）
-        working-directory: ${{ env.UI_DIR }}
-        run: |
-          set -euo pipefail
-          export NODE_OPTIONS="--openssl-legacy-provider"
-          npm ci
-          npm run test:unit --if-present -- --ci --passWithNoTests
-          npm run build --if-present
-          BASE="$(pwd)/../.."
-          mkdir -p "${BASE}/aggregated-coverage/ui"
-          if [ -d coverage ]; then cp -R coverage "${BASE}/aggregated-coverage/ui/"; fi
-          if [ -f junit.xml ]; then cp junit.xml "${BASE}/aggregated-coverage/ui/junit.xml"; fi
-
-      - name: 6 个子项目 → 平铺到工作区根目录
+      - name: Pack 源码包 + docs 包（临时 _g${SHORT_SHA} 后缀，上传后改名回友好名）
         run: |
           set -euo pipefail
           BASE="$(pwd)"
-          for repo in clklog-manage clklog-api clklog-receiver clklog-init clklog-processing clklog-ui; do
-            if [ -d "clklog/${repo}" ] && [ ! -d "${repo}" ]; then
-              cp -R "clklog/${repo}" "${repo}/"
-            fi
-          done
-          echo "========== 平铺完成 =========="
-          ls -la "${BASE}"
+          TAG="${CLKLOG_VERSION}"
+          OUT="${BASE}/${OUTPUT_DIR}"
+          SHA="${CLKLOG_SHORT_SHA}"
+          cd "${BASE}"
+          tar --exclude='node_modules' \
+              --exclude='target' \
+              --exclude='dist' \
+              --exclude='.git' \
+              --exclude='*.log' \
+              -czf "${OUT}/clklog-source-${TAG}_g${SHA}.tar.gz" clklog
+          if tar tzf "${OUT}/clklog-source-${TAG}_g${SHA}.tar.gz" | grep -Eq '^/home|^/runner|/node_modules/|/target/|/dist/|\.log$'; then
+            echo "::error::源码包包含绝对路径/构建产物/日志，打包失败"; exit 1
+          fi
+          cd "${BASE}"
+          if [ ! -d docs ]; then
+            echo "::error::仓库根目录缺少 docs/，请先补齐后再发版"; exit 1
+          fi
+          tar --exclude='*.log' \
+              -czf "${OUT}/clklog-docs-${TAG}_g${SHA}.tar.gz" docs
+          if tar tzf "${OUT}/clklog-docs-${TAG}_g${SHA}.tar.gz" | grep -Eq '^/home|^/runner|\.log$'; then
+            echo "::error::docs 包包含绝对路径/日志，打包失败"; exit 1
+          fi
 
-      - name: 读取 5 个 Java 子项目 POM version（拼 JAR 文件名）
-        id: vers
-        run: |
-          set -euo pipefail
-          for repo in clklog-manage clklog-api clklog-receiver clklog-processing clklog-init; do
-            name_short="${repo#clklog-}"
-            V=$( (cd "$repo" && mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f pom.xml) )
-            echo "ver_${name_short}=$V" >> $GITHUB_OUTPUT
-            echo "$repo version = $V"
-          done
+      - name: 上传 3 个打包资源产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          path: ${{ env.OUTPUT_DIR }}
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────
+  # 3) docker：并行 build + push 6 个镜像到阿里云 ACR（非特权，无需审批）
+  # ─────────────────────────────────────────────────────────────
+  docker:
+    name: docker-${{ matrix.short }}
+    needs: [build, setup]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix: ${{ fromJSON(needs.setup.outputs.docker_matrix) }}
+    steps:
+      - name: 下载 build 产物（jar/dist + Dockerfile + 版本号）
+        uses: actions/download-artifact@v4
+        with:
+          name: svc-${{ matrix.short }}
+          path: ${{ github.workspace }}
 
       - name: 设置 Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -156,20 +321,6 @@ jobs:
           ALIYUN_USERNAME_SECRET: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
           ALIYUN_PASSWORD_SECRET: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
 
-      - name: Runner 内修改 5 个 Java 子项目 Dockerfile Base Image（openjdk:8 → temurin:8u422-b05-jdk，不入库）
-        run: |
-          set -euo pipefail
-          BASE="$(pwd)"
-          for d in clklog-manage clklog-api clklog-receiver clklog-init clklog-processing; do
-            if [ "$d" = "clklog-processing" ]; then continue; fi
-            DF="${BASE}/${d}/Dockerfile"
-            if [ ! -f "$DF" ]; then continue; fi
-            ORIG="$(head -1 "$DF")"
-            sed -i -E 's/^FROM openjdk:8(u[0-9]+-[a-z]+)?$/FROM eclipse-temurin:8u422-b05-jdk/' "$DF"
-            NEW="$(head -1 "$DF")"
-            echo "[${d}] FROM: [$ORIG] → [$NEW]"
-          done
-
       - name: 登录阿里云 ACR
         id: login_aliyun
         if: steps.check_push_ok.outputs.push_aliyun_ok == 'true'
@@ -184,7 +335,12 @@ jobs:
         if: steps.check_push_ok.outputs.push_aliyun_ok == 'true'
         run: echo "login_ok=true" >> $GITHUB_OUTPUT
 
-      - name: Build + Push 6 Docker images（仅阿里云 ACR）
+      - name: Build + Push 单镜像（仅阿里云 ACR）
+        working-directory: ${{ matrix.dir }}
+        env:
+          ALIYUN_REGISTRY_SECRET: ${{ secrets.ALIYUN_REGISTRY }}
+          ALIYUN_USERNAME_SECRET: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          ALIYUN_PASSWORD_SECRET: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
         run: |
           set -euo pipefail
           BASE="$(pwd)"
@@ -193,88 +349,35 @@ jobs:
           ALIYUN_REG="${ALIYUN_REGISTRY_SECRET:-}"
           PUSH_ALI=0
           if [ "${{ steps.post_login_aliyun.outputs.login_ok || 'false' }}" = "true" ]; then PUSH_ALI=1; fi
-          CONTEXTS=(clklog-manage clklog-api clklog-receiver clklog-init clklog-processing clklog-ui)
-          DOCKERFILES=(clklog-manage/Dockerfile clklog-api/Dockerfile clklog-receiver/Dockerfile clklog-init/Dockerfile clklog-processing/Dockerfile clklog-ui/Dockerfile)
-          JAR_SUFFIXES=("" "" "" "" "-jar-with-dependencies" "")
-          VER_MANAGE="${{ steps.vers.outputs.ver_manage }}"
-          VER_API="${{ steps.vers.outputs.ver_api }}"
-          VER_RECEIVER="${{ steps.vers.outputs.ver_receiver }}"
-          VER_PROCESSING="${{ steps.vers.outputs.ver_processing }}"
-          VER_INIT="${{ steps.vers.outputs.ver_init }}"
-          VERS=( "$VER_MANAGE" "$VER_API" "$VER_RECEIVER" "$VER_INIT" "$VER_PROCESSING" "__UI__" )
-          ALI_NAMES=("manage" "api" "receiver" "init" "processing" "ui")
-          TEST_MODE="${{ github.event.inputs.test_mode || 'false' }}"
-          mkdir -p "${BASE}/${OUTPUT_DIR}"
-          IMAGES=()
-          for i in "${!CONTEXTS[@]}"; do
-            name="${CONTEXTS[$i]}"
-            ctx="${CONTEXTS[$i]}"
-            df="${DOCKERFILES[$i]}"
-            js="${JAR_SUFFIXES[$i]}"
-            v="${VERS[$i]}"
-            ali_short="${ALI_NAMES[$i]}"
-            ali_tag="${ALIYUN_REG}/${ALIYUN_NS_SUFFIX}/${ali_short}:${TAG}"
-            ali_latest="${ALIYUN_REG}/${ALIYUN_NS_SUFFIX}/${ali_short}:latest"
-            BUILD_ARGS=()
-            if [ "$name" = "clklog-ui" ]; then BUILD_ARGS=(--build-arg HTML_DIR=dist)
-            else BUILD_ARGS=(--build-arg "JAR_FILE=target/${name}-${v}${js}.jar")
-            fi
-            placeholder_tag="ghcr.io/clklog/placeholder-${name}:${TAG}"
-            echo "========== [A/2] build placeholder（验证 COPY JAR/HTML_DIR）${name} =========="
-            docker buildx build "${BUILD_ARGS[@]}" \
-              --platform "linux/amd64" \
-              --output "type=docker" \
-              -t "${placeholder_tag}" \
-              -f "${df}" "${ctx}"
-            IMAGES+=("${placeholder_tag} (COPY CHECK PASSED)")
-            if [ "$PUSH_ALI" = "1" ]; then
-              echo "========== [B.1/2] retag ${name} → Aliyun ACR（2 tags）=========="
-              docker tag "${placeholder_tag}" "${ali_tag}"
-              docker tag "${placeholder_tag}" "${ali_latest}"
-              echo "========== [B.2/2] push Aliyun ACR ${ali_tag} + ${ali_latest} =========="
-              docker push "${ali_tag}"
-              docker push "${ali_latest}"
-              IMAGES+=("${ali_tag}" "${ali_latest}")
-            else
-              IMAGES+=("${name} ALIYUN ACR PUSH SKIPPED")
-            fi
-          done
-          DIGEST_FILE="${BASE}/${OUTPUT_DIR}/images-digests.txt"
-          : > "${DIGEST_FILE}"
-          echo "单 Registry 推送模式（仅阿里云 ACR）：" >> "${DIGEST_FILE}"
-          echo "  Registry · 阿里云 ACR：域名=${ALIYUN_REG:-<UNSET>}，命名空间=${ALIYUN_NS_SUFFIX}，UI 仓库=ui，PUSH=$PUSH_ALI" >> "${DIGEST_FILE}"
-          echo "  TEST_MODE=$TEST_MODE" >> "${DIGEST_FILE}"
-          echo "" >> "${DIGEST_FILE}"
-          if [ "$PUSH_ALI" = "1" ]; then
-            for img in "${IMAGES[@]}"; do
-              case "$img" in
-                *"COPY CHECK PASSED"*|*"PUSH SKIPPED"*)
-                  echo "=== $img ===" >> "${DIGEST_FILE}"
-                  echo "(placeholder / skipped，无 digest)" >> "${DIGEST_FILE}"
-                  echo "" >> "${DIGEST_FILE}"
-                  ;;
-                *)
-                  digest=$(docker buildx imagetools inspect "${img}" 2>/dev/null | grep -E '^Name:|Digest:' | head -4 || echo "digest-unknown ${img}")
-                  echo "=== ${img} ===" >> "${DIGEST_FILE}"
-                  echo "${digest}" >> "${DIGEST_FILE}"
-                  echo "" >> "${DIGEST_FILE}"
-                  ;;
-              esac
-            done
+          name="${{ matrix.name }}"
+          df="Dockerfile"
+          js="${{ matrix.jar_suffix }}"
+          if [ "$name" = "clklog-ui" ]; then
+            BUILD_ARGS=(--build-arg HTML_DIR=dist)
           else
-            echo "PUSH SKIPPED：test_mode=true，或 Environment release-prod Secrets 未配齐，或 ALIYUN_REGISTRY=占位符。仅 build 验证 COPY JAR/HTML_DIR 正确性。" >> "${DIGEST_FILE}"
-            echo "" >> "${DIGEST_FILE}"
-            for img in "${IMAGES[@]}"; do
-              echo "=== ${img} ===" >> "${DIGEST_FILE}"
-              echo "Build 成功（COPY 验证通过），PUSH 跳过。" >> "${DIGEST_FILE}"
-              echo "" >> "${DIGEST_FILE}"
-            done
+            VER="$(cat version.txt)"
+            BUILD_ARGS=(--build-arg "JAR_FILE=target/${name}-${VER}${js}.jar")
           fi
-          echo "========== 6 镜像 build + push 完成（仅阿里云 ACR）=========="
-        env:
-          ALIYUN_REGISTRY_SECRET: ${{ secrets.ALIYUN_REGISTRY }}
-          ALIYUN_USERNAME_SECRET: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
-          ALIYUN_PASSWORD_SECRET: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+          ali_short="${{ matrix.ali }}"
+          ali_tag="${ALIYUN_REG}/${ALIYUN_NS_SUFFIX}/${ali_short}:${TAG}"
+          ali_latest="${ALIYUN_REG}/${ALIYUN_NS_SUFFIX}/${ali_short}:latest"
+          placeholder_tag="ghcr.io/clklog/placeholder-${name}:${TAG}"
+          echo "========== build placeholder（验证 COPY JAR/HTML_DIR）${name} =========="
+          docker buildx build "${BUILD_ARGS[@]}" \
+            --platform "linux/amd64" \
+            --output "type=docker" \
+            -t "${placeholder_tag}" \
+            -f "${df}" .
+          if [ "$PUSH_ALI" = "1" ]; then
+            echo "========== retag ${name} → Aliyun ACR（2 tags）=========="
+            docker tag "${placeholder_tag}" "${ali_tag}"
+            docker tag "${placeholder_tag}" "${ali_latest}"
+            echo "========== push Aliyun ACR ${ali_tag} + ${ali_latest} =========="
+            docker push "${ali_tag}"
+            docker push "${ali_latest}"
+          else
+            echo "${name} ALIYUN ACR PUSH SKIPPED（test_mode 或 Secrets 未配齐）"
+          fi
 
       - name: 清理 Docker Registry 登录态
         if: always()
@@ -290,66 +393,28 @@ jobs:
         env:
           ALIYUN_REGISTRY_SECRET: ${{ secrets.ALIYUN_REGISTRY }}
 
-      - name: 替换 compose .env VER_PLACEHOLDER → 当前 tag（仅 Runner 内存副本，不入库）
+  # ─────────────────────────────────────────────────────────────
+  # 4) release：删旧 → 传 3 资产 → 改名/清理 body（非特权，无需审批）
+  # ─────────────────────────────────────────────────────────────
+  release:
+    name: publish-github-release
+    needs: [package, docker, setup]
+    if: needs.setup.outputs.full_release == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: 计算 SHORT_SHA（7 位，用于匹配打包资源文件名）
         run: |
           set -euo pipefail
-          BASE="$(pwd)"
-          TAG="${DOCKER_TAG}"
-          cp -R "${BASE}/docker-compose" "${BASE}/${OUTPUT_DIR}/__compose_env_pack"
-          sed -i "s/VER_PLACEHOLDER/${TAG}/g" "${BASE}/${OUTPUT_DIR}/__compose_env_pack/.env"
+          echo "CLKLOG_SHORT_SHA=${GITHUB_SHA:0:7}" >> "${GITHUB_ENV}"
 
-      - name: Pack compose tar（临时输出 _g${SHORT_SHA} 后缀，上传后改名回友好名；--exclude=clklog_dc_data）
-        run: |
-          set -euo pipefail
-          BASE="$(pwd)"
-          TAG="${CLKLOG_VERSION}"
-          SHA="${CLKLOG_SHORT_SHA}"
-          COMPOSE_BASENAME="clklog-docker-compose"
-          COMPOSE_DIR="${BASE}/${OUTPUT_DIR}/${COMPOSE_BASENAME}"
-          mkdir -p "${COMPOSE_DIR}"
-          SRC_DC="${BASE}/${OUTPUT_DIR}/__compose_env_pack"
-          cp -v "${SRC_DC}/docker-compose-clklog-simple.yml" \
-                "${SRC_DC}/docker-compose-clklog-simple-base.yml" \
-                "${SRC_DC}/docker-compose-clklog-full.yml" \
-                "${SRC_DC}/docker-compose-clklog-full-base.yml" \
-                "${SRC_DC}/.env" \
-                "${SRC_DC}/clklog_init.sh" \
-                -t "${COMPOSE_DIR}/"
-          cp -R "${SRC_DC}/clklog_dc_config" "${COMPOSE_DIR}/"
-          cd "${BASE}/${OUTPUT_DIR}"
-          tar --exclude='clklog_dc_data' \
-              --exclude='*.log' \
-              -czf "${COMPOSE_BASENAME}-${TAG}_g${SHA}.tar.gz" "${COMPOSE_BASENAME}"
-          if tar tzf "${COMPOSE_BASENAME}-${TAG}_g${SHA}.tar.gz" | grep -q "clklog_dc_data"; then
-            echo "::error::compose tar 包含数据卷 clklog_dc_data，打包失败"; exit 1
-          fi
-
-      - name: Pack 源码包 + docs 包（临时输出 _g${SHORT_SHA} 后缀，上传后改名回友好名）
-        run: |
-          set -euo pipefail
-          BASE="$(pwd)"
-          TAG="${CLKLOG_VERSION}"
-          OUT="${BASE}/${OUTPUT_DIR}"
-          SHA="${CLKLOG_SHORT_SHA}"
-          cd "${BASE}"
-          tar --exclude='node_modules' \
-              --exclude='target' \
-              --exclude='dist' \
-              --exclude='.git' \
-              --exclude='*.log' \
-              -czf "${OUT}/clklog-source-${TAG}_g${SHA}.tar.gz" clklog
-          if tar tzf "${OUT}/clklog-source-${TAG}_g${SHA}.tar.gz" | grep -Eq '^/home|^/runner|/node_modules/|/target/|/dist/|\.log$'; then
-            echo "::error::源码包包含绝对路径/构建产物/日志，打包失败"; exit 1
-          fi
-          cd "${BASE}"
-          if [ ! -d docs ]; then
-            echo "::error::仓库根目录缺少 docs/，请先补齐后再发版"; exit 1
-          fi
-          tar --exclude='*.log' \
-              -czf "${OUT}/clklog-docs-${TAG}_g${SHA}.tar.gz" docs
-          if tar tzf "${OUT}/clklog-docs-${TAG}_g${SHA}.tar.gz" | grep -Eq '^/home|^/runner|\.log$'; then
-            echo "::error::docs 包包含绝对路径/日志，打包失败"; exit 1
-          fi
+      - name: 下载打包资源产物（3 个 tar）
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets
+          path: ${{ github.workspace }}
 
       - name: 上传前清空旧 Release（Git tag 保留，不删 tag）
         env:
@@ -401,7 +466,7 @@ jobs:
             ${{ env.OUTPUT_DIR }}/clklog-docker-compose-${{ env.CLKLOG_VERSION }}_g${{ env.CLKLOG_SHORT_SHA }}.tar.gz
           fail_on_unmatched_files: true
 
-      - name: 改名回友好名 + 清理 body 重复（删 _g 后缀；asset id 全新 = CDN 零缓存；body 只保留 1 条 Full Changelog）
+      - name: 改名回友好名 + 清理 body 重复（删 _g 后缀；body 只保留 1 条 Full Changelog）
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -473,3 +538,138 @@ jobs:
           else
             echo "::warning::PATCH Release body 失败 exit_code=${PATCH_RC}，详情：${PATCH_OUT}"
           fi
+
+  # ─────────────────────────────────────────────────────────────
+  # 5) Gitee 镜像：把 GitHub Release 的「标题 / 描述 / 打包资源」同步到 Gitee（特权操作，需 release-prod 审批）
+  # 依赖仓库 Secrets（缺 GITEE_TOKEN 则本 job 自动跳过，不影响已发布的 GitHub Release）：
+  #   GITEE_TOKEN     【必填】Gitee 私人令牌，需 projects(repo) 权限（含 API 调用与 git push）
+  #   GITEE_OWNER     【可选，默认 clklog】Gitee 仓库所属空间地址；仅同步到非官方仓库时才需覆盖
+  #   GITEE_REPO      【可选，默认 clklog】Gitee 仓库名；仅同步到非官方仓库时才需覆盖
+  #                   → 默认即同步至 https://gitee.com/clklog/clklog
+  #   GITEE_PUSH_TAG  (可选，默认 true) true = 把 tag 及对应 commit 推到 Gitee（Release 指向正确 commit）
+  #                                      false = Release 指向 Gitee 默认分支 HEAD（不推送代码）
+  #   GITEE_API       (可选) 企业版可覆盖为 https://<域名>/api/v5
+  # 注意：Gitee 单文件附件上限 100MB，超出自动跳过并告警。
+  # ─────────────────────────────────────────────────────────────
+  sync-gitee:
+    name: 同步 GitHub Release → Gitee
+    needs: release
+    environment: release-prod
+    if: >-
+      needs.release.result == 'success' &&
+      (github.event.inputs.test_mode || 'false') != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    env:
+      GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+      # 默认同步至官方 Gitee 仓库 clklog/clklog；如需同步到其它 Gitee 仓库，用 Secret 覆盖即可
+      GITEE_OWNER: ${{ secrets.GITEE_OWNER || 'clklog' }}
+      GITEE_REPO: ${{ secrets.GITEE_REPO || 'clklog' }}
+      GITEE_PUSH_TAG: ${{ secrets.GITEE_PUSH_TAG || 'true' }}
+      GITEE_API: ${{ secrets.GITEE_API || 'https://gitee.com/api/v5' }}
+      TAG: ${{ env.CLKLOG_VERSION }}
+    steps:
+      - name: 判定 Gitee 同步开关（缺 Token 则跳过）
+        id: cfg
+        run: |
+          if [ -z "${GITEE_TOKEN:-}" ]; then
+            echo "未配置 GITEE_TOKEN，跳过 Gitee 同步（owner/repo 已默认 clklog/clklog）"
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout（仅 GITEE_PUSH_TAG=true 时需要，用于推送 tag）
+        if: steps.cfg.outputs.enabled == 'true' && env.GITEE_PUSH_TAG == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 拉取 GitHub Release 元数据（标题 / 描述 / 资产清单）
+        id: meta
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release view "${TAG}" --json tagName,name,body,assets \
+            --jq '{tag:.tagName, name:.name, body:.body, assets:[.assets[]|{name,url}]}' > /tmp/gh_release.json
+          echo "tag=$(jq -r .tag /tmp/gh_release.json)"   >> "$GITHUB_OUTPUT"
+          echo "name=$(jq -r .name /tmp/gh_release.json)" >> "$GITHUB_OUTPUT"
+          jq -r .body /tmp/gh_release.json > /tmp/release_body.md
+          echo "GitHub Release 资产清单："
+          jq -r '.assets[] | "  - \(.name)"' /tmp/gh_release.json
+
+      - name: (可选) 推送 tag 到 Gitee
+        if: steps.cfg.outputs.enabled == 'true' && env.GITEE_PUSH_TAG == 'true'
+        run: |
+          set -euo pipefail
+          git remote add gitee "https://${GITEE_OWNER}:${GITEE_TOKEN}@gitee.com/${GITEE_OWNER}/${GITEE_REPO}.git" 2>/dev/null || true
+          git fetch --unshallow || true
+          if git push gitee "refs/tags/${TAG}"; then
+            echo "已推送 tag ${TAG} 到 Gitee"
+          else
+            echo "::warning::推送 tag 到 Gitee 失败（可能已存在 / 历史分叉 / 需完整历史），Release 将退化为指向默认分支 HEAD"
+          fi
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+
+      - name: 创建 / 复用 Gitee Release（标题 + 描述）
+        id: gitee_rel
+        if: steps.cfg.outputs.enabled == 'true'
+        run: |
+          set -euo pipefail
+          TOKEN="$GITEE_TOKEN"; OWNER="$GITEE_OWNER"; REPO="$GITEE_REPO"; API="$GITEE_API"
+          TAG="$TAG"; NAME="${{ steps.meta.outputs.name }}"
+          BODY="$(cat /tmp/release_body.md)"
+          [ -z "$BODY" ] && BODY="Release ${TAG}（由 GitHub Actions 自动同步）"
+          # 已存在则复用，避免重复 Release
+          HTTP=$(curl -s -o /tmp/exist.json -w "%{http_code}" "${API}/repos/${OWNER}/${REPO}/releases/tags/${TAG}?access_token=${TOKEN}")
+          RID=""
+          if [ "$HTTP" = "200" ]; then RID=$(jq -r '.id // empty' /tmp/exist.json); fi
+          if [ -z "$RID" ]; then
+            DEF=$(curl -s "${API}/repos/${OWNER}/${REPO}?access_token=${TOKEN}" | jq -r '.default_branch // "master"')
+            PAYLOAD=$(jq -n --arg t "$TOKEN" --arg tag "$TAG" --arg name "$NAME" --arg body "$BODY" --arg tc "$DEF" \
+              '{access_token:$t, tag_name:$tag, name:$name, body:$body, target_commitish:$tc, prerelease:false, draft:false}')
+            HTTP=$(curl -s -o /tmp/create.json -w "%{http_code}" -X POST "${API}/repos/${OWNER}/${REPO}/releases" \
+              -H "Content-Type: application/json" -d "$PAYLOAD")
+            if [ "$HTTP" = "200" ] || [ "$HTTP" = "201" ]; then
+              RID=$(jq -r '.id // empty' /tmp/create.json)
+            else
+              echo "::warning::创建 Gitee Release 返回 HTTP=${HTTP}：$(head -c 300 /tmp/create.json)"
+            fi
+          fi
+          if [ -z "$RID" ]; then echo "::error::无法获取/创建 Gitee Release"; exit 1; fi
+          echo "release_id=$RID" >> "$GITHUB_OUTPUT"
+          echo "Gitee Release id=$RID"
+
+      - name: 下载 GitHub 资产并上传到 Gitee（去重 + 100MB 限流）
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TOKEN="$GITEE_TOKEN"; OWNER="$GITEE_OWNER"; REPO="$GITEE_REPO"; API="$GITEE_API"
+          RID="${{ steps.gitee_rel.outputs.release_id }}"
+          mkdir -p /tmp/gitee_assets
+          gh release download "$TAG" --dir /tmp/gitee_assets --pattern 'clklog-*.tar.gz'
+          EXISTING_NAMES=$(curl -s "${API}/repos/${OWNER}/${REPO}/releases/${RID}?access_token=${TOKEN}" | jq -r '[.assets[].name] | join("\n")')
+          for f in /tmp/gitee_assets/*; do
+            [ -e "$f" ] || continue
+            FN="$(basename "$f")"
+            if printf '%s\n' "$EXISTING_NAMES" | grep -qx "$FN"; then
+              echo "跳过已存在附件：$FN"
+              continue
+            fi
+            SIZE=$(stat -c%s "$f")
+            if [ "$SIZE" -gt 104857600 ]; then
+              echo "::warning::$FN 体积 $((SIZE/1024/1024))MB 超过 Gitee 单文件 100MB 上限，跳过"
+              continue
+            fi
+            echo "上传 $FN ..."
+            curl -s -X POST "${API}/repos/${OWNER}/${REPO}/releases/${RID}/attach_files" \
+              -F "access_token=${TOKEN}" -F "file=@${f}" | jq -r '.id // "upload-no-id"' | sed 's/^/  attach_id=/'
+          done
+          echo "Gitee 同步完成：https://gitee.com/${OWNER}/${REPO}/releases/${TAG}"

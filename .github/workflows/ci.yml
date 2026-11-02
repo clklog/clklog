@@ -10,6 +10,20 @@ on:
       - '.github/workflows/ci.yml'
       - '.gitignore'
   workflow_dispatch:
+    inputs:
+      service:
+        description: "仅构建/校验单个服务（默认 all = 全部 6 个；与 release.yml 对齐）"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - "all"
+          - "manage"
+          - "api"
+          - "receiver"
+          - "processing"
+          - "init"
+          - "ui"
 
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
@@ -22,24 +36,50 @@ env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
 
 jobs:
+  # ─────────────────────────────────────────────────────────────
+  # setup：构建矩阵单一事实源（字段与 release.yml 完全对齐：name/dir/lang/jar_suffix/short），
+  #        并依据 workflow_dispatch 的 service 输入过滤出需要构建/校验的服务
+  # ─────────────────────────────────────────────────────────────
+  setup:
+    name: 解析构建矩阵（service 输入）
+    runs-on: ubuntu-latest
+    outputs:
+      build_matrix: ${{ steps.set.outputs.build_matrix }}
+    steps:
+      - id: set
+        shell: bash
+        run: |
+          set -euo pipefail
+          SVC="${{ github.event.inputs.service || 'all' }}"
+          SERVICES='[
+            {"name":"clklog-manage","dir":"clklog/clklog-manage","lang":"java","jar_suffix":"","short":"manage"},
+            {"name":"clklog-api","dir":"clklog/clklog-api","lang":"java","jar_suffix":"","short":"api"},
+            {"name":"clklog-receiver","dir":"clklog/clklog-receiver","lang":"java","jar_suffix":"","short":"receiver"},
+            {"name":"clklog-processing","dir":"clklog/clklog-processing","lang":"java","jar_suffix":"-jar-with-dependencies","short":"processing"},
+            {"name":"clklog-init","dir":"clklog/clklog-init","lang":"java","jar_suffix":"","short":"init"},
+            {"name":"clklog-ui","dir":"clklog/clklog-ui","lang":"node","jar_suffix":"","short":"ui"}
+          ]'
+          if [ "$SVC" = "all" ] || [ -z "$SVC" ]; then
+            SELECTED="$SERVICES"
+          else
+            SELECTED="$(printf '%s' "$SERVICES" | jq --arg s "$SVC" 'map(select(.short==$s or .name==$s))')"
+          fi
+          BUILD_M="$(printf '%s' "$SELECTED" | jq -c '.')"
+          echo "build_matrix=$BUILD_M" >> "$GITHUB_OUTPUT"
+          echo "selected services:"; printf '%s' "$SELECTED" | jq -r '.[].short | "  - "+.'
+
   build-matrix:
-    name: build-${{ matrix.name }}
+    name: build-${{ matrix.short }}
     # 方案 Z：直接 push aitest 分支时跳过 CI 构建，交给 deploy-test.yml 专属流水线跑 build+deploy 全链路（0 重复构建）
     # PR 到 aitest / 所有 main 行为 / 手动触发 → 正常跑 build-matrix 做构建验证
     if: "! (github.event_name == 'push' && github.ref == 'refs/heads/aitest')"
+    needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
       fail-fast: false
       max-parallel: 6
-      matrix:
-        include:
-          - { name: clklog-manage,     dir: clklog/clklog-manage,     lang: java, jar_suffix: "",                short: manage }
-          - { name: clklog-api,        dir: clklog/clklog-api,        lang: java, jar_suffix: "",                short: api }
-          - { name: clklog-receiver,   dir: clklog/clklog-receiver,   lang: java, jar_suffix: "",                short: receiver }
-          - { name: clklog-processing, dir: clklog/clklog-processing, lang: java, jar_suffix: "-jar-with-dependencies", short: processing }
-          - { name: clklog-init,       dir: clklog/clklog-init,       lang: java, jar_suffix: "",                short: init }
-          - { name: clklog-ui,         dir: clklog/clklog-ui,         lang: node, jar_suffix: "",                short: ui }
+      matrix: ${{ fromJSON(needs.setup.outputs.build_matrix) }}
     steps:
       - uses: actions/checkout@v4
 
