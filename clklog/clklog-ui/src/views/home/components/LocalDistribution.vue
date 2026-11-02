@@ -1,7 +1,7 @@
 <template>
   <div
     v-loading="loadingRefresh"
-    class="documentation-container block-main public-hoverItem"
+    class="documentation-container block-main public-hoverItem local-distribution"
   >
     <div class="block-head" @click="$router.push('/visitorAnalysis/regional')">
       <div class="block-title" >地域分布</div>
@@ -11,7 +11,7 @@
         <img src="@/assets/images/icon.png" alt="" width="10px" />
       </div>
     </div>
-    <mapArea ref="mapArea" id="charts3" style="height: 100%" width="100%" />
+    <mapArea ref="mapArea" id="charts3" class="map-wrap" width="100%" />
   </div>
 </template>
 
@@ -52,3 +52,11 @@ export default {
   },
 };
 </script>
+<style lang="scss" scoped>
+.local-distribution {
+  min-height: 480px;
+  .map-wrap {
+    height: 420px;
+  }
+}
+</style>

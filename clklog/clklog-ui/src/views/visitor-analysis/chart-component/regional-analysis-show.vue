@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import chinamap from "echarts/map/json/china.json";
+import chinamap from "@/assets/json/china.json";
 import resize from "@/components/Charts/mixins/resize";
 import { getAreaApi } from "@/api/trackingapi/area";
 import { percentage } from "@/utils/percent";
@@ -168,7 +168,9 @@ export default {
         geo: {
           map: "china",
           aspectScale: 0.75,
-          zoom: 1.1,
+          zoom: 1.05,
+          top: 10,
+          bottom: 10,
         },
         tooltip: {
           formatter(params, ticket, callback) {
@@ -211,7 +213,9 @@ export default {
         },
         series: [
           {
-            zoom: 1.1,
+            zoom: 1.05,
+            top: 10,
+            bottom: 10,
             map: "china",
             type: "map",
 

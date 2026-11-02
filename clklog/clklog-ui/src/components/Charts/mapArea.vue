@@ -10,7 +10,7 @@
 
 <script>
 import { validLowerCase } from "@/utils/validate";
-import chinamap from "echarts/map/json/china.json";
+import chinamap from "@/assets/json/china.json";
 import { percentage } from "@/utils/percent";
 export default {
   data() {
@@ -109,7 +109,9 @@ export default {
           // 地理坐标系组件,支持在地理坐标系上绘制散点图、线图
           map: "china",
           aspectScale: 0.75,
-          zoom: 1.1,
+          zoom: 1.05,
+          top: 10,
+          bottom: 10,
         },
         // tooltip: {
         //   formatter: "{b}:{c}",
@@ -160,7 +162,9 @@ export default {
         },
         series: [
           {
-            zoom: 1.1,
+            zoom: 1.05,
+            top: 10,
+            bottom: 10,
             map: "china",
             type: "map",
             itemStyle: {
