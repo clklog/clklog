@@ -421,6 +421,8 @@ jobs:
           name: release-assets
           path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}
 
+      # 注意：本 job 无 checkout，workspace 非 git 仓库，gh release view/delete 必须显式 -R 指定仓库，
+      # 否则 gh 依赖 git remote 推断会报 "fatal: not a git repository"
       - name: 上传前清空旧 Release（Git tag 保留，不删 tag）
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -429,12 +431,12 @@ jobs:
           TAG="${CLKLOG_VERSION}"
           OWNER="${GITHUB_REPOSITORY%%/*}"
           REPO="${GITHUB_REPOSITORY##*/}"
-          if gh release view "${TAG}" >/dev/null 2>&1; then
-            gh release delete -y "${TAG}" --cleanup-tag=never
+          if gh release view "${TAG}" -R "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release delete -y "${TAG}" -R "${GITHUB_REPOSITORY}" --cleanup-tag=never
             DEL_RC=$?
             echo "gh release delete exit_code=${DEL_RC}"
             if [ "${DEL_RC}" -ne 0 ]; then
-              REL_ID="$(gh release view "${TAG}" --json databaseId --jq '.databaseId' 2>/dev/null || true)"
+              REL_ID="$(gh release view "${TAG}" -R "${GITHUB_REPOSITORY}" --json databaseId --jq '.databaseId' 2>/dev/null || true)"
               if [ -n "${REL_ID}" ]; then
                 echo "旧 Release 仍存在（databaseId=${REL_ID}），兜底逐个清理用户上传资产"
                 OLD_ASSETS="$(gh api "/repos/${OWNER}/${REPO}/releases/${REL_ID}/assets" 2>/dev/null || echo '[]')"
@@ -480,7 +482,7 @@ jobs:
           REPO="${GITHUB_REPOSITORY##*/}"
           TAG="${CLKLOG_VERSION}"
           SHA="${CLKLOG_SHORT_SHA}"
-          RELEASE_ID="$(gh release view "${TAG}" --json databaseId --jq '.databaseId')"
+          RELEASE_ID="$(gh release view "${TAG}" -R "${GITHUB_REPOSITORY}" --json databaseId --jq '.databaseId')"
           echo "RELEASE_ID(databaseId)=${RELEASE_ID}"
           ASSETS_JSON="$(gh api "/repos/${OWNER}/${REPO}/releases/${RELEASE_ID}/assets")"
           echo "${ASSETS_JSON}" | jq -r '.[] | "  id=\(.id)  name=[\(.name)]"'
@@ -522,7 +524,7 @@ jobs:
           echo "清理完成：删除 ${CLEAN} 个 _g 后缀残留"
           echo "==> 确保 Release body 只有 1 条 Full Changelog（去掉平台自动追加的重复行 / Markdown 反引号包 URL）"
           TARGET="Full Changelog: ${GITHUB_SERVER_URL}/${OWNER}/${REPO}/commits/${TAG}"
-          BODY="$(gh release view "${TAG}" --json body --jq '.body' || true)"
+          BODY="$(gh release view "${TAG}" -R "${GITHUB_REPOSITORY}" --json body --jq '.body' || true)"
           echo "当前 body（去重前）："
           printf "%s\n" "${BODY}"
           # 仅对 Full Changelog 行去重，保留资产说明等其余非空行（否则说明会被整段覆盖掉）
@@ -600,7 +602,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          gh release view "${TAG}" --json tagName,name,body,assets \
+          gh release view "${TAG}" -R "${GITHUB_REPOSITORY}" --json tagName,name,body,assets \
             --jq '{tag:.tagName, name:.name, body:.body, assets:[.assets[]|{name,url}]}' > /tmp/gh_release.json
           echo "tag=$(jq -r .tag /tmp/gh_release.json)"   >> "$GITHUB_OUTPUT"
           echo "name=$(jq -r .name /tmp/gh_release.json)" >> "$GITHUB_OUTPUT"
@@ -660,7 +662,7 @@ jobs:
           TOKEN="$GITEE_TOKEN"; OWNER="$GITEE_OWNER"; REPO="$GITEE_REPO"; API="$GITEE_API"
           RID="${{ steps.gitee_rel.outputs.release_id }}"
           mkdir -p /tmp/gitee_assets
-          gh release download "$TAG" --dir /tmp/gitee_assets --pattern 'clklog-*.tar.gz'
+          gh release download "$TAG" -R "${GITHUB_REPOSITORY}" --dir /tmp/gitee_assets --pattern 'clklog-*.tar.gz'
           EXISTING_NAMES=$(curl -s "${API}/repos/${OWNER}/${REPO}/releases/${RID}?access_token=${TOKEN}" | jq -r '[.assets[].name] | join("\n")')
           for f in /tmp/gitee_assets/*; do
             [ -e "$f" ] || continue
