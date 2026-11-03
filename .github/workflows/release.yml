@@ -449,7 +449,7 @@ jobs:
           body: |
             > **资产说明**
             > - 部署请使用：clklog-docker-compose-${{ env.CLKLOG_VERSION }}.tar.gz（含已替换版本号的 .env 与初始化脚本）
-            > - 源码与文档：请直接克隆仓库，或下载 GitHub / Gitee / GitCode 在该 tag 下自带的 Source code 归档包。
+            > - 源码与文档：请直接克隆仓库，或下载该 tag 下自带的 Source code 归档包。
             >
             Full Changelog: ${{ github.server_url }}/${{ github.repository }}/commits/${{ env.CLKLOG_VERSION }}
           files: |
