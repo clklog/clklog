@@ -52,7 +52,7 @@ env:
 #   特权边界：仅「同步到 Gitee / GitCode」属于特权操作，需 release-prod Environment 审批；阿里云 ACR push 与 GitHub Release 发布均无需审批。
 #   单服务重建：workflow_dispatch 选 service≠all 时，full_release=false → 只跑 build+docker（仅重建 + push 该镜像），
 #              自动跳过 package / release / sync-gitee / sync-gitcode（不重建 Release、不同步外部平台）。
-#   说明：原单 job 内「6 个子项目平铺到根目录」已移除，docker 直接用 clklog/clklog-<short> 作 build context（与 ci.yml 一致）。
+#   docker 用 clklog/clklog-<short> 作 build context（与 ci.yml 一致）。
 #   矩阵单一事实源：6 个子服务的 name/dir/lang/jar_suffix/short(及 docker 的 ali) 由 setup job 统一定义，与 ci.yml 对齐。
 
 jobs:
@@ -138,7 +138,7 @@ jobs:
             ${{ runner.os }}-release-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package.json', matrix.dir)) }}-
             ${{ runner.os }}-release-node-modules-${{ env.NODE_VERSION }}-
 
-      - name: Build Java (clean verify · jacoco LINE≥80% 由 quality-gate 承担)
+      - name: Build Java (clean verify)
         id: build_java
         if: matrix.lang == 'java'
         working-directory: ${{ matrix.dir }}
@@ -189,7 +189,8 @@ jobs:
           retention-days: 7
 
   # ─────────────────────────────────────────────────────────────
-  # 2) package：仅 checkout，打 compose / source / docs 三个 tar（与 build 并行）
+  # 2) package：仅 checkout，打 compose 部署包（与 build 并行）。
+  #    docs / source 已是仓库内容（clone 或平台自带 Source 归档即得），不再单独打包，避免冗余与同步体积过大。
   # ─────────────────────────────────────────────────────────────
   package:
     name: package-assets
@@ -207,7 +208,7 @@ jobs:
           SHORT_SHA="${GITHUB_SHA:0:7}"
           echo "CLKLOG_SHORT_SHA=${SHORT_SHA}" >> "${GITHUB_ENV}"
           echo "GITHUB_SHA=${GITHUB_SHA}  SHORT_SHA=${SHORT_SHA}"
-          echo "::notice::Source code (zip)/(tar.gz) 是 GitHub 针对 tag 自动生成的仓库快照：GitHub 不提供删除/禁用开关，它不属于 release assets，CI 侧 API 无法删除；无需处理。"
+          echo "::notice::GitHub 会针对 tag 自动生成 Source code 快照，无法用 API 删除，无需处理（不影响 Release 资产）。"
 
       - name: 替换 compose .env VER_PLACEHOLDER → 当前 tag（仅 Runner 内存副本，不入库）
         run: |
@@ -215,7 +216,7 @@ jobs:
           BASE="$(pwd)"
           TAG="${CLKLOG_VERSION}"
           mkdir -p "${BASE}/${OUTPUT_DIR}"
-          cp -R "${BASE}/docker-compose" "${BASE}/${OUTPUT_DIR}/__compose_env_pack"
+          cp -R "${BASE}/deploy/compose-template" "${BASE}/${OUTPUT_DIR}/__compose_env_pack"
           sed -i "s/VER_PLACEHOLDER/${TAG}/g" "${BASE}/${OUTPUT_DIR}/__compose_env_pack/.env"
 
       - name: Pack compose tar（临时 _g${SHORT_SHA} 后缀，上传后改名回友好名）
@@ -228,6 +229,7 @@ jobs:
           COMPOSE_DIR="${BASE}/${OUTPUT_DIR}/${COMPOSE_BASENAME}"
           mkdir -p "${COMPOSE_DIR}"
           SRC_DC="${BASE}/${OUTPUT_DIR}/__compose_env_pack"
+          # 仅拷贝下列显式文件：不包含模板说明 README.md（避免误导发布包用户，README 仅存在于源码仓 deploy/compose-template/）
           cp -v "${SRC_DC}/docker-compose-clklog-simple.yml" \
                 "${SRC_DC}/docker-compose-clklog-simple-base.yml" \
                 "${SRC_DC}/docker-compose-clklog-full.yml" \
@@ -239,39 +241,13 @@ jobs:
           cd "${BASE}/${OUTPUT_DIR}"
           tar --exclude='clklog_dc_data' \
               --exclude='*.log' \
+              --exclude='README.md' \
               -czf "${COMPOSE_BASENAME}-${TAG}_g${SHA}.tar.gz" "${COMPOSE_BASENAME}"
           if tar tzf "${COMPOSE_BASENAME}-${TAG}_g${SHA}.tar.gz" | grep -q "clklog_dc_data"; then
             echo "::error::compose tar 包含数据卷 clklog_dc_data，打包失败"; exit 1
           fi
 
-      - name: Pack 源码包 + docs 包（临时 _g${SHORT_SHA} 后缀，上传后改名回友好名）
-        run: |
-          set -euo pipefail
-          BASE="$(pwd)"
-          TAG="${CLKLOG_VERSION}"
-          OUT="${BASE}/${OUTPUT_DIR}"
-          SHA="${CLKLOG_SHORT_SHA}"
-          cd "${BASE}"
-          tar --exclude='node_modules' \
-              --exclude='target' \
-              --exclude='dist' \
-              --exclude='.git' \
-              --exclude='*.log' \
-              -czf "${OUT}/clklog-source-${TAG}_g${SHA}.tar.gz" clklog
-          if tar tzf "${OUT}/clklog-source-${TAG}_g${SHA}.tar.gz" | grep -Eq '^/home|^/runner|/node_modules/|/target/|/dist/|\.log$'; then
-            echo "::error::源码包包含绝对路径/构建产物/日志，打包失败"; exit 1
-          fi
-          cd "${BASE}"
-          if [ ! -d docs ]; then
-            echo "::error::仓库根目录缺少 docs/，请先补齐后再发版"; exit 1
-          fi
-          tar --exclude='*.log' \
-              -czf "${OUT}/clklog-docs-${TAG}_g${SHA}.tar.gz" docs
-          if tar tzf "${OUT}/clklog-docs-${TAG}_g${SHA}.tar.gz" | grep -Eq '^/home|^/runner|\.log$'; then
-            echo "::error::docs 包包含绝对路径/日志，打包失败"; exit 1
-          fi
-
-      - name: 上传 3 个打包资源产物
+      - name: 上传打包资源产物
         uses: actions/upload-artifact@v4
         with:
           name: release-assets
@@ -365,17 +341,14 @@ jobs:
           ali_tag="${ALIYUN_REG}/${ALIYUN_NS_SUFFIX}/${ali_short}:${TAG}"
           ali_latest="${ALIYUN_REG}/${ALIYUN_NS_SUFFIX}/${ali_short}:latest"
           if [ "$PUSH_ALI" = "1" ]; then
-            # 原生 buildx --push：buildkit 直接把 manifest+config+layers 完整推到 ACR，
+            # 原生 buildx 推送（--output type=image,push=true）：buildkit 直接把 manifest+config+layers 完整推到 ACR，
             # 避免「本地加载再 docker push」导致控制台镜像ID/大小为空的元数据缺失问题。
             # --provenance=false --sbom=false：关闭 buildx 默认附带的 attestation/SBOM 清单，
             # 否则会生成 application/vnd.oci.empty.v1+json 这类 manifest class，阿里云 ACR 不识别会报
             # "denied: unknown manifest class for application/vnd.oci.empty.v1+json" 并拒绝推送。
-            echo "========== buildx --push ${name} → Aliyun ACR（${ali_tag} + ${ali_latest}）=========="
-            # 关键补充：oci-mediatypes=false —— 让 buildx 写出「经典 Docker Manifest V2」媒体类型，
-            # 而非默认的 OCI 媒体类型。阿里云 ACR 控制台对 OCI 格式镜像的 size 计算存在兼容缺陷，
-            # 仅加 --provenance=false 仍会保留 OCI 媒体类型，导致镜像大小显示为“-”。
-            # 说明：--push 等价于 --output type=image,push=true，二者不能共存，
-            # 因此这里改用完整 --output 写法以附加 oci-mediatypes=false（标签仍用 -t 指定）。
+            echo "========== buildx 推送 ${name} → Aliyun ACR（${ali_tag} + ${ali_latest}）=========="
+            # 关键补充：oci-mediatypes=false —— 让 buildx 写出「经典 Docker Manifest V2」媒体类型（而非默认 OCI），
+            # 修复阿里云 ACR 控制台镜像大小显示为“-”的兼容缺陷（仅加 --provenance=false 仍保留 OCI 媒体类型）。
             docker buildx build "${BUILD_ARGS[@]}" \
               --platform "linux/amd64" \
               --provenance=false \
@@ -412,7 +385,7 @@ jobs:
           ALIYUN_REGISTRY_SECRET: ${{ secrets.ALIYUN_REGISTRY }}
 
   # ─────────────────────────────────────────────────────────────
-  # 4) release：删旧 → 传 3 资产 → 改名/清理 body（非特权，无需审批）
+  # 4) release：删旧 → 传 compose 部署包（1 资产） → 改名/清理 body（非特权，无需审批）
   # ─────────────────────────────────────────────────────────────
   release:
     name: publish-github-release
@@ -429,8 +402,8 @@ jobs:
           echo "CLKLOG_SHORT_SHA=${GITHUB_SHA:0:7}" >> "${GITHUB_ENV}"
 
       # 注意：package 上传 release-assets 用的是单目录（path: release-output），artifact 根=该目录本身，
-      # 3 个 tar.gz 平铺在 artifact 根；此处解压到 OUTPUT_DIR 子目录，保持下方 files: 的 OUTPUT_DIR/ 前缀成立。
-      - name: 下载打包资源产物（3 个 tar · 解压到 OUTPUT_DIR 子目录）
+      # compose 部署包 tar.gz 平铺在 artifact 根；此处解压到 OUTPUT_DIR 子目录，保持下方 files: 的 OUTPUT_DIR/ 前缀成立。
+      - name: 下载打包资源产物（compose 部署包 tar · 解压到 OUTPUT_DIR 子目录）
         uses: actions/download-artifact@v4
         with:
           name: release-assets
@@ -467,7 +440,7 @@ jobs:
             echo "无旧 Release，直接上传"
           fi
 
-      - name: 上传 3 个 Release Assets（源码 / docs / compose）
+      - name: 上传 Release Asset（compose 部署包）
         id: release_upload
         uses: softprops/action-gh-release@v2
         with:
@@ -475,16 +448,11 @@ jobs:
           generate_release_notes: false
           body: |
             > **资产说明**
-            > - 部署请使用：clklog-docker-compose-${{ env.CLKLOG_VERSION }}.tar.gz
-            > - 源码请使用：clklog-source-${{ env.CLKLOG_VERSION }}.tar.gz
-            > - 文档请参考：clklog-docs-${{ env.CLKLOG_VERSION }}.tar.gz
+            > - 部署请使用：clklog-docker-compose-${{ env.CLKLOG_VERSION }}.tar.gz（含已替换版本号的 .env 与初始化脚本）
+            > - 源码与文档：请直接克隆仓库，或下载 GitHub / Gitee / GitCode 在该 tag 下自带的 Source code 归档包。
             >
-            > 下方的 Source code (zip) / Source code (tar.gz) 是 tag 对应的全仓库快照，请勿用于部署；代码仓不提供删除或关闭它们的选项。
-
             Full Changelog: ${{ github.server_url }}/${{ github.repository }}/commits/${{ env.CLKLOG_VERSION }}
           files: |
-            ${{ env.OUTPUT_DIR }}/clklog-source-${{ env.CLKLOG_VERSION }}_g${{ env.CLKLOG_SHORT_SHA }}.tar.gz
-            ${{ env.OUTPUT_DIR }}/clklog-docs-${{ env.CLKLOG_VERSION }}_g${{ env.CLKLOG_SHORT_SHA }}.tar.gz
             ${{ env.OUTPUT_DIR }}/clklog-docker-compose-${{ env.CLKLOG_VERSION }}_g${{ env.CLKLOG_SHORT_SHA }}.tar.gz
           fail_on_unmatched_files: true
 
@@ -507,9 +475,7 @@ jobs:
             exit 1
           fi
           RENAME=0
-          for PAIR in "clklog-source-${TAG}_g${SHA}.tar.gz|clklog-source-${TAG}.tar.gz" \
-                      "clklog-docs-${TAG}_g${SHA}.tar.gz|clklog-docs-${TAG}.tar.gz" \
-                      "clklog-docker-compose-${TAG}_g${SHA}.tar.gz|clklog-docker-compose-${TAG}.tar.gz"; do
+          for PAIR in "clklog-docker-compose-${TAG}_g${SHA}.tar.gz|clklog-docker-compose-${TAG}.tar.gz"; do
             OLD="${PAIR%%|*}"
             NEW="${PAIR##*|}"
             AID="$(echo "${ASSETS_JSON}" | jq -r --arg n "${OLD}" '.[] | select(.name==$n) | .id')"
@@ -571,7 +537,6 @@ jobs:
   #   GITEE_PUSH_TAG  (可选，默认 true) true = 把 tag 及对应 commit 推到 Gitee（Release 指向正确 commit）
   #                                      false = Release 指向 Gitee 默认分支 HEAD（不推送代码）
   #   GITEE_API       (可选) 企业版可覆盖为 https://<域名>/api/v5
-  # 注意：Gitee 单文件附件上限 100MB，超出自动跳过并告警。
   # ─────────────────────────────────────────────────────────────
   sync-gitee:
     name: 同步 GitHub Release → Gitee
@@ -670,7 +635,7 @@ jobs:
           echo "release_id=$RID" >> "$GITHUB_OUTPUT"
           echo "Gitee Release id=$RID"
 
-      - name: 下载 GitHub 资产并并行上传到 Gitee（去重 + 100MB 限流，3 路并发）
+      - name: 下载 GitHub 资产并上传到 Gitee（去重 · 并发）
         if: steps.cfg.outputs.enabled == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -682,16 +647,12 @@ jobs:
           mkdir -p /tmp/gitee_assets
           gh release download "$TAG" -R "${GITHUB_REPOSITORY}" --dir /tmp/gitee_assets --pattern 'clklog-*.tar.gz'
           EXISTING_NAMES=$(curl -s "${API}/repos/${OWNER}/${REPO}/releases/${RID}?access_token=${TOKEN}" | jq -r '[.assets[].name] | join("\n")')
-          # 3 路并发上传：GitHub Runner 在境外、Gitee 在境内，串行单次长连接很慢，并发显著缩短墙钟时间
+          # 3 路并发上传：多资产时并行可缩短墙钟时间（当前仅有 compose 部署包一个资产）
           upload_one() {
-            local f="$1" FN SIZE
+            local f="$1" FN
             FN="$(basename "$f")"
             if printf '%s\n' "$EXISTING_NAMES" | grep -qx "$FN"; then
               echo "跳过已存在附件：$FN"; return 0
-            fi
-            SIZE=$(stat -c%s "$f")
-            if [ "$SIZE" -gt 104857600 ]; then
-              echo "::error::$FN 体积 $((SIZE/1024/1024))MB 超过 Gitee 单文件 100MB 硬上限，且 source 必须同步——请改用分卷/外链或调整打包，终止本次同步"; return 1
             fi
             echo "上传 $FN ..."
             curl -s --retry 5 --retry-delay 10 --retry-all-errors --connect-timeout 30 --max-time 1800 -X POST "${API}/repos/${OWNER}/${REPO}/releases/${RID}/attach_files" \
@@ -716,7 +677,6 @@ jobs:
   #                                        false = Release 指向 GitCode 默认分支 HEAD（不推送代码）
   #   GITCODE_API       (可选，默认 https://api.gitcode.com/api/v5) 企业版/私有部署可覆盖
   # 注意：GitCode 附件走「获取预签名上传地址 → PUT 直传」两步式（OBS 对象存储），与 Gitee 的 attach_files 不同；
-  #       GitCode 单文件上限未知，沿用 100MB 保守保护，超出自动跳过并告警。
   # ─────────────────────────────────────────────────────────────
   sync-gitcode:
     name: 同步 GitHub Release → GitCode
@@ -819,7 +779,7 @@ jobs:
           fi
           echo "existed=${EXISTED}" >> "$GITHUB_OUTPUT"
 
-      - name: 下载 GitHub 资产并并行上传到 GitCode（去重 + 100MB 限流，3 路并发）
+      - name: 下载 GitHub 资产并上传到 GitCode（去重 · 并发）
         if: steps.cfg.outputs.enabled == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -832,16 +792,12 @@ jobs:
           gh release download "$TAG" -R "${GITHUB_REPOSITORY}" --dir /tmp/gitcode_assets --pattern 'clklog-*.tar.gz'
           # 现有附件名（去重用，避免重复上传）
           EXISTING_NAMES=$(curl -s "${API}/repos/${OWNER}/${REPO}/releases/tags/${TAG}?access_token=${TOKEN}" | jq -r '[.assets[]?.name] | join("\n")')
-          # 3 路并发上传：直传华为云 OBS（华南），境外 Runner → 境内 OBS 单流很慢，并发显著缩短墙钟时间
+          # 3 路并发上传：直传华为云 OBS（华南）；当前仅有 compose 部署包一个资产，并发保留以备扩展
           upload_gc() {
-            local f="$1" FN SIZE UP URL HDR_ARGS h HTTP tmp
+            local f="$1" FN UP URL HDR_ARGS h HTTP tmp
             FN="$(basename "$f")"
             if printf '%s\n' "$EXISTING_NAMES" | grep -qx "$FN"; then
               echo "跳过已存在附件：$FN"; return 0
-            fi
-            SIZE=$(stat -c%s "$f")
-            if [ "$SIZE" -gt 536870912 ]; then
-              echo "::error::$FN 体积 $((SIZE/1024/1024))MB 超过 GitCode 同步保护阈值 512MB，且 source 必须同步——请检查打包产物是否异常膨胀，终止本次同步"; return 1
             fi
             echo "上传 $FN ..."
             # 1) 获取预签名上传地址与所需请求头（OBS 两步式）
