@@ -64,26 +64,45 @@ public class LogReceiveProcessBoss {
                 return;
             }
 
+            int count = 0;
             List<RawMessage> logList = new ArrayList<RawMessage>();
             logList.add(log);
-            queueForLog.drainTo(logList, 999);
-            long retryDelay = 1000;
-            while (true) {
+            count++;
+
+            while (running) {
+                try {
+                    log = queueForLog.poll();
+                    if (log != null) {
+                        logList.add(log);
+                        count++;
+                    } else {
+                        break;
+                    }
+                    if (count >= 1000) {
+                        handle(logList);
+                        count = 0;
+                        logList.clear();
+                    }
+                } catch (Exception ex) {
+                    count = 0;
+                    logList.clear();
+                    logger.error("handle err ", ex);
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+            if (count > 0) {
                 try {
                     handle(logList);
-                    break;
+                    logList.clear();
                 } catch (Exception ex) {
-                    logger.error("Batch processing failed; {} messages remain unconfirmed", logList.size(), ex);
-                    if (!running || Thread.currentThread().isInterrupted()) {
-                        return;
-                    }
+                    logger.error("handle err ", ex);
                     try {
-                        Thread.sleep(retryDelay);
+                        Thread.sleep(5000);
                     } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return;
                     }
-                    retryDelay = Math.min(retryDelay * 2, 30000);
                 }
             }
         }

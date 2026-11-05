@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.Collections;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.doReturn;
@@ -25,10 +26,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 验证机器人批次写入失败后重试原目标表，不转写普通日志表。 */
+/** 验证数据库批次失败时立即抛出，不重试或转写其他目标表。 */
 class TrafficRetryTest {
     @Test
-    void retriesFailedBotBatchWithoutRoutingItToNormalTable() {
+    void propagatesFailedBotBatchWithoutRetryOrRoutingToNormalTable() {
         JdbcTemplate jdbc = mock(JdbcTemplate.class);
         when(jdbc.batchUpdate(contains("log_analysis_bot"), any(BatchPreparedStatementSetter.class)))
                 .thenThrow(new IllegalStateException("temporary failure")).thenReturn(new int[]{1});
@@ -41,8 +42,8 @@ class TrafficRetryTest {
         bot.setUserAgent("Googlebot/2.1");
         RawMessage message = new RawMessage();
         doReturn(Collections.singletonList(bot)).when(service).analysisData(message);
-        service.saveToClickHouse(Collections.singletonList(message));
-        verify(jdbc, times(2)).batchUpdate(contains("log_analysis_bot"), any(BatchPreparedStatementSetter.class));
+        assertThrows(IllegalStateException.class, () -> service.saveToClickHouse(Collections.singletonList(message)));
+        verify(jdbc, times(1)).batchUpdate(contains("log_analysis_bot"), any(BatchPreparedStatementSetter.class));
         verify(jdbc, times(0)).batchUpdate(contains("insert into log_analysis ("), any(BatchPreparedStatementSetter.class));
     }
 }

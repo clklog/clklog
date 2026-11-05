@@ -478,26 +478,11 @@ public class ReceiveServiceImpl implements IReceiveService {
                         uaRuleCache.get(event.getProjectName(), excludedUa), searchEngineIpLibrary.snapshot()));
                 (event.getTrafficDecision().isBot() ? bots : normal).add(event);
             }
-            saveBatchWithRetry(normal, false);
-            saveBatchWithRetry(bots, true);
-        }
-    }
-
-    private void saveBatchWithRetry(List<LogBean> events, boolean bot) {
-        long delay = 1000;
-        while (!events.isEmpty()) {
-            try {
-                doSaveToClickHouse(events, bot);
-                return;
-            } catch (Exception ex) {
-                logger.error("ClickHouse batch failed; retrying {} events, bot={}", events.size(), bot, ex);
-                try {
-                    Thread.sleep(delay);
-                } catch (InterruptedException interrupted) {
-                    Thread.currentThread().interrupt();
-                    throw new IllegalStateException("Interrupted with " + events.size() + " events not confirmed", interrupted);
-                }
-                delay = Math.min(delay * 2, 30000);
+            if (!normal.isEmpty()) {
+                doSaveToClickHouse(normal, false);
+            }
+            if (!bots.isEmpty()) {
+                doSaveToClickHouse(bots, true);
             }
         }
     }
