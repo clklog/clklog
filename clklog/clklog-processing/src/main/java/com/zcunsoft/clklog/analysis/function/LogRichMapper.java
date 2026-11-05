@@ -1,6 +1,11 @@
 package com.zcunsoft.clklog.analysis.function;
 
 import com.zcunsoft.clklog.analysis.bean.*;
+import com.zcunsoft.clklog.traffic.SearchEngineIpEntry;
+import com.zcunsoft.clklog.traffic.SearchEngineIpRecordParser;
+import com.zcunsoft.clklog.traffic.SearchEngineIpSnapshot;
+import com.zcunsoft.clklog.traffic.UaRuleCache;
+import com.zcunsoft.clklog.traffic.UaTrafficClassifier;
 import com.zcunsoft.clklog.analysis.cfg.RedisSettings;
 import com.zcunsoft.clklog.analysis.utils.ExtractUtil;
 import com.zcunsoft.clklog.analysis.utils.IPUtil;
@@ -48,6 +53,10 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
     private HashMap<String, ProjectSetting> htProjectSetting;
 
     private transient ScheduledExecutorService scheduler;
+    private transient UaRuleCache uaRules;
+    private transient UaTrafficClassifier classifier;
+    private transient volatile SearchEngineIpSnapshot searchEngineIpSnapshot;
+    private String searchEngineIpKey;
 
     /**
      * 城市中英文映射表
@@ -83,6 +92,16 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
 
             List<LogBean> logBeanList = ExtractUtil.extractToLogBeanList(rawMessage, "clklog-global", userAgentAnalyzer, htProjectSetting);
             if (!logBeanList.isEmpty()) {
+                ProjectSetting setting = htProjectSetting.get(rawMessage.getProject());
+                if (setting == null) {
+                    setting = htProjectSetting.get("clklog-global");
+                }
+                String excludedUa = setting == null ? "" : setting.getExcludedUa();
+                for (LogBean event : logBeanList) {
+                    event.setTrafficDecision(classifier.classify(event.getUserAgent(), event.getClientIp(),
+                            event.getDeviceClass(), event.getAgentName(), event.getUaOsName(),
+                            uaRules.get(rawMessage.getProject(), excludedUa), searchEngineIpSnapshot));
+                }
                 List<String> clientIpList = logBeanList.stream().map(LogBean::getClientIp).distinct().collect(Collectors.toList());
                 List<String> ipInfoList = jedis.hmget("ClientIpRegionHash", clientIpList.toArray(new String[0]));
                 for (LogBean logBean : logBeanList) {
@@ -177,6 +196,29 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
             }
 
             if (jedisForCache != null) {
+                long ipLibraryRefreshStart = System.nanoTime();
+                try {
+                    Map<String, String> records = jedisForCache.hgetAll(searchEngineIpKey);
+                    List<SearchEngineIpEntry> entries = new ArrayList<>();
+                    ObjectMapperUtil mapper = new ObjectMapperUtil();
+                    for (Map.Entry<String, String> record : records.entrySet()) {
+                        try {
+                            Map<String, Object> fields = mapper.readValue(record.getValue(),
+                                    new TypeReference<Map<String, Object>>() { });
+                            entries.add(SearchEngineIpRecordParser.parse(record.getKey(), fields));
+                        } catch (Exception ex) {
+                            logger.warn("Invalid search engine IP library entry: {}", record.getKey(), ex);
+                        }
+                    }
+                    SearchEngineIpSnapshot refreshed = new SearchEngineIpSnapshot(entries);
+                    searchEngineIpSnapshot = refreshed;
+                    logger.info("Refreshed search engine IP library: {} entries, versions {}, in {} ms",
+                            entries.size(), refreshed.getVersionSummary(),
+                            TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - ipLibraryRefreshStart));
+                } catch (Exception ex) {
+                    logger.warn("Search engine IP library refresh failed after {} ms; keeping previous snapshot",
+                            TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - ipLibraryRefreshStart), ex);
+                }
                 cityMap = jedisForCache.hgetAll("CityEngChsMapKey");
                 logger.info("cityMap size " + cityMap.size());
 
@@ -199,6 +241,10 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
     @Override
     public void open(Configuration configuration) throws IOException {
         ParameterTool parameters = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+        uaRules = new UaRuleCache();
+        classifier = new UaTrafficClassifier();
+        searchEngineIpSnapshot = SearchEngineIpSnapshot.empty();
+        searchEngineIpKey = parameters.get("traffic.search-engine-ip-key", "ClkLog:Traffic:SearchEngineIpLibrary");
 
         /* 获取redis配置 */
         redisSetting = new RedisSettings();
@@ -233,6 +279,7 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
         ipUtil.loadIpFile();
 
         userAgentAnalyzer = UserAgentAnalyzer.newBuilder().withField(UserAgent.AGENT_NAME)
+                .withField(UserAgent.DEVICE_CLASS)
                 .withField(UserAgent.AGENT_NAME_VERSION)
                 .withField(UserAgent.DEVICE_NAME)
                 .withField(UserAgent.DEVICE_BRAND)
@@ -258,7 +305,24 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
             } catch (Exception ex) {
                 logger.error("Exception occurred when querying: " + ex);
             }
-        }, 0, 60, TimeUnit.SECONDS);//调度频率
+        }, 0, parameters.getLong("traffic.search-engine-ip-refresh-seconds", 600), TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
+        if (jedis != null) {
+            jedis.close();
+        }
+        if (jedisSinglePool != null) {
+            jedisSinglePool.close();
+        }
+        if (jedisSentinelPool != null) {
+            jedisSentinelPool.close();
+        }
+        super.close();
     }
 
     private void createRedisPool() {

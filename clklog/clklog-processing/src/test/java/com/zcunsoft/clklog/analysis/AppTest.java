@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
@@ -51,9 +52,10 @@ public class AppTest {
         target1.setIsCompress("0");
         target1.setClientIp("8.8.8.8");
         target1.setDistinctId("1a7cc28c-52e1-40bb-b506-d86cdcfd7361");
-        target1.setLogTime(Timestamp.valueOf("2024-01-06 17:08:03"));
-        target1.setStatDate("2024-01-06");
-        target1.setStatHour("17");
+        String expectedTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(1704532083862L));
+        target1.setLogTime(Timestamp.valueOf(expectedTime));
+        target1.setStatDate(expectedTime.substring(0, 10));
+        target1.setStatHour(expectedTime.substring(11, 13));
         target1.setFlushTime(1704532083880L);
         target1.setTypeContext("track");
         target1.setEvent("$WebPageLeave");
@@ -91,8 +93,6 @@ public class AppTest {
         target1.setCreateTime("2024-01-05 17:08:04");
         target1.setRawUrl("https://app.clklogapp.com/?time=1704531493267&&event=bdstore#/all?tab=0");
         target1.setAnonymousId("1a7cc28c-52e1-40bb-b506-d86cdcfd7361");
-        Object[] actualArr = getFiledsInfo(target1).toArray();
-
         List<DynamicTest> dynamicTestList = new ArrayList<>();
         AbstractUserAgentAnalyzer userAgentAnalyzer = UserAgentAnalyzer.newBuilder().withField(UserAgent.AGENT_NAME)
                 .withField(UserAgent.AGENT_NAME_VERSION)
@@ -101,6 +101,11 @@ public class AppTest {
                 .withField(UserAgent.OPERATING_SYSTEM_NAME)
                 .withField(UserAgent.OPERATING_SYSTEM_NAME_VERSION).hideMatcherLoadStats().withCache(10000)
                 .build();
+        UserAgent parsedUa = userAgentAnalyzer.parse(rawMessage.getUa());
+        target1.setDeviceClass(parsedUa.getValue(UserAgent.DEVICE_CLASS));
+        target1.setAgentName(parsedUa.getValue(UserAgent.AGENT_NAME));
+        target1.setUaOsName(parsedUa.getValue(UserAgent.OPERATING_SYSTEM_NAME));
+        Object[] actualArr = getFiledsInfo(target1).toArray();
 
         String projectSettingContent = FileUtils.readFileToString(new File(System.getProperty("user.dir") + File.separator + "project-setting.json"), Charset.forName("GB2312"));
 

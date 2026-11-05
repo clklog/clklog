@@ -7,6 +7,10 @@ import com.ip2location.IPResult;
 import com.zcunsoft.cfg.KafkaSetting;
 import com.zcunsoft.cfg.ReceiverSetting;
 import com.zcunsoft.cfg.RedisConstsConfig;
+import com.zcunsoft.clklog.traffic.TrafficDecision;
+import com.zcunsoft.clklog.traffic.UaRuleCache;
+import com.zcunsoft.clklog.traffic.UaTrafficClassifier;
+import com.zcunsoft.clklog.traffic.TrafficTableValidator;
 import com.zcunsoft.handlers.ConstsDataHolder;
 import com.zcunsoft.model.LogBean;
 import com.zcunsoft.model.ProjectSetting;
@@ -27,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.URLDecoder;
@@ -67,6 +72,9 @@ public class ReceiveServiceImpl implements IReceiveService {
     };
 
     private final ReceiverSetting receiverSetting;
+    private final SearchEngineIpLibraryService searchEngineIpLibrary;
+    private final UaRuleCache uaRuleCache = new UaRuleCache();
+    private final UaTrafficClassifier trafficClassifier = new UaTrafficClassifier();
 
     private final KafkaSetting kafkaSetting;
 
@@ -79,13 +87,14 @@ public class ReceiveServiceImpl implements IReceiveService {
      */
     private final RedisConstsConfig redisConstsConfig;
 
-    public ReceiveServiceImpl(ConstsDataHolder constsDataHolder, ObjectMapperUtil objectMapper, StringRedisTemplate queueRedisTemplate, AbstractUserAgentAnalyzer userAgentAnalyzer, JdbcTemplate clickHouseJdbcTemplate, ReceiverSetting receiverSetting, KafkaSetting kafkaSetting, RedisConstsConfig redisConstsConfig) {
+    public ReceiveServiceImpl(ConstsDataHolder constsDataHolder, ObjectMapperUtil objectMapper, StringRedisTemplate queueRedisTemplate, AbstractUserAgentAnalyzer userAgentAnalyzer, JdbcTemplate clickHouseJdbcTemplate, ReceiverSetting receiverSetting, KafkaSetting kafkaSetting, RedisConstsConfig redisConstsConfig, SearchEngineIpLibraryService searchEngineIpLibrary) {
         this.objectMapper = objectMapper;
         this.queueRedisTemplate = queueRedisTemplate;
         this.userAgentAnalyzer = userAgentAnalyzer;
         this.constsDataHolder = constsDataHolder;
         this.clickHouseJdbcTemplate = clickHouseJdbcTemplate;
         this.receiverSetting = receiverSetting;
+        this.searchEngineIpLibrary = searchEngineIpLibrary;
         this.kafkaSetting = kafkaSetting;
         this.redisConstsConfig = redisConstsConfig;
         String binIpV4file = getResourcePath() + File.separator + "iplib" + File.separator + "IP2LOCATION-LITE-DB3.BIN";
@@ -456,11 +465,54 @@ public class ReceiveServiceImpl implements IReceiveService {
             }
         }
         if (!allList.isEmpty()) {
-            doSaveToClickHouse(allList);
+            List<LogBean> normal = new ArrayList<>();
+            List<LogBean> bots = new ArrayList<>();
+            for (LogBean event : allList) {
+                ProjectSetting setting = constsDataHolder.getHtProjectSetting().get(event.getProjectName());
+                if (setting == null) {
+                    setting = constsDataHolder.getHtProjectSetting().get("clklog-global");
+                }
+                String excludedUa = setting == null ? "" : setting.getExcludedUa();
+                event.setTrafficDecision(trafficClassifier.classify(event.getUserAgent(), event.getClientIp(),
+                        event.getDeviceClass(), event.getAgentName(), event.getUaOsName(),
+                        uaRuleCache.get(event.getProjectName(), excludedUa), searchEngineIpLibrary.snapshot()));
+                (event.getTrafficDecision().isBot() ? bots : normal).add(event);
+            }
+            saveBatchWithRetry(normal, false);
+            saveBatchWithRetry(bots, true);
         }
     }
 
-    private void doSaveToClickHouse(List<LogBean> logBeanList) {
+    private void saveBatchWithRetry(List<LogBean> events, boolean bot) {
+        long delay = 1000;
+        while (!events.isEmpty()) {
+            try {
+                doSaveToClickHouse(events, bot);
+                return;
+            } catch (Exception ex) {
+                logger.error("ClickHouse batch failed; retrying {} events, bot={}", events.size(), bot, ex);
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Interrupted with " + events.size() + " events not confirmed", interrupted);
+                }
+                delay = Math.min(delay * 2, 30000);
+            }
+        }
+    }
+
+    @PostConstruct
+    public void validateBotTable() {
+        if (receiverSetting.isEnableSimpleVersion()) {
+            clickHouseJdbcTemplate.execute((org.springframework.jdbc.core.ConnectionCallback<Void>) connection -> {
+                TrafficTableValidator.validate(connection);
+                return null;
+            });
+        }
+    }
+
+    private void doSaveToClickHouse(List<LogBean> logBeanList, boolean bot) {
 
         String sql = "insert into log_analysis (distinct_id,typeContext,event,time,track_id,flush_time,identity_cookie_id,lib,lib_method,lib_version," +
                 "timezone_offset,screen_height,screen_width,viewport_height,viewport_width,referrer,url,url_path,title,latest_referrer," +
@@ -486,6 +538,11 @@ public class ReceiveServiceImpl implements IReceiveService {
                 "?,?,?,?,?,?,?,?,?," +
                 "?,?,?,?,?,?)";
 
+        if (bot) {
+            sql = sql.replace("insert into log_analysis (", "insert into log_analysis_bot (")
+                    .replace("app_crashed_reason)", "app_crashed_reason,is_bot,bot_score,bot_reason,device_class,agent_name,os_name,search_engine,search_engine_verify_status,search_engine_ip_library_version)")
+                    .replace("?,?,?,?,?,?)", "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        }
         clickHouseJdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement pst, int i) throws SQLException {
@@ -591,6 +648,18 @@ public class ReceiveServiceImpl implements IReceiveService {
                 pst.setString(99, value.getRawUrl());
                 pst.setString(100, value.getCreateTime());
                 pst.setString(101, value.getAppCrashedReason());
+                if (bot) {
+                    TrafficDecision decision = value.getTrafficDecision();
+                    pst.setInt(102, 1);
+                    pst.setInt(103, decision.getBotScore());
+                    pst.setArray(104, pst.getConnection().createArrayOf("String", decision.getReasons().toArray(new String[0])));
+                    pst.setString(105, decision.getDeviceClass());
+                    pst.setString(106, decision.getAgentName());
+                    pst.setString(107, decision.getOsName());
+                    pst.setString(108, decision.getSearchEngine());
+                    pst.setString(109, decision.getVerificationStatus());
+                    pst.setString(110, decision.getLibraryVersion());
+                }
             }
 
             @Override

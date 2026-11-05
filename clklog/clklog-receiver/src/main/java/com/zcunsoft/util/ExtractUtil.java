@@ -55,6 +55,7 @@ public class ExtractUtil {
         LogBean logBean = null;
         try {
             logBean = new LogBean();
+            logBean.setUserAgent(rawMessage.getUa());
             logBean.setKafkaDataTime(String.valueOf(System.currentTimeMillis() / 1000));
             logBean.setProjectName(rawMessage.getProject());
             logBean.setProjectToken(rawMessage.getToken());
@@ -388,7 +389,11 @@ public class ExtractUtil {
                 }
 
                 if (StringUtils.isNotBlank(logBean.getUserAgent())) {
+                    try {
                     UserAgent userAgent = userAgentAnalyzer.parse(logBean.getUserAgent());
+                    logBean.setDeviceClass(userAgent.getValue(UserAgent.DEVICE_CLASS));
+                    logBean.setAgentName(userAgent.getValue(UserAgent.AGENT_NAME));
+                    logBean.setUaOsName(userAgent.getValue(UserAgent.OPERATING_SYSTEM_NAME));
 
                     String browser = "";
                     AgentField browserField = userAgent.get(UserAgent.AGENT_NAME);
@@ -436,6 +441,9 @@ public class ExtractUtil {
                         }
                     }
                     logBean.setOsVersion(osVersion);
+                    } catch (RuntimeException ex) {
+                        logger.warn("UA parsing failed; raw UA rules will still be evaluated", ex);
+                    }
                 }
 
                 if (properties.has("app_crashed_reason")) {
@@ -462,6 +470,15 @@ public class ExtractUtil {
                     if (StringUtils.isNotBlank(projectSetting.getSearchwordKey())) {
                         logBean.setInternalSearchKeyword(getSearchwordFromUrl(projectSetting.getSearchwordKey(), logBean.getRawUrl()));
                     }
+                }
+            } else if (StringUtils.isNotBlank(logBean.getUserAgent())) {
+                try {
+                    UserAgent userAgent = userAgentAnalyzer.parse(logBean.getUserAgent());
+                    logBean.setDeviceClass(userAgent.getValue(UserAgent.DEVICE_CLASS));
+                    logBean.setAgentName(userAgent.getValue(UserAgent.AGENT_NAME));
+                    logBean.setUaOsName(userAgent.getValue(UserAgent.OPERATING_SYSTEM_NAME));
+                } catch (RuntimeException ex) {
+                    logger.warn("UA parsing failed; raw UA rules will still be evaluated", ex);
                 }
             }
         } catch (Exception ex) {
@@ -508,11 +525,6 @@ public class ExtractUtil {
             if (err.isEmpty() && StringUtils.isNotBlank(projectSetting.getExcludedIp())) {
                 if (checkIfIpInExcludedIpList(projectSetting.getExcludedIp(), logBean.getClientIp())) {
                     err = logBean.getClientIp() + " is in excluded ip list";
-                }
-            }
-            if (err.isEmpty() && StringUtils.isNotBlank(projectSetting.getExcludedUa())) {
-                if (checkIfUaContainsExcludedUa(projectSetting.getExcludedUa(), logBean.getUserAgent())) {
-                    err = logBean.getUserAgent() + " is in excluded ua list";
                 }
             }
         }

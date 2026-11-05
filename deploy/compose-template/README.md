@@ -1,5 +1,24 @@
 # ClkLog 部署模板（compose-template）
 
+## UA 实时分流升级
+
+升级 receiver 或 processing 前，先在目标 ClickHouse 库执行
+`clklog/clklog-init/scripts/upgrade_ua_routing_v1.sql`，替换 `${CLKLOG_LOG_DB}` 为目标库名。
+脚本不迁移历史数据；新安装使用更新后的 `scripts/init.sql`。
+
+本版本默认将正常事件写入 `log_analysis`，机器人事件写入 `log_analysis_bot`。
+现有 `excludedUa` 命中后写机器人表，不再丢弃，也不进入常规统计。
+构建 receiver 或 processing 前先执行 `mvn -f clklog/clklog-traffic-rules/pom.xml clean install`。
+
+搜索引擎 IP 库为 Redis Hash `ClkLog:Traffic:SearchEngineIpLibrary`，field 为
+`engine|cidr`，value 为 JSON，包含 `engine`、`cidr`、`source`、`verified_at`、
+`expires_at`、`library_version`。时间为毫秒时间戳，单 IP 使用 `/32` 或 `/128`。
+只写入来源可信且有效期明确的记录；空库或未命中表示未验证，不表示伪造。
+本阶段不提供 DNS 验证或库自动维护。
+
+接收队列使用内存，进程退出可能丢失未落库事件；ClickHouse 写入响应丢失或 Flink
+重放可能产生重复，不保证端到端 exactly-once。回滚可恢复旧服务版本并保留机器人表。
+
 > ⚠️ 这是**源码仓内的部署模板目录**，**不能直接用于部署**。
 > 推荐直接下载 Release 中的 **`clklog-docker-compose-<版本号>.tar.gz`**（已替好版本号、开箱即用）。
 

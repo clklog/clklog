@@ -117,6 +117,7 @@ jobs:
         run: |
           set -euo pipefail
           rc=0
+          mvn -B -ntp -f clklog/clklog-traffic-rules/pom.xml clean install
           for d in clklog-manage clklog-api clklog-receiver clklog-init clklog-processing; do
             echo "=========== [${d}] mvn clean test ==========="
             MVN_CMD="mvn -B -ntp"

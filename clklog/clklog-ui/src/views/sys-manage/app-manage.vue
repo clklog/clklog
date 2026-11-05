@@ -200,8 +200,8 @@
         <el-row>
           <el-col :span="11">
             <div class="gm-left-header">
-              <p class="gm-h1">排除的用户代理列表</p>
-              <p class="gm-h2">以下用户代理将被排除在本项目统计外。</p>
+              <p class="gm-h1">机器人用户代理列表</p>
+              <p class="gm-h2">命中的用户代理将写入机器人表，不进入常规统计。</p>
 
               <el-form-item prop="excludedUa" class="gp-item-01">
                 <el-input
@@ -217,11 +217,10 @@
           <el-col :span="13">
             <div class="gm-right">
               <div class="gm-right-prompt">
-                输入不需要加入系统统计的用户代理列表
+                输入需要分流至机器人表的用户代理列表
                 (每行一个)，支持正则表达式。
-                如果访客的用户代理字串包含指定的字符，访问将不被 统计。
-                <br /><br />您可以用它排除统计机器人。例如/bot
-                spiderlcrawlscanner/i。
+                命中规则的事件写入机器人表，不进入常规统计。
+                <br /><br />例如：(?i)bot|spider|crawl|scanner。
               </div>
             </div>
           </el-col>

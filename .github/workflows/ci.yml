@@ -7,12 +7,14 @@ on:
     # 纯文档（docs/、README）、compose 等提交不再触发全量 6 构建
     paths:
       - 'clklog/clklog-{api,init,manage,processing,receiver,ui}/**'
+      - 'clklog/clklog-traffic-rules/**'
       - '.github/workflows/ci.yml'
       - '.gitignore'
   pull_request:
     branches: [main, aitest]
     paths:
       - 'clklog/clklog-{api,init,manage,processing,receiver,ui}/**'
+      - 'clklog/clklog-traffic-rules/**'
       - '.github/workflows/ci.yml'
       - '.gitignore'
   workflow_dispatch:
@@ -116,6 +118,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package.json', matrix.dir)) }}-
             ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-
+
+      - name: Build shared traffic rules
+        if: matrix.name == 'clklog-receiver' || matrix.name == 'clklog-processing'
+        working-directory: clklog/clklog-traffic-rules
+        run: mvn -B -ntp clean install
 
       - name: Build Java (clean verify · 子 pom 自带 jacoco LINE≥80% 硬卡生效)
         id: build_java

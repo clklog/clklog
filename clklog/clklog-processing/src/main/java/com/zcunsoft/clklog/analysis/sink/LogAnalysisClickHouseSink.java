@@ -4,6 +4,8 @@ package com.zcunsoft.clklog.analysis.sink;
 import com.zcunsoft.clklog.analysis.bean.LogBean;
 import com.zcunsoft.clklog.analysis.bean.LogBeanCollection;
 import com.zcunsoft.clklog.analysis.utils.ClickHouseUtil;
+import com.zcunsoft.clklog.traffic.TrafficDecision;
+import com.zcunsoft.clklog.traffic.TrafficTableValidator;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
@@ -20,7 +22,8 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
 
     Connection conn = null;
 
-    PreparedStatement pst = null;
+    PreparedStatement normalStatement = null;
+    PreparedStatement botStatement = null;
 
     String sql = "insert into log_analysis (distinct_id,typeContext,event,time,track_id,flush_time,identity_cookie_id,lib,lib_method,lib_version," +
             "timezone_offset,screen_height,screen_width,viewport_height,viewport_width,referrer,url,url_path,title,latest_referrer," +
@@ -58,14 +61,25 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
 
         conn = ClickHouseUtil.getConn(clickhouseHost, clickhouseDb, clickhouseUsername, clickhousePwd);
 
-        pst = conn.prepareStatement(sql);
+        String botSql = sql.replace("insert into log_analysis (", "insert into log_analysis_bot (")
+                .replace("app_crashed_reason)", "app_crashed_reason,is_bot,bot_score,bot_reason,device_class,agent_name,os_name,search_engine,search_engine_verify_status,search_engine_ip_library_version)")
+                .replace("?,?,?,?,?,?)", "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        if (conn == null) {
+            throw new SQLException("Cannot connect to ClickHouse");
+        }
+        TrafficTableValidator.validate(conn);
+        normalStatement = conn.prepareStatement(sql);
+        botStatement = conn.prepareStatement(botSql);
     }
 
     @Override
     public void close() throws Exception {
         super.close();
-        if (pst != null) {
-            pst.close();
+        if (normalStatement != null) {
+            normalStatement.close();
+        }
+        if (botStatement != null) {
+            botStatement.close();
         }
         if (conn != null) {
             conn.close();
@@ -75,9 +89,14 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
 
     @Override
     public void invoke(List<LogBeanCollection> logBeanCollectionList, Context context) throws Exception {
+        int normalCount = 0;
+        int botCount = 0;
+        try {
         for (LogBeanCollection logBeanCollection : logBeanCollectionList) {
             List<LogBean> dataList = logBeanCollection.getData();
             for (LogBean value : dataList) {
+                boolean bot = value.getTrafficDecision() != null && value.getTrafficDecision().isBot();
+                PreparedStatement pst = bot ? botStatement : normalStatement;
                 pst.setString(1, value.getDistinctId());
                 pst.setString(2, value.getTypeContext());
                 pst.setString(3, value.getEvent());
@@ -193,9 +212,33 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
                 pst.setString(99, value.getRawUrl());
                 pst.setString(100, value.getCreateTime());
                 pst.setString(101, value.getAppCrashedReason());
+                if (bot) {
+                    TrafficDecision decision = value.getTrafficDecision();
+                    pst.setInt(102, 1);
+                    pst.setInt(103, decision.getBotScore());
+                    pst.setArray(104, conn.createArrayOf("String", decision.getReasons().toArray(new String[0])));
+                    pst.setString(105, decision.getDeviceClass());
+                    pst.setString(106, decision.getAgentName());
+                    pst.setString(107, decision.getOsName());
+                    pst.setString(108, decision.getSearchEngine());
+                    pst.setString(109, decision.getVerificationStatus());
+                    pst.setString(110, decision.getLibraryVersion());
+                    botCount++;
+                } else {
+                    normalCount++;
+                }
                 pst.addBatch();
             }
         }
-        int[] ints = pst.executeBatch();
+        if (normalCount > 0) {
+            normalStatement.executeBatch();
+        }
+        if (botCount > 0) {
+            botStatement.executeBatch();
+        }
+        } finally {
+            normalStatement.clearBatch();
+            botStatement.clearBatch();
+        }
     }
 }

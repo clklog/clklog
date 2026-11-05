@@ -31,7 +31,7 @@ public class LogReceiveProcessBoss {
 
     List<Thread> threadList = null;
 
-    boolean running = false;
+    volatile boolean running = false;
 
     @PostConstruct
     public void start() {
@@ -64,45 +64,26 @@ public class LogReceiveProcessBoss {
                 return;
             }
 
-            int count = 0;
             List<RawMessage> logList = new ArrayList<RawMessage>();
             logList.add(log);
-            count++;
-
-            while (running) {
-                try {
-                    log = queueForLog.poll();
-                    if (log != null) {
-                        logList.add(log);
-                        count++;
-                    } else {
-                        break;
-                    }
-                    if (count >= 1000) {
-                        handle(logList);
-                        count = 0;
-                        logList.clear();
-                    }
-                } catch (Exception ex) {
-                    count = 0;
-                    logList.clear();
-                    logger.error("handle err ", ex);
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                    }
-                }
-            }
-            if (count > 0) {
+            queueForLog.drainTo(logList, 999);
+            long retryDelay = 1000;
+            while (true) {
                 try {
                     handle(logList);
-                    logList.clear();
+                    break;
                 } catch (Exception ex) {
-                    logger.error("handle err ", ex);
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
+                    logger.error("Batch processing failed; {} messages remain unconfirmed", logList.size(), ex);
+                    if (!running || Thread.currentThread().isInterrupted()) {
+                        return;
                     }
+                    try {
+                        Thread.sleep(retryDelay);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                    retryDelay = Math.min(retryDelay * 2, 30000);
                 }
             }
         }
@@ -120,11 +101,23 @@ public class LogReceiveProcessBoss {
     @PreDestroy
     public void stop() {
         running = false;
+        int queued = constsDataHolder.getLogQueue().size();
+        if (queued > 0) {
+            logger.warn("Stopping with {} messages still in the in-memory queue", queued);
+        }
+        long deadline = System.currentTimeMillis() + 30000;
         for (Thread thread : threadList) {
-            thread.interrupt();
             try {
-                thread.join();
+                long remaining = deadline - System.currentTimeMillis();
+                if (remaining > 0 && thread.getState() != Thread.State.WAITING) {
+                    thread.join(remaining);
+                }
+                if (thread.isAlive()) {
+                    thread.interrupt();
+                    thread.join(1000);
+                }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 logger.error("thread join interrupted", e);
             }
 

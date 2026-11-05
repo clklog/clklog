@@ -1,11 +1,16 @@
 package com.zcunsoft.model;
 
+import com.zcunsoft.clklog.traffic.TrafficDecision;
 import lombok.Data;
 
 import java.sql.Timestamp;
 
 @Data
 public class LogBean {
+    TrafficDecision trafficDecision;
+    String deviceClass = "";
+    String agentName = "";
+    String uaOsName = "";
     String kafkaDataTime = "";
     String projectName = "clklogapp";
     String projectToken = "";

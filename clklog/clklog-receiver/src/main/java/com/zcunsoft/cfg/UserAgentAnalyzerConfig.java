@@ -11,6 +11,7 @@ public class UserAgentAnalyzerConfig {
 	@Bean
 	public AbstractUserAgentAnalyzer userAgentAnalyzer() {
 		UserAgentAnalyzer userAgentAnalyzer = UserAgentAnalyzer.newBuilder().withField(UserAgent.AGENT_NAME)
+                .withField(UserAgent.DEVICE_CLASS)
 				.withField(UserAgent.AGENT_NAME_VERSION)
 				.withField(UserAgent.DEVICE_NAME)
 				.withField(UserAgent.DEVICE_BRAND)

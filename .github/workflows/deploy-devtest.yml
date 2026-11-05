@@ -50,6 +50,7 @@ jobs:
       - name: 构建后端 JAR
         if: ${{ github.event.inputs.skip_build != 'true' }}
         run: |
+          mvn -B -ntp -f clklog/clklog-traffic-rules/pom.xml clean install
           for module in api manage receiver processing init; do
             echo "Building clklog-${module}..."
             cd "clklog/clklog-${module}"

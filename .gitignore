@@ -47,6 +47,7 @@ selenium-debug.log
 .springBeans
 .idea
 .vscode
+.trae
 *.iws
 *.iml
 *.ipr

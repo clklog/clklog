@@ -45,3 +45,7 @@ receiver:
   # IP 地域缓存 Hash 的过期天数（默认 7 天，避免缓存长期堆积）
   client-ip-region-expire-days: 7
 
+traffic:
+  search-engine-ip-key: ClkLog:Traffic:SearchEngineIpLibrary
+  search-engine-ip-refresh-ms: 60000
+

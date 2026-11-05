@@ -383,6 +383,11 @@ jobs:
             ${{ runner.os }}-node18-ui-aitest-${{ hashFiles('clklog/clklog-ui/package.json') }}-
             ${{ runner.os }}-node18-ui-aitest-
 
+      - name: Build shared traffic rules
+        if: ${{ env.SKIP_LOCAL_BUILD != 'true' }}
+        working-directory: clklog/clklog-traffic-rules
+        run: mvn -B -ntp clean install
+
       - name: "Build Java · init（首项 · 基础配置/公共模块依赖先编译进本地 M2，避免其他 4 项目报缺）"
         if: ${{ env.SKIP_LOCAL_BUILD != 'true' }}
         working-directory: clklog/clklog-init

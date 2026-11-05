@@ -1,5 +1,9 @@
 # ClkLog 源码安装应用部署说明
 
+> UA 实时分流升级前必须先创建 `log_analysis_bot`。升级脚本、构建顺序、Redis
+> 搜索引擎 IP 库格式及可靠性边界见 `deploy/compose-template/README.md` 的“UA 实时分流升级”。
+> `excludedUa` 命中后写入机器人表，不再直接丢弃。
+
 | **版权所有**     | ClkLog     |
 | :--------------- | :--------- |
 | **产品型号**     | 社区版   |
