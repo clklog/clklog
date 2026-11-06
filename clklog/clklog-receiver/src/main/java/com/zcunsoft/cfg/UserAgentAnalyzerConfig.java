@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Configuration;
 public class UserAgentAnalyzerConfig {
 	@Bean
 	public AbstractUserAgentAnalyzer userAgentAnalyzer() {
-		UserAgentAnalyzer userAgentAnalyzer = UserAgentAnalyzer.newBuilder().withField(UserAgent.AGENT_NAME)
+		UserAgentAnalyzer userAgentAnalyzer = UserAgentAnalyzer.newBuilder()
+				.withField(UserAgent.AGENT_NAME)
+				.withField(UserAgent.AGENT_CLASS)
                 .withField(UserAgent.DEVICE_CLASS)
 				.withField(UserAgent.AGENT_NAME_VERSION)
 				.withField(UserAgent.DEVICE_NAME)

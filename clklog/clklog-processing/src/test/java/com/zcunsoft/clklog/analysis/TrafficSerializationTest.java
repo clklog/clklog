@@ -24,12 +24,16 @@ class TrafficSerializationTest {
     void preservesDecisionAcrossFlinkSerialization() throws Exception {
         LogBean event = new LogBean();
         event.setDistinctId("bot");
+        event.setAgentClass("Robot");
+        event.setDeviceClass("Robot");
         event.setTrafficDecision(new UaTrafficClassifier().classify("Googlebot/2.1", "192.0.2.1",
-                "Robot", "Googlebot", "", UaRuleSet.compile("", false), SearchEngineIpSnapshot.empty()));
+                "Robot", "Robot", "Googlebot", "", UaRuleSet.compile("", false), SearchEngineIpSnapshot.empty()));
         TypeSerializer<LogBean> serializer = TypeInformation.of(LogBean.class).createSerializer(new ExecutionConfig());
         DataOutputSerializer output = new DataOutputSerializer(512);
         serializer.serialize(event, output);
         LogBean decoded = serializer.deserialize(new DataInputDeserializer(output.getCopyOfBuffer()));
+        assertEquals("Robot", decoded.getAgentClass());
+        assertEquals("Robot", decoded.getTrafficDecision().getDeviceClass());
         assertTrue(decoded.getTrafficDecision().isBot());
         assertEquals("google", decoded.getTrafficDecision().getSearchEngine());
         assertEquals("unverified", decoded.getTrafficDecision().getVerificationStatus());

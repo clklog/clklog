@@ -32,6 +32,29 @@ class UaTrafficClassifierTest {
     }
 
     @Test
+    void recognizesAgentAndDeviceRobotClasses() {
+        SearchEngineIpSnapshot empty = SearchEngineIpSnapshot.empty();
+        for (String agentClass : Arrays.asList("Robot", "Robot Mobile")) {
+            TrafficDecision result = classifier.classify("example", "", "Desktop", agentClass, "", "", rules, empty);
+            assertTrue(result.isBot(), agentClass);
+            assertEquals(Collections.singletonList("ua_agent_class"), result.getReasons());
+            assertEquals("Desktop", result.getDeviceClass());
+        }
+        for (String deviceClass : Arrays.asList("Robot", "Robot Mobile", "Robot Imitator", "Hacker")) {
+            TrafficDecision result = classifier.classify("example", "", deviceClass, "Browser", "", "", rules, empty);
+            assertTrue(result.isBot(), deviceClass);
+            assertEquals(Collections.singletonList("ua_device_class"), result.getReasons());
+            assertEquals(deviceClass, result.getDeviceClass());
+        }
+        TrafficDecision combined = classifier.classify("example", "", "Robot Mobile", "Robot", "", "", rules, empty);
+        assertEquals(Arrays.asList("ua_device_class", "ua_agent_class"), combined.getReasons());
+        assertFalse(classifier.classify("example", "", null, null, "", "", rules, empty).isBot());
+        assertFalse(classifier.classify("example", "", "Desktop", "Browser", "", "", rules, empty).isBot());
+        assertFalse(classifier.classify("example", "", "Desktop", "Robot Imitator", "", "", rules, empty).isBot());
+        assertTrue(classifier.classify("example", "", "robot mobile", "browser", "", "", rules, empty).isBot());
+    }
+
+    @Test
     void matchesValidCidrAndExpiresAtLookup() {
         long now = System.currentTimeMillis();
         SearchEngineIpSnapshot snapshot = new SearchEngineIpSnapshot(Arrays.asList(

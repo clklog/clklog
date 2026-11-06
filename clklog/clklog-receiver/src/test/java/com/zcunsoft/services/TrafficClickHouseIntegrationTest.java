@@ -51,12 +51,13 @@ class TrafficClickHouseIntegrationTest {
         LogBean bot = event("bot-" + id);
         bot.setUserAgent("Googlebot/2.1");
         bot.setDeviceClass("Robot");
+        bot.setAgentClass("Robot");
         RawMessage message = new RawMessage();
         doReturn(Arrays.asList(normal, bot)).when(service).analysisData(message);
         service.saveToClickHouse(Collections.singletonList(message));
         assertEquals(1L, jdbc.queryForObject("SELECT count() FROM log_analysis WHERE distinct_id='normal-" + id + "'", Long.class));
         assertEquals(1L, jdbc.queryForObject("SELECT count() FROM log_analysis_bot WHERE distinct_id='bot-" + id + "' "
-                + "AND has(bot_reason, 'search_engine_ua') AND search_engine_verify_status='unverified'", Long.class));
+                + "AND has(bot_reason, 'search_engine_ua') AND search_engine_verify_status='unverified' AND agent_class='Robot'", Long.class));
         assertEquals(0L, jdbc.queryForObject("SELECT count() FROM log_analysis WHERE distinct_id='bot-" + id + "'", Long.class));
     }
 

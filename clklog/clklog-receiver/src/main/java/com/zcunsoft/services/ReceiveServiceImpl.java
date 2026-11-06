@@ -474,7 +474,7 @@ public class ReceiveServiceImpl implements IReceiveService {
                 }
                 String excludedUa = setting == null ? "" : setting.getExcludedUa();
                 event.setTrafficDecision(trafficClassifier.classify(event.getUserAgent(), event.getClientIp(),
-                        event.getDeviceClass(), event.getAgentName(), event.getUaOsName(),
+                        event.getDeviceClass(), event.getAgentClass(), event.getAgentName(), event.getUaOsName(),
                         uaRuleCache.get(event.getProjectName(), excludedUa), searchEngineIpLibrary.snapshot()));
                 (event.getTrafficDecision().isBot() ? bots : normal).add(event);
             }
@@ -525,8 +525,8 @@ public class ReceiveServiceImpl implements IReceiveService {
 
         if (bot) {
             sql = sql.replace("insert into log_analysis (", "insert into log_analysis_bot (")
-                    .replace("app_crashed_reason)", "app_crashed_reason,is_bot,bot_score,bot_reason,device_class,agent_name,os_name,search_engine,search_engine_verify_status,search_engine_ip_library_version)")
-                    .replace("?,?,?,?,?,?)", "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                    .replace("app_crashed_reason)", "app_crashed_reason,is_bot,bot_score,bot_reason,device_class,agent_name,os_name,search_engine,search_engine_verify_status,search_engine_ip_library_version,agent_class)")
+                    .replace("?,?,?,?,?,?)", "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         }
         clickHouseJdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
@@ -644,6 +644,7 @@ public class ReceiveServiceImpl implements IReceiveService {
                     pst.setString(108, decision.getSearchEngine());
                     pst.setString(109, decision.getVerificationStatus());
                     pst.setString(110, decision.getLibraryVersion());
+                    pst.setString(111, value.getAgentClass() == null ? "" : value.getAgentClass());
                 }
             }
 

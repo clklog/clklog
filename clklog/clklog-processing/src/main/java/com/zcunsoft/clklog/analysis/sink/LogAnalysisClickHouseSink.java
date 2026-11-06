@@ -61,15 +61,18 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
 
         conn = ClickHouseUtil.getConn(clickhouseHost, clickhouseDb, clickhouseUsername, clickhousePwd);
 
-        String botSql = sql.replace("insert into log_analysis (", "insert into log_analysis_bot (")
-                .replace("app_crashed_reason)", "app_crashed_reason,is_bot,bot_score,bot_reason,device_class,agent_name,os_name,search_engine,search_engine_verify_status,search_engine_ip_library_version)")
-                .replace("?,?,?,?,?,?)", "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         if (conn == null) {
             throw new SQLException("Cannot connect to ClickHouse");
         }
         TrafficTableValidator.validate(conn);
         normalStatement = conn.prepareStatement(sql);
-        botStatement = conn.prepareStatement(botSql);
+        botStatement = conn.prepareStatement(botSql());
+    }
+
+    String botSql() {
+        return sql.replace("insert into log_analysis (", "insert into log_analysis_bot (")
+                .replace("app_crashed_reason)", "app_crashed_reason,is_bot,bot_score,bot_reason,device_class,agent_name,os_name,search_engine,search_engine_verify_status,search_engine_ip_library_version,agent_class)")
+                .replace("?,?,?,?,?,?)", "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
     }
 
     @Override
@@ -223,6 +226,7 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
                     pst.setString(108, decision.getSearchEngine());
                     pst.setString(109, decision.getVerificationStatus());
                     pst.setString(110, decision.getLibraryVersion());
+                    pst.setString(111, value.getAgentClass() == null ? "" : value.getAgentClass());
                     botCount++;
                 } else {
                     normalCount++;

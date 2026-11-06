@@ -95,6 +95,8 @@ public class AppTest {
         target1.setAnonymousId("1a7cc28c-52e1-40bb-b506-d86cdcfd7361");
         List<DynamicTest> dynamicTestList = new ArrayList<>();
         AbstractUserAgentAnalyzer userAgentAnalyzer = UserAgentAnalyzer.newBuilder().withField(UserAgent.AGENT_NAME)
+                .withField(UserAgent.AGENT_CLASS)
+                .withField(UserAgent.DEVICE_CLASS)
                 .withField(UserAgent.AGENT_NAME_VERSION)
                 .withField(UserAgent.DEVICE_NAME)
                 .withField(UserAgent.DEVICE_BRAND)
@@ -103,6 +105,7 @@ public class AppTest {
                 .build();
         UserAgent parsedUa = userAgentAnalyzer.parse(rawMessage.getUa());
         target1.setDeviceClass(parsedUa.getValue(UserAgent.DEVICE_CLASS));
+        target1.setAgentClass(parsedUa.getValue(UserAgent.AGENT_CLASS));
         target1.setAgentName(parsedUa.getValue(UserAgent.AGENT_NAME));
         target1.setUaOsName(parsedUa.getValue(UserAgent.OPERATING_SYSTEM_NAME));
         Object[] actualArr = getFiledsInfo(target1).toArray();

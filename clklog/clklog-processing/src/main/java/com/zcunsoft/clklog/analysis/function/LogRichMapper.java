@@ -99,7 +99,7 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
                 String excludedUa = setting == null ? "" : setting.getExcludedUa();
                 for (LogBean event : logBeanList) {
                     event.setTrafficDecision(classifier.classify(event.getUserAgent(), event.getClientIp(),
-                            event.getDeviceClass(), event.getAgentName(), event.getUaOsName(),
+                            event.getDeviceClass(), event.getAgentClass(), event.getAgentName(), event.getUaOsName(),
                             uaRules.get(rawMessage.getProject(), excludedUa), searchEngineIpSnapshot));
                 }
                 List<String> clientIpList = logBeanList.stream().map(LogBean::getClientIp).distinct().collect(Collectors.toList());
@@ -279,6 +279,7 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
         ipUtil.loadIpFile();
 
         userAgentAnalyzer = UserAgentAnalyzer.newBuilder().withField(UserAgent.AGENT_NAME)
+                .withField(UserAgent.AGENT_CLASS)
                 .withField(UserAgent.DEVICE_CLASS)
                 .withField(UserAgent.AGENT_NAME_VERSION)
                 .withField(UserAgent.DEVICE_NAME)

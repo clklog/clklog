@@ -32,7 +32,7 @@ public final class TrafficTableValidator {
                 throw new SQLException("Missing or incompatible bot table column: " + column.getKey());
             }
         }
-        String[] required = {"is_bot", "bot_score", "bot_reason", "device_class", "agent_name", "os_name",
+        String[] required = {"is_bot", "bot_score", "bot_reason", "device_class", "agent_class", "agent_name", "os_name",
                 "search_engine", "search_engine_verify_status", "search_engine_ip_library_version"};
         for (String column : required) {
             if (!bot.containsKey(column)) {

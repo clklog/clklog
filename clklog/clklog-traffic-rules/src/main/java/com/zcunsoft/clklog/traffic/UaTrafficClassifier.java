@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 /**
  * 社区版实时 UA 单事件识别器，两条入库链路共用相同规则。
  *
- * <p>黑名单、Robot/Hacker 设备类型、明确的 HeadlessChrome 标识和搜索引擎
+ * <p>黑名单、机器人客户端或设备类型、Hacker 设备类型、明确的 HeadlessChrome 标识和搜索引擎
  * UA 声明均可直接判定机器人；不依赖 PV、会话数量或离线行为评分。
  * 多条规则可以同时命中，分别记录原因。</p>
  */
@@ -35,13 +35,14 @@ public final class UaTrafficClassifier {
      * @param ua 请求或 SDK 提供的原始 UA
      * @param ip 事件来源 IP
      * @param deviceClass UA 解析出的设备类型
+     * @param agentClass UA 解析出的客户端类型
      * @param agentName UA 解析出的客户端名称
      * @param osName UA 解析出的操作系统名称
      * @param rules 项目当前可用的 UA 黑名单
      * @param snapshot 已加载到内存的搜索引擎 IP 库
      * @return 包含命中原因、设备信息和搜索引擎 IP 校验状态的结果
      */
-    public TrafficDecision classify(String ua, String ip, String deviceClass, String agentName, String osName,
+    public TrafficDecision classify(String ua, String ip, String deviceClass, String agentClass, String agentName, String osName,
                                     UaRuleSet rules, SearchEngineIpSnapshot snapshot) {
         String safeUa = safe(ua);
         String device = safe(deviceClass);
@@ -50,8 +51,12 @@ public final class UaTrafficClassifier {
         if (rules.matches(safeUa)) {
             reasons.add("ua_blacklist");
         }
-        if ("robot".equalsIgnoreCase(device) || "hacker".equalsIgnoreCase(device)) {
+        if ("robot".equalsIgnoreCase(device) || "robot mobile".equalsIgnoreCase(device)
+                || "robot imitator".equalsIgnoreCase(device) || "hacker".equalsIgnoreCase(device)) {
             reasons.add("ua_device_class");
+        }
+        if ("robot".equalsIgnoreCase(agentClass) || "robot mobile".equalsIgnoreCase(agentClass)) {
+            reasons.add("ua_agent_class");
         }
         if (HEADLESS.matcher(safeUa).find() || agent.toLowerCase(Locale.ROOT).contains("headlesschrome")) {
             reasons.add("ua_headless");
@@ -66,6 +71,12 @@ public final class UaTrafficClassifier {
         }
         SearchEngineIpSnapshot.Match match = snapshot.match(engine, ip, System.currentTimeMillis());
         return new TrafficDecision(reasons, device, agent, safe(osName), engine, match.getStatus(), match.getVersion());
+    }
+
+    /** 保留旧调用形式；未提供客户端类型时仍执行其他识别规则。 */
+    public TrafficDecision classify(String ua, String ip, String deviceClass, String agentName, String osName,
+                                    UaRuleSet rules, SearchEngineIpSnapshot snapshot) {
+        return classify(ua, ip, deviceClass, "", agentName, osName, rules, snapshot);
     }
 
     private static String safe(String value) {

@@ -6,6 +6,7 @@ ALTER TABLE ${CLKLOG_LOG_DB}.log_analysis_bot
     ADD COLUMN IF NOT EXISTS bot_score UInt8 DEFAULT 100,
     ADD COLUMN IF NOT EXISTS bot_reason Array(String),
     ADD COLUMN IF NOT EXISTS device_class String,
+    ADD COLUMN IF NOT EXISTS agent_class String,
     ADD COLUMN IF NOT EXISTS agent_name String,
     ADD COLUMN IF NOT EXISTS os_name String,
     ADD COLUMN IF NOT EXISTS search_engine String,

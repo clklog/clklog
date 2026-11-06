@@ -391,6 +391,7 @@ public class ExtractUtil {
                 if (StringUtils.isNotBlank(logBean.getUserAgent())) {
                     try {
                     UserAgent userAgent = userAgentAnalyzer.parse(logBean.getUserAgent());
+                    logBean.setAgentClass(userAgent.getValue(UserAgent.AGENT_CLASS));
                     logBean.setDeviceClass(userAgent.getValue(UserAgent.DEVICE_CLASS));
                     logBean.setAgentName(userAgent.getValue(UserAgent.AGENT_NAME));
                     logBean.setUaOsName(userAgent.getValue(UserAgent.OPERATING_SYSTEM_NAME));
@@ -474,6 +475,7 @@ public class ExtractUtil {
             } else if (StringUtils.isNotBlank(logBean.getUserAgent())) {
                 try {
                     UserAgent userAgent = userAgentAnalyzer.parse(logBean.getUserAgent());
+                    logBean.setAgentClass(userAgent.getValue(UserAgent.AGENT_CLASS));
                     logBean.setDeviceClass(userAgent.getValue(UserAgent.DEVICE_CLASS));
                     logBean.setAgentName(userAgent.getValue(UserAgent.AGENT_NAME));
                     logBean.setUaOsName(userAgent.getValue(UserAgent.OPERATING_SYSTEM_NAME));

@@ -33,13 +33,11 @@ class TrafficSinkIntegrationTest {
             LogAnalysisClickHouseSink sink = new LogAnalysisClickHouseSink();
             sink.conn = conn;
             sink.normalStatement = conn.prepareStatement(sink.sql);
-            String botSql = sink.sql.replace("insert into log_analysis (", "insert into log_analysis_bot (")
-                    .replace("app_crashed_reason)", "app_crashed_reason,is_bot,bot_score,bot_reason,device_class,agent_name,os_name,search_engine,search_engine_verify_status,search_engine_ip_library_version)")
-                    .replace("?,?,?,?,?,?)", "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-            sink.botStatement = conn.prepareStatement(botSql);
+            sink.botStatement = conn.prepareStatement(sink.botSql());
             String id = UUID.randomUUID().toString();
             LogBean normal = event("flink-normal-" + id);
             LogBean bot = event("flink-bot-" + id);
+            bot.setAgentClass("Robot");
             bot.setTrafficDecision(new UaTrafficClassifier().classify("Googlebot/2.1", "192.0.2.1",
                     "Robot", "Googlebot", "", UaRuleSet.compile("", false), SearchEngineIpSnapshot.empty()));
             LogBeanCollection collection = new LogBeanCollection();
@@ -52,7 +50,7 @@ class TrafficSinkIntegrationTest {
                     assertEquals(1, result.getInt(1));
                 }
                 try (ResultSet result = statement.executeQuery(
-                        "SELECT count() FROM log_analysis_bot WHERE distinct_id='flink-bot-" + id + "' AND has(bot_reason, 'search_engine_ua')")) {
+                        "SELECT count() FROM log_analysis_bot WHERE distinct_id='flink-bot-" + id + "' AND has(bot_reason, 'search_engine_ua') AND agent_class='Robot'")) {
                     result.next();
                     assertEquals(1, result.getInt(1));
                 }

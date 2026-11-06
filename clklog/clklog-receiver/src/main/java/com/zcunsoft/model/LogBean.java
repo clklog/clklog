@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 public class LogBean {
     TrafficDecision trafficDecision;
     String deviceClass = "";
+    String agentClass = "";
     String agentName = "";
     String uaOsName = "";
     String kafkaDataTime = "";
