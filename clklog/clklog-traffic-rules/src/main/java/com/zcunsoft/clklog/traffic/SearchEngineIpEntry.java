@@ -7,13 +7,12 @@ import java.util.Locale;
 /**
  * 搜索引擎 IP 库中的一条可信网段记录。
  *
- * <p>构造时校验来源、版本、有效期和 CIDR 前缀，并将网段地址转换为字节数组；
+ * <p>构造时校验来源、有效期和 CIDR 前缀，并将网段地址转换为字节数组；
  * 匹配时同时检查地址族、有效期和前缀。此类只消费已维护的可信记录，
  * 不负责通过 DNS 验证搜索引擎身份。</p>
  */
 public final class SearchEngineIpEntry {
     private final String engine;
-    private final String version;
     private final long expiresAt;
     private final long verifiedAt;
     private final byte[] network;
@@ -25,9 +24,9 @@ public final class SearchEngineIpEntry {
      *
      * @throws IllegalArgumentException 元数据、IP 字面量或 CIDR 前缀无效
      */
-    public SearchEngineIpEntry(String engine, String cidr, String source, long verifiedAt, long expiresAt, String version) {
+    public SearchEngineIpEntry(String engine, String cidr, String source, long verifiedAt, long expiresAt) {
         if (engine == null || engine.trim().isEmpty() || source == null || source.trim().isEmpty()
-                || verifiedAt <= 0 || expiresAt <= verifiedAt || version == null || version.trim().isEmpty()) {
+                || verifiedAt <= 0 || expiresAt <= verifiedAt) {
             throw new IllegalArgumentException("invalid search engine IP metadata");
         }
         String[] parts = cidr == null ? new String[0] : cidr.split("/", -1);
@@ -46,7 +45,6 @@ public final class SearchEngineIpEntry {
         this.engine = engine.toLowerCase(Locale.ROOT);
         this.expiresAt = expiresAt;
         this.verifiedAt = verifiedAt;
-        this.version = version;
     }
 
     /**
@@ -104,5 +102,4 @@ public final class SearchEngineIpEntry {
     }
 
     String getEngine() { return engine; }
-    String getVersion() { return version; }
 }

@@ -9,7 +9,7 @@ import java.util.List;
  * 单条事件的 UA 识别结果，供接收端和 Flink 写入链路决定目标表并保留判定依据。
  *
  * <p>当前阶段只包含 UA 直判：原因列表非空即判为机器人、分值为 100；
- * 未命中时分值为 0。搜索引擎 IP 校验状态只是附加信息，不改变分流结果。</p>
+ * 未命中时分值为 0。搜索引擎与 AI 来源的 IP 校验状态只是附加信息，不改变分流结果。</p>
  */
 public final class TrafficDecision implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -19,10 +19,10 @@ public final class TrafficDecision implements Serializable {
     private final String osName;
     private final String searchEngine;
     private final String verificationStatus;
-    private final String libraryVersion;
+    private final String aiVerificationStatus;
 
     TrafficDecision(List<String> reasons, String deviceClass, String agentName, String osName,
-                    String searchEngine, String verificationStatus, String libraryVersion) {
+                    String searchEngine, String verificationStatus, String aiVerificationStatus) {
         // 内部使用普通 ArrayList 兼容 Flink 的 Kryo 反序列化，对外通过只读视图保护结果。
         this.reasons = new ArrayList<>(reasons);
         this.deviceClass = deviceClass;
@@ -30,7 +30,7 @@ public final class TrafficDecision implements Serializable {
         this.osName = osName;
         this.searchEngine = searchEngine;
         this.verificationStatus = verificationStatus;
-        this.libraryVersion = libraryVersion;
+        this.aiVerificationStatus = aiVerificationStatus;
     }
 
     public boolean isBot() { return !reasons.isEmpty(); }
@@ -41,5 +41,5 @@ public final class TrafficDecision implements Serializable {
     public String getOsName() { return osName; }
     public String getSearchEngine() { return searchEngine; }
     public String getVerificationStatus() { return verificationStatus; }
-    public String getLibraryVersion() { return libraryVersion; }
+    public String getAiVerificationStatus() { return aiVerificationStatus; }
 }

@@ -6,7 +6,7 @@ import java.util.Map;
  * 将 Redis Hash 中已解码的 JSON 记录转换为搜索引擎 IP 网段。
  *
  * <p>Hash 字段名必须与内容中的 engine 和 cidr 一致，格式为 {@code engine|cidr}；
- * 可信来源、时间范围、CIDR 及版本的进一步校验由 {@link SearchEngineIpEntry} 完成。</p>
+ * 可信来源、时间范围及 CIDR 的进一步校验由 {@link SearchEngineIpEntry} 完成。</p>
  */
 public final class SearchEngineIpRecordParser {
     private SearchEngineIpRecordParser() { }
@@ -26,7 +26,7 @@ public final class SearchEngineIpRecordParser {
             throw new IllegalArgumentException("IP library key does not match value");
         }
         return new SearchEngineIpEntry(engine, cidr, string(value, "source"),
-                number(value, "verified_at"), number(value, "expires_at"), string(value, "library_version"));
+                number(value, "verified_at"), number(value, "expires_at"));
     }
 
     private static String string(Map<String, Object> value, String key) {
