@@ -33,9 +33,9 @@ public final class TrafficTableValidator {
             }
         }
         // 浏览器/操作系统不单独落列：bot 表复用 log_analysis 的 browser/os（Yauaa AGENT_NAME/OS_NAME，上报值优先），
-        // 原 agent_name/os_name 列已废弃。
+        // 原 agent_name/os_name 列已废弃；搜索引擎厂商由 bot_category/bot_subcategory 承载，search_engine 列已删除。
         String[] required = {"is_bot", "bot_score", "bot_reason", "device_class", "agent_class",
-                "search_engine", "search_engine_verify_status", "ai_verify_status", "bot_category", "bot_subcategory"};
+                "search_engine_verify_status", "ai_verify_status", "bot_category", "bot_subcategory"};
         for (String column : required) {
             if (!bot.containsKey(column)) {
                 throw new SQLException("Missing bot table column: " + column);

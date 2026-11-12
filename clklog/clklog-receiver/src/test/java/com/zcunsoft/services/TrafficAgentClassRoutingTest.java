@@ -43,7 +43,7 @@ class TrafficAgentClassRoutingTest {
                 .thenAnswer(invocation -> {
                     String sql = invocation.getArgument(0);
                     assertTrue(sql.contains("ai_verify_status,agent_class,bot_category,bot_subcategory)"));
-                    assertEquals(111, sql.chars().filter(c -> c == '?').count());
+                    assertEquals(110, sql.chars().filter(c -> c == '?').count());
                     BatchPreparedStatementSetter setter = invocation.getArgument(1);
                     setter.setValues(statement, 0);
                     return new int[]{1};
@@ -66,8 +66,8 @@ class TrafficAgentClassRoutingTest {
         verify(jdbc).batchUpdate(contains("insert into log_analysis_bot ("), any(BatchPreparedStatementSetter.class));
         verify(jdbc, never()).batchUpdate(contains("insert into log_analysis ("), any(BatchPreparedStatementSetter.class));
         verify(statement).setString(105, "Mobile");
-        verify(statement).setString(109, "Robot Mobile");
-        verify(statement).setString(110, "other");
-        verify(statement).setString(111, "robot_unknown");
+        verify(statement).setString(108, "Robot Mobile");
+        verify(statement).setString(109, "other");
+        verify(statement).setString(110, "robot_unknown");
     }
 }

@@ -237,7 +237,7 @@ public final class UaTrafficClassifier {
             botCategory = "other";
             botSubcategory = otherSubcategory(device, agentClass, attackPayload, reasons);
         }
-        return new TrafficDecision(reasons, device, engine, seStatus, aiVerificationStatus,
+        return new TrafficDecision(reasons, device, seStatus, aiVerificationStatus,
                 botCategory, botSubcategory);
     }
 

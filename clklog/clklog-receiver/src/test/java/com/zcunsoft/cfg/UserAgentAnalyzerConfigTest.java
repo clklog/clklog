@@ -34,7 +34,8 @@ class UserAgentAnalyzerConfigTest {
         assertEquals("Robot", analyzer.parse(googlebot).getValue(UserAgent.AGENT_CLASS));
         TrafficDecision searchEngine = classify(analyzer, googlebot);
         assertTrue(searchEngine.isBot());
-        assertEquals("google", searchEngine.getSearchEngine());
+        assertEquals("search_engine", searchEngine.getBotCategory());
+        assertEquals("google", searchEngine.getBotSubcategory());
         assertEquals("unverified", searchEngine.getVerificationStatus());
         assertTrue(classify(analyzer, headless).getReasons().contains("ua_headless"));
     }

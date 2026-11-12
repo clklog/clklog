@@ -119,7 +119,6 @@ ALTER TABLE log_analysis_bot
     ADD COLUMN IF NOT EXISTS bot_reason Array(String),
     ADD COLUMN IF NOT EXISTS device_class String,
     ADD COLUMN IF NOT EXISTS agent_class String,
-    ADD COLUMN IF NOT EXISTS search_engine String,
     ADD COLUMN IF NOT EXISTS search_engine_verify_status String,
     ADD COLUMN IF NOT EXISTS ai_verify_status String,
     ADD COLUMN IF NOT EXISTS bot_category String DEFAULT '',

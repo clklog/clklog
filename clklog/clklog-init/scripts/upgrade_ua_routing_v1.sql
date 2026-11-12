@@ -7,7 +7,6 @@ ALTER TABLE ${CLKLOG_LOG_DB}.log_analysis_bot
     ADD COLUMN IF NOT EXISTS bot_reason Array(String),
     ADD COLUMN IF NOT EXISTS device_class String,
     ADD COLUMN IF NOT EXISTS agent_class String,
-    ADD COLUMN IF NOT EXISTS search_engine String,
     ADD COLUMN IF NOT EXISTS search_engine_verify_status String,
     ADD COLUMN IF NOT EXISTS ai_verify_status String,
     ADD COLUMN IF NOT EXISTS bot_category String DEFAULT '',
@@ -26,3 +25,6 @@ ALTER TABLE ${CLKLOG_LOG_DB}.log_analysis_bot DROP COLUMN IF EXISTS search_engin
 -- agent_name/os_name 已废弃（与 browser/os 语义重复），统一改读 browser/os 列。
 ALTER TABLE ${CLKLOG_LOG_DB}.log_analysis_bot DROP COLUMN IF EXISTS agent_name;
 ALTER TABLE ${CLKLOG_LOG_DB}.log_analysis_bot DROP COLUMN IF EXISTS os_name;
+
+-- search_engine 列已废弃：搜索引擎厂商由 bot_category=search_engine 时的 bot_subcategory 承载。
+ALTER TABLE ${CLKLOG_LOG_DB}.log_analysis_bot DROP COLUMN IF EXISTS search_engine;

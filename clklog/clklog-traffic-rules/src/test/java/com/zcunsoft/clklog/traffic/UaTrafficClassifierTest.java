@@ -24,7 +24,8 @@ class UaTrafficClassifierTest {
         assertTrue(classifier.classify("HeadlessChrome/1.0", "", "", "", rules, empty).isBot());
         TrafficDecision google = classifier.classify("Googlebot/2.1", "", "Robot", "", rules, empty);
         assertEquals(100, google.getBotScore());
-        assertEquals("google", google.getSearchEngine());
+        assertEquals("search_engine", google.getBotCategory());
+        assertEquals("google", google.getBotSubcategory());
         assertEquals("unverified", google.getVerificationStatus());
         assertEquals("not_applicable", google.getAiVerificationStatus());
         assertEquals(Arrays.asList("ua_device_class", "search_engine_ua"), google.getReasons());
@@ -63,7 +64,6 @@ class UaTrafficClassifierTest {
             assertTrue(decision.getReasons().contains("ua_script"), script[0]);
             assertEquals("script_crawler", decision.getBotCategory(), script[0]);
             assertEquals(script[1], decision.getBotSubcategory(), script[0]);
-            assertEquals("", decision.getSearchEngine(), script[0]);
             assertEquals("not_applicable", decision.getAiVerificationStatus(), script[0]);
         }
         assertEquals("EMPTY_UA", classifier.classifyScriptUa(""));
@@ -156,7 +156,8 @@ class UaTrafficClassifierTest {
                 {"Mozilla/5.0 (compatible; Bravebot/1.0; +https://brave.com/search)", "brave"}};
         for (String[] engine : engines) {
             TrafficDecision decision = classifier.classify(engine[0], "", "", "", "", rules, empty);
-            assertEquals(engine[1], decision.getSearchEngine(), engine[0]);
+            assertEquals("search_engine", decision.getBotCategory(), engine[0]);
+            assertEquals(engine[1], decision.getBotSubcategory(), engine[0]);
             assertTrue(decision.getReasons().contains("search_engine_ua"), engine[0]);
             assertEquals("not_applicable", decision.getAiVerificationStatus(), engine[0]);
         }
@@ -174,7 +175,7 @@ class UaTrafficClassifierTest {
                 "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.1; +https://openai.com/gptbot",
                 "192.0.2.1", "", "", "", noRules, library);
         assertEquals(Collections.singletonList("ua_ai_crawler"), gpt.getReasons());
-        assertEquals("", gpt.getSearchEngine());
+        assertEquals("ai_crawler", gpt.getBotCategory());
         assertEquals("not_applicable", gpt.getVerificationStatus());
         assertEquals("verified", gpt.getAiVerificationStatus());
 
@@ -183,7 +184,8 @@ class UaTrafficClassifierTest {
                 "Mozilla/5.0 (compatible; Applebot-Extended/1.0; +https://support.apple.com/applebot)",
                 "192.0.2.1", "", "", "", noRules, empty);
         assertEquals(Collections.singletonList("ua_ai_crawler"), appleExt.getReasons());
-        assertEquals("", appleExt.getSearchEngine());
+        assertEquals("ai_crawler", appleExt.getBotCategory());
+        assertEquals("applebot-extended", appleExt.getBotSubcategory());
         assertEquals("unverified", appleExt.getAiVerificationStatus());
 
         // 字节爬虫由搜索引擎迁移至 AI 来源
@@ -191,7 +193,8 @@ class UaTrafficClassifierTest {
                 "Mozilla/5.0 (compatible; Bytespider; https://zhanzhang.toutiao.com/)",
                 "192.0.2.1", "", "", "", noRules, empty);
         assertEquals(Collections.singletonList("ua_ai_crawler"), bytespider.getReasons());
-        assertEquals("", bytespider.getSearchEngine());
+        assertEquals("ai_crawler", bytespider.getBotCategory());
+        assertEquals("bytedance", bytespider.getBotSubcategory());
         assertEquals("unverified", bytespider.getAiVerificationStatus());
 
         // DuckAssistBot 归 DuckDuckGo AI 来源，不进搜索引擎分类
@@ -199,7 +202,8 @@ class UaTrafficClassifierTest {
                 "DuckAssistBot/1.2; (+http://duckduckgo.com/duckassistbot.html)",
                 "192.0.2.1", "", "", "", noRules, empty);
         assertEquals(Collections.singletonList("ua_ai_crawler"), duckAssist.getReasons());
-        assertEquals("", duckAssist.getSearchEngine());
+        assertEquals("ai_crawler", duckAssist.getBotCategory());
+        assertEquals("duckassist", duckAssist.getBotSubcategory());
         assertEquals("unverified", duckAssist.getAiVerificationStatus());
     }
 

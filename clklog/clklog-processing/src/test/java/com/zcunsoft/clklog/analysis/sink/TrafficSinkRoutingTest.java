@@ -36,7 +36,7 @@ class TrafficSinkRoutingTest {
 
         LogAnalysisClickHouseSink sink = new LogAnalysisClickHouseSink();
         assertTrue(sink.botSql().contains("ai_verify_status,agent_class,bot_category,bot_subcategory)"));
-        assertEquals(111, sink.botSql().chars().filter(c -> c == '?').count());
+        assertEquals(110, sink.botSql().chars().filter(c -> c == '?').count());
         sink.conn = connection;
         sink.botStatement = botStatement;
         sink.normalStatement = normalStatement;
@@ -64,11 +64,11 @@ class TrafficSinkRoutingTest {
                 new Class<?>[]{PreparedStatement.class}, (proxy, method, args) -> {
                     if ("setString".equals(method.getName()) && Integer.valueOf(105).equals(args[0])) {
                         deviceClass.set((String) args[1]);
-                    } else if ("setString".equals(method.getName()) && Integer.valueOf(109).equals(args[0])) {
+                    } else if ("setString".equals(method.getName()) && Integer.valueOf(108).equals(args[0])) {
                         agentClass.set((String) args[1]);
-                    } else if ("setString".equals(method.getName()) && Integer.valueOf(110).equals(args[0])) {
+                    } else if ("setString".equals(method.getName()) && Integer.valueOf(109).equals(args[0])) {
                         botCategory.set((String) args[1]);
-                    } else if ("setString".equals(method.getName()) && Integer.valueOf(111).equals(args[0])) {
+                    } else if ("setString".equals(method.getName()) && Integer.valueOf(110).equals(args[0])) {
                         botSubcategory.set((String) args[1]);
                     } else if ("executeBatch".equals(method.getName())) {
                         batches.incrementAndGet();

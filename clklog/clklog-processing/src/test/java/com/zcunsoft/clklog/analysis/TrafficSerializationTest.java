@@ -35,7 +35,8 @@ class TrafficSerializationTest {
         assertEquals("Robot", decoded.getAgentClass());
         assertEquals("Robot", decoded.getTrafficDecision().getDeviceClass());
         assertTrue(decoded.getTrafficDecision().isBot());
-        assertEquals("google", decoded.getTrafficDecision().getSearchEngine());
+        assertEquals("search_engine", decoded.getTrafficDecision().getBotCategory());
+        assertEquals("google", decoded.getTrafficDecision().getBotSubcategory());
         assertEquals("unverified", decoded.getTrafficDecision().getVerificationStatus());
 
         LogBeanCollection collection = new LogBeanCollection();
@@ -46,6 +47,6 @@ class TrafficSerializationTest {
         collectionSerializer.serialize(collection, collectionOutput);
         LogBeanCollection decodedCollection = collectionSerializer.deserialize(
                 new DataInputDeserializer(collectionOutput.getCopyOfBuffer()));
-        assertEquals("google", decodedCollection.getData().get(0).getTrafficDecision().getSearchEngine());
+        assertEquals("google", decodedCollection.getData().get(0).getTrafficDecision().getBotSubcategory());
     }
 }
