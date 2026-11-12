@@ -89,7 +89,15 @@ public final class UaTrafficClassifier {
     };
 
 
-    private static final Pattern HEADLESS = Pattern.compile("(?i)\\bheadlesschrome\\b");
+    // 无头浏览器特征：Chrome 无头（含 Yauaa AGENT_NAME=HeadlessChrome 的场景）、AI 专用无头、PhantomJS 及通用 headless 标识。
+    private static final Pattern HEADLESS_CHROME = Pattern.compile("(?i)\\bheadlesschrome\\b|\\bchrome\\s+headless\\b");
+    private static final Pattern HEADLESS_GENERIC = Pattern.compile("(?i)\\bheadless\\b");
+    private static final Pattern LIGHTPANDA = Pattern.compile("(?i)lightpanda");
+    private static final Pattern PHANTOMJS = Pattern.compile("(?i)phantomjs");
+    // 攻击载荷：Log4Shell ${jndi: 探测、Shellshock () { :; }; 载荷、CVE 漏洞探针。
+    private static final Pattern ATTACK_PAYLOAD = Pattern.compile("(?i)\\$\\{jndi:|\\(\\)\\s*\\{\\s*:\\s*;|^cve-\\d");
+    // 通用脚本兜底：带词边界的 *bot/spider/crawl*/scrap*，置于所有具体关键词之后。
+    private static final Pattern GENERIC_BOT = Pattern.compile("(?i)\\b(?:\\w*bot|spider|crawl\\w*|scrap\\w*)\\b");
 
     // 脚本/程序化访问规则：UA 含关键词即命中，按声明顺序比较，键名作为脚本子类标识。
     // 使用 LinkedHashMap 固定优先级：跨类别关键词同时命中时按声明顺序归类（Map.of 迭代顺序不确定）。
@@ -116,6 +124,17 @@ public final class UaTrafficClassifier {
                 "typhoeus", "faraday"));
         scriptRules.put("DART", Arrays.asList(
                 "dart/", "dart:io"));
+        scriptRules.put("SEO_TOOL", Arrays.asList(
+                "ahrefs", "semrush", "mj12bot", "dotbot",
+                "dataforseo", "barkrowler", "babbar"));
+        scriptRules.put("SOCIAL_PREVIEW", Arrays.asList(
+                "twitterbot", "discordbot", "telegrambot", "whatsapp",
+                "facebookexternalhit", "slackbot", "linkedinbot"));
+        scriptRules.put("MONITOR_ARCHIVER", Arrays.asList(
+                "uptimerobot", "pingdom", "site24x7", "statuscake",
+                "archive.org_bot", "ia_archiver"));
+        scriptRules.put("PHP", Arrays.asList(
+                "php/", "guzzle", "wordpress", "jetpack"));
         SCRIPT_UA_RULES = Collections.unmodifiableMap(scriptRules);
     }
 
@@ -123,19 +142,19 @@ public final class UaTrafficClassifier {
      * 根据 UA、解析结果和预加载的 IP 库生成单条事件的判定结果。
      *
      * <p>仅对第一个匹配的搜索引擎 UA 记录引擎名称，再查询该引擎与来源 IP 的匹配状态。
-     * IP 未验证或与其他引擎匹配不撤销 UA 直判，也不据此认定 UA 伪造。</p>
+     * IP 未验证或与其他引擎匹配不撤销 UA 直判，也不据此认定 UA 伪造。
+     * agentName 仅用于无头浏览器识别，不再随结果落库（bot 表浏览器/操作系统读 browser/os 列）。</p>
      *
      * @param ua 请求或 SDK 提供的原始 UA
      * @param ip 事件来源 IP
      * @param deviceClass UA 解析出的设备类型
      * @param agentClass UA 解析出的客户端类型
-     * @param agentName UA 解析出的客户端名称
-     * @param osName UA 解析出的操作系统名称
+     * @param agentName UA 解析出的客户端名称（Yauaa AGENT_NAME）
      * @param rules 项目当前可用的 UA 黑名单
      * @param snapshot 已加载到内存的搜索引擎 IP 库
-     * @return 包含命中原因、设备信息和搜索引擎 IP 校验状态的结果
+     * @return 包含命中原因、设备信息、IP 校验状态与五分类的结果
      */
-    public TrafficDecision classify(String ua, String ip, String deviceClass, String agentClass, String agentName, String osName,
+    public TrafficDecision classify(String ua, String ip, String deviceClass, String agentClass, String agentName,
                                     UaRuleSet rules, SearchEngineIpSnapshot snapshot) {
         String safeUa = safe(ua);
         String device = safe(deviceClass);
@@ -151,8 +170,17 @@ public final class UaTrafficClassifier {
         if ("robot".equalsIgnoreCase(agentClass) || "robot mobile".equalsIgnoreCase(agentClass)) {
             reasons.add("ua_agent_class");
         }
-        if (HEADLESS.matcher(safeUa).find() || agent.toLowerCase(Locale.ROOT).contains("headlesschrome")) {
+        boolean headless = HEADLESS_CHROME.matcher(safeUa).find()
+                || HEADLESS_GENERIC.matcher(safeUa).find()
+                || LIGHTPANDA.matcher(safeUa).find()
+                || PHANTOMJS.matcher(safeUa).find()
+                || agent.toLowerCase(Locale.ROOT).contains("headlesschrome");
+        if (headless) {
             reasons.add("ua_headless");
+        }
+        boolean attackPayload = ATTACK_PAYLOAD.matcher(safeUa).find();
+        if (attackPayload) {
+            reasons.add("ua_attack_payload");
         }
         String engine = "";
         String aiSource = "";
@@ -173,10 +201,13 @@ public final class UaTrafficClassifier {
             }
         }
         // 脚本规则位于 AI 与搜索引擎之后，保持分类优先级；命中即判机器人。
+        String scriptCategory = "";
         if (aiSource.isEmpty() && engine.isEmpty()) {
-            String scriptCategory = classifyScriptUa(safeUa);
+            scriptCategory = classifyScriptUa(safeUa);
             if (!"UNKNOWN".equals(scriptCategory) && !"EMPTY_UA".equals(scriptCategory)) {
                 reasons.add("ua_script");
+            } else {
+                scriptCategory = "";
             }
         }
         // 分类互斥：UA 声明 AI 来源时只做 AI 来源 IP 校验，搜索引擎校验保持 not_applicable，反之亦然。
@@ -187,7 +218,67 @@ public final class UaTrafficClassifier {
         } else {
             aiVerificationStatus = snapshot.match(aiSource, ip, System.currentTimeMillis()).getStatus();
         }
-        return new TrafficDecision(reasons, device, agent, safe(osName), engine, seStatus, aiVerificationStatus);
+        // 五分类按 AI > 搜索引擎 > 无头 > 脚本 > 其他 优先级取首个命中；普通流量两类均为空。
+        String botCategory = "";
+        String botSubcategory = "";
+        if (!aiSource.isEmpty()) {
+            botCategory = "ai_crawler";
+            botSubcategory = aiSource;
+        } else if (!engine.isEmpty()) {
+            botCategory = "search_engine";
+            botSubcategory = engine;
+        } else if (headless) {
+            botCategory = "headless_browser";
+            botSubcategory = headlessSubcategory(safeUa, agent);
+        } else if (!scriptCategory.isEmpty()) {
+            botCategory = "script_crawler";
+            botSubcategory = scriptCategory;
+        } else if (!reasons.isEmpty()) {
+            botCategory = "other";
+            botSubcategory = otherSubcategory(device, agentClass, attackPayload, reasons);
+        }
+        return new TrafficDecision(reasons, device, engine, seStatus, aiVerificationStatus,
+                botCategory, botSubcategory);
+    }
+
+    /** 保留旧调用形式；未提供客户端类型时仍执行其他识别规则。 */
+    public TrafficDecision classify(String ua, String ip, String deviceClass, String agentName,
+                                    UaRuleSet rules, SearchEngineIpSnapshot snapshot) {
+        return classify(ua, ip, deviceClass, "", agentName, rules, snapshot);
+    }
+
+    /** 无头浏览器子类：Chrome 无头优先，其次 AI 专用与 PhantomJS，其余归 other。 */
+    private static String headlessSubcategory(String ua, String agentName) {
+        String lower = ua.toLowerCase(Locale.ROOT);
+        if (lower.contains("headlesschrome") || lower.contains("chrome headless")
+                || agentName.toLowerCase(Locale.ROOT).contains("headlesschrome")) {
+            return "headless_chrome";
+        }
+        if (lower.contains("lightpanda")) {
+            return "lightpanda";
+        }
+        if (lower.contains("phantomjs")) {
+            return "phantomjs";
+        }
+        return "other";
+    }
+
+    /** 其他类子类：攻击载荷最具体，其次伪装与黑客标识，再次未分类机器人，仅黑名单命中归 blacklist。 */
+    private static String otherSubcategory(String device, String agentClass, boolean attackPayload, List<String> reasons) {
+        if (attackPayload) {
+            return "attack_payload";
+        }
+        if ("hacker".equalsIgnoreCase(device)) {
+            return "hacker";
+        }
+        if ("robot imitator".equalsIgnoreCase(device)) {
+            return "robot_imitator";
+        }
+        if ("robot".equalsIgnoreCase(agentClass) || "robot mobile".equalsIgnoreCase(agentClass)
+                || "robot".equalsIgnoreCase(device) || "robot mobile".equalsIgnoreCase(device)) {
+            return "robot_unknown";
+        }
+        return "blacklist";
     }
 
     /**
@@ -209,13 +300,11 @@ public final class UaTrafficClassifier {
                 }
             }
         }
+        // 通用兜底置于全部关键词类别之后，避免 UptimeRobot 等被误归 GENERIC_BOT。
+        if (GENERIC_BOT.matcher(ua).find()) {
+            return "GENERIC_BOT";
+        }
         return "UNKNOWN";
-    }
-
-    /** 保留旧调用形式；未提供客户端类型时仍执行其他识别规则。 */
-    public TrafficDecision classify(String ua, String ip, String deviceClass, String agentName, String osName,
-                                    UaRuleSet rules, SearchEngineIpSnapshot snapshot) {
-        return classify(ua, ip, deviceClass, "", agentName, osName, rules, snapshot);
     }
 
     private static String safe(String value) {

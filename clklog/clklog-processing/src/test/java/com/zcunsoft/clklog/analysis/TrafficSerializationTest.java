@@ -27,7 +27,7 @@ class TrafficSerializationTest {
         event.setAgentClass("Robot");
         event.setDeviceClass("Robot");
         event.setTrafficDecision(new UaTrafficClassifier().classify("Googlebot/2.1", "192.0.2.1",
-                "Robot", "Robot", "Googlebot", "", UaRuleSet.compile("", false), SearchEngineIpSnapshot.empty()));
+                "Robot", "Robot", "Googlebot", UaRuleSet.compile("", false), SearchEngineIpSnapshot.empty()));
         TypeSerializer<LogBean> serializer = TypeInformation.of(LogBean.class).createSerializer(new ExecutionConfig());
         DataOutputSerializer output = new DataOutputSerializer(512);
         serializer.serialize(event, output);

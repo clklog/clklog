@@ -69,8 +69,8 @@ public class SearchEngineIpLibraryService {
             }
             SearchEngineIpSnapshot refreshed = new SearchEngineIpSnapshot(entries);
             snapshot = refreshed;
-            LOGGER.info("Refreshed search engine IP library: {} entries, versions {}, in {} ms",
-                    entries.size(), refreshed.getVersionSummary(), System.currentTimeMillis() - start);
+            LOGGER.info("Refreshed search engine IP library: {} entries, in {} ms",
+                    entries.size(), System.currentTimeMillis() - start);
         } catch (Exception ex) {
             LOGGER.warn("Search engine IP library refresh failed after {} ms; keeping previous snapshot",
                     System.currentTimeMillis() - start, ex);

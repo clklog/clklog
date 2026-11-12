@@ -99,7 +99,7 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
                 String excludedUa = setting == null ? "" : setting.getExcludedUa();
                 for (LogBean event : logBeanList) {
                     event.setTrafficDecision(classifier.classify(event.getUserAgent(), event.getClientIp(),
-                            event.getDeviceClass(), event.getAgentClass(), event.getAgentName(), event.getUaOsName(),
+                            event.getDeviceClass(), event.getAgentClass(), event.getAgentName(),
                             uaRules.get(rawMessage.getProject(), excludedUa), searchEngineIpSnapshot));
                 }
                 List<String> clientIpList = logBeanList.stream().map(LogBean::getClientIp).distinct().collect(Collectors.toList());
@@ -212,8 +212,8 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
                     }
                     SearchEngineIpSnapshot refreshed = new SearchEngineIpSnapshot(entries);
                     searchEngineIpSnapshot = refreshed;
-                    logger.info("Refreshed search engine IP library: {} entries, versions {}, in {} ms",
-                            entries.size(), refreshed.getVersionSummary(),
+                    logger.info("Refreshed search engine IP library: {} entries, in {} ms",
+                            entries.size(),
                             TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - ipLibraryRefreshStart));
                 } catch (Exception ex) {
                     logger.warn("Search engine IP library refresh failed after {} ms; keeping previous snapshot",

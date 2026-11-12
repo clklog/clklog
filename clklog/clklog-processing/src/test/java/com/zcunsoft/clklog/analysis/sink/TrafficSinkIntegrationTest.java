@@ -39,7 +39,7 @@ class TrafficSinkIntegrationTest {
             LogBean bot = event("flink-bot-" + id);
             bot.setAgentClass("Robot");
             bot.setTrafficDecision(new UaTrafficClassifier().classify("Googlebot/2.1", "192.0.2.1",
-                    "Robot", "Googlebot", "", UaRuleSet.compile("", false), SearchEngineIpSnapshot.empty()));
+                    "Robot", "Googlebot", UaRuleSet.compile("", false), SearchEngineIpSnapshot.empty()));
             LogBeanCollection collection = new LogBeanCollection();
             collection.setData(Arrays.asList(normal, bot));
             sink.invoke(Collections.singletonList(collection), null);

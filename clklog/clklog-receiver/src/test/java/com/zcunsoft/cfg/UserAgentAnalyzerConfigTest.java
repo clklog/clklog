@@ -58,8 +58,7 @@ class UserAgentAnalyzerConfigTest {
         UserAgent parsed = analyzer.parse(ua);
         return new UaTrafficClassifier().classify(ua, "192.0.2.1",
                 parsed.getValue(UserAgent.DEVICE_CLASS), parsed.getValue(UserAgent.AGENT_CLASS),
-                parsed.getValue(UserAgent.AGENT_NAME),
-                parsed.getValue(UserAgent.OPERATING_SYSTEM_NAME), UaRuleSet.compile("", false),
+                parsed.getValue(UserAgent.AGENT_NAME), UaRuleSet.compile("", false),
                 SearchEngineIpSnapshot.empty());
     }
 }

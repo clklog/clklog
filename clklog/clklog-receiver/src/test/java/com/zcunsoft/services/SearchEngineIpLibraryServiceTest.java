@@ -22,8 +22,7 @@ class SearchEngineIpLibraryServiceTest {
         when(redis.opsForHash()).thenReturn(hash);
         long now = System.currentTimeMillis();
         String json = "{\"engine\":\"google\",\"cidr\":\"192.0.2.0/24\",\"source\":\"official_feed\","
-                + "\"verified_at\":" + (now - 1000) + ",\"expires_at\":" + (now + 60000)
-                + ",\"library_version\":\"v1\"}";
+                + "\"verified_at\":" + (now - 1000) + ",\"expires_at\":" + (now + 60000) + "}";
         Map<Object, Object> records = Collections.<Object, Object>singletonMap("google|192.0.2.0/24", json);
         when(hash.entries("test")).thenReturn(records).thenThrow(new RuntimeException("offline"))
                 .thenReturn(Collections.emptyMap());

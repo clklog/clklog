@@ -71,7 +71,7 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
 
     String botSql() {
         return sql.replace("insert into log_analysis (", "insert into log_analysis_bot (")
-                .replace("app_crashed_reason)", "app_crashed_reason,is_bot,bot_score,bot_reason,device_class,agent_name,os_name,search_engine,search_engine_verify_status,search_engine_ip_library_version,agent_class)")
+                .replace("app_crashed_reason)", "app_crashed_reason,is_bot,bot_score,bot_reason,device_class,search_engine,search_engine_verify_status,ai_verify_status,agent_class,bot_category,bot_subcategory)")
                 .replace("?,?,?,?,?,?)", "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
     }
 
@@ -221,12 +221,12 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
                     pst.setInt(103, decision.getBotScore());
                     pst.setArray(104, conn.createArrayOf("String", decision.getReasons().toArray(new String[0])));
                     pst.setString(105, decision.getDeviceClass());
-                    pst.setString(106, decision.getAgentName());
-                    pst.setString(107, decision.getOsName());
-                    pst.setString(108, decision.getSearchEngine());
-                    pst.setString(109, decision.getVerificationStatus());
-                    pst.setString(110, decision.getLibraryVersion());
-                    pst.setString(111, value.getAgentClass() == null ? "" : value.getAgentClass());
+                    pst.setString(106, decision.getSearchEngine());
+                    pst.setString(107, decision.getVerificationStatus());
+                    pst.setString(108, decision.getAiVerificationStatus());
+                    pst.setString(109, value.getAgentClass() == null ? "" : value.getAgentClass());
+                    pst.setString(110, decision.getBotCategory());
+                    pst.setString(111, decision.getBotSubcategory());
                     botCount++;
                 } else {
                     normalCount++;

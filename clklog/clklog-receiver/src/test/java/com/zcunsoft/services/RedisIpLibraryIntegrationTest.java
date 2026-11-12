@@ -24,8 +24,7 @@ class RedisIpLibraryIntegrationTest {
         long now = System.currentTimeMillis();
         try {
             String json = "{\"engine\":\"google\",\"cidr\":\"192.0.2.0/24\",\"source\":\"official_feed\","
-                    + "\"verified_at\":" + (now - 1000) + ",\"expires_at\":" + (now + 60000)
-                    + ",\"library_version\":\"v1\"}";
+                    + "\"verified_at\":" + (now - 1000) + ",\"expires_at\":" + (now + 60000) + "}";
             redis.opsForHash().put(key, "google|192.0.2.0/24", json);
             SearchEngineIpLibraryService service = new SearchEngineIpLibraryService(redis, new ObjectMapper(), key);
             service.refresh();
