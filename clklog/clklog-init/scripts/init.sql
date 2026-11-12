@@ -111,6 +111,8 @@ PARTITION BY stat_date
 ORDER BY distinct_id
 SETTINGS index_granularity = 8192;
 
+-- 机器人事件表：log_analysis 克隆 + 机器人判定/分类列。
+-- 浏览器/操作系统复用 browser/os 列；搜索引擎/AI厂商由 bot_category/bot_subcategory 承载。
 CREATE TABLE IF NOT EXISTS log_analysis_bot AS log_analysis;
 
 ALTER TABLE log_analysis_bot
@@ -123,12 +125,6 @@ ALTER TABLE log_analysis_bot
     ADD COLUMN IF NOT EXISTS ai_verify_status String,
     ADD COLUMN IF NOT EXISTS bot_category String DEFAULT '',
     ADD COLUMN IF NOT EXISTS bot_subcategory String DEFAULT '';
-
--- bot 表的浏览器/操作系统复用 log_analysis 的 browser/os（Yauaa AGENT_NAME/OS_NAME，上报值优先），
--- 不再单独建 agent_name/os_name 列，在此通过列备注标记对应关系。
-ALTER TABLE log_analysis_bot
-    MODIFY COLUMN browser String COMMENT '浏览器(=Yauaa AGENT_NAME；bot 表复用此列，替代已废弃的 agent_name)',
-    MODIFY COLUMN os String COMMENT '操作系统(=上报值或Yauaa OS_NAME；bot 表复用此列，替代已废弃的 os_name)';
 
 
 CREATE TABLE IF NOT EXISTS visituri_summary_bydate
