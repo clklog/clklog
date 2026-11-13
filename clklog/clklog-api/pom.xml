@@ -13,6 +13,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <swagger.version>2.1.12</swagger.version>
         <springdoc-openapi.version>1.6.6</springdoc-openapi.version>
+        <!-- 覆盖 Boot 2.6.4 默认的 1.18.22：1.18.22 在 JDK 17 + -nowarn 下延迟符号解析失效（编译报找不到符号） -->
+        <lombok.version>1.18.30</lombok.version>
     </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -100,6 +102,15 @@
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <!-- 关闭增量编译：老插件在 clean 后按"改动子集"编译会漏依赖源码，导致新增类找不到符号 -->
+                    <useIncrementalCompilation>false</useIncrementalCompilation>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
