@@ -127,6 +127,117 @@ ALTER TABLE log_analysis_bot
     ADD COLUMN IF NOT EXISTS bot_subcategory String DEFAULT '';
 
 
+-- 机器人流量总览（日）：真人侧行复用 flow_trend_bydate 联查
+CREATE TABLE IF NOT EXISTS bot_overview_bydate
+(
+    `stat_date` Date COMMENT '统计日期',
+    `project_name` String COMMENT '项目名',
+    `pv` UInt32 DEFAULT 0 COMMENT '机器人浏览量',
+    `uv` UInt32 DEFAULT 0 COMMENT '机器人访客数',
+    `ip_count` UInt32 DEFAULT 0 COMMENT '机器人IP数',
+    `visit_count` UInt32 DEFAULT 0 COMMENT '机器人访问次数',
+    `visit_time` UInt64 DEFAULT 0 COMMENT '机器人访问时长(秒)',
+    `bounce_count` UInt32 DEFAULT 0 COMMENT '机器人跳出次数',
+    `update_time` DateTime COMMENT '统计更新时间'
+)
+ENGINE = ReplacingMergeTree
+PARTITION BY stat_date
+ORDER BY (project_name)
+SETTINGS index_granularity = 8192;
+
+
+-- 机器人分类汇总（日）：环图占比按 ip_count 计算
+CREATE TABLE IF NOT EXISTS bot_category_summary_bydate
+(
+    `stat_date` Date COMMENT '统计日期',
+    `project_name` String COMMENT '项目名',
+    `bot_category` String COMMENT '机器人分类',
+    `ip_count` UInt32 DEFAULT 0 COMMENT '机器人IP数',
+    `pv` UInt32 DEFAULT 0 COMMENT '机器人浏览量',
+    `update_time` DateTime COMMENT '统计更新时间'
+)
+ENGINE = ReplacingMergeTree
+PARTITION BY stat_date
+ORDER BY (project_name, bot_category)
+SETTINGS index_granularity = 8192;
+
+
+-- 机器人地域分布（日）：中国/海外分组由查询层按 country 判断
+CREATE TABLE IF NOT EXISTS bot_area_bydate
+(
+    `stat_date` Date COMMENT '统计日期',
+    `project_name` String COMMENT '项目名',
+    `country` String COMMENT '国家',
+    `province` String COMMENT '省份',
+    `ip_count` UInt32 DEFAULT 0 COMMENT '机器人IP数',
+    `pv` UInt32 DEFAULT 0 COMMENT '机器人浏览量',
+    `visit_count` UInt32 DEFAULT 0 COMMENT '机器人访问次数',
+    `update_time` DateTime COMMENT '统计更新时间'
+)
+ENGINE = ReplacingMergeTree
+PARTITION BY stat_date
+ORDER BY (project_name, country, province)
+SETTINGS index_granularity = 8192;
+
+
+-- 搜索引擎抓取汇总（日）：抓取页面数 vs IP数
+CREATE TABLE IF NOT EXISTS bot_engine_page_summary_bydate
+(
+    `stat_date` Date COMMENT '统计日期',
+    `project_name` String COMMENT '项目名',
+    `engine` String COMMENT '搜索引擎标识(bot_subcategory)',
+    `page_count` UInt32 DEFAULT 0 COMMENT '抓取页面数',
+    `pv` UInt32 DEFAULT 0 COMMENT '抓取次数',
+    `ip_count` UInt32 DEFAULT 0 COMMENT '机器人IP数',
+    `update_time` DateTime COMMENT '统计更新时间'
+)
+ENGINE = ReplacingMergeTree
+PARTITION BY stat_date
+ORDER BY (project_name, engine)
+SETTINGS index_granularity = 8192;
+
+
+-- 搜索引擎抓取页面明细（日）
+CREATE TABLE IF NOT EXISTS bot_engine_page_detail_bydate
+(
+    `stat_date` Date COMMENT '统计日期',
+    `project_name` String COMMENT '项目名',
+    `engine` String COMMENT '搜索引擎标识(bot_subcategory)',
+    `url` String COMMENT '抓取页面',
+    `title` String COMMENT '页面标题',
+    `crawl_count` UInt32 DEFAULT 0 COMMENT '抓取次数',
+    `last_crawl_time` DateTime COMMENT '最后抓取时间',
+    `update_time` DateTime COMMENT '统计更新时间'
+)
+ENGINE = ReplacingMergeTree
+PARTITION BY stat_date
+ORDER BY (project_name, engine, url, title)
+SETTINGS index_granularity = 8192;
+
+
+-- 机器人IP明细（日）
+CREATE TABLE IF NOT EXISTS bot_ip_detail_bydate
+(
+    `stat_date` Date COMMENT '统计日期',
+    `project_name` String COMMENT '项目名',
+    `client_ip` String COMMENT '机器人请求IP',
+    `country` String COMMENT '国家',
+    `province` String COMMENT '省份',
+    `bot_category` String COMMENT '机器人分类',
+    `bot_subcategory` String COMMENT 'UA归属',
+    `hit_reasons` String COMMENT '命中原因(逗号分隔)',
+    `pv` UInt32 DEFAULT 0 COMMENT '浏览量',
+    `visit_count` UInt32 DEFAULT 0 COMMENT '访问次数',
+    `visit_time` UInt64 DEFAULT 0 COMMENT '访问时长(秒)',
+    `last_visit_time` DateTime COMMENT '最后访问时间',
+    `update_time` DateTime COMMENT '统计更新时间'
+)
+ENGINE = ReplacingMergeTree
+PARTITION BY stat_date
+ORDER BY (project_name, client_ip)
+SETTINGS index_granularity = 8192;
+
+
 CREATE TABLE IF NOT EXISTS visituri_summary_bydate
 (
     `stat_date` Date COMMENT '统计日期',
