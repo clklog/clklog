@@ -1,7 +1,7 @@
 INSERT INTO ${CLKLOG_LOG_DB}.bot_engine_page_summary_bydate
 SELECT ':cal_date' AS stat_date
-     , If(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
-     , If(t2.engine = '', 'all', t2.engine) AS engine
+     , multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
+     , multiIf(t2.engine = '', 'all', t2.engine) AS engine
      , t2.pageCount, t2.pv, t2.ipCount, NOW() AS update_time
 FROM (
          SELECT project_name, engine
@@ -10,8 +10,8 @@ FROM (
               , COUNTDistinct(t1.client_ip) AS ipCount
          FROM (
                   SELECT project_name
-                       , if(bot_subcategory = '', 'N/A', bot_subcategory) AS engine
-                       , if(url = '', 'N/A', url) AS url
+                       , multiIf(bot_subcategory = '', 'N/A', bot_subcategory) AS engine
+                       , multiIf(url = '', 'N/A', url) AS url
                        , multiIf(lib = 'js'
                                      AND event = '$pageview', event, lib IN ('iOS', 'Android')
                                      AND event = '$AppViewScreen', event, lib = 'MiniProgram'

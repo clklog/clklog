@@ -11,21 +11,21 @@ SELECT ':cal_date' AS stat_date
      , t2.lastVisit, NOW() AS update_time
 FROM (
          SELECT project_name
-              , if(client_ip = '', 'N/A', client_ip) AS client_ip
-              , if(country = '', 'N/A', country) AS country
-              , if(province = '', 'N/A', province) AS province
-              , if(bot_category = '', 'N/A', bot_category) AS bot_category
-              , if(bot_subcategory = '', 'N/A', bot_subcategory) AS bot_subcategory
+              , multiIf(client_ip = '', 'N/A', client_ip) AS client_ip
+              , multiIf(country = '', 'N/A', country) AS country
+              , multiIf(province = '', 'N/A', province) AS province
+              , multiIf(bot_category = '', 'N/A', bot_category) AS bot_category
+              , multiIf(bot_subcategory = '', 'N/A', bot_subcategory) AS bot_subcategory
               , arrayStringConcat(arrayDistinct(arrayFlatten(groupUniqArray(bot_reason))), ',') AS hitReasons
               , count(t1.pv) AS pv
               , max(log_time) AS lastVisit
          FROM (
                   SELECT project_name
-                       , if(client_ip = '', 'N/A', client_ip) AS client_ip
-                       , if(country = '', 'N/A', country) AS country
-                       , if(province = '', 'N/A', province) AS province
-                       , if(bot_category = '', 'N/A', bot_category) AS bot_category
-                       , if(bot_subcategory = '', 'N/A', bot_subcategory) AS bot_subcategory
+                       , multiIf(client_ip = '', 'N/A', client_ip) AS client_ip
+                       , multiIf(country = '', 'N/A', country) AS country
+                       , multiIf(province = '', 'N/A', province) AS province
+                       , multiIf(bot_category = '', 'N/A', bot_category) AS bot_category
+                       , multiIf(bot_subcategory = '', 'N/A', bot_subcategory) AS bot_subcategory
                        , bot_reason
                        , multiIf(lib = 'js'
                                      AND event = '$pageview', event, lib IN ('iOS', 'Android')
@@ -42,7 +42,7 @@ FROM (
          , count(1) AS visitCount, sum(diff) AS visitTime
     FROM (
              SELECT project_name
-                  , if(client_ip = '', 'N/A', client_ip) AS client_ip
+                  , multiIf(client_ip = '', 'N/A', client_ip) AS client_ip
                   , arraySort(groupUniqArray(stat_date)) AS stat_dates
                   , max(log_time) - min(log_time) AS diff
              FROM ${CLKLOG_LOG_DB}.log_analysis_bot

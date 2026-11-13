@@ -1,8 +1,8 @@
 INSERT INTO ${CLKLOG_LOG_DB}.bot_area_bydate
 SELECT ':cal_date' AS stat_date
-     , If(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
-     , If(t2.country = '', 'all', t2.country = 'N/A', '', t2.country) AS country
-     , If(t2.province = '', 'all', t2.province = 'N/A', '', t2.province) AS province
+     , multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
+     , multiIf(t2.country = '', 'all', t2.country = 'N/A', '', t2.country) AS country
+     , multiIf(t2.province = '', 'all', t2.province = 'N/A', '', t2.province) AS province
      , t2.ipCount, t2.pv, t4.visitCount, NOW() AS update_time
 FROM (
          SELECT project_name, country, province
@@ -15,8 +15,8 @@ FROM (
                                      AND event = '$AppViewScreen', event, lib = 'MiniProgram'
                                      AND event = '$MPViewScreen', event, event = 'ClkViewScreen', event, NULL) AS pv
                        , client_ip
-                       , if(country = '', 'N/A', country) AS country
-                       , if(province = '', 'N/A', province) AS province
+                       , multiIf(country = '', 'N/A', country) AS country
+                       , multiIf(province = '', 'N/A', province) AS province
                   FROM ${CLKLOG_LOG_DB}.log_analysis_bot
                   WHERE stat_date = ':cal_date'
                   ) t1
@@ -27,8 +27,8 @@ FROM (
          , count(1) AS visitCount
     FROM (
              SELECT project_name
-                  , if(country = '', 'N/A', country) AS country
-                  , if(province = '', 'N/A', province) AS province
+                  , multiIf(country = '', 'N/A', country) AS country
+                  , multiIf(province = '', 'N/A', province) AS province
                   , arraySort(groupUniqArray(stat_date)) AS stat_dates
              FROM ${CLKLOG_LOG_DB}.log_analysis_bot
              WHERE stat_date <= ':cal_date'

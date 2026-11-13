@@ -1,6 +1,6 @@
 INSERT INTO ${CLKLOG_LOG_DB}.bot_overview_bydate
 SELECT ':cal_date' AS stat_date
-     , If(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
+     , multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
      , t2.pv, t2.uv, t2.ipCount, t4.visitCount
      , t4.visitTime, t4.bounce, NOW() AS update_time
 FROM (

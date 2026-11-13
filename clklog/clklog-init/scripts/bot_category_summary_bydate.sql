@@ -1,7 +1,7 @@
 INSERT INTO ${CLKLOG_LOG_DB}.bot_category_summary_bydate
 SELECT ':cal_date' AS stat_date
-     , If(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
-     , If(t2.bot_category = '', 'all', t2.bot_category) AS bot_category
+     , multiIf(t2.project_name = '', 'all', t2.project_name = 'N/A', '', t2.project_name) AS project_name
+     , multiIf(t2.bot_category = '', 'all', t2.bot_category) AS bot_category
      , t2.ipCount, t2.pv, NOW() AS update_time
 FROM (
          SELECT project_name, bot_category
@@ -9,7 +9,7 @@ FROM (
               , count(t1.pv) AS pv
          FROM (
                   SELECT project_name
-                       , if(bot_category = '', 'N/A', bot_category) AS bot_category
+                       , multiIf(bot_category = '', 'N/A', bot_category) AS bot_category
                        , multiIf(lib = 'js'
                                      AND event = '$pageview', event, lib IN ('iOS', 'Android')
                                      AND event = '$AppViewScreen', event, lib = 'MiniProgram'

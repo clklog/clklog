@@ -10,8 +10,8 @@ SELECT ':cal_date' AS stat_date
 FROM (
          SELECT project_name
               , multiIf(bot_subcategory = '', 'N/A', bot_subcategory) AS engine
-              , if(url = '', 'N/A', url) AS url
-              , if(title = '', 'N/A', title) AS title
+              , multiIf(url = '', 'N/A', url) AS url
+              , multiIf(title = '', 'N/A', title) AS title
               , count(multiIf(lib = 'js'
                                   AND event = '$pageview', event, lib IN ('iOS', 'Android')
                                   AND event = '$AppViewScreen', event, lib = 'MiniProgram'
