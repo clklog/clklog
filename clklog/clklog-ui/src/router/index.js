@@ -78,6 +78,19 @@ export const constantRoutes = [
       },
     ],
   },
+  {
+    path: "/botAnalysis",
+    component: Layout,
+    redirect: "/botAnalysis/index",
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/visitor-analysis/bot-analysis"),
+        name: "botAnalysis",
+        meta: { title: "机器人分析", icon: "trend", affix: true, },
+      },
+    ],
+  },
 
 ];
 

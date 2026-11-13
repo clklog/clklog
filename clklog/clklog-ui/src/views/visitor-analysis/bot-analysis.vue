@@ -1,0 +1,601 @@
+<template>
+  <div class="app-container bot-analysis-page">
+    <div class="bid-list-header">
+      <FilterBar @setFilterBarParams="setFilterBarParams" />
+    </div>
+
+    <!-- 流量概览 -->
+    <div class="public-block">
+      <div class="public-hoverItem overview-card">
+        <div class="public-firstHead">流量概览</div>
+        <el-table
+          :data="overviewRows"
+          :show-header="true"
+          style="width: 100%"
+          :cell-style="overviewCellStyle"
+          size="medium"
+        >
+          <el-table-column prop="name" label="" width="120" align="center" />
+          <el-table-column prop="pv" label="浏览量(PV)" align="center" />
+          <el-table-column prop="visitCount" label="访问次数" align="center" />
+          <el-table-column prop="uv" label="访客数" align="center" />
+          <el-table-column prop="ipCount" label="IP数" align="center" />
+          <el-table-column prop="avgPv" label="平均访问页数" align="center" />
+          <el-table-column prop="avgVisitTime" label="平均访问时长" align="center">
+            <template slot-scope="scope">
+              {{ formatDuration(scope.row.avgVisitTime) }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </div>
+
+    <!-- 分类环图 + 地域分布 -->
+    <el-row :gutter="16">
+      <el-col :span="12">
+        <div class="public-block">
+          <div class="public-hoverItem chart-card">
+            <div class="public-firstHead">机器人分类</div>
+            <div ref="categoryChart" class="chart-box" />
+          </div>
+        </div>
+      </el-col>
+      <el-col :span="12">
+        <div class="public-block">
+          <div class="public-hoverItem chart-card">
+            <div class="public-firstHead">机器人地域分布</div>
+            <div ref="areaChart" class="chart-box" />
+          </div>
+        </div>
+      </el-col>
+    </el-row>
+
+    <!-- 引擎汇总 + 引擎抓取页面 -->
+    <el-row :gutter="16">
+      <el-col :span="12">
+        <div class="public-block">
+          <div class="public-hoverItem chart-card">
+            <div class="public-firstHead">搜索引擎 抓取页面数 vs IP数</div>
+            <div ref="engineChart" class="chart-box" />
+          </div>
+        </div>
+      </el-col>
+      <el-col :span="12">
+        <div class="public-block">
+          <div class="public-hoverItem chart-card">
+            <div class="table-head">
+              <span class="public-firstHead">引擎抓取页面</span>
+              <div class="table-filters">
+                <el-select
+                  v-model="engineFilter"
+                  placeholder="搜索引擎 全部"
+                  size="small"
+                  clearable
+                  class="filter-select"
+                  @change="enginePageNum = 1; fetchEnginePages()"
+                >
+                  <el-option label="全部" value="" />
+                  <el-option v-for="item in engineOptions" :key="item.engine" :label="item.engineName" :value="item.engine" />
+                </el-select>
+                <el-input
+                  v-model="urlKeyword"
+                  placeholder="请输入页面地址"
+                  size="small"
+                  clearable
+                  class="filter-input"
+                  @keyup.enter.native="enginePageNum = 1; fetchEnginePages()"
+                >
+                  <el-button slot="append" icon="el-icon-search" @click="enginePageNum = 1; fetchEnginePages()" />
+                </el-input>
+              </div>
+            </div>
+            <el-table :data="enginePageList" size="small" style="width: 100%">
+              <el-table-column type="index" label="序号" width="60" align="center" />
+              <el-table-column label="页面" min-width="200">
+                <template slot-scope="scope">
+                  <div class="page-name">{{ scope.row.title }}</div>
+                  <div class="page-url">{{ scope.row.url }}</div>
+                </template>
+              </el-table-column>
+              <el-table-column label="搜索引擎" align="center" width="150">
+                <template slot-scope="scope">
+                  <el-tag
+                    v-for="name in scope.row.engines"
+                    :key="name"
+                    size="mini"
+                    style="margin: 2px;"
+                  >{{ name }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="crawlCount" label="总抓取次数" align="center" />
+              <el-table-column label="最后抓取时间" align="center">
+                <template slot-scope="scope">{{ scope.row.lastCrawlTime || "--" }}</template>
+              </el-table-column>
+            </el-table>
+            <el-pagination
+              class="table-pagination"
+              layout="total, prev, pager, next"
+              :total="enginePageTotal"
+              :page-size="enginePageSize"
+              :current-page.sync="enginePageNum"
+              @current-change="fetchEnginePages()"
+            />
+          </div>
+        </div>
+      </el-col>
+    </el-row>
+
+    <!-- 机器人IP明细 -->
+    <div class="public-block">
+      <div class="public-hoverItem chart-card">
+        <div class="table-head">
+          <span class="public-firstHead">机器人IP明细</span>
+          <div class="table-filters">
+            <el-select
+              v-model="categoryFilter"
+              placeholder="分类 全部"
+              size="small"
+              clearable
+              class="filter-select"
+              @change="ipPageNum = 1; fetchIpDetail()"
+            >
+              <el-option label="全部" value="" />
+              <el-option v-for="item in categoryOptions" :key="item.botCategory" :label="item.categoryName" :value="item.botCategory" />
+            </el-select>
+            <el-input
+              v-model="ipKeyword"
+              placeholder="请输入及机器人请求IP"
+              size="small"
+              clearable
+              class="filter-input"
+              @keyup.enter.native="ipPageNum = 1; fetchIpDetail()"
+            >
+              <el-button slot="append" icon="el-icon-search" @click="ipPageNum = 1; fetchIpDetail()" />
+            </el-input>
+          </div>
+        </div>
+        <el-table :data="ipDetailList" size="small" style="width: 100%">
+          <el-table-column type="index" label="序号" width="60" align="center" />
+          <el-table-column prop="ip" label="IP" align="center" />
+          <el-table-column label="地域" align="center">
+            <template slot-scope="scope">{{ scope.row.country }} {{ scope.row.province }}</template>
+          </el-table-column>
+          <el-table-column label="分类" align="center">
+            <template slot-scope="scope">{{ scope.row.categoryName }}</template>
+          </el-table-column>
+          <el-table-column prop="uaOwner" label="UA归属" align="center" />
+          <el-table-column prop="hitReasons" label="命中原因" align="center">
+            <template slot-scope="scope">{{ scope.row.hitReasons || "--" }}</template>
+          </el-table-column>
+          <el-table-column prop="pv" label="浏览量" align="center" />
+          <el-table-column prop="visitCount" label="访问次数" align="center" />
+          <el-table-column prop="avgPv" label="平均访问页数" align="center" />
+          <el-table-column label="平均访问时长" align="center">
+            <template slot-scope="scope">{{ formatDuration(scope.row.avgVisitTime) }}</template>
+          </el-table-column>
+          <el-table-column label="最后访问时间" align="center" width="150">
+            <template slot-scope="scope">{{ scope.row.lastVisitTime || "--" }}</template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          class="table-pagination"
+          layout="total, prev, pager, next"
+          :total="ipDetailTotal"
+          :page-size="ipPageSize"
+          :current-page.sync="ipPageNum"
+          @current-change="fetchIpDetail()"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import echarts from "echarts";
+import resize from "@/components/Charts/mixins/resize";
+import { FilterBar } from "@/layout/components";
+import { copyObj } from "@/utils/copy";
+import {
+  getBotOverviewApi,
+  getBotCategoryApi,
+  getBotAreaApi,
+  getBotEngineSummaryApi,
+  getBotEnginePagesApi,
+  getBotIpDetailApi,
+} from "@/api/trackingapi/bot";
+
+const CATEGORY_COLORS = {
+  search_engine: "#3B7BFF",
+  ai_crawler: "#F5A623",
+  script_crawler: "#2BC3C3",
+  headless_browser: "#55C486",
+  other: "#F2C94C",
+};
+
+const CATEGORY_NAMES = {
+  search_engine: "搜索引擎",
+  ai_crawler: "AI爬虫",
+  script_crawler: "脚本爬虫",
+  headless_browser: "无头浏览器",
+  other: "未知/可疑机器人",
+};
+
+// IP2LOCATION 部分国家返回两位码，此处映射为中文名
+const COUNTRY_CODE_NAMES = {
+  gb: "英国",
+  us: "美国",
+  jp: "日本",
+  kr: "韩国",
+  ru: "俄罗斯",
+  de: "德国",
+  fr: "法国",
+  in: "印度",
+};
+
+const ENGINE_NAMES = {
+  baidu: "百度",
+  google: "谷歌",
+  bing: "必应",
+  sogou: "搜狗",
+  qihoo360: "360搜索",
+  yisou: "神马",
+  yandex: "Yandex",
+  duckduckgo: "DuckDuckGo",
+  apple: "苹果",
+  huawei: "华为",
+  brave: "Brave",
+  other: "其他",
+};
+
+export default {
+  name: "BotAnalysis",
+  components: { FilterBar },
+  mixins: [resize],
+  data() {
+    return {
+      filterBarParams: {},
+      overviewRows: [],
+      categoryList: [],
+      categoryTotalIpCount: 0,
+      areaList: [],
+      engineSummaryList: [],
+      // 引擎抓取页面
+      enginePageList: [],
+      enginePageTotal: 0,
+      enginePageNum: 1,
+      enginePageSize: 10,
+      engineFilter: "",
+      urlKeyword: "",
+      // 机器人IP明细
+      ipDetailList: [],
+      ipDetailTotal: 0,
+      ipPageNum: 1,
+      ipPageSize: 10,
+      categoryFilter: "",
+      ipKeyword: "",
+      charts: {},
+    };
+  },
+  computed: {
+    projectName() {
+      return this.$store.getters.projectName;
+    },
+    commonParams() {
+      const { projectName } = this;
+      const params = Object.assign({ projectName }, this.filterBarParams);
+      // bot 聚合表按天统计，时间边界不做周/月扩展
+      params.timeType = "day";
+      return params;
+    },
+    engineOptions() {
+      return this.engineSummaryList.map((item) => ({
+        engine: item.engine,
+        engineName: item.engineName,
+      }));
+    },
+    categoryOptions() {
+      return this.categoryList.map((item) => ({
+        botCategory: item.botCategory,
+        categoryName: item.categoryName,
+      }));
+    },
+  },
+  watch: {
+    commonParams(val) {
+      this.fetchOverview(val);
+      this.fetchCategory(val);
+      this.fetchArea(val);
+      this.fetchEngineSummary(val);
+      this.enginePageNum = 1;
+      this.fetchEnginePages(Object.assign({}, val));
+      this.ipPageNum = 1;
+      this.fetchIpDetail(Object.assign({}, val));
+    },
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.initCharts();
+    });
+  },
+  beforeDestroy() {
+    Object.keys(this.charts).forEach((key) => {
+      if (this.charts[key]) {
+        this.charts[key].dispose();
+        this.charts[key] = null;
+      }
+    });
+  },
+  methods: {
+    setFilterBarParams(val) {
+      this.filterBarParams = copyObj(val);
+      this.filterBarParams.timeType = "day";
+    },
+    formatDuration(seconds) {
+      if (!seconds || seconds <= 0) {
+        return "--";
+      }
+      const total = Math.round(seconds);
+      const m = Math.floor(total / 60);
+      const s = total % 60;
+      return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    },
+    initCharts() {
+      const refs = ["categoryChart", "areaChart", "engineChart"];
+      refs.forEach((ref) => {
+        if (this.$refs[ref]) {
+          this.charts[ref] = echarts.init(this.$refs[ref]);
+        }
+      });
+    },
+    fetchOverview(params) {
+      getBotOverviewApi(params).then((res) => {
+        if (res.code == 200 && res.data) {
+          const bot = res.data.bot || {};
+          const human = res.data.human || {};
+          const row = (name, data) => ({
+            name,
+            pv: data.pv || 0,
+            visitCount: data.visitCount || 0,
+            uv: data.uv || 0,
+            ipCount: data.ipCount || 0,
+            avgPv: data.avgPv || 0,
+            avgVisitTime: data.avgVisitTime || 0,
+          });
+          this.overviewRows = [row("机器人", bot), row("真人", human)];
+        }
+      });
+    },
+    fetchCategory(params) {
+      getBotCategoryApi(params).then((res) => {
+        if (res.code == 200 && res.data) {
+          this.categoryList = res.data.list || [];
+          this.categoryTotalIpCount = res.data.totalIpCount || 0;
+          this.renderCategoryChart();
+        }
+      });
+    },
+    renderCategoryChart() {
+      const chart = this.charts.categoryChart;
+      if (!chart) {
+        return;
+      }
+      const list = this.categoryList;
+      const option = {
+        tooltip: {
+          trigger: "item",
+          formatter: (p) =>
+            p.name + "<br/>请求IP数: " + p.value + "<br/>占比: " + p.percent.toFixed(2) + "%",
+        },
+        legend: { bottom: 0, icon: "circle", itemWidth: 10, itemHeight: 10 },
+        title: {
+          text: String(this.categoryTotalIpCount),
+          subtext: "机器人请求IP数",
+          left: "center",
+          top: "42%",
+          textStyle: { fontSize: 22, color: "#303133" },
+          subtextStyle: { fontSize: 12, color: "#909399" },
+        },
+        series: [
+          {
+            name: "机器人分类",
+            type: "pie",
+            radius: ["48%", "70%"],
+            center: ["50%", "46%"],
+            avoidLabelOverlap: true,
+            label: { formatter: "{b} {d}%", fontSize: 12 },
+            data: list.map((item) => ({
+              name: item.categoryName,
+              value: item.ipCount,
+              itemStyle: { color: CATEGORY_COLORS[item.botCategory] || "#909399" },
+            })),
+          },
+        ],
+      };
+      chart.setOption(option, true);
+    },
+    fetchArea(params) {
+      getBotAreaApi(params).then((res) => {
+        if (res.code == 200 && res.data) {
+          const list = res.data.list || [];
+          const inChina = list.filter((x) => x.region === "国内");
+          const overseas = list.filter((x) => x.region === "海外");
+          inChina.sort((a, b) => b.ipCount - a.ipCount);
+          overseas.sort((a, b) => b.ipCount - a.ipCount);
+          this.areaList = inChina.concat(overseas);
+          this.renderAreaChart();
+        }
+      });
+    },
+    renderAreaChart() {
+      const chart = this.charts.areaChart;
+      if (!chart) {
+        return;
+      }
+      // 国内按省份展示，海外按国家汇总展示
+      const inChina = this.areaList
+        .filter((x) => x.region === "国内")
+        .sort((a, b) => b.ipCount - a.ipCount)
+        .map((x) => ({ name: x.province, ipCount: x.ipCount, pv: x.pv, visitCount: x.visitCount }));
+      const overseasMap = {};
+      this.areaList
+        .filter((x) => x.region === "海外")
+        .forEach((x) => {
+          const countryName = COUNTRY_CODE_NAMES[x.country] || x.country;
+          if (!overseasMap[countryName]) {
+            overseasMap[countryName] = { name: countryName, ipCount: 0, pv: 0, visitCount: 0 };
+          }
+          overseasMap[countryName].ipCount += x.ipCount;
+          overseasMap[countryName].pv += x.pv;
+          overseasMap[countryName].visitCount += x.visitCount;
+        });
+      const overseasItems = Object.values(overseasMap).sort((a, b) => b.ipCount - a.ipCount);
+      // 类目过多时标签互相重叠，各取 IP 数 Top10 展示（精确数值见机器人IP明细）
+      const chartItems = inChina.slice(0, 10).concat(overseasItems.slice(0, 10));
+      const names = chartItems.map((x) => x.name);
+      const option = {
+        tooltip: { trigger: "axis" },
+        legend: { bottom: 0, icon: "circle", itemWidth: 10, itemHeight: 10 },
+        grid: { left: 50, right: 16, top: 20, bottom: 56 },
+        xAxis: { type: "category", data: names, axisLabel: { interval: 0, rotate: 40, fontSize: 11 } },
+        yAxis: { type: "value" },
+        series: [
+          {
+            name: "机器人IP数",
+            type: "bar",
+            barMaxWidth: 18,
+            itemStyle: { color: "#F5A623" },
+            data: chartItems.map((x) => x.ipCount),
+          },
+          {
+            name: "访问次数",
+            type: "bar",
+            barMaxWidth: 18,
+            itemStyle: { color: "#3B7BFF" },
+            data: chartItems.map((x) => x.visitCount),
+          },
+        ],
+      };
+      chart.setOption(option, true);
+    },
+    fetchEngineSummary(params) {
+      getBotEngineSummaryApi(params).then((res) => {
+        if (res.code == 200 && res.data) {
+          this.engineSummaryList = res.data.list || [];
+          this.renderEngineChart();
+        }
+      });
+    },
+    renderEngineChart() {
+      const chart = this.charts.engineChart;
+      if (!chart) {
+        return;
+      }
+      const list = this.engineSummaryList;
+      const names = list.map((x) => x.engineName);
+      const option = {
+        tooltip: { trigger: "axis" },
+        legend: { bottom: 0, icon: "circle", itemWidth: 10, itemHeight: 10 },
+        grid: { left: 60, right: 30, top: 20, bottom: 40 },
+        yAxis: { type: "category", data: names, inverse: true },
+        xAxis: { type: "value" },
+        series: [
+          {
+            name: "抓取页面数",
+            type: "bar",
+            barMaxWidth: 14,
+            itemStyle: { color: "#3B7BFF" },
+            data: list.map((x) => x.pageCount),
+          },
+          {
+            name: "IP数",
+            type: "bar",
+            barMaxWidth: 14,
+            itemStyle: { color: "#8FB6FF" },
+            data: list.map((x) => x.ipCount),
+          },
+        ],
+      };
+      chart.setOption(option, true);
+    },
+    fetchEnginePages(paramsOverride) {
+      const params = Object.assign({}, paramsOverride || this.commonParams, {
+        pageNum: this.enginePageNum,
+        pageSize: this.enginePageSize,
+        engine: this.engineFilter || "",
+        urlKeyword: this.urlKeyword || "",
+      });
+      getBotEnginePagesApi(params).then((res) => {
+        if (res.code == 200 && res.data) {
+          this.enginePageList = res.data.list || [];
+          this.enginePageTotal = res.data.total || 0;
+        }
+      });
+    },
+    fetchIpDetail(paramsOverride) {
+      const params = Object.assign({}, paramsOverride || this.commonParams, {
+        pageNum: this.ipPageNum,
+        pageSize: this.ipPageSize,
+        botCategory: this.categoryFilter || "",
+        ipKeyword: this.ipKeyword || "",
+      });
+      getBotIpDetailApi(params).then((res) => {
+        if (res.code == 200 && res.data) {
+          this.ipDetailList = res.data.list || [];
+          this.ipDetailTotal = res.data.total || 0;
+        }
+      });
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+.bot-analysis-page {
+  .overview-card {
+    .public-firstHead {
+      padding: 10px 0;
+    }
+  }
+  .chart-card {
+    min-height: 380px;
+  }
+  .chart-box {
+    height: 320px;
+    width: 100%;
+  }
+  .table-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    .table-filters {
+      display: flex;
+      align-items: center;
+      .filter-select {
+        width: 160px;
+        margin-right: 10px;
+      }
+      .filter-input {
+        width: 240px;
+      }
+    }
+  }
+  .page-name {
+    color: #303133;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .page-url {
+    color: #909399;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .table-pagination {
+    text-align: right;
+    padding: 10px 0;
+  }
+}
+</style>

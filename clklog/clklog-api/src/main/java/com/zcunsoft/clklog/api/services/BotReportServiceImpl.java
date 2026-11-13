@@ -113,9 +113,10 @@ public class BotReportServiceImpl implements IBotReportService {
                     + " and t.bot_category != 'all' group by bot_category order by ip_count desc";
             List<Map<String, Object>> rows = clickHouseJdbcTemplate.queryForList(rowSql, paramMap);
 
-            String totalSql = "select sum(ip_count) ip_count, sum(pv) pv"
+            // 合计不依赖 CUBE 汇总行：所选日期/项目无数据时也返回 0，避免 queryForMap 空结果抛异常
+            String totalSql = "select ifnull(sum(ip_count), 0) ip_count, ifnull(sum(pv), 0) pv"
                     + " from bot_category_summary_bydate t where " + where
-                    + " and t.bot_category = 'all'";
+                    + " and t.bot_category != 'all'";
             Map<String, Object> total = clickHouseJdbcTemplate.queryForMap(totalSql, paramMap);
 
             long totalIpCount = total.get("ip_count") == null ? 0 : ((Number) total.get("ip_count")).longValue();
@@ -240,24 +241,32 @@ public class BotReportServiceImpl implements IBotReportService {
                 paramMap.addValue("url_keyword", "%" + request.getUrlKeyword() + "%");
             }
 
-            String listSql = "select engine, url, max(title) title, sum(crawl_count) crawl_count, max(last_crawl_time) last_crawl_time"
+            // 按页面路径聚合：一行一个 URL，engines 列收集抓取过该页面的全部搜索引擎，次数为各引擎合计
+            String listSql = "select url, max(title) title"
+                    + ", arrayStringConcat(arrayDistinct(groupArray(engine)), ',') engines"
+                    + ", sum(crawl_count) crawl_count, max(last_crawl_time) last_crawl_time"
                     + " from bot_engine_page_detail_bydate t FINAL where " + where
-                    + " group by engine, url order by crawl_count desc"
+                    + " group by url order by crawl_count desc"
                     + " limit " + (long) (request.getPageNum() - 1) * request.getPageSize() + "," + request.getPageSize();
-            String countSql = "select count() from (select engine, url"
+            String countSql = "select count() from (select url"
                     + " from bot_engine_page_detail_bydate t FINAL where " + where
-                    + " group by engine, url)";
+                    + " group by url)";
 
             GetBotEnginePageData data = new GetBotEnginePageData();
             data.setTotal(clickHouseJdbcTemplate.queryForObject(countSql, paramMap, Integer.class));
             List<BotEnginePageItem> list = new ArrayList<>();
             for (Map<String, Object> row : clickHouseJdbcTemplate.queryForList(listSql, paramMap)) {
                 BotEnginePageItem item = new BotEnginePageItem();
-                String engine = (String) row.get("engine");
-                item.setEngine(engine);
-                item.setEngineName(BotDicts.engineName(engine));
                 item.setUrl((String) row.get("url"));
                 item.setTitle((String) row.get("title"));
+                List<String> engineNames = new ArrayList<>();
+                Object enginesRaw = row.get("engines");
+                if (enginesRaw != null && StringUtils.isNotBlank((String) enginesRaw)) {
+                    for (String engine : ((String) enginesRaw).split(",")) {
+                        engineNames.add(BotDicts.engineName(engine.trim()));
+                    }
+                }
+                item.setEngines(engineNames);
                 item.setCrawlCount(row.get("crawl_count") == null ? 0 : ((Number) row.get("crawl_count")).longValue());
                 item.setLastCrawlTime(formatTime(row.get("last_crawl_time")));
                 list.add(item);
