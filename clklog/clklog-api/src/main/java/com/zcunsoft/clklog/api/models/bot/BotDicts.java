@@ -19,6 +19,9 @@ public class BotDicts {
     /** 搜索引擎厂商中文名（bot_subcategory 键 → 页面文案）. */
     private static final Map<String, String> ENGINE_NAMES = new HashMap<>();
 
+    /** AI爬虫来源中文名（bot_subcategory 键 → 页面文案）. */
+    private static final Map<String, String> AI_SOURCE_NAMES = new HashMap<>();
+
     static {
         CATEGORY_NAMES.put("search_engine", "搜索引擎");
         CATEGORY_NAMES.put("ai_crawler", "AI爬虫");
@@ -49,6 +52,24 @@ public class BotDicts {
         ENGINE_NAMES.put("brave", "Brave");
         ENGINE_NAMES.put("other", "其他");
         ENGINE_NAMES.put("all", "全部");
+
+        AI_SOURCE_NAMES.put("meta", "Meta");
+        AI_SOURCE_NAMES.put("bytedance", "字节跳动");
+        AI_SOURCE_NAMES.put("reflection-ai", "Reflection AI");
+        AI_SOURCE_NAMES.put("anthropic", "Anthropic");
+        AI_SOURCE_NAMES.put("openai", "OpenAI");
+        AI_SOURCE_NAMES.put("duckassist", "DuckDuckGo AI");
+        AI_SOURCE_NAMES.put("perplexity", "Perplexity");
+        AI_SOURCE_NAMES.put("deepseek", "DeepSeek");
+        AI_SOURCE_NAMES.put("youchat", "You");
+        AI_SOURCE_NAMES.put("commoncrawl", "Common Crawl");
+        AI_SOURCE_NAMES.put("amazon", "Amazon");
+        AI_SOURCE_NAMES.put("cohere", "Cohere");
+        AI_SOURCE_NAMES.put("iask", "iAsk");
+        AI_SOURCE_NAMES.put("mistral", "Mistral");
+        AI_SOURCE_NAMES.put("applebot-extended", "Applebot扩展");
+        AI_SOURCE_NAMES.put("other", "其他AI");
+        AI_SOURCE_NAMES.put("all", "全部");
     }
 
     private BotDicts() {
@@ -62,6 +83,11 @@ public class BotDicts {
     /** 引擎中文名；未知键原样返回. */
     public static String engineName(String key) {
         return ENGINE_NAMES.getOrDefault(key, key);
+    }
+
+    /** AI爬虫来源中文名；未知键原样返回. */
+    public static String aiSourceName(String key) {
+        return AI_SOURCE_NAMES.getOrDefault(key, key);
     }
 
     /**

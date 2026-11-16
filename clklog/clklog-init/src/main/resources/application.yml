@@ -40,3 +40,5 @@ init:
     bot_engine_page_summary_bydate: '0 */1 * * * ?'
     bot_engine_page_detail_bydate: '0 */1 * * * ?'
     bot_ip_detail_bydate: '0 */1 * * * ?'
+    bot_ai_page_summary_bydate: '0 */1 * * * ?'
+    bot_ai_page_detail_bydate: '0 */1 * * * ?'

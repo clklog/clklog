@@ -26,6 +26,14 @@ import com.zcunsoft.clklog.api.models.bot.GetBotIpDetailRequest;
 import com.zcunsoft.clklog.api.models.bot.GetBotIpDetailResponse;
 import com.zcunsoft.clklog.api.models.bot.GetBotOverviewData;
 import com.zcunsoft.clklog.api.models.bot.GetBotOverviewRequest;
+import com.zcunsoft.clklog.api.models.bot.AiCrawlerPageItem;
+import com.zcunsoft.clklog.api.models.bot.AiCrawlerSummaryItem;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerPageData;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerPageRequest;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerPageResponse;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerSummaryData;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerSummaryRequest;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerSummaryResponse;
 import com.zcunsoft.clklog.api.models.bot.GetBotOverviewResponse;
 import com.zcunsoft.clklog.api.models.summary.BaseSummaryRequest;
 import com.zcunsoft.clklog.api.models.summary.FlowSummary;
@@ -377,6 +385,107 @@ public class BotReportServiceImpl implements IBotReportService {
         summary.setBounceRate(visitCount > 0 ? Float.parseFloat(decimalFormat.get().format(bounceCount * 100.0f / visitCount)) : 0F);
         summary.setStatTime(paramMap.getValue("starttime") + " - " + paramMap.getValue("endtime"));
         return summary;
+    }
+
+    @Override
+    public GetAiCrawlerSummaryResponse getAiCrawlerSummary(GetAiCrawlerSummaryRequest request) {
+        GetAiCrawlerSummaryResponse response = new GetAiCrawlerSummaryResponse();
+        try {
+            MapSqlParameterSource paramMap = new MapSqlParameterSource();
+            String where = buildBotWhere(request, paramMap);
+
+            // 抓取次数/IP数取自汇总表（与搜索引擎口径一致，跨天 IP 数为日去重之和）
+            String pvSql = "select source, sum(pv) pv, sum(ip_count) ip_count"
+                    + " from bot_ai_page_summary_bydate t where " + where
+                    + " and t.source != 'all' group by source";
+            // 抓取页面数取自明细表（时间范围内去重URL，跨天不重复计数）
+            String pageSql = "select source, uniqExact(url) page_count"
+                    + " from bot_ai_page_detail_bydate t where " + where
+                    + " group by source";
+
+            Map<String, AiCrawlerSummaryItem> items = new LinkedHashMap<>();
+            for (Map<String, Object> row : clickHouseJdbcTemplate.queryForList(pvSql, paramMap)) {
+                AiCrawlerSummaryItem item = new AiCrawlerSummaryItem();
+                String source = (String) row.get("source");
+                item.setSource(source);
+                item.setSourceName(BotDicts.aiSourceName(source));
+                item.setPv(row.get("pv") == null ? 0 : ((Number) row.get("pv")).longValue());
+                item.setIpCount(row.get("ip_count") == null ? 0 : ((Number) row.get("ip_count")).longValue());
+                item.setPageCount(0L);
+                items.put(source, item);
+            }
+            for (Map<String, Object> row : clickHouseJdbcTemplate.queryForList(pageSql, paramMap)) {
+                AiCrawlerSummaryItem item = items.get(row.get("source"));
+                if (item != null) {
+                    item.setPageCount(row.get("page_count") == null ? 0 : ((Number) row.get("page_count")).longValue());
+                }
+            }
+
+            GetAiCrawlerSummaryData data = new GetAiCrawlerSummaryData();
+            data.setList(new ArrayList<>(items.values()));
+            response.setData(data);
+        } catch (Exception ex) {
+            logger.error("getAiCrawlerSummary error," + ex.getMessage());
+            response.setCode(ResponseBase.FAIL);
+            response.setMsg("操作失败");
+        }
+        return response;
+    }
+
+    @Override
+    public GetAiCrawlerPageResponse getAiCrawlerPages(GetAiCrawlerPageRequest request) {
+        GetAiCrawlerPageResponse response = new GetAiCrawlerPageResponse();
+        try {
+            MapSqlParameterSource paramMap = new MapSqlParameterSource();
+            String where = buildBotWhere(request, paramMap);
+
+            if (StringUtils.isNotBlank(request.getSource())) {
+                where += " and t.source = :source";
+                paramMap.addValue("source", request.getSource());
+            }
+            if (StringUtils.isNotBlank(request.getUrlKeyword())) {
+                where += " and t.url like :url_keyword";
+                paramMap.addValue("url_keyword", "%" + request.getUrlKeyword() + "%");
+            }
+
+            // 按页面路径聚合：一行一个 URL，sources 列收集抓取过该页面的全部AI爬虫，次数为各爬虫合计
+            String listSql = "select url, max(title) title"
+                    + ", arrayStringConcat(arrayDistinct(groupArray(source)), ',') sources"
+                    + ", sum(crawl_count) crawl_count, max(last_crawl_time) last_crawl_time"
+                    + " from bot_ai_page_detail_bydate t FINAL where " + where
+                    + " group by url order by crawl_count desc"
+                    + " limit " + (long) (request.getPageNum() - 1) * request.getPageSize() + "," + request.getPageSize();
+            String countSql = "select count() from (select url"
+                    + " from bot_ai_page_detail_bydate t FINAL where " + where
+                    + " group by url)";
+
+            GetAiCrawlerPageData data = new GetAiCrawlerPageData();
+            data.setTotal(clickHouseJdbcTemplate.queryForObject(countSql, paramMap, Integer.class));
+            List<AiCrawlerPageItem> list = new ArrayList<>();
+            for (Map<String, Object> row : clickHouseJdbcTemplate.queryForList(listSql, paramMap)) {
+                AiCrawlerPageItem item = new AiCrawlerPageItem();
+                item.setUrl((String) row.get("url"));
+                item.setTitle((String) row.get("title"));
+                List<String> sourceNames = new ArrayList<>();
+                Object sourcesRaw = row.get("sources");
+                if (sourcesRaw != null && StringUtils.isNotBlank((String) sourcesRaw)) {
+                    for (String source : ((String) sourcesRaw).split(",")) {
+                        sourceNames.add(BotDicts.aiSourceName(source.trim()));
+                    }
+                }
+                item.setSources(sourceNames);
+                item.setCrawlCount(row.get("crawl_count") == null ? 0 : ((Number) row.get("crawl_count")).longValue());
+                item.setLastCrawlTime(formatTime(row.get("last_crawl_time")));
+                list.add(item);
+            }
+            data.setList(list);
+            response.setData(data);
+        } catch (Exception ex) {
+            logger.error("getAiCrawlerPages error," + ex.getMessage());
+            response.setCode(ResponseBase.FAIL);
+            response.setMsg("操作失败");
+        }
+        return response;
     }
 
     /** Timestamp/DateTime 值格式化为 yyyy-MM-dd HH:mm:ss，空值返回空串. */

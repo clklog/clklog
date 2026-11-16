@@ -1,190 +1,255 @@
 <template>
-  <div class="app-container bot-analysis-page">
-    <div class="bid-list-header">
-      <FilterBar @setFilterBarParams="setFilterBarParams" />
-    </div>
-
-    <!-- 流量概览 -->
-    <div class="public-block">
-      <div class="public-hoverItem overview-card">
-        <div class="public-firstHead">流量概览</div>
-        <el-table
-          :data="overviewRows"
-          :show-header="true"
-          style="width: 100%"
-          :cell-style="overviewCellStyle"
-          size="medium"
-        >
-          <el-table-column prop="name" label="" width="120" align="center" />
-          <el-table-column prop="pv" label="浏览量(PV)" align="center" />
-          <el-table-column prop="visitCount" label="访问次数" align="center" />
-          <el-table-column prop="uv" label="访客数" align="center" />
-          <el-table-column prop="ipCount" label="IP数" align="center" />
-          <el-table-column prop="avgPv" label="平均访问页数" align="center" />
-          <el-table-column prop="avgVisitTime" label="平均访问时长" align="center">
-            <template slot-scope="scope">
-              {{ formatDuration(scope.row.avgVisitTime) }}
-            </template>
-          </el-table-column>
-        </el-table>
+  <div class="bot-analysis-page">
+    <div class="bot-filter-bar">
+      <div class="radio-com">
+        <span class="radio-com-label">时间：</span>
+        <el-radio-group v-model="timeFlag" class="radio-com-el" @change="handleTimeChange">
+          <el-radio label="today">今日</el-radio>
+          <el-radio label="week">本周</el-radio>
+          <el-radio label="month">本月</el-radio>
+        </el-radio-group>
       </div>
+      <el-date-picker
+        v-model="dateRange"
+        type="daterange"
+        size="small"
+        unlink-panels
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        value-format="yyyy-MM-dd"
+        :clearable="false"
+        class="filter-date"
+        @change="handleDateChange"
+      />
     </div>
-
-    <!-- 分类环图 + 地域分布 -->
-    <el-row :gutter="16">
-      <el-col :span="12">
-        <div class="public-block">
-          <div class="public-hoverItem chart-card">
-            <div class="public-firstHead">机器人分类</div>
-            <div ref="categoryChart" class="chart-box" />
-          </div>
-        </div>
-      </el-col>
-      <el-col :span="12">
-        <div class="public-block">
-          <div class="public-hoverItem chart-card">
-            <div class="public-firstHead">机器人地域分布</div>
-            <div ref="areaChart" class="chart-box" />
-          </div>
-        </div>
-      </el-col>
-    </el-row>
-
-    <!-- 引擎汇总 + 引擎抓取页面 -->
-    <el-row :gutter="16">
-      <el-col :span="12">
-        <div class="public-block">
-          <div class="public-hoverItem chart-card">
-            <div class="public-firstHead">搜索引擎 抓取页面数 vs IP数</div>
-            <div ref="engineChart" class="chart-box" />
-          </div>
-        </div>
-      </el-col>
-      <el-col :span="12">
-        <div class="public-block">
-          <div class="public-hoverItem chart-card">
-            <div class="table-head">
-              <span class="public-firstHead">引擎抓取页面</span>
-              <div class="table-filters">
-                <el-select
-                  v-model="engineFilter"
-                  placeholder="搜索引擎 全部"
-                  size="small"
-                  clearable
-                  class="filter-select"
-                  @change="enginePageNum = 1; fetchEnginePages()"
-                >
-                  <el-option label="全部" value="" />
-                  <el-option v-for="item in engineOptions" :key="item.engine" :label="item.engineName" :value="item.engine" />
-                </el-select>
-                <el-input
-                  v-model="urlKeyword"
-                  placeholder="请输入页面地址"
-                  size="small"
-                  clearable
-                  class="filter-input"
-                  @keyup.enter.native="enginePageNum = 1; fetchEnginePages()"
-                >
-                  <el-button slot="append" icon="el-icon-search" @click="enginePageNum = 1; fetchEnginePages()" />
-                </el-input>
-              </div>
-            </div>
-            <el-table :data="enginePageList" size="small" style="width: 100%">
-              <el-table-column type="index" label="序号" width="60" align="center" />
-              <el-table-column label="页面" min-width="200">
-                <template slot-scope="scope">
-                  <div class="page-name">{{ scope.row.title }}</div>
-                  <div class="page-url">{{ scope.row.url }}</div>
-                </template>
-              </el-table-column>
-              <el-table-column label="搜索引擎" align="center" width="150">
-                <template slot-scope="scope">
-                  <el-tag
-                    v-for="name in scope.row.engines"
-                    :key="name"
-                    size="mini"
-                    style="margin: 2px;"
-                  >{{ name }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column prop="crawlCount" label="总抓取次数" align="center" />
-              <el-table-column label="最后抓取时间" align="center">
-                <template slot-scope="scope">{{ scope.row.lastCrawlTime || "--" }}</template>
-              </el-table-column>
-            </el-table>
-            <el-pagination
-              class="table-pagination"
-              layout="total, prev, pager, next"
-              :total="enginePageTotal"
-              :page-size="enginePageSize"
-              :current-page.sync="enginePageNum"
-              @current-change="fetchEnginePages()"
-            />
-          </div>
-        </div>
-      </el-col>
-    </el-row>
-
-    <!-- 机器人IP明细 -->
     <div class="public-block">
-      <div class="public-hoverItem chart-card">
-        <div class="table-head">
-          <span class="public-firstHead">机器人IP明细</span>
-          <div class="table-filters">
-            <el-select
-              v-model="categoryFilter"
-              placeholder="分类 全部"
-              size="small"
-              clearable
-              class="filter-select"
-              @change="ipPageNum = 1; fetchIpDetail()"
-            >
-              <el-option label="全部" value="" />
-              <el-option v-for="item in categoryOptions" :key="item.botCategory" :label="item.categoryName" :value="item.botCategory" />
-            </el-select>
-            <el-input
-              v-model="ipKeyword"
-              placeholder="请输入及机器人请求IP"
-              size="small"
-              clearable
-              class="filter-input"
-              @keyup.enter.native="ipPageNum = 1; fetchIpDetail()"
-            >
-              <el-button slot="append" icon="el-icon-search" @click="ipPageNum = 1; fetchIpDetail()" />
-            </el-input>
+      <!-- 流量概览 -->
+      <div class="block-line">
+        <div class="block-main public-hoverItem overview-card">
+          <div class="block-head" style="margin-bottom: 0px">
+            <div class="block-title">流量概览</div>
           </div>
+          <el-table
+            :data="overviewRows"
+            :show-header="true"
+            style="width: 100%"
+            size="medium"
+          >
+            <el-table-column prop="name" label="" width="120" align="center" />
+            <el-table-column prop="pv" label="浏览量(PV)" align="center" />
+            <el-table-column prop="visitCount" label="访问次数" align="center" />
+            <el-table-column prop="uv" label="访客数" align="center" />
+            <el-table-column prop="ipCount" label="IP数" align="center" />
+            <el-table-column prop="avgPv" label="平均访问页数" align="center" />
+            <el-table-column label="平均访问时长" align="center">
+              <template slot-scope="scope">
+                {{ formatDuration(scope.row.avgVisitTime) }}
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
-        <el-table :data="ipDetailList" size="small" style="width: 100%">
-          <el-table-column type="index" label="序号" width="60" align="center" />
-          <el-table-column prop="ip" label="IP" align="center" />
-          <el-table-column label="地域" align="center">
-            <template slot-scope="scope">{{ scope.row.country }} {{ scope.row.province }}</template>
-          </el-table-column>
-          <el-table-column label="分类" align="center">
-            <template slot-scope="scope">{{ scope.row.categoryName }}</template>
-          </el-table-column>
-          <el-table-column prop="uaOwner" label="UA归属" align="center" />
-          <el-table-column prop="hitReasons" label="命中原因" align="center">
-            <template slot-scope="scope">{{ scope.row.hitReasons || "--" }}</template>
-          </el-table-column>
-          <el-table-column prop="pv" label="浏览量" align="center" />
-          <el-table-column prop="visitCount" label="访问次数" align="center" />
-          <el-table-column prop="avgPv" label="平均访问页数" align="center" />
-          <el-table-column label="平均访问时长" align="center">
-            <template slot-scope="scope">{{ formatDuration(scope.row.avgVisitTime) }}</template>
-          </el-table-column>
-          <el-table-column label="最后访问时间" align="center" width="150">
-            <template slot-scope="scope">{{ scope.row.lastVisitTime || "--" }}</template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          class="table-pagination"
-          layout="total, prev, pager, next"
-          :total="ipDetailTotal"
-          :page-size="ipPageSize"
-          :current-page.sync="ipPageNum"
-          @current-change="fetchIpDetail()"
-        />
+      </div>
+
+      <!-- 搜索引擎/AI爬虫 抓取页面数 vs IP数 -->
+      <div class="block-line">
+        <div class="block-main public-hoverItem left chart-card">
+          <div class="block-head">
+            <div class="block-title">搜索引擎 抓取页面数 vs IP数</div>
+          </div>
+          <div ref="engineChart" class="chart-box" />
+        </div>
+        <div class="block-main public-hoverItem right chart-card">
+          <div class="block-head">
+            <div class="block-title">AI爬虫 抓取页面数 vs IP数</div>
+          </div>
+          <div ref="aiChart" class="chart-box" />
+        </div>
+      </div>
+
+      <!-- 引擎抓取页面 / AI爬虫抓取页面 -->
+      <div class="block-line">
+        <div class="block-main public-hoverItem left chart-card">
+          <div class="block-head">
+            <div class="block-title">引擎抓取页面</div>
+            <div class="table-filters">
+              <el-select
+                v-model="engineFilter"
+                placeholder="搜索引擎 全部"
+                size="small"
+                clearable
+                class="filter-select"
+                @change="enginePageNum = 1; fetchEnginePages()"
+              >
+                <el-option label="全部" value="" />
+                <el-option v-for="item in engineOptions" :key="item.engine" :label="item.engineName" :value="item.engine" />
+              </el-select>
+              <el-input
+                v-model="urlKeyword"
+                placeholder="请输入页面地址"
+                size="small"
+                clearable
+                class="filter-input"
+                @keyup.enter.native="enginePageNum = 1; fetchEnginePages()"
+              >
+                <el-button slot="append" icon="el-icon-search" @click="enginePageNum = 1; fetchEnginePages()" />
+              </el-input>
+            </div>
+          </div>
+          <el-table :data="enginePageList" size="small" style="width: 100%">
+            <el-table-column type="index" label="序号" width="60" align="center" />
+            <el-table-column label="页面" min-width="200">
+              <template slot-scope="scope">
+                <div class="page-name">{{ scope.row.title }}</div>
+                <div class="page-url">{{ scope.row.url }}</div>
+              </template>
+            </el-table-column>
+            <el-table-column label="搜索引擎" align="center" width="150">
+              <template slot-scope="scope">
+                <el-tag
+                  v-for="name in scope.row.engines"
+                  :key="name"
+                  size="mini"
+                  style="margin: 2px;"
+                >{{ name }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="crawlCount" label="总抓取次数" align="center" />
+            <el-table-column label="最后抓取时间" align="center">
+              <template slot-scope="scope">{{ scope.row.lastCrawlTime || "--" }}</template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            class="table-pagination"
+            layout="total, prev, pager, next"
+            :total="enginePageTotal"
+            :page-size="enginePageSize"
+            :current-page.sync="enginePageNum"
+            @current-change="fetchEnginePages()"
+          />
+        </div>
+        <div class="block-main public-hoverItem right chart-card">
+          <div class="block-head">
+            <div class="block-title">AI爬虫抓取页面</div>
+            <div class="table-filters">
+              <el-select
+                v-model="aiSourceFilter"
+                placeholder="AI爬虫 全部"
+                size="small"
+                clearable
+                class="filter-select"
+                @change="aiPageNum = 1; fetchAiPages()"
+              >
+                <el-option label="全部" value="" />
+                <el-option v-for="item in aiSourceOptions" :key="item.source" :label="item.sourceName" :value="item.source" />
+              </el-select>
+              <el-input
+                v-model="aiUrlKeyword"
+                placeholder="请输入页面地址"
+                size="small"
+                clearable
+                class="filter-input"
+                @keyup.enter.native="aiPageNum = 1; fetchAiPages()"
+              >
+                <el-button slot="append" icon="el-icon-search" @click="aiPageNum = 1; fetchAiPages()" />
+              </el-input>
+            </div>
+          </div>
+          <el-table :data="aiPageList" size="small" style="width: 100%">
+            <el-table-column type="index" label="序号" width="60" align="center" />
+            <el-table-column label="页面" min-width="200">
+              <template slot-scope="scope">
+                <div class="page-name">{{ scope.row.title }}</div>
+                <div class="page-url">{{ scope.row.url }}</div>
+              </template>
+            </el-table-column>
+            <el-table-column label="AI爬虫" align="center" width="170">
+              <template slot-scope="scope">
+                <el-tag
+                  v-for="name in scope.row.sources"
+                  :key="name"
+                  size="mini"
+                  style="margin: 2px;"
+                >{{ name }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="crawlCount" label="总抓取次数" align="center" />
+            <el-table-column label="最后抓取时间" align="center">
+              <template slot-scope="scope">{{ scope.row.lastCrawlTime || "--" }}</template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            class="table-pagination"
+            layout="total, prev, pager, next"
+            :total="aiPageTotal"
+            :page-size="aiPageSize"
+            :current-page.sync="aiPageNum"
+            @current-change="fetchAiPages()"
+          />
+        </div>
+      </div>
+
+      <!-- 机器人IP明细 -->
+      <div class="block-line">
+        <div class="block-main public-hoverItem overview-card">
+          <div class="block-head">
+            <div class="block-title">机器人IP明细</div>
+            <div class="table-filters">
+              <el-select
+                v-model="categoryFilter"
+                placeholder="分类 全部"
+                size="small"
+                clearable
+                class="filter-select"
+                @change="ipPageNum = 1; fetchIpDetail()"
+              >
+                <el-option label="全部" value="" />
+                <el-option v-for="item in categoryOptions" :key="item.botCategory" :label="item.categoryName" :value="item.botCategory" />
+              </el-select>
+              <el-input
+                v-model="ipKeyword"
+                placeholder="请输入及机器人请求IP"
+                size="small"
+                clearable
+                class="filter-input"
+                @keyup.enter.native="ipPageNum = 1; fetchIpDetail()"
+              >
+                <el-button slot="append" icon="el-icon-search" @click="ipPageNum = 1; fetchIpDetail()" />
+              </el-input>
+            </div>
+          </div>
+          <el-table :data="ipDetailList" size="small" style="width: 100%">
+            <el-table-column type="index" label="序号" width="60" align="center" />
+            <el-table-column prop="ip" label="IP" align="center" />
+            <el-table-column label="地域" align="center">
+              <template slot-scope="scope">{{ scope.row.country }} {{ scope.row.province }}</template>
+            </el-table-column>
+            <el-table-column label="分类" align="center">
+              <template slot-scope="scope">{{ scope.row.categoryName }}</template>
+            </el-table-column>
+            <el-table-column prop="uaOwner" label="UA归属" align="center" />
+            <el-table-column prop="hitReasons" label="命中原因" align="center">
+              <template slot-scope="scope">{{ scope.row.hitReasons || "--" }}</template>
+            </el-table-column>
+            <el-table-column prop="pv" label="浏览量" align="center" />
+            <el-table-column prop="visitCount" label="访问次数" align="center" />
+            <el-table-column prop="avgPv" label="平均访问页数" align="center" />
+            <el-table-column label="平均访问时长" align="center">
+              <template slot-scope="scope">{{ formatDuration(scope.row.avgVisitTime) }}</template>
+            </el-table-column>
+            <el-table-column label="最后访问时间" align="center" width="150">
+              <template slot-scope="scope">{{ scope.row.lastVisitTime || "--" }}</template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            class="table-pagination"
+            layout="total, prev, pager, next"
+            :total="ipDetailTotal"
+            :page-size="ipPageSize"
+            :current-page.sync="ipPageNum"
+            @current-change="fetchIpDetail()"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -193,8 +258,6 @@
 <script>
 import echarts from "echarts";
 import resize from "@/components/Charts/mixins/resize";
-import { FilterBar } from "@/layout/components";
-import { copyObj } from "@/utils/copy";
 import {
   getBotOverviewApi,
   getBotCategoryApi,
@@ -202,6 +265,8 @@ import {
   getBotEngineSummaryApi,
   getBotEnginePagesApi,
   getBotIpDetailApi,
+  getAiCrawlerSummaryApi,
+  getAiCrawlerPagesApi,
 } from "@/api/trackingapi/bot";
 
 const CATEGORY_COLORS = {
@@ -232,6 +297,24 @@ const COUNTRY_CODE_NAMES = {
   in: "印度",
 };
 
+const AI_SOURCE_NAMES = {
+  meta: "Meta",
+  bytedance: "字节跳动",
+  "reflection-ai": "Reflection AI",
+  anthropic: "Anthropic",
+  openai: "OpenAI",
+  duckassist: "DuckDuckGo AI",
+  perplexity: "Perplexity",
+  deepseek: "DeepSeek",
+  youchat: "You",
+  commoncrawl: "Common Crawl",
+  amazon: "Amazon",
+  cohere: "Cohere",
+  iask: "iAsk",
+  mistral: "Mistral",
+  "applebot-extended": "Applebot扩展",
+};
+
 const ENGINE_NAMES = {
   baidu: "百度",
   google: "谷歌",
@@ -249,11 +332,16 @@ const ENGINE_NAMES = {
 
 export default {
   name: "BotAnalysis",
-  components: { FilterBar },
+  components: {},
   mixins: [resize],
   data() {
     return {
-      filterBarParams: {},
+      timeFlag: "today",
+      dateRange: [],
+      filterBarParams: {
+        startTime: "",
+        endTime: "",
+      },
       overviewRows: [],
       categoryList: [],
       categoryTotalIpCount: 0,
@@ -266,6 +354,13 @@ export default {
       enginePageSize: 10,
       engineFilter: "",
       urlKeyword: "",
+      aiSummaryList: [],
+      aiPageList: [],
+      aiPageTotal: 0,
+      aiPageNum: 1,
+      aiPageSize: 10,
+      aiSourceFilter: "",
+      aiUrlKeyword: "",
       // 机器人IP明细
       ipDetailList: [],
       ipDetailTotal: 0,
@@ -299,6 +394,12 @@ export default {
         categoryName: item.categoryName,
       }));
     },
+    aiSourceOptions() {
+      return this.aiSummaryList.map((item) => ({
+        source: item.source,
+        sourceName: item.sourceName,
+      }));
+    },
   },
   watch: {
     commonParams(val) {
@@ -306,15 +407,27 @@ export default {
       this.fetchCategory(val);
       this.fetchArea(val);
       this.fetchEngineSummary(val);
+      this.fetchAiSummary(val);
       this.enginePageNum = 1;
       this.fetchEnginePages(Object.assign({}, val));
+      this.aiPageNum = 1;
+      this.fetchAiPages(Object.assign({}, val));
       this.ipPageNum = 1;
       this.fetchIpDetail(Object.assign({}, val));
     },
   },
+  created() {
+    const today = this.fmt(new Date());
+    this.applyRange(today, today);
+  },
   mounted() {
     this.$nextTick(() => {
       this.initCharts();
+      // 筛选栏（子组件）先于本组件挂载即触发查询，数据可能先于图表就绪，补渲染一次
+      this.renderCategoryChart();
+      this.renderAreaChart();
+      this.renderEngineChart();
+      this.renderAiSummaryChart();
     });
   },
   beforeDestroy() {
@@ -326,9 +439,31 @@ export default {
     });
   },
   methods: {
-    setFilterBarParams(val) {
-      this.filterBarParams = copyObj(val);
-      this.filterBarParams.timeType = "day";
+    fmt(d) {
+      const p2 = (n) => (n < 10 ? "0" + n : "" + n);
+      return d.getFullYear() + "-" + p2(d.getMonth() + 1) + "-" + p2(d.getDate());
+    },
+    applyRange(start, end) {
+      this.filterBarParams.startTime = start;
+      this.filterBarParams.endTime = end;
+      this.dateRange = [start, end];
+    },
+    handleTimeChange(val) {
+      const today = this.fmt(new Date());
+      let start = today;
+      if (val === "week") {
+        const d = new Date();
+        start = this.fmt(new Date(d.getTime() - ((d.getDay() + 6) % 7) * 86400000));
+      } else if (val === "month") {
+        const d = new Date();
+        start = this.fmt(new Date(d.getFullYear(), d.getMonth(), 1));
+      }
+      this.applyRange(start, today);
+    },
+    handleDateChange(val) {
+      if (val && val.length === 2) {
+        this.applyRange(val[0], val[1]);
+      }
     },
     formatDuration(seconds) {
       if (!seconds || seconds <= 0) {
@@ -340,7 +475,7 @@ export default {
       return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
     },
     initCharts() {
-      const refs = ["categoryChart", "areaChart", "engineChart"];
+      const refs = ["categoryChart", "areaChart", "engineChart", "aiChart"];
       refs.forEach((ref) => {
         if (this.$refs[ref]) {
           this.charts[ref] = echarts.init(this.$refs[ref]);
@@ -517,6 +652,62 @@ export default {
       };
       chart.setOption(option, true);
     },
+    aiSourceName(key) {
+      return AI_SOURCE_NAMES[key] || key;
+    },
+    fetchAiSummary(params) {
+      getAiCrawlerSummaryApi(params).then((res) => {
+        if (res.code == 200 && res.data) {
+          this.aiSummaryList = res.data.list || [];
+          this.renderAiSummaryChart();
+        }
+      });
+    },
+    renderAiSummaryChart() {
+      const chart = this.charts.aiChart;
+      if (!chart) {
+        return;
+      }
+      const list = this.aiSummaryList;
+      const option = {
+        tooltip: { trigger: "axis" },
+        legend: { bottom: 0, icon: "circle", itemWidth: 10, itemHeight: 10 },
+        grid: { left: 60, right: 30, top: 20, bottom: 40 },
+        yAxis: { type: "category", data: list.map((x) => x.sourceName), inverse: true },
+        xAxis: { type: "value" },
+        series: [
+          {
+            name: "抓取页面数",
+            type: "bar",
+            barMaxWidth: 14,
+            itemStyle: { color: "#F5A623" },
+            data: list.map((x) => x.pageCount),
+          },
+          {
+            name: "IP数",
+            type: "bar",
+            barMaxWidth: 14,
+            itemStyle: { color: "#8FB6FF" },
+            data: list.map((x) => x.ipCount),
+          },
+        ],
+      };
+      chart.setOption(option, true);
+    },
+    fetchAiPages(paramsOverride) {
+      const params = Object.assign({}, paramsOverride || this.commonParams, {
+        pageNum: this.aiPageNum,
+        pageSize: this.aiPageSize,
+        source: this.aiSourceFilter || "",
+        urlKeyword: this.aiUrlKeyword || "",
+      });
+      getAiCrawlerPagesApi(params).then((res) => {
+        if (res.code == 200 && res.data) {
+          this.aiPageList = res.data.list || [];
+          this.aiPageTotal = res.data.total || 0;
+        }
+      });
+    },
     fetchEnginePages(paramsOverride) {
       const params = Object.assign({}, paramsOverride || this.commonParams, {
         pageNum: this.enginePageNum,
@@ -550,27 +741,59 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/styles/components/custom-select.scss";
 .bot-analysis-page {
+  // 顶部筛选栏：对齐数据概览 TopFilter 的白底/内边距/下边框样式
+  .bot-filter-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 15px 16px;
+    background: #fff;
+    border-bottom: 1px #eee solid;
+    .filter-date {
+      margin-left: 16px;
+      width: 280px;
+    }
+    .el-radio {
+      margin-right: 12px;
+    }
+  }
+  .block-line {
+    box-sizing: border-box;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    .left {
+      width: 50%;
+      margin-right: 10px;
+    }
+    .right {
+      width: 50%;
+      margin-left: 10px;
+    }
+  }
   .overview-card {
-    .public-firstHead {
-      padding: 10px 0;
+    // 通栏卡片（流量概览/机器人IP明细）：block-line 是 flex 容器，需显式占满宽度
+    width: 100%;
+    .block-head {
+      margin-bottom: 0;
     }
   }
   .chart-card {
-    min-height: 380px;
+    .chart-box {
+      height: 320px;
+      width: 100%;
+    }
   }
-  .chart-box {
-    height: 320px;
-    width: 100%;
-  }
-  .table-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+  .block-head {
     .table-filters {
       display: flex;
       align-items: center;
+      margin-left: auto;
       .filter-select {
         width: 160px;
         margin-right: 10px;

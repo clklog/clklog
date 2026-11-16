@@ -11,6 +11,10 @@ import com.zcunsoft.clklog.api.models.bot.GetBotEngineSummaryResponse;
 import com.zcunsoft.clklog.api.models.bot.GetBotIpDetailRequest;
 import com.zcunsoft.clklog.api.models.bot.GetBotIpDetailResponse;
 import com.zcunsoft.clklog.api.models.bot.GetBotOverviewRequest;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerPageRequest;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerPageResponse;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerSummaryRequest;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerSummaryResponse;
 import com.zcunsoft.clklog.api.models.bot.GetBotOverviewResponse;
 import com.zcunsoft.clklog.api.services.IBotReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -68,5 +72,17 @@ public class BotAnalysisController {
     @RequestMapping(path = "/getBotIpDetail", method = RequestMethod.POST)
     public GetBotIpDetailResponse getBotIpDetail(@RequestBody GetBotIpDetailRequest request, HttpServletRequest httpServletRequest) {
         return botReportService.getBotIpDetail(request);
+    }
+
+    @Operation(summary = "获取AI爬虫抓取汇总（抓取页面数 vs IP数）")
+    @RequestMapping(path = "/getAiCrawlerSummary", method = RequestMethod.POST)
+    public GetAiCrawlerSummaryResponse getAiCrawlerSummary(@RequestBody GetAiCrawlerSummaryRequest request, HttpServletRequest httpServletRequest) {
+        return botReportService.getAiCrawlerSummary(request);
+    }
+
+    @Operation(summary = "分页获取AI爬虫抓取页面明细（AI爬虫筛选 + URL模糊搜索）")
+    @RequestMapping(path = "/getAiCrawlerPages", method = RequestMethod.POST)
+    public GetAiCrawlerPageResponse getAiCrawlerPages(@RequestBody GetAiCrawlerPageRequest request, HttpServletRequest httpServletRequest) {
+        return botReportService.getAiCrawlerPages(request);
     }
 }

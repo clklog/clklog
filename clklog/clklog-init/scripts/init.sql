@@ -215,6 +215,41 @@ ORDER BY (project_name, engine, url, title)
 SETTINGS index_granularity = 8192;
 
 
+-- AI爬虫抓取汇总（日）：抓取页面数 vs IP数
+CREATE TABLE IF NOT EXISTS bot_ai_page_summary_bydate
+(
+    `stat_date` Date COMMENT '统计日期',
+    `project_name` String COMMENT '项目名',
+    `source` String COMMENT 'AI爬虫标识(bot_subcategory)',
+    `page_count` UInt32 DEFAULT 0 COMMENT '抓取页面数',
+    `pv` UInt32 DEFAULT 0 COMMENT '抓取次数',
+    `ip_count` UInt32 DEFAULT 0 COMMENT '机器人IP数',
+    `update_time` DateTime COMMENT '统计更新时间'
+)
+ENGINE = ReplacingMergeTree
+PARTITION BY stat_date
+ORDER BY (project_name, source)
+SETTINGS index_granularity = 8192;
+
+
+-- AI爬虫抓取页面明细（日）
+CREATE TABLE IF NOT EXISTS bot_ai_page_detail_bydate
+(
+    `stat_date` Date COMMENT '统计日期',
+    `project_name` String COMMENT '项目名',
+    `source` String COMMENT 'AI爬虫标识(bot_subcategory)',
+    `url` String COMMENT '抓取页面',
+    `title` String COMMENT '页面标题',
+    `crawl_count` UInt32 DEFAULT 0 COMMENT '抓取次数',
+    `last_crawl_time` DateTime COMMENT '最后抓取时间',
+    `update_time` DateTime COMMENT '统计更新时间'
+)
+ENGINE = ReplacingMergeTree
+PARTITION BY stat_date
+ORDER BY (project_name, source, url, title)
+SETTINGS index_granularity = 8192;
+
+
 -- 机器人IP明细（日）
 CREATE TABLE IF NOT EXISTS bot_ip_detail_bydate
 (

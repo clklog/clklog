@@ -11,6 +11,10 @@ import com.zcunsoft.clklog.api.models.bot.GetBotEngineSummaryResponse;
 import com.zcunsoft.clklog.api.models.bot.GetBotIpDetailRequest;
 import com.zcunsoft.clklog.api.models.bot.GetBotIpDetailResponse;
 import com.zcunsoft.clklog.api.models.bot.GetBotOverviewRequest;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerPageRequest;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerPageResponse;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerSummaryRequest;
+import com.zcunsoft.clklog.api.models.bot.GetAiCrawlerSummaryResponse;
 import com.zcunsoft.clklog.api.models.bot.GetBotOverviewResponse;
 
 /**
@@ -35,4 +39,10 @@ public interface IBotReportService {
 
     /** 机器人IP明细：分页 + 分类筛选 + IP模糊搜索. */
     GetBotIpDetailResponse getBotIpDetail(GetBotIpDetailRequest request);
+
+    /** AI爬虫抓取汇总：抓取页面数 vs IP数. */
+    GetAiCrawlerSummaryResponse getAiCrawlerSummary(GetAiCrawlerSummaryRequest request);
+
+    /** AI爬虫抓取页面明细：分页 + AI爬虫筛选 + URL模糊搜索. */
+    GetAiCrawlerPageResponse getAiCrawlerPages(GetAiCrawlerPageRequest request);
 }

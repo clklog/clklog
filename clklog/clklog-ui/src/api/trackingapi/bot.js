@@ -45,6 +45,24 @@ export function getBotEnginePagesApi(params) {
   })
 }
 
+// AI爬虫抓取汇总（抓取页面数 vs IP数）
+export function getAiCrawlerSummaryApi(params) {
+  return request({
+    url: '/bot/getAiCrawlerSummary',
+    method: 'post',
+    data: params
+  })
+}
+
+// 分页获取AI爬虫抓取页面明细
+export function getAiCrawlerPagesApi(params) {
+  return request({
+    url: '/bot/getAiCrawlerPages',
+    method: 'post',
+    data: params
+  })
+}
+
 // 分页获取机器人IP明细
 export function getBotIpDetailApi(params) {
   return request({
