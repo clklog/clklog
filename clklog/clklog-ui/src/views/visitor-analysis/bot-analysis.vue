@@ -795,9 +795,13 @@ export default {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    padding: 15px 16px;
+    padding: 15px 20px;
     background: #fff;
     border-bottom: 1px #eee solid;
+    // 时间组边框左缘与下方卡片左缘对齐
+    .radio-com {
+      margin-left: 0;
+    }
     .filter-date {
       margin-left: 16px;
       width: 280px;
