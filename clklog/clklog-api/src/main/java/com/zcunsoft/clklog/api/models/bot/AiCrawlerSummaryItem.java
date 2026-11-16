@@ -21,4 +21,7 @@ public class AiCrawlerSummaryItem {
 
     @Schema(description = "机器人IP数", example = "2")
     private Long ipCount;
+
+    @Schema(description = "判断规则正则", example = "(?i)gptbot|oai-searchbot|chatgpt-user")
+    private String pattern;
 }

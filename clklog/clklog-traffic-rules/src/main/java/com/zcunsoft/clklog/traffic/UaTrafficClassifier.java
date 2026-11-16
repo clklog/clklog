@@ -241,6 +241,36 @@ public final class UaTrafficClassifier {
                 botCategory, botSubcategory);
     }
 
+    /**
+     * 返回搜索引擎的判断正则（用于页面悬浮展示）；未匹配返回空串.
+     *
+     * @param engine 引擎标识（bot_subcategory）
+     * @return 对应的判断正则字符串
+     */
+    public static String enginePattern(String engine) {
+        for (int i = 0; i < ENGINES.length; i++) {
+            if (ENGINES[i].equals(engine)) {
+                return ENGINE_PATTERNS[i].pattern();
+            }
+        }
+        return "";
+    }
+
+    /**
+     * 返回AI爬虫来源的判断正则（用于页面悬浮展示）；未匹配返回空串.
+     *
+     * @param source AI来源标识（bot_subcategory）
+     * @return 对应的判断正则字符串
+     */
+    public static String aiSourcePattern(String source) {
+        for (int i = 0; i < AI_SOURCES.length; i++) {
+            if (AI_SOURCES[i].equals(source)) {
+                return AI_SOURCE_PATTERNS[i].pattern();
+            }
+        }
+        return "";
+    }
+
     /** 保留旧调用形式；未提供客户端类型时仍执行其他识别规则。 */
     public TrafficDecision classify(String ua, String ip, String deviceClass, String agentName,
                                     UaRuleSet rules, SearchEngineIpSnapshot snapshot) {

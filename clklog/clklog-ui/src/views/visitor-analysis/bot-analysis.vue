@@ -636,7 +636,20 @@ export default {
       const list = this.engineSummaryList;
       const names = list.map((x) => x.engineName);
       const option = {
-        tooltip: { trigger: "axis" },
+        tooltip: {
+          trigger: "axis",
+          formatter: (params) => {
+            const item = this.engineSummaryList[params[0].dataIndex] || {};
+            let html = item.engineName;
+            if (item.pattern) {
+              html += "<br/>判断规则: " + item.pattern;
+            }
+            params.forEach((p) => {
+              html += "<br/>" + p.marker + p.seriesName + ": " + p.value;
+            });
+            return html;
+          },
+        },
         legend: { bottom: 0, icon: "circle", itemWidth: 10, itemHeight: 10 },
         grid: { left: 10, right: 30, top: 20, bottom: 40, containLabel: true },
         yAxis: {
@@ -683,7 +696,20 @@ export default {
       }
       const list = this.aiSummaryList;
       const option = {
-        tooltip: { trigger: "axis" },
+        tooltip: {
+          trigger: "axis",
+          formatter: (params) => {
+            const item = this.aiSummaryList[params[0].dataIndex] || {};
+            let html = item.sourceName;
+            if (item.pattern) {
+              html += "<br/>判断规则: " + item.pattern;
+            }
+            params.forEach((p) => {
+              html += "<br/>" + p.marker + p.seriesName + ": " + p.value;
+            });
+            return html;
+          },
+        },
         legend: { bottom: 0, icon: "circle", itemWidth: 10, itemHeight: 10 },
         grid: { left: 10, right: 30, top: 20, bottom: 40, containLabel: true },
         yAxis: {

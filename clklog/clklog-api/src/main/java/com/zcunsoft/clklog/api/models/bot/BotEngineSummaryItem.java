@@ -21,4 +21,7 @@ public class BotEngineSummaryItem {
 
     @Schema(description = "机器人IP数", example = "1")
     private Long ipCount;
+
+    @Schema(description = "判断规则正则", example = "(?i)petalbot")
+    private String pattern;
 }

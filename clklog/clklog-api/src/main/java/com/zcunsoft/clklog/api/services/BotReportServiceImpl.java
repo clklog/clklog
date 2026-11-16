@@ -1,5 +1,6 @@
 package com.zcunsoft.clklog.api.services;
 
+import com.zcunsoft.clklog.traffic.UaTrafficClassifier;
 import com.zcunsoft.clklog.api.cfg.ClklogApiSetting;
 import com.zcunsoft.clklog.api.entity.clickhouse.FlowSummarybydate;
 import com.zcunsoft.clklog.api.models.ResponseBase;
@@ -213,6 +214,7 @@ public class BotReportServiceImpl implements IBotReportService {
                 item.setPv(row.get("pv") == null ? 0 : ((Number) row.get("pv")).longValue());
                 item.setIpCount(row.get("ip_count") == null ? 0 : ((Number) row.get("ip_count")).longValue());
                 item.setPageCount(0L);
+                item.setPattern(UaTrafficClassifier.enginePattern(engine));
                 items.put(engine, item);
             }
             for (Map<String, Object> row : clickHouseJdbcTemplate.queryForList(pageSql, paramMap)) {
@@ -412,6 +414,7 @@ public class BotReportServiceImpl implements IBotReportService {
                 item.setPv(row.get("pv") == null ? 0 : ((Number) row.get("pv")).longValue());
                 item.setIpCount(row.get("ip_count") == null ? 0 : ((Number) row.get("ip_count")).longValue());
                 item.setPageCount(0L);
+                item.setPattern(UaTrafficClassifier.aiSourcePattern(source));
                 items.put(source, item);
             }
             for (Map<String, Object> row : clickHouseJdbcTemplate.queryForList(pageSql, paramMap)) {
