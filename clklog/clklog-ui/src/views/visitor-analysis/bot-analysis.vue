@@ -106,12 +106,16 @@
             </el-table-column>
             <el-table-column label="搜索引擎" align="center" width="150">
               <template slot-scope="scope">
-                <el-tag
-                  v-for="name in scope.row.engines"
-                  :key="name"
-                  size="mini"
-                  style="margin: 2px;"
-                >{{ name }}</el-tag>
+                <el-tooltip :content="scope.row.engines.join('、')" placement="top" effect="dark">
+                  <div class="tag-clamp">
+                    <el-tag
+                      v-for="name in scope.row.engines"
+                      :key="name"
+                      size="mini"
+                      style="margin: 2px;"
+                    >{{ name }}</el-tag>
+                  </div>
+                </el-tooltip>
               </template>
             </el-table-column>
             <el-table-column prop="crawlCount" label="总抓取次数" align="center" />
@@ -165,12 +169,16 @@
             </el-table-column>
             <el-table-column label="AI爬虫" align="center" width="170">
               <template slot-scope="scope">
-                <el-tag
-                  v-for="name in scope.row.sources"
-                  :key="name"
-                  size="mini"
-                  style="margin: 2px;"
-                >{{ name }}</el-tag>
+                <el-tooltip :content="scope.row.sources.join('、')" placement="top" effect="dark">
+                  <div class="tag-clamp">
+                    <el-tag
+                      v-for="name in scope.row.sources"
+                      :key="name"
+                      size="mini"
+                      style="margin: 2px;"
+                    >{{ name }}</el-tag>
+                  </div>
+                </el-tooltip>
               </template>
             </el-table-column>
             <el-table-column prop="crawlCount" label="总抓取次数" align="center" />
@@ -630,8 +638,13 @@ export default {
       const option = {
         tooltip: { trigger: "axis" },
         legend: { bottom: 0, icon: "circle", itemWidth: 10, itemHeight: 10 },
-        grid: { left: 60, right: 30, top: 20, bottom: 40 },
-        yAxis: { type: "category", data: names, inverse: true },
+        grid: { left: 10, right: 30, top: 20, bottom: 40, containLabel: true },
+        yAxis: {
+          type: "category",
+          data: names,
+          inverse: true,
+          axisLabel: { formatter: (v) => (v.length > 12 ? v.slice(0, 12) + "…" : v) },
+        },
         xAxis: { type: "value" },
         series: [
           {
@@ -672,8 +685,13 @@ export default {
       const option = {
         tooltip: { trigger: "axis" },
         legend: { bottom: 0, icon: "circle", itemWidth: 10, itemHeight: 10 },
-        grid: { left: 60, right: 30, top: 20, bottom: 40 },
-        yAxis: { type: "category", data: list.map((x) => x.sourceName), inverse: true },
+        grid: { left: 10, right: 30, top: 20, bottom: 40, containLabel: true },
+        yAxis: {
+          type: "category",
+          data: list.map((x) => x.sourceName),
+          inverse: true,
+          axisLabel: { formatter: (v) => (v.length > 12 ? v.slice(0, 12) + "…" : v) },
+        },
         xAxis: { type: "value" },
         series: [
           {
@@ -802,6 +820,14 @@ export default {
         width: 240px;
       }
     }
+  }
+  .tag-clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 22px;
+    text-align: left;
   }
   .page-name {
     color: #303133;
