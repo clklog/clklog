@@ -252,11 +252,15 @@ public class BotReportServiceImpl implements IBotReportService {
             }
 
             // 按页面路径聚合：一行一个 URL，engines 列收集抓取过该页面的全部搜索引擎，次数为各引擎合计
+            Map<String, String> sortable = new LinkedHashMap<>();
+            sortable.put("crawlCount", "crawl_count");
+            sortable.put("lastCrawlTime", "last_crawl_time");
+            String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "crawl_count");
             String listSql = "select url, max(title) title"
                     + ", arrayStringConcat(arrayDistinct(groupArray(engine)), ',') engines"
                     + ", sum(crawl_count) crawl_count, max(last_crawl_time) last_crawl_time"
                     + " from bot_engine_page_detail_bydate t FINAL where " + where
-                    + " group by url order by crawl_count desc"
+                    + " group by url" + orderBy
                     + " limit " + (long) (request.getPageNum() - 1) * request.getPageSize() + "," + request.getPageSize();
             String countSql = "select count() from (select url"
                     + " from bot_engine_page_detail_bydate t FINAL where " + where
@@ -310,13 +314,20 @@ public class BotReportServiceImpl implements IBotReportService {
             // 跨天合并到 IP 粒度：地理/分类取字典序最小值（确定性），命中原因取多日并集
             String reasonExpr = "arrayStringConcat(arrayDistinct(arrayFilter(x -> x != ''"
                     + ", arrayFlatten(groupArray(splitByChar(',', hit_reasons))))), ',')";
+            Map<String, String> sortable = new LinkedHashMap<>();
+            sortable.put("pv", "pv");
+            sortable.put("visitCount", "visit_count");
+            sortable.put("avgPv", "if(sum(visit_count) = 0, 0, sum(pv) / sum(visit_count))");
+            sortable.put("avgVisitTime", "if(sum(visit_count) = 0, 0, sum(visit_time) / sum(visit_count))");
+            sortable.put("lastVisitTime", "last_visit_time");
+            String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "pv");
             String listSql = "select client_ip, min(country) country, min(province) province"
                     + ", min(bot_category) bot_category, min(bot_subcategory) bot_subcategory"
                     + ", " + reasonExpr + " hit_reasons"
                     + ", sum(pv) pv, sum(visit_count) visit_count, sum(visit_time) visit_time"
                     + ", max(last_visit_time) last_visit_time"
                     + " from bot_ip_detail_bydate t FINAL where " + where
-                    + " group by client_ip order by pv desc"
+                    + " group by client_ip" + orderBy
                     + " limit " + (long) (request.getPageNum() - 1) * request.getPageSize() + "," + request.getPageSize();
             String countSql = "select count() from (select client_ip"
                     + " from bot_ip_detail_bydate t FINAL where " + where
@@ -333,7 +344,18 @@ public class BotReportServiceImpl implements IBotReportService {
                 String category = (String) row.get("bot_category");
                 item.setBotCategory(category);
                 item.setCategoryName(BotDicts.categoryName(category));
-                item.setUaOwner((String) row.get("bot_subcategory"));
+                String uaOwner = (String) row.get("bot_subcategory");
+                item.setUaOwner(uaOwner);
+                // UA归属显示值：搜索引擎/AI爬虫/脚本爬虫子类映射为中文，与引擎抓取页面、AI爬虫抓取页面的名称列保持一致
+                if ("search_engine".equals(category)) {
+                    item.setUaOwnerName(BotDicts.engineName(uaOwner));
+                } else if ("ai_crawler".equals(category)) {
+                    item.setUaOwnerName(BotDicts.aiSourceName(uaOwner));
+                } else if ("script_crawler".equals(category)) {
+                    item.setUaOwnerName(BotDicts.scriptCategoryName(uaOwner));
+                } else {
+                    item.setUaOwnerName(BotDicts.otherSubcategoryName(uaOwner));
+                }
                 item.setHitReasons(BotDicts.reasonNames((String) row.get("hit_reasons")));
                 long pv = row.get("pv") == null ? 0 : ((Number) row.get("pv")).longValue();
                 long visitCount = row.get("visit_count") == null ? 0 : ((Number) row.get("visit_count")).longValue();
@@ -365,6 +387,24 @@ public class BotReportServiceImpl implements IBotReportService {
             where = where.substring(4);
         }
         return where;
+    }
+
+    /**
+     * 构建机器人分页列表的排序子句：排序字段经白名单映射为列表达式，方向仅限 asc/desc，
+     * 非法字段回退默认排序，避免拼接注入.
+     *
+     * @param sortField       前端排序字段键，空表示默认
+     * @param sortOrder       asc/desc，空或非法按 desc
+     * @param sortableColumns 允许排序的字段键 → SQL 列表达式
+     * @param defaultColumn   默认排序列表达式
+     * @return " order by ..." 子句
+     */
+    private String buildBotOrderBy(String sortField, String sortOrder, Map<String, String> sortableColumns, String defaultColumn) {
+        String column = StringUtils.isBlank(sortField) ? null : sortableColumns.get(sortField);
+        if (StringUtils.isBlank(column)) {
+            column = defaultColumn;
+        }
+        return " order by " + column + ("asc".equalsIgnoreCase(sortOrder) ? " asc" : " desc");
     }
 
     /** 汇总行装配为流量概要（平均访问页数/时长、跳出率）. */
@@ -452,11 +492,15 @@ public class BotReportServiceImpl implements IBotReportService {
             }
 
             // 按页面路径聚合：一行一个 URL，sources 列收集抓取过该页面的全部AI爬虫，次数为各爬虫合计
+            Map<String, String> sortable = new LinkedHashMap<>();
+            sortable.put("crawlCount", "crawl_count");
+            sortable.put("lastCrawlTime", "last_crawl_time");
+            String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "crawl_count");
             String listSql = "select url, max(title) title"
                     + ", arrayStringConcat(arrayDistinct(groupArray(source)), ',') sources"
                     + ", sum(crawl_count) crawl_count, max(last_crawl_time) last_crawl_time"
                     + " from bot_ai_page_detail_bydate t FINAL where " + where
-                    + " group by url order by crawl_count desc"
+                    + " group by url" + orderBy
                     + " limit " + (long) (request.getPageNum() - 1) * request.getPageSize() + "," + request.getPageSize();
             String countSql = "select count() from (select url"
                     + " from bot_ai_page_detail_bydate t FINAL where " + where

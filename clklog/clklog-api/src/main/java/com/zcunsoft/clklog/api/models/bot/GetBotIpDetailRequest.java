@@ -19,4 +19,10 @@ public class GetBotIpDetailRequest extends BaseSummaryRequest {
 
     @Schema(description = "机器人IP模糊搜索（空=不过滤）", example = "220.181")
     private String ipKeyword;
+
+    @Schema(description = "排序字段（pv/visitCount/avgPv/avgVisitTime/lastVisitTime，空=默认按浏览量）", example = "pv")
+    private String sortField;
+
+    @Schema(description = "排序方向（asc/desc，空=desc）", example = "desc")
+    private String sortOrder;
 }

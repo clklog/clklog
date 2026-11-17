@@ -22,6 +22,12 @@ public class BotDicts {
     /** AI爬虫来源中文名（bot_subcategory 键 → 页面文案）. */
     private static final Map<String, String> AI_SOURCE_NAMES = new HashMap<>();
 
+    /** 脚本爬虫子类中文名（bot_subcategory 键 → 页面文案）. */
+    private static final Map<String, String> SCRIPT_CATEGORY_NAMES = new HashMap<>();
+
+    /** 其他类子类中文名（bot_subcategory 键 → 页面文案）. */
+    private static final Map<String, String> OTHER_SUBCATEGORY_NAMES = new HashMap<>();
+
     static {
         CATEGORY_NAMES.put("search_engine", "搜索引擎");
         CATEGORY_NAMES.put("ai_crawler", "AI爬虫");
@@ -70,6 +76,22 @@ public class BotDicts {
         AI_SOURCE_NAMES.put("applebot-extended", "Applebot扩展");
         AI_SOURCE_NAMES.put("other", "其他AI");
         AI_SOURCE_NAMES.put("all", "全部");
+
+        SCRIPT_CATEGORY_NAMES.put("GENERIC_BOT", "通用脚本");
+        SCRIPT_CATEGORY_NAMES.put("SOCIAL_PREVIEW", "社交平台脚本");
+        SCRIPT_CATEGORY_NAMES.put("COMMAND_LINE", "命令行脚本");
+        SCRIPT_CATEGORY_NAMES.put("SECURITY_SCANNER", "安全扫描脚本");
+        SCRIPT_CATEGORY_NAMES.put("MONITOR_ARCHIVER", "监控脚本");
+        SCRIPT_CATEGORY_NAMES.put("PYTHON", "Python脚本");
+        SCRIPT_CATEGORY_NAMES.put("GO", "Go脚本");
+        SCRIPT_CATEGORY_NAMES.put("JAVA", "Java脚本");
+        SCRIPT_CATEGORY_NAMES.put("NODEJS", "NodeJs脚本");
+        SCRIPT_CATEGORY_NAMES.put("RUBY", "Ruby脚本");
+        SCRIPT_CATEGORY_NAMES.put("DART", "Dart脚本");
+        SCRIPT_CATEGORY_NAMES.put("PHP", "PHP脚本");
+        SCRIPT_CATEGORY_NAMES.put("SEO_TOOL", "SEO工具");
+
+        OTHER_SUBCATEGORY_NAMES.put("robot_unknown", "未知");
     }
 
     private BotDicts() {
@@ -88,6 +110,16 @@ public class BotDicts {
     /** AI爬虫来源中文名；未知键原样返回. */
     public static String aiSourceName(String key) {
         return AI_SOURCE_NAMES.getOrDefault(key, key);
+    }
+
+    /** 脚本爬虫子类中文名；未知键原样返回. */
+    public static String scriptCategoryName(String key) {
+        return SCRIPT_CATEGORY_NAMES.getOrDefault(key, key);
+    }
+
+    /** 其他类子类中文名；未知键原样返回. */
+    public static String otherSubcategoryName(String key) {
+        return OTHER_SUBCATEGORY_NAMES.getOrDefault(key, key);
     }
 
     /**

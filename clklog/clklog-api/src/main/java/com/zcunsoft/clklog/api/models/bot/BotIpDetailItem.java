@@ -25,6 +25,9 @@ public class BotIpDetailItem {
     @Schema(description = "UA归属（bot_subcategory）", example = "baidu")
     private String uaOwner;
 
+    @Schema(description = "UA归属中文名", example = "百度")
+    private String uaOwnerName;
+
     @Schema(description = "命中原因（中文，逗号分隔）", example = "搜索引擎UA")
     private String hitReasons;
 

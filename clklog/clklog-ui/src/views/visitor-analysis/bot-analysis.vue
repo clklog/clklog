@@ -30,24 +30,83 @@
           <div class="block-head" style="margin-bottom: 0px">
             <div class="block-title">流量概览</div>
           </div>
-          <el-table
-            :data="overviewRows"
-            :show-header="true"
-            style="width: 100%"
-            size="medium"
-          >
-            <el-table-column prop="name" label="" width="120" align="center" />
-            <el-table-column prop="pv" label="浏览量(PV)" align="center" />
-            <el-table-column prop="visitCount" label="访问次数" align="center" />
-            <el-table-column prop="uv" label="访客数" align="center" />
-            <el-table-column prop="ipCount" label="IP数" align="center" />
-            <el-table-column prop="avgPv" label="平均访问页数" align="center" />
-            <el-table-column label="平均访问时长" align="center">
-              <template slot-scope="scope">
-                {{ formatDuration(scope.row.avgVisitTime) }}
-              </template>
-            </el-table-column>
-          </el-table>
+          <div class="bid-list-page">
+            <div class="bid-list-header">
+              <div class="header-name w156"></div>
+              <div class="header-name w156">
+                浏览量(PV)
+                <div class="parentPosition">
+                  <el-popover placement="bottom-start" width="200" trigger="hover" class="popImg">
+                    <div v-html="$sharedText.pv" style="padding: 5px; font-size: 12px"></div>
+                    <img slot="reference" class="icon-question" src="@/assets/images/question.png" alt="" />
+                  </el-popover>
+                </div>
+              </div>
+              <div class="header-name w156">
+                访问次数
+                <div class="parentPosition">
+                  <el-popover placement="bottom-start" width="200" trigger="hover" class="popImg">
+                    <div v-html="$sharedText.visitCount" style="padding: 5px; font-size: 12px"></div>
+                    <img slot="reference" class="icon-question" src="@/assets/images/question.png" alt="" />
+                  </el-popover>
+                </div>
+              </div>
+              <div class="header-name w156">
+                访客数
+                <div class="parentPosition">
+                  <el-popover placement="bottom-start" width="200" trigger="hover" class="popImg">
+                    <div v-html="$sharedText.uv" style="padding: 5px; font-size: 12px"></div>
+                    <img slot="reference" class="icon-question" src="@/assets/images/question.png" alt="" />
+                  </el-popover>
+                </div>
+              </div>
+              <div class="header-name w156">
+                IP数
+                <div class="parentPosition">
+                  <el-popover placement="bottom-start" width="200" trigger="hover" class="popImg">
+                    <div v-html="$sharedText.ip" style="padding: 5px; font-size: 12px"></div>
+                    <img slot="reference" class="icon-question" src="@/assets/images/question.png" alt="" />
+                  </el-popover>
+                </div>
+              </div>
+              <div class="header-name w156">
+                平均访问页数
+                <div class="parentPosition">
+                  <el-popover placement="bottom-start" width="200" trigger="hover" class="popImg">
+                    <div v-html="$sharedText.avgPv" style="padding: 5px; font-size: 12px"></div>
+                    <img slot="reference" class="icon-question" src="@/assets/images/question.png" alt="" />
+                  </el-popover>
+                </div>
+              </div>
+              <div class="header-name w156">
+                平均访问时长
+                <div class="parentPosition">
+                  <el-popover placement="bottom-start" width="200" trigger="hover" class="popImg">
+                    <div v-html="$sharedText.avgVisitTime" style="padding: 5px; font-size: 12px"></div>
+                    <img slot="reference" class="icon-question" src="@/assets/images/question.png" alt="" />
+                  </el-popover>
+                </div>
+              </div>
+            </div>
+            <div class="bid-list-record">
+              <div class="bid-list-item1 w157"><p>机器人</p></div>
+              <div class="bid-list-item w158"><p>{{ botRow.pv || "--" }}</p></div>
+              <div class="bid-list-item w158"><p>{{ botRow.visitCount || "--" }}</p></div>
+              <div class="bid-list-item w158"><p>{{ botRow.uv || "--" }}</p></div>
+              <div class="bid-list-item w158"><p>{{ botRow.ipCount || "--" }}</p></div>
+              <div class="bid-list-item w158"><p>{{ averageRulesEvent(botRow.avgPv) || "--" }}</p></div>
+              <div class="bid-list-item w158"><p>{{ formatTimeFun(botRow.avgVisitTime) || "--" }}</p></div>
+            </div>
+            <div class="bid-list-record">
+              <div class="bid-list-item1 w157"><p>真人</p></div>
+              <div class="bid-list-item w159"><p>{{ humanRow.pv || "--" }}</p></div>
+              <div class="bid-list-item w159"><p>{{ humanRow.visitCount || "--" }}</p></div>
+              <div class="bid-list-item w159"><p>{{ humanRow.uv || "--" }}</p></div>
+              <div class="bid-list-item w159"><p>{{ humanRow.ipCount || "--" }}</p></div>
+              <div class="bid-list-item w159"><p>{{ averageRulesEvent(humanRow.avgPv) || "--" }}</p></div>
+              <div class="bid-list-item w159"><p>{{ formatTimeFun(humanRow.avgVisitTime) || "--" }}</p></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -112,7 +171,7 @@
               </el-input>
             </div>
           </div>
-          <el-table :data="enginePageList" size="small" style="width: 100%">
+          <el-table :data="enginePageList" size="small" style="width: 100%" :default-sort="{ prop: 'crawlCount', order: 'descending' }" @sort-change="onEngineSortChange">
             <el-table-column type="index" label="序号" width="60" align="center" />
             <el-table-column label="页面" min-width="200">
               <template slot-scope="scope">
@@ -128,14 +187,15 @@
                       v-for="name in scope.row.engines"
                       :key="name"
                       size="mini"
-                      style="margin: 2px;"
+                      :color="tagColor(name)"
+                      style="margin: 2px; border: none; color: #fff;"
                     >{{ name }}</el-tag>
                   </div>
                 </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column prop="crawlCount" label="总抓取次数" align="center" />
-            <el-table-column label="最后抓取时间" align="center">
+            <el-table-column prop="crawlCount" label="总抓取次数" sortable="custom" align="center" />
+            <el-table-column prop="lastCrawlTime" label="最后抓取时间" sortable="custom" align="center">
               <template slot-scope="scope">{{ scope.row.lastCrawlTime || "--" }}</template>
             </el-table-column>
           </el-table>
@@ -175,7 +235,7 @@
               </el-input>
             </div>
           </div>
-          <el-table :data="aiPageList" size="small" style="width: 100%">
+          <el-table :data="aiPageList" size="small" style="width: 100%" :default-sort="{ prop: 'crawlCount', order: 'descending' }" @sort-change="onAiSortChange">
             <el-table-column type="index" label="序号" width="60" align="center" />
             <el-table-column label="页面" min-width="200">
               <template slot-scope="scope">
@@ -191,14 +251,15 @@
                       v-for="name in scope.row.sources"
                       :key="name"
                       size="mini"
-                      style="margin: 2px;"
+                      :color="tagColor(name)"
+                      style="margin: 2px; border: none; color: #fff;"
                     >{{ name }}</el-tag>
                   </div>
                 </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column prop="crawlCount" label="总抓取次数" align="center" />
-            <el-table-column label="最后抓取时间" align="center">
+            <el-table-column prop="crawlCount" label="总抓取次数" sortable="custom" align="center" />
+            <el-table-column prop="lastCrawlTime" label="最后抓取时间" sortable="custom" align="center">
               <template slot-scope="scope">{{ scope.row.lastCrawlTime || "--" }}</template>
             </el-table-column>
           </el-table>
@@ -232,7 +293,7 @@
               </el-select>
               <el-input
                 v-model="ipKeyword"
-                placeholder="请输入及机器人请求IP"
+                placeholder="请输入机器人请求IP"
                 size="small"
                 clearable
                 class="filter-input"
@@ -242,7 +303,7 @@
               </el-input>
             </div>
           </div>
-          <el-table :data="ipDetailList" size="small" style="width: 100%">
+          <el-table :data="ipDetailList" size="small" border style="width: 100%" :default-sort="{ prop: 'pv', order: 'descending' }" @sort-change="onIpSortChange">
             <el-table-column type="index" label="序号" width="60" align="center" />
             <el-table-column prop="ip" label="IP" align="center" />
             <el-table-column label="地域" align="center">
@@ -251,17 +312,19 @@
             <el-table-column label="分类" align="center">
               <template slot-scope="scope">{{ scope.row.categoryName }}</template>
             </el-table-column>
-            <el-table-column prop="uaOwner" label="UA归属" align="center" />
+            <el-table-column label="UA归属" align="center">
+              <template slot-scope="scope">{{ scope.row.uaOwnerName || scope.row.uaOwner || "--" }}</template>
+            </el-table-column>
             <el-table-column prop="hitReasons" label="命中原因" align="center">
               <template slot-scope="scope">{{ scope.row.hitReasons || "--" }}</template>
             </el-table-column>
-            <el-table-column prop="pv" label="浏览量" align="center" />
-            <el-table-column prop="visitCount" label="访问次数" align="center" />
-            <el-table-column prop="avgPv" label="平均访问页数" align="center" />
-            <el-table-column label="平均访问时长" align="center">
+            <el-table-column prop="pv" label="浏览量" sortable="custom" align="center" />
+            <el-table-column prop="visitCount" label="访问次数" sortable="custom" align="center" />
+            <el-table-column prop="avgPv" label="平均访问页数" sortable="custom" align="center" />
+            <el-table-column prop="avgVisitTime" label="平均访问时长" sortable="custom" align="center">
               <template slot-scope="scope">{{ formatDuration(scope.row.avgVisitTime) }}</template>
             </el-table-column>
-            <el-table-column label="最后访问时间" align="center" width="150">
+            <el-table-column prop="lastVisitTime" label="最后访问时间" sortable="custom" align="center" width="150">
               <template slot-scope="scope">{{ scope.row.lastVisitTime || "--" }}</template>
             </el-table-column>
           </el-table>
@@ -282,6 +345,8 @@
 <script>
 import echarts from "echarts";
 import resize from "@/components/Charts/mixins/resize";
+import { formatTime } from "@/utils/format";
+import { averageRules } from "@/utils/percent";
 import {
   getBotOverviewApi,
   getBotCategoryApi,
@@ -354,6 +419,12 @@ const ENGINE_NAMES = {
   other: "其他",
 };
 
+// 标签区分色板：按名称稳定散列取色，同名标签颜色固定
+const TAG_PALETTE = [
+  "#3B7BFF", "#F5A623", "#2BC3C3", "#55C486", "#9B59B6", "#E67E22",
+  "#F06292", "#4D6BFE", "#10A37F", "#DE5833", "#E0A800", "#6E6E6E",
+];
+
 export default {
   name: "BotAnalysis",
   components: {},
@@ -378,6 +449,8 @@ export default {
       enginePageSize: 10,
       engineFilter: "",
       urlKeyword: "",
+      engineSortField: "",
+      engineSortOrder: "desc",
       aiSummaryList: [],
       aiPageList: [],
       aiPageTotal: 0,
@@ -385,6 +458,8 @@ export default {
       aiPageSize: 10,
       aiSourceFilter: "",
       aiUrlKeyword: "",
+      aiSortField: "",
+      aiSortOrder: "desc",
       // 机器人IP明细
       ipDetailList: [],
       ipDetailTotal: 0,
@@ -392,12 +467,20 @@ export default {
       ipPageSize: 10,
       categoryFilter: "",
       ipKeyword: "",
+      ipSortField: "",
+      ipSortOrder: "desc",
       charts: {},
     };
   },
   computed: {
     projectName() {
       return this.$store.getters.projectName;
+    },
+    botRow() {
+      return this.overviewRows[0] || {};
+    },
+    humanRow() {
+      return this.overviewRows[1] || {};
     },
     commonParams() {
       const { projectName } = this;
@@ -498,6 +581,15 @@ export default {
       const s = total % 60;
       return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
     },
+    averageRulesEvent(num) {
+      return averageRules(num);
+    },
+    formatTimeFun(val) {
+      if (!val || val <= 0) {
+        return "";
+      }
+      return formatTime(Math.floor(val));
+    },
     initCharts() {
       const refs = ["categoryChart", "areaChart", "engineChart", "aiChart"];
       refs.forEach((ref) => {
@@ -542,6 +634,7 @@ export default {
       const option = {
         tooltip: {
           trigger: "item",
+          confine: true,
           formatter: (p) =>
             p.name + "<br/>请求IP数: " + p.value + "<br/>占比: " + p.percent.toFixed(2) + "%",
         },
@@ -612,7 +705,7 @@ export default {
       const chartItems = inChina.slice(0, 10).concat(overseasItems.slice(0, 10));
       const names = chartItems.map((x) => x.name);
       const option = {
-        tooltip: { trigger: "axis" },
+        tooltip: { trigger: "axis", confine: true },
         legend: { bottom: 0, icon: "circle", itemWidth: 10, itemHeight: 10 },
         grid: { left: 50, right: 16, top: 20, bottom: 56 },
         xAxis: { type: "category", data: names, axisLabel: { interval: 0, rotate: 40, fontSize: 11 } },
@@ -654,6 +747,7 @@ export default {
       const option = {
         tooltip: {
           trigger: "axis",
+          confine: true,
           formatter: (params) => {
             const item = this.engineSummaryList[params[0].dataIndex] || {};
             let html = item.engineName;
@@ -697,6 +791,13 @@ export default {
     aiSourceName(key) {
       return AI_SOURCE_NAMES[key] || key;
     },
+    tagColor(name) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) {
+        hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+      }
+      return TAG_PALETTE[hash % TAG_PALETTE.length];
+    },
     fetchAiSummary(params) {
       getAiCrawlerSummaryApi(params).then((res) => {
         if (res.code == 200 && res.data) {
@@ -714,6 +815,7 @@ export default {
       const option = {
         tooltip: {
           trigger: "axis",
+          confine: true,
           formatter: (params) => {
             const item = this.aiSummaryList[params[0].dataIndex] || {};
             let html = item.sourceName;
@@ -760,6 +862,8 @@ export default {
         pageSize: this.aiPageSize,
         source: this.aiSourceFilter || "",
         urlKeyword: this.aiUrlKeyword || "",
+        sortField: this.aiSortField || "",
+        sortOrder: this.aiSortOrder || "desc",
       });
       getAiCrawlerPagesApi(params).then((res) => {
         if (res.code == 200 && res.data) {
@@ -774,6 +878,8 @@ export default {
         pageSize: this.enginePageSize,
         engine: this.engineFilter || "",
         urlKeyword: this.urlKeyword || "",
+        sortField: this.engineSortField || "",
+        sortOrder: this.engineSortOrder || "desc",
       });
       getBotEnginePagesApi(params).then((res) => {
         if (res.code == 200 && res.data) {
@@ -788,6 +894,8 @@ export default {
         pageSize: this.ipPageSize,
         botCategory: this.categoryFilter || "",
         ipKeyword: this.ipKeyword || "",
+        sortField: this.ipSortField || "",
+        sortOrder: this.ipSortOrder || "desc",
       });
       getBotIpDetailApi(params).then((res) => {
         if (res.code == 200 && res.data) {
@@ -795,6 +903,24 @@ export default {
           this.ipDetailTotal = res.data.total || 0;
         }
       });
+    },
+    onEngineSortChange({ prop, order }) {
+      this.engineSortField = order ? prop : "";
+      this.engineSortOrder = order === "ascending" ? "asc" : "desc";
+      this.enginePageNum = 1;
+      this.fetchEnginePages();
+    },
+    onAiSortChange({ prop, order }) {
+      this.aiSortField = order ? prop : "";
+      this.aiSortOrder = order === "ascending" ? "asc" : "desc";
+      this.aiPageNum = 1;
+      this.fetchAiPages();
+    },
+    onIpSortChange({ prop, order }) {
+      this.ipSortField = order ? prop : "";
+      this.ipSortOrder = order === "ascending" ? "asc" : "desc";
+      this.ipPageNum = 1;
+      this.fetchIpDetail();
     },
   },
 };
@@ -846,6 +972,75 @@ export default {
     .block-head {
       margin-bottom: 0;
     }
+    // 流量概览无边框行布局，样式对齐数据概览 FlowView
+    .bid-list-page {
+      display: flex;
+      flex-direction: column;
+      .bid-list-header {
+        display: flex;
+        margin-bottom: 12px;
+        .header-name {
+          width: calc(100% / 7);
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          .icon-question {
+            width: 11.44px;
+            height: 11.44px;
+            margin-left: 6px;
+            cursor: pointer;
+            position: absolute;
+            transform: translate(0, -50%);
+          }
+        }
+        .w156 {
+          font-size: 13px;
+          font-weight: 400;
+          line-height: 14px;
+          color: #4d4d4d;
+        }
+      }
+      .bid-list-record {
+        display: flex;
+        margin-bottom: 11px;
+        .bid-list-item1 {
+          width: calc(100% / 7);
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+        }
+        .bid-list-item {
+          width: calc(100% / 7);
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .w157 {
+          font-size: 13px;
+          font-weight: 400;
+          line-height: 14px;
+          color: #4d4d4d;
+        }
+        // 机器人行：蓝色加粗，与数据概览“今日”行一致
+        .w158 {
+          font-size: 16px;
+          font-weight: bold;
+          color: #2c7be5;
+          line-height: 17px;
+        }
+        // 真人行：深色加粗，对应设计稿
+        .w159 {
+          font-size: 16px;
+          font-weight: bold;
+          color: #303133;
+          line-height: 17px;
+        }
+      }
+    }
   }
   .chart-card {
     .chart-box {
@@ -868,12 +1063,14 @@ export default {
     }
   }
   .tag-clamp {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    max-height: 48px;
     overflow: hidden;
     line-height: 22px;
-    text-align: left;
+    text-align: center;
   }
   .page-name {
     color: #303133;
