@@ -251,14 +251,17 @@ public class BotReportServiceImpl implements IBotReportService {
                 paramMap.addValue("url_keyword", "%" + request.getUrlKeyword() + "%");
             }
 
-            // 按页面路径聚合：一行一个 URL，engines 列收集抓取过该页面的全部搜索引擎，次数为各引擎合计
+            // 按页面路径聚合：一行一个 URL，engines 列收集抓取过该页面的全部搜索引擎，次数为各引擎合计；
+            // engine_counts 列输出 "引擎:次数" 对，供 Java 侧按引擎求和得到每个搜索引擎的抓取次数。
+            // 注意 sum 别名需与列名 crawl_count 区分，否则 groupArray 内的 crawl_count 会被解析为聚合别名导致 ILLEGAL_AGGREGATION
             Map<String, String> sortable = new LinkedHashMap<>();
-            sortable.put("crawlCount", "crawl_count");
+            sortable.put("crawlCount", "total_crawl_count");
             sortable.put("lastCrawlTime", "last_crawl_time");
-            String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "crawl_count");
+            String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "total_crawl_count");
             String listSql = "select url, max(title) title"
                     + ", arrayStringConcat(arrayDistinct(groupArray(engine)), ',') engines"
-                    + ", sum(crawl_count) crawl_count, max(last_crawl_time) last_crawl_time"
+                    + ", sum(crawl_count) total_crawl_count, max(last_crawl_time) last_crawl_time"
+                    + ", arrayStringConcat(groupArray(concat(engine, ':', toString(crawl_count))), ',') engine_counts"
                     + " from bot_engine_page_detail_bydate t FINAL where " + where
                     + " group by url" + orderBy
                     + " limit " + (long) (request.getPageNum() - 1) * request.getPageSize() + "," + request.getPageSize();
@@ -281,7 +284,8 @@ public class BotReportServiceImpl implements IBotReportService {
                     }
                 }
                 item.setEngines(engineNames);
-                item.setCrawlCount(row.get("crawl_count") == null ? 0 : ((Number) row.get("crawl_count")).longValue());
+                item.setCrawlCount(row.get("total_crawl_count") == null ? 0 : ((Number) row.get("total_crawl_count")).longValue());
+                item.setEngineCounts(parseEngineCounts((String) row.get("engine_counts")));
                 item.setLastCrawlTime(formatTime(row.get("last_crawl_time")));
                 list.add(item);
             }
@@ -293,6 +297,40 @@ public class BotReportServiceImpl implements IBotReportService {
             response.setMsg("操作失败");
         }
         return response;
+    }
+
+    /**
+     * 解析 "引擎:次数" 对串为按引擎求和的分引擎抓取次数，输出按次数降序.
+     *
+     * @param raw groupArray(concat(engine, ':', toString(crawl_count))) 拼接的串，形如 "baidu:2,bing:1"
+     * @return engineName（中文）+ crawlCount 列表；入参空返回空列表
+     */
+    private List<Map<String, Object>> parseEngineCounts(String raw) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (StringUtils.isBlank(raw)) {
+            return result;
+        }
+        Map<String, Long> countByEngine = new LinkedHashMap<>();
+        for (String pair : raw.split(",")) {
+            int idx = pair.lastIndexOf(':');
+            if (idx <= 0) {
+                continue;
+            }
+            try {
+                countByEngine.merge(pair.substring(0, idx), Long.parseLong(pair.substring(idx + 1)), Long::sum);
+            } catch (NumberFormatException ex) {
+                logger.warn("skip invalid engine count pair: " + pair);
+            }
+        }
+        List<Map.Entry<String, Long>> entries = new ArrayList<>(countByEngine.entrySet());
+        entries.sort((a, b) -> Long.compare(b.getValue(), a.getValue()));
+        for (Map.Entry<String, Long> entry : entries) {
+            Map<String, Object> engineCount = new LinkedHashMap<>();
+            engineCount.put("engineName", BotDicts.engineName(entry.getKey()));
+            engineCount.put("crawlCount", entry.getValue());
+            result.add(engineCount);
+        }
+        return result;
     }
 
     @Override
@@ -491,14 +529,17 @@ public class BotReportServiceImpl implements IBotReportService {
                 paramMap.addValue("url_keyword", "%" + request.getUrlKeyword() + "%");
             }
 
-            // 按页面路径聚合：一行一个 URL，sources 列收集抓取过该页面的全部AI爬虫，次数为各爬虫合计
+            // 按页面路径聚合：一行一个 URL，sources 列收集抓取过该页面的全部AI爬虫，次数为各爬虫合计；
+            // source_counts 列输出 "爬虫:次数" 对，供 Java 侧按爬虫求和得到每个AI爬虫的抓取次数。
+            // sum 别名用 total_crawl_count 与列名区分，避免 groupArray 内 crawl_count 被解析为聚合别名
             Map<String, String> sortable = new LinkedHashMap<>();
-            sortable.put("crawlCount", "crawl_count");
+            sortable.put("crawlCount", "total_crawl_count");
             sortable.put("lastCrawlTime", "last_crawl_time");
-            String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "crawl_count");
+            String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "total_crawl_count");
             String listSql = "select url, max(title) title"
                     + ", arrayStringConcat(arrayDistinct(groupArray(source)), ',') sources"
-                    + ", sum(crawl_count) crawl_count, max(last_crawl_time) last_crawl_time"
+                    + ", sum(crawl_count) total_crawl_count, max(last_crawl_time) last_crawl_time"
+                    + ", arrayStringConcat(groupArray(concat(source, ':', toString(crawl_count))), ',') source_counts"
                     + " from bot_ai_page_detail_bydate t FINAL where " + where
                     + " group by url" + orderBy
                     + " limit " + (long) (request.getPageNum() - 1) * request.getPageSize() + "," + request.getPageSize();
@@ -521,7 +562,8 @@ public class BotReportServiceImpl implements IBotReportService {
                     }
                 }
                 item.setSources(sourceNames);
-                item.setCrawlCount(row.get("crawl_count") == null ? 0 : ((Number) row.get("crawl_count")).longValue());
+                item.setCrawlCount(row.get("total_crawl_count") == null ? 0 : ((Number) row.get("total_crawl_count")).longValue());
+                item.setSourceCounts(parseSourceCounts((String) row.get("source_counts")));
                 item.setLastCrawlTime(formatTime(row.get("last_crawl_time")));
                 list.add(item);
             }
@@ -533,6 +575,40 @@ public class BotReportServiceImpl implements IBotReportService {
             response.setMsg("操作失败");
         }
         return response;
+    }
+
+    /**
+     * 解析 "爬虫:次数" 对串为按爬虫求和的分AI爬虫抓取次数，输出按次数降序.
+     *
+     * @param raw groupArray(concat(source, ':', toString(crawl_count))) 拼接的串，形如 "openai:2,bytedance:1"
+     * @return sourceName（中文）+ crawlCount 列表；入参空返回空列表
+     */
+    private List<Map<String, Object>> parseSourceCounts(String raw) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (StringUtils.isBlank(raw)) {
+            return result;
+        }
+        Map<String, Long> countBySource = new LinkedHashMap<>();
+        for (String pair : raw.split(",")) {
+            int idx = pair.lastIndexOf(':');
+            if (idx <= 0) {
+                continue;
+            }
+            try {
+                countBySource.merge(pair.substring(0, idx), Long.parseLong(pair.substring(idx + 1)), Long::sum);
+            } catch (NumberFormatException ex) {
+                logger.warn("skip invalid source count pair: " + pair);
+            }
+        }
+        List<Map.Entry<String, Long>> entries = new ArrayList<>(countBySource.entrySet());
+        entries.sort((a, b) -> Long.compare(b.getValue(), a.getValue()));
+        for (Map.Entry<String, Long> entry : entries) {
+            Map<String, Object> sourceCount = new LinkedHashMap<>();
+            sourceCount.put("sourceName", BotDicts.aiSourceName(entry.getKey()));
+            sourceCount.put("crawlCount", entry.getValue());
+            result.add(sourceCount);
+        }
+        return result;
     }
 
     /** Timestamp/DateTime 值格式化为 yyyy-MM-dd HH:mm:ss，空值返回空串. */

@@ -194,7 +194,16 @@
                 </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column prop="crawlCount" label="总抓取次数" sortable="custom" align="center" />
+            <el-table-column prop="crawlCount" label="总抓取次数" sortable="custom" align="center">
+              <template slot-scope="scope">
+                <el-tooltip placement="top" effect="dark">
+                  <div slot="content">
+                    <div v-for="(item, i) in scope.row.engineCounts" :key="i">{{ item.engineName }}: {{ item.crawlCount }}</div>
+                  </div>
+                  <span class="crawl-count-cell">{{ scope.row.crawlCount }}</span>
+                </el-tooltip>
+              </template>
+            </el-table-column>
             <el-table-column prop="lastCrawlTime" label="最后抓取时间" sortable="custom" align="center">
               <template slot-scope="scope">{{ scope.row.lastCrawlTime || "--" }}</template>
             </el-table-column>
@@ -258,7 +267,16 @@
                 </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column prop="crawlCount" label="总抓取次数" sortable="custom" align="center" />
+            <el-table-column prop="crawlCount" label="总抓取次数" sortable="custom" align="center">
+              <template slot-scope="scope">
+                <el-tooltip placement="top" effect="dark">
+                  <div slot="content">
+                    <div v-for="(item, i) in scope.row.sourceCounts" :key="i">{{ item.sourceName }}: {{ item.crawlCount }}</div>
+                  </div>
+                  <span class="crawl-count-cell">{{ scope.row.crawlCount }}</span>
+                </el-tooltip>
+              </template>
+            </el-table-column>
             <el-table-column prop="lastCrawlTime" label="最后抓取时间" sortable="custom" align="center">
               <template slot-scope="scope">{{ scope.row.lastCrawlTime || "--" }}</template>
             </el-table-column>
