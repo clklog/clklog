@@ -51,6 +51,22 @@
         </div>
       </div>
 
+      <!-- 机器人分类 / 地域分布 -->
+      <div class="block-line">
+        <div class="block-main public-hoverItem left chart-card">
+          <div class="block-head">
+            <div class="block-title">机器人分类</div>
+          </div>
+          <div ref="categoryChart" class="chart-box" />
+        </div>
+        <div class="block-main public-hoverItem right chart-card">
+          <div class="block-head">
+            <div class="block-title">地域分布</div>
+          </div>
+          <div ref="areaChart" class="chart-box" />
+        </div>
+      </div>
+
       <!-- 搜索引擎/AI爬虫 抓取页面数 vs IP数 -->
       <div class="block-line">
         <div class="block-main public-hoverItem left chart-card">
