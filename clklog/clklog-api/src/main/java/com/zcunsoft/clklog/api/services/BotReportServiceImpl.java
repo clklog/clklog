@@ -122,10 +122,12 @@ public class BotReportServiceImpl implements IBotReportService {
                     + " and t.bot_category != 'all' group by bot_category order by ip_count desc";
             List<Map<String, Object>> rows = clickHouseJdbcTemplate.queryForList(rowSql, paramMap);
 
-            // 合计不依赖 CUBE 汇总行：所选日期/项目无数据时也返回 0，避免 queryForMap 空结果抛异常
+            // 合计行使用全局去重口径：读取 CUBE 汇总的 all 行（跨分类去重），与流量概览的机器人 IP 数一致；
+            // 各分类行仍为分类内去重，跨分类 IP 在合计中只计一次。
+            // 所选日期/项目无数据时聚合结果为单行 0，不会出现空结果集
             String totalSql = "select ifnull(sum(ip_count), 0) ip_count, ifnull(sum(pv), 0) pv"
                     + " from bot_category_summary_bydate t where " + where
-                    + " and t.bot_category != 'all'";
+                    + " and t.bot_category = 'all'";
             Map<String, Object> total = clickHouseJdbcTemplate.queryForMap(totalSql, paramMap);
 
             long totalIpCount = total.get("ip_count") == null ? 0 : ((Number) total.get("ip_count")).longValue();
