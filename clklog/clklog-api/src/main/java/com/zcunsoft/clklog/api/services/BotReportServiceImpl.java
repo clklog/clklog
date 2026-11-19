@@ -354,20 +354,25 @@ public class BotReportServiceImpl implements IBotReportService {
             // 跨天合并到 IP 粒度：地理/分类取字典序最小值（确定性），命中原因取多日并集
             String reasonExpr = "arrayStringConcat(arrayDistinct(arrayFilter(x -> x != ''"
                     + ", arrayFlatten(groupArray(splitByChar(',', hit_reasons))))), ',')";
+            // 排序表达式引用子查询外层已算好的列：聚合函数嵌套在 if() 里会触发
+            // ClickHouse ILLEGAL_AGGREGATION（无法在 order by 中对聚合再做函数包装）
             Map<String, String> sortable = new LinkedHashMap<>();
             sortable.put("pv", "pv");
             sortable.put("visitCount", "visit_count");
-            sortable.put("avgPv", "if(sum(visit_count) = 0, 0, sum(pv) / sum(visit_count))");
-            sortable.put("avgVisitTime", "if(sum(visit_count) = 0, 0, sum(visit_time) / sum(visit_count))");
+            sortable.put("avgPv", "if(visit_count = 0, 0, pv / visit_count)");
+            sortable.put("avgVisitTime", "if(visit_count = 0, 0, visit_time / visit_count)");
             sortable.put("lastVisitTime", "last_visit_time");
             String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "pv");
-            String listSql = "select client_ip, min(country) country, min(province) province"
+            // 聚合结果包一层子查询，排序引用外层列（visit_count/pv/visit_time 等）
+            String listSql = "select * from ("
+                    + "select client_ip, min(country) country, min(province) province"
                     + ", min(bot_category) bot_category, min(bot_subcategory) bot_subcategory"
                     + ", " + reasonExpr + " hit_reasons"
                     + ", sum(pv) pv, sum(visit_count) visit_count, sum(visit_time) visit_time"
                     + ", max(last_visit_time) last_visit_time"
                     + " from bot_ip_detail_bydate t FINAL where " + where
-                    + " group by client_ip" + orderBy
+                    + " group by client_ip)"
+                    + orderBy
                     + " limit " + (long) (request.getPageNum() - 1) * request.getPageSize() + "," + request.getPageSize();
             String countSql = "select count() from (select client_ip"
                     + " from bot_ip_detail_bydate t FINAL where " + where
