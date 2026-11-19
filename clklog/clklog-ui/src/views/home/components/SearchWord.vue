@@ -13,8 +13,10 @@
     <div class="block-index-form">
       <el-table
         class="public-radius"
+        border
         :data="searchWordList"
         :cell-style="tableHeaderColor"
+        :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }"
         style="width: 100%"
       >
         <el-table-column
@@ -95,4 +97,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.el-table {
+  overflow: hidden;
+}
+</style>

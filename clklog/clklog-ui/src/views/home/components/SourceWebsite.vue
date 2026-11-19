@@ -14,6 +14,8 @@
         :data="SourceWebsitelist"
         :cell-style="tableHeaderColor"
         class="public-radius"
+        border
+        :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }"
         style="width: 100%;"
       >
         <el-table-column
@@ -83,4 +85,8 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.el-table {
+  overflow: hidden;
+}
+
 </style>
