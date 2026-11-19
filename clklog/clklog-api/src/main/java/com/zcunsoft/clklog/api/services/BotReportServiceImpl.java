@@ -201,7 +201,7 @@ public class BotReportServiceImpl implements IBotReportService {
             // 抓取次数/IP数取自汇总表（与 flow_trend 一致，跨天 IP 数为日去重之和）
             String pvSql = "select engine, sum(pv) pv, sum(ip_count) ip_count"
                     + " from bot_engine_page_summary_bydate t where " + where
-                    + " and t.engine != 'all' group by engine";
+                    + " and t.engine != 'all' group by engine order by ip_count desc";
             // 抓取页面数取自明细表（时间范围内去重URL，跨天不重复计数）
             String pageSql = "select engine, uniqExact(url) page_count"
                     + " from bot_engine_page_detail_bydate t where " + where
@@ -259,6 +259,9 @@ public class BotReportServiceImpl implements IBotReportService {
             Map<String, String> sortable = new LinkedHashMap<>();
             sortable.put("crawlCount", "total_crawl_count");
             sortable.put("lastCrawlTime", "last_crawl_time");
+            sortable.put("url", "url");
+            sortable.put("title", "title");
+            sortable.put("engines", "engines");
             String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "total_crawl_count");
             String listSql = "select url, max(title) title"
                     + ", arrayStringConcat(arrayDistinct(groupArray(engine)), ',') engines"
@@ -362,7 +365,11 @@ public class BotReportServiceImpl implements IBotReportService {
             sortable.put("avgPv", "if(visit_count = 0, 0, pv / visit_count)");
             sortable.put("avgVisitTime", "if(visit_count = 0, 0, visit_time / visit_count)");
             sortable.put("lastVisitTime", "last_visit_time");
-            String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "pv");
+            sortable.put("ip", "client_ip");
+            sortable.put("region", "concat(country, ' ', province)");
+            sortable.put("botCategory", "bot_category");
+            sortable.put("uaOwner", "bot_subcategory");
+            String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "last_visit_time");
             // 聚合结果包一层子查询，排序引用外层列（visit_count/pv/visit_time 等）
             String listSql = "select * from ("
                     + "select client_ip, min(country) country, min(province) province"
@@ -484,7 +491,7 @@ public class BotReportServiceImpl implements IBotReportService {
             // 抓取次数/IP数取自汇总表（与搜索引擎口径一致，跨天 IP 数为日去重之和）
             String pvSql = "select source, sum(pv) pv, sum(ip_count) ip_count"
                     + " from bot_ai_page_summary_bydate t where " + where
-                    + " and t.source != 'all' group by source";
+                    + " and t.source != 'all' group by source order by ip_count desc";
             // 抓取页面数取自明细表（时间范围内去重URL，跨天不重复计数）
             String pageSql = "select source, uniqExact(url) page_count"
                     + " from bot_ai_page_detail_bydate t where " + where
@@ -542,6 +549,9 @@ public class BotReportServiceImpl implements IBotReportService {
             Map<String, String> sortable = new LinkedHashMap<>();
             sortable.put("crawlCount", "total_crawl_count");
             sortable.put("lastCrawlTime", "last_crawl_time");
+            sortable.put("url", "url");
+            sortable.put("title", "title");
+            sortable.put("sources", "sources");
             String orderBy = buildBotOrderBy(request.getSortField(), request.getSortOrder(), sortable, "total_crawl_count");
             String listSql = "select url, max(title) title"
                     + ", arrayStringConcat(arrayDistinct(groupArray(source)), ',') sources"
