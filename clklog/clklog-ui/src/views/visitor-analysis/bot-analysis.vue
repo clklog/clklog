@@ -1050,12 +1050,12 @@ export default {
           color: #2c7be5;
           line-height: 17px;
         }
-        // 真人行：深色加粗，对应设计稿
+        // 真人行：统计数字样式（试用：与标签同规格 13px/#4d4d4d）
         .w159 {
-          font-size: 16px;
-          font-weight: bold;
-          color: #303133;
-          line-height: 17px;
+          font-size: 13px;
+          font-weight: 400;
+          line-height: 14px;
+          color: #4d4d4d;
         }
       }
     }
