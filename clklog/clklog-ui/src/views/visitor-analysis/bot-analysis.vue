@@ -116,14 +116,50 @@
         <div class="block-main public-hoverItem left chart-card">
           <div class="block-head">
             <div class="block-title">机器人分类</div>
+            <el-radio-group v-model="categoryDisplayMode" size="mini" class="area-mode-switch">
+              <el-radio-button label="pie">饼图</el-radio-button>
+              <el-radio-button label="list">列表</el-radio-button>
+            </el-radio-group>
           </div>
-          <div ref="categoryChart" class="chart-box" />
+          <div v-show="categoryDisplayMode === 'pie'" ref="categoryChart" class="chart-box" />
+          <el-table
+            v-show="categoryDisplayMode === 'list'"
+            :data="categoryTableItems"
+            size="small"
+            border
+            height="320"
+            class="area-list-table"
+            :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }"
+          >
+            <el-table-column type="index" label="排序" width="70" align="center" />
+            <el-table-column prop="categoryName" label="分类" :sortable="true" align="center" />
+            <el-table-column prop="ipCount" label="IP数" :sortable="true" align="center" />
+            <el-table-column prop="rateText" label="占比" :sortable="true" align="center" :sort-by="'ipCount'" />
+          </el-table>
         </div>
         <div class="block-main public-hoverItem right chart-card">
           <div class="block-head">
             <div class="block-title">地域分布</div>
+            <el-radio-group v-model="areaDisplayMode" size="mini" class="area-mode-switch">
+              <el-radio-button label="bar">柱状图</el-radio-button>
+              <el-radio-button label="list">列表</el-radio-button>
+            </el-radio-group>
           </div>
-          <div ref="areaChart" class="chart-box" />
+          <div v-show="areaDisplayMode === 'bar'" ref="barChart" class="chart-box" />
+          <el-table
+            v-show="areaDisplayMode === 'list'"
+            :data="areaRegionItems"
+            size="small"
+            border
+            height="320"
+            class="area-list-table"
+            :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }"
+          >
+            <el-table-column type="index" label="排序" width="70" align="center" />
+            <el-table-column prop="name" label="地域" :sortable="true" align="center" />
+            <el-table-column prop="ipCount" label="IP数" :sortable="true" align="center" />
+            <el-table-column prop="rateText" label="占比" :sortable="true" align="center" :sort-by="'ipCount'" />
+          </el-table>
         </div>
       </div>
 
@@ -132,14 +168,52 @@
         <div class="block-main public-hoverItem left chart-card">
           <div class="block-head">
             <div class="block-title">搜索引擎 抓取页面数 vs IP数</div>
+            <el-radio-group v-model="engineDisplayMode" size="mini" class="area-mode-switch">
+              <el-radio-button label="bar">条形图</el-radio-button>
+              <el-radio-button label="list">列表</el-radio-button>
+            </el-radio-group>
           </div>
-          <div ref="engineChart" class="chart-box" />
+          <div v-show="engineDisplayMode === 'bar'" ref="engineChart" class="chart-box" />
+          <el-table
+            v-show="engineDisplayMode === 'list'"
+            :data="engineTableItems"
+            size="small"
+            border
+            height="320"
+            class="area-list-table"
+            :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }"
+          >
+            <el-table-column type="index" label="排序" width="70" align="center" />
+            <el-table-column prop="engineName" label="搜索引擎" :sortable="true" align="center" />
+            <el-table-column prop="pageCount" label="抓取页面数" :sortable="true" align="center" />
+            <el-table-column prop="ipCount" label="IP数" :sortable="true" align="center" />
+            <el-table-column prop="rateText" label="占比" :sortable="true" align="center" :sort-by="'ipCount'" />
+          </el-table>
         </div>
         <div class="block-main public-hoverItem right chart-card">
           <div class="block-head">
             <div class="block-title">AI爬虫 抓取页面数 vs IP数</div>
+            <el-radio-group v-model="aiDisplayMode" size="mini" class="area-mode-switch">
+              <el-radio-button label="bar">条形图</el-radio-button>
+              <el-radio-button label="list">列表</el-radio-button>
+            </el-radio-group>
           </div>
-          <div ref="aiChart" class="chart-box" />
+          <div v-show="aiDisplayMode === 'bar'" ref="aiChart" class="chart-box" />
+          <el-table
+            v-show="aiDisplayMode === 'list'"
+            :data="aiTableItems"
+            size="small"
+            border
+            height="320"
+            class="area-list-table"
+            :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }"
+          >
+            <el-table-column type="index" label="排序" width="70" align="center" />
+            <el-table-column prop="sourceName" label="AI爬虫" :sortable="true" align="center" />
+            <el-table-column prop="pageCount" label="抓取页面数" :sortable="true" align="center" />
+            <el-table-column prop="ipCount" label="IP数" :sortable="true" align="center" />
+            <el-table-column prop="rateText" label="占比" :sortable="true" align="center" :sort-by="'ipCount'" />
+          </el-table>
         </div>
       </div>
 
@@ -174,13 +248,13 @@
           </div>
           <el-table :data="enginePageList" size="small" style="width: 100%" :default-sort="{ prop: 'crawlCount', order: 'descending' }" @sort-change="onEngineSortChange">
             <el-table-column type="index" label="序号" width="60" align="center" />
-            <el-table-column label="页面" min-width="200">
+            <el-table-column prop="url" label="页面" min-width="200" sortable="custom">
               <template slot-scope="scope">
                 <div class="page-name">{{ scope.row.title }}</div>
                 <div class="page-url">{{ scope.row.url }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="搜索引擎" align="center" width="150">
+            <el-table-column prop="engines" label="搜索引擎" align="center" width="150" sortable="custom">
               <template slot-scope="scope">
                 <el-tooltip :content="scope.row.engines.join('、')" placement="top" effect="dark">
                   <div class="tag-clamp">
@@ -247,13 +321,13 @@
           </div>
           <el-table :data="aiPageList" size="small" style="width: 100%" :default-sort="{ prop: 'crawlCount', order: 'descending' }" @sort-change="onAiSortChange">
             <el-table-column type="index" label="序号" width="60" align="center" />
-            <el-table-column label="页面" min-width="200">
+            <el-table-column prop="url" label="页面" min-width="200" sortable="custom">
               <template slot-scope="scope">
                 <div class="page-name">{{ scope.row.title }}</div>
                 <div class="page-url">{{ scope.row.url }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="AI爬虫" align="center" width="170">
+            <el-table-column prop="sources" label="AI爬虫" align="center" width="170" sortable="custom">
               <template slot-scope="scope">
                 <el-tooltip :content="scope.row.sources.join('、')" placement="top" effect="dark">
                   <div class="tag-clamp">
@@ -322,16 +396,16 @@
               </el-input>
             </div>
           </div>
-          <el-table :data="ipDetailList" size="small" border style="width: 100%" :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }" :default-sort="{ prop: 'pv', order: 'descending' }" @sort-change="onIpSortChange">
+          <el-table :data="ipDetailList" size="small" border style="width: 100%" :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }" :default-sort="{ prop: 'lastVisitTime', order: 'descending' }" @sort-change="onIpSortChange">
             <el-table-column type="index" label="序号" width="60" align="center" />
-            <el-table-column prop="ip" label="IP" align="center" />
-            <el-table-column label="地域" align="center">
+            <el-table-column prop="ip" label="IP" sortable="custom" align="center" />
+            <el-table-column prop="region" label="地域" sortable="custom" align="center">
               <template slot-scope="scope">{{ scope.row.country }} {{ scope.row.province }}</template>
             </el-table-column>
-            <el-table-column label="分类" align="center">
+            <el-table-column prop="botCategory" label="分类" sortable="custom" align="center">
               <template slot-scope="scope">{{ scope.row.categoryName }}</template>
             </el-table-column>
-            <el-table-column label="UA归属" align="center">
+            <el-table-column prop="uaOwner" label="UA归属" sortable="custom" align="center">
               <template slot-scope="scope">{{ scope.row.uaOwnerName || scope.row.uaOwner || "--" }}</template>
             </el-table-column>
             <el-table-column prop="hitReasons" label="命中原因" align="center">
@@ -452,6 +526,10 @@ export default {
     return {
       timeFlag: "today",
       dateRange: [],
+      categoryDisplayMode: "pie",
+      areaDisplayMode: "bar",
+      engineDisplayMode: "bar",
+      aiDisplayMode: "bar",
       // 日期快捷按钮：与趋势分析（filterBar）保持一致
       pickerOptions: {
         shortcuts: [
@@ -576,8 +654,86 @@ export default {
         sourceName: item.sourceName,
       }));
     },
+    // 地域列表数据：国内按省份、海外按国家汇总，按 IP 数降序，占比以全部地域为分母
+    areaRegionItems() {
+      const inChina = this.areaList
+        .filter((x) => x.region === "国内")
+        .map((x) => ({ name: x.province, ipCount: x.ipCount, isChina: true }));
+      const overseasMap = {};
+      this.areaList
+        .filter((x) => x.region === "海外")
+        .forEach((x) => {
+          const countryName = COUNTRY_CODE_NAMES[x.country] || x.country;
+          if (!overseasMap[countryName]) {
+            overseasMap[countryName] = { name: countryName, ipCount: 0, isChina: false };
+          }
+          overseasMap[countryName].ipCount += x.ipCount;
+        });
+      const items = inChina
+        .concat(Object.values(overseasMap))
+        .sort((a, b) => b.ipCount - a.ipCount);
+      const total = items.reduce((s, x) => s + x.ipCount, 0);
+      items.forEach((x) => {
+        x.rateText = total > 0 ? ((x.ipCount * 100.0) / total).toFixed(2) + "%" : "0.00%";
+      });
+      return items;
+    },
+    // 分类列表数据：按 IP 数降序（接口已按 ip_count desc 返回），占比直接用接口的 ipRatio（两位小数）
+    categoryTableItems() {
+      return this.categoryList.map((x) => ({
+        botCategory: x.botCategory,
+        categoryName: x.categoryName,
+        ipCount: x.ipCount,
+        rateText: (x.ipRatio || 0) + "%",
+      }));
+    },
+    // 搜索引擎汇总列表：按 IP 数降序 + 占比
+    engineTableItems() {
+      const items = this.engineSummaryList
+        .map((x) => ({ engineName: x.engineName, pageCount: x.pageCount, ipCount: x.ipCount }))
+        .sort((a, b) => b.ipCount - a.ipCount);
+      const total = items.reduce((s2, x) => s2 + x.ipCount, 0);
+      items.forEach((x) => {
+        x.rateText = total > 0 ? ((x.ipCount * 100.0) / total).toFixed(2) + "%" : "0.00%";
+      });
+      return items;
+    },
+    // AI爬虫汇总列表：按 IP 数降序 + 占比
+    aiTableItems() {
+      const items = this.aiSummaryList
+        .map((x) => ({ sourceName: x.sourceName, pageCount: x.pageCount, ipCount: x.ipCount }))
+        .sort((a, b) => b.ipCount - a.ipCount);
+      const total = items.reduce((s2, x) => s2 + x.ipCount, 0);
+      items.forEach((x) => {
+        x.rateText = total > 0 ? ((x.ipCount * 100.0) / total).toFixed(2) + "%" : "0.00%";
+      });
+      return items;
+    },
   },
   watch: {
+    areaDisplayMode(val) {
+      // 切换显示方式时容器尺寸可能变化，触发一次 resize
+      this.$nextTick(() => {
+        if (val === "bar" && this.charts.barChart) {
+          this.charts.barChart.resize();
+        }
+      });
+    },
+    categoryDisplayMode(val) {
+      if (val === "pie" && this.charts.categoryChart) {
+        this.$nextTick(() => this.charts.categoryChart.resize());
+      }
+    },
+    engineDisplayMode(val) {
+      if (val === "bar" && this.charts.engineChart) {
+        this.$nextTick(() => this.charts.engineChart.resize());
+      }
+    },
+    aiDisplayMode(val) {
+      if (val === "bar" && this.charts.aiChart) {
+        this.$nextTick(() => this.charts.aiChart.resize());
+      }
+    },
     commonParams(val) {
       this.fetchOverview(val);
       this.fetchCategory(val);
@@ -677,7 +833,7 @@ export default {
       );
     },
     initCharts() {
-      const refs = ["categoryChart", "areaChart", "engineChart", "aiChart"];
+      const refs = ["categoryChart", "barChart", "engineChart", "aiChart"];
       refs.forEach((ref) => {
         if (this.$refs[ref]) {
           this.charts[ref] = echarts.init(this.$refs[ref]);
@@ -764,12 +920,12 @@ export default {
           inChina.sort((a, b) => b.ipCount - a.ipCount);
           overseas.sort((a, b) => b.ipCount - a.ipCount);
           this.areaList = inChina.concat(overseas);
-          this.renderAreaChart();
+          this.renderAreaBarChart();
         }
       });
     },
-    renderAreaChart() {
-      const chart = this.charts.areaChart;
+    renderAreaBarChart() {
+      const chart = this.charts.barChart;
       if (!chart) {
         return;
       }
@@ -1077,6 +1233,9 @@ export default {
       // 机器人IP明细：搜索框与表格之间留出间距（表格仅此卡片存在）
       .el-table {
         margin-top: 10px;
+        // 表格四角圆角，overflow 裁掉表头背景的直角
+        border-radius: 6px;
+        overflow: hidden;
       }
     // 流量概览无边框行布局，样式对齐数据概览 FlowView
     .bid-list-page {
@@ -1167,6 +1326,14 @@ export default {
         width: 240px;
       }
     }
+    .area-mode-switch {
+      margin-left: auto;
+    }
+  }
+  // 4 个新增列表：与机器人IP明细一致的圆角
+  .area-list-table {
+    border-radius: 6px;
+    overflow: hidden;
   }
   .tag-clamp {
     display: flex;
