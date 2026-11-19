@@ -19,6 +19,7 @@
         end-placeholder="结束日期"
         value-format="yyyy-MM-dd"
         :clearable="false"
+        :picker-options="pickerOptions"
         class="filter-date"
         @change="handleDateChange"
       />
@@ -321,7 +322,7 @@
               </el-input>
             </div>
           </div>
-          <el-table :data="ipDetailList" size="small" border style="width: 100%" :default-sort="{ prop: 'pv', order: 'descending' }" @sort-change="onIpSortChange">
+          <el-table :data="ipDetailList" size="small" border style="width: 100%" :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }" :default-sort="{ prop: 'pv', order: 'descending' }" @sort-change="onIpSortChange">
             <el-table-column type="index" label="序号" width="60" align="center" />
             <el-table-column prop="ip" label="IP" align="center" />
             <el-table-column label="地域" align="center">
@@ -451,6 +452,56 @@ export default {
     return {
       timeFlag: "today",
       dateRange: [],
+      // 日期快捷按钮：与趋势分析（filterBar）保持一致
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "近六个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 180);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "近一年",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 365);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
+      },
       filterBarParams: {
         startTime: "",
         endTime: "",
@@ -608,6 +659,23 @@ export default {
       }
       return formatTime(Math.floor(val));
     },
+    // 空数据占位：与 pieMarker 空状态一致，居中提示"暂无数据"
+    setChartEmpty(chart) {
+      chart.setOption(
+        {
+          title: {
+            text: "暂无数据",
+            left: "center",
+            top: "center",
+            textStyle: { color: "#999", fontSize: 14, fontWeight: "normal" },
+          },
+          series: [],
+          legend: {},
+          tooltip: { show: false },
+        },
+        { notMerge: true }
+      );
+    },
     initCharts() {
       const refs = ["categoryChart", "areaChart", "engineChart", "aiChart"];
       refs.forEach((ref) => {
@@ -646,6 +714,10 @@ export default {
     renderCategoryChart() {
       const chart = this.charts.categoryChart;
       if (!chart) {
+        return;
+      }
+      if (!this.categoryList.length || !this.categoryTotalIpCount) {
+        this.setChartEmpty(chart);
         return;
       }
       const list = this.categoryList;
@@ -699,6 +771,10 @@ export default {
     renderAreaChart() {
       const chart = this.charts.areaChart;
       if (!chart) {
+        return;
+      }
+      if (!this.areaList.length) {
+        this.setChartEmpty(chart);
         return;
       }
       // 国内按省份展示，海外按国家汇总展示
@@ -758,6 +834,10 @@ export default {
     renderEngineChart() {
       const chart = this.charts.engineChart;
       if (!chart) {
+        return;
+      }
+      if (!this.engineSummaryList.length) {
+        this.setChartEmpty(chart);
         return;
       }
       const list = this.engineSummaryList;
@@ -827,6 +907,10 @@ export default {
     renderAiSummaryChart() {
       const chart = this.charts.aiChart;
       if (!chart) {
+        return;
+      }
+      if (!this.aiSummaryList.length) {
+        this.setChartEmpty(chart);
         return;
       }
       const list = this.aiSummaryList;
@@ -984,12 +1068,16 @@ export default {
       margin-left: 10px;
     }
   }
-  .overview-card {
-    // 通栏卡片（流量概览/机器人IP明细）：block-line 是 flex 容器，需显式占满宽度
-    width: 100%;
-    .block-head {
-      margin-bottom: 0;
-    }
+    .overview-card {
+      // 通栏卡片（流量概览/机器人IP明细）：block-line 是 flex 容器，需显式占满宽度
+      width: 100%;
+      .block-head {
+        margin-bottom: 0;
+      }
+      // 机器人IP明细：搜索框与表格之间留出间距（表格仅此卡片存在）
+      .el-table {
+        margin-top: 10px;
+      }
     // 流量概览无边框行布局，样式对齐数据概览 FlowView
     .bid-list-page {
       display: flex;
