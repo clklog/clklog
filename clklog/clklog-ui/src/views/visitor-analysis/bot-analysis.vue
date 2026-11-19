@@ -246,7 +246,7 @@
               </el-input>
             </div>
           </div>
-          <el-table :data="enginePageList" size="small" style="width: 100%" :default-sort="{ prop: 'crawlCount', order: 'descending' }" @sort-change="onEngineSortChange">
+          <el-table :data="enginePageList" size="small" border style="width: 100%" :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }" :default-sort="{ prop: 'crawlCount', order: 'descending' }" @sort-change="onEngineSortChange">
             <el-table-column type="index" label="序号" width="60" align="center" />
             <el-table-column prop="url" label="页面" min-width="200" sortable="custom">
               <template slot-scope="scope">
@@ -319,7 +319,7 @@
               </el-input>
             </div>
           </div>
-          <el-table :data="aiPageList" size="small" style="width: 100%" :default-sort="{ prop: 'crawlCount', order: 'descending' }" @sort-change="onAiSortChange">
+          <el-table :data="aiPageList" size="small" border style="width: 100%" :header-cell-style="{ textAlign: 'center', background: '#f7fafe' }" :default-sort="{ prop: 'crawlCount', order: 'descending' }" @sort-change="onAiSortChange">
             <el-table-column type="index" label="序号" width="60" align="center" />
             <el-table-column prop="url" label="页面" min-width="200" sortable="custom">
               <template slot-scope="scope">
@@ -1290,18 +1290,17 @@ export default {
           line-height: 14px;
           color: #4d4d4d;
         }
-        // 机器人行：蓝色加粗，与数据概览“今日”行一致
+        // 机器人/真人两行统计数字统一：15px 常规字重 #4d4d4d
         .w158 {
-          font-size: 16px;
-          font-weight: bold;
-          color: #2c7be5;
-          line-height: 17px;
-        }
-        // 真人行：统计数字样式（试用：与标签同规格 13px/#4d4d4d）
-        .w159 {
-          font-size: 13px;
+          font-size: 15px;
           font-weight: 400;
-          line-height: 14px;
+          color: #4d4d4d;
+          line-height: 16px;
+        }
+        .w159 {
+          font-size: 15px;
+          font-weight: 400;
+          line-height: 16px;
           color: #4d4d4d;
         }
       }
@@ -1311,6 +1310,11 @@ export default {
     .chart-box {
       height: 320px;
       width: 100%;
+    }
+    // 引擎抓取页面/AI爬虫抓取页面：表格四角圆角，与机器人IP明细一致
+    .el-table {
+      border-radius: 6px;
+      overflow: hidden;
     }
   }
   .block-head {
