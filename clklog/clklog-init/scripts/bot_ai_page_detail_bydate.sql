@@ -21,4 +21,5 @@ FROM (
          WHERE stat_date = ':cal_date'
            AND bot_category = 'ai_crawler'
          GROUP BY project_name, source, url, title
+         HAVING crawlCount > 0
          ) t1
