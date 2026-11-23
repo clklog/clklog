@@ -120,7 +120,7 @@ jobs:
             ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-
 
       - name: Build shared traffic rules
-        if: matrix.name == 'clklog-receiver' || matrix.name == 'clklog-processing'
+        if: matrix.lang == 'java'
         working-directory: clklog/clklog-traffic-rules
         run: mvn -B -ntp clean install
 
