@@ -65,6 +65,12 @@ jobs:
             ls -la target/*.jar | head -5
             cd ../../
           done
+          # processing 的 fat jar 是 multi-release jar（连接实现只在 META-INF/versions/11），
+          # Flink 子类加载器不解析 MR 目录，上传前先展平
+          processing_jar=$(ls -1 clklog/clklog-processing/target/*jar-with-dependencies.jar 2>/dev/null | head -1)
+          if [ -n "${processing_jar}" ]; then
+            python3 clklog/clklog-processing/scripts/flatten_mr_jar.py "${processing_jar}"
+          fi
 
       - name: 构建前端
         if: ${{ github.event.inputs.skip_build != 'true' }}

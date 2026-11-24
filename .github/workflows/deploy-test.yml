@@ -456,6 +456,11 @@ jobs:
           head -120 /tmp/build_processing.log 2>/dev/null || true
           echo "--- target jars ---"
           ls -la target/*.jar 2>/dev/null || true
+          echo "--- flatten MR jar（clickhouse-jdbc http 变体为 multi-release，Flink 子加载器不解析 versions/11）---"
+          jarfile_flat=$(ls -1 target/*jar-with-dependencies.jar 2>/dev/null | head -1)
+          if [ -n "${jarfile_flat}" ]; then
+            python3 scripts/flatten_mr_jar.py "${jarfile_flat}"
+          fi
           exit "${MVN_RC}"
 
       - name: "Build Node UI · npm ci → test:unit（存在则跑 → passWithNoTests）→ build dist"

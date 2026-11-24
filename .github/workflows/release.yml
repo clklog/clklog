@@ -341,6 +341,11 @@ jobs:
             BUILD_ARGS=(--build-arg HTML_DIR=dist)
           else
             VER="$(cat version.txt)"
+            # processing 的 fat jar 是 multi-release jar（连接实现只在 META-INF/versions/11），
+            # Flink 子类加载器不解析 MR 目录，镜像构建前先展平（脚本随模块 artifact 一起下载）
+            if [ "$name" = "clklog-processing" ]; then
+              python3 scripts/flatten_mr_jar.py "target/${name}-${VER}${js}.jar"
+            fi
             BUILD_ARGS=(--build-arg "JAR_FILE=target/${name}-${VER}${js}.jar")
           fi
           ali_short="${{ matrix.ali }}"
