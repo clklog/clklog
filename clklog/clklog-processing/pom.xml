@@ -10,7 +10,9 @@
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<flink.version>1.16.1</flink.version>
+		<flink.version>1.19.3</flink.version>
+		<!-- Flink 1.17 起连接器外置独立发版，版本号与 Flink 主版本解耦 -->
+		<flink.connector.kafka.version>3.3.0-1.19</flink.connector.kafka.version>
 		<slf4j2.version>2.20.0</slf4j2.version>
 		<java.version>17</java.version>
 	</properties>
@@ -35,18 +37,29 @@
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-connector-kafka</artifactId>
-			<version>${flink.version}</version>
+			<version>${flink.connector.kafka.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.clickhouse</groupId>
 			<artifactId>clickhouse-jdbc</artifactId>
 			<version>0.4.6</version>
-			<classifier>http</classifier>
+		</dependency>
+		<!-- clickhouse-jdbc 的 http classifier 变体不含 Apache HttpClient5，
+		     显式补充，避免 Flink 子加载器加载连接实现时 NoClassDefFoundError -->
+		<dependency>
+			<groupId>org.apache.httpcomponents.client5</groupId>
+			<artifactId>httpclient5</artifactId>
+			<version>5.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents.core5</groupId>
+			<artifactId>httpcore5</artifactId>
+			<version>5.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.26</version>
+			<version>1.18.30</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

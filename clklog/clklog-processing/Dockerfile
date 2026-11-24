@@ -1,4 +1,4 @@
-FROM flink:1.16-java8
+FROM flink:1.19.3-java17
 
 ARG JAR_FILE
 
