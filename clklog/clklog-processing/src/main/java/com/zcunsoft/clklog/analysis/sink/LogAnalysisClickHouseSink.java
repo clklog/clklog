@@ -116,6 +116,9 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
             for (LogBean value : dataList) {
                 boolean bot = value.getTrafficDecision() != null && value.getTrafficDecision().isBot();
                 PreparedStatement pst = bot ? botStatement : normalStatement;
+                // 单条数据写入异常时丢弃该行并继续处理后续数据（与 receiver 保存修复同款思路），
+                // 避免坏数据（如 project_token 为空）导致作业无限重启
+                try {
                 pst.setString(1, value.getDistinctId());
                 pst.setString(2, value.getTypeContext());
                 pst.setString(3, value.getEvent());
@@ -247,6 +250,11 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
                     normalCount++;
                 }
                 pst.addBatch();
+                } catch (Exception ex) {
+                    logger.error("丢弃写入异常的数据 distinctId={} trackId={} project={} event={}",
+                            value.getDistinctId(), value.getTrackId(), value.getProjectName(), value.getEvent(), ex);
+                    pst.clearParameters();
+                }
             }
         }
         if (normalCount > 0) {
@@ -255,6 +263,9 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
         if (botCount > 0) {
             botStatement.executeBatch();
         }
+        } catch (Exception ex) {
+            // 批次执行异常时丢弃本批数据并继续，保证作业不因写入失败而中断
+            logger.error("批次写入 ClickHouse 失败，丢弃本批次 {} 条数据", normalCount + botCount, ex);
         } finally {
             normalStatement.clearBatch();
             botStatement.clearBatch();
