@@ -1,4 +1,4 @@
-package com.zcunsoft.clklog.analysis.utils;
+package com.zcunsoft.clklog.core.util;
 
 import java.math.BigInteger;
 import java.net.InetAddress;

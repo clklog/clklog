@@ -1,6 +1,6 @@
 package com.zcunsoft.cfg;
 
-import com.zcunsoft.util.ObjectMapperUtil;
+import com.zcunsoft.clklog.core.util.ObjectMapperUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

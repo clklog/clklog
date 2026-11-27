@@ -2,7 +2,7 @@ package com.zcunsoft.clklog.analysis.utils;
 
 import com.ip2location.IP2Location;
 import com.ip2location.IPResult;
-import com.zcunsoft.clklog.analysis.bean.Region;
+import com.zcunsoft.clklog.core.bean.Region;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.slf4j.Logger;

@@ -1,17 +1,17 @@
 package com.zcunsoft.clklog.analysis;
 
-import com.zcunsoft.clklog.analysis.bean.LogBean;
-import com.zcunsoft.clklog.analysis.bean.ProjectSetting;
 import com.zcunsoft.clklog.analysis.bean.QueryCriteria;
-import com.zcunsoft.clklog.analysis.bean.Region;
-import com.zcunsoft.clklog.analysis.utils.ExtractUtil;
 import com.zcunsoft.clklog.analysis.utils.IPUtil;
-import com.zcunsoft.clklog.analysis.utils.ObjectMapperUtil;
+import com.zcunsoft.clklog.core.bean.LogBean;
+import com.zcunsoft.clklog.core.bean.ProjectSetting;
+import com.zcunsoft.clklog.core.bean.Region;
+import com.zcunsoft.clklog.core.util.ExtractUtil;
+import com.zcunsoft.clklog.core.util.ObjectMapperUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 import org.apache.commons.io.FileUtils;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;

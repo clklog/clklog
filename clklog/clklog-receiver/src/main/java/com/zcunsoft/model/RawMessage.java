@@ -1,9 +1,10 @@
 package com.zcunsoft.model;
 
+import com.zcunsoft.clklog.core.bean.LogMessage;
 import lombok.Data;
 
 @Data
-public class RawMessage {
+public class RawMessage implements LogMessage {
 
     private String data_list;
 

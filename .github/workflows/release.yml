@@ -138,6 +138,12 @@ jobs:
             ${{ runner.os }}-release-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package.json', matrix.dir)) }}-
             ${{ runner.os }}-release-node-modules-${{ env.NODE_VERSION }}-
 
+      - name: Build clklog-core (公共模块先行 install，供各服务依赖)
+        if: matrix.lang == 'java'
+        working-directory: clklog/clklog-core
+        shell: bash
+        run: mvn -B -ntp clean install -DskipTests
+
       - name: Build Java (clean verify)
         id: build_java
         if: matrix.lang == 'java'

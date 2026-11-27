@@ -6,13 +6,13 @@ on:
     # 与 pull_request 的 paths 过滤保持一致：仅子项目代码 / CI 自身 / .gitignore 变更才触发构建验证，
     # 纯文档（docs/、README）、compose 等提交不再触发全量 6 构建
     paths:
-      - 'clklog/clklog-{api,init,manage,processing,receiver,ui}/**'
+      - 'clklog/clklog-{api,init,manage,processing,receiver,ui,core}/**'
       - '.github/workflows/ci.yml'
       - '.gitignore'
   pull_request:
     branches: [main, aitest]
     paths:
-      - 'clklog/clklog-{api,init,manage,processing,receiver,ui}/**'
+      - 'clklog/clklog-{api,init,manage,processing,receiver,ui,core}/**'
       - '.github/workflows/ci.yml'
       - '.gitignore'
   workflow_dispatch:
@@ -116,6 +116,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/package.json', matrix.dir)) }}-
             ${{ runner.os }}-node-modules-${{ env.NODE_VERSION }}-
+
+      - name: Build clklog-core (公共模块先行 install，供各服务依赖)
+        if: matrix.lang == 'java'
+        working-directory: clklog/clklog-core
+        shell: bash
+        run: mvn -B -ntp clean install -DskipTests
 
       - name: Build Java (clean verify · 子 pom 自带 jacoco LINE≥80% 硬卡生效)
         id: build_java

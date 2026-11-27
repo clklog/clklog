@@ -1,12 +1,17 @@
-package com.zcunsoft.clklog.analysis.utils;
+package com.zcunsoft.clklog.core.util;
 
-import com.zcunsoft.clklog.analysis.bean.*;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.zcunsoft.clklog.core.bean.LogBean;
+import com.zcunsoft.clklog.core.bean.LogMessage;
+import com.zcunsoft.clklog.core.bean.PathRule;
+import com.zcunsoft.clklog.core.bean.ProjectSetting;
+import com.zcunsoft.clklog.core.bean.Region;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import nl.basjes.parse.useragent.AgentField;
 import nl.basjes.parse.useragent.UserAgent;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ArrayNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +28,7 @@ import java.util.regex.Pattern;
 
 public class ExtractUtil {
     private static final Logger logger = LoggerFactory.getLogger(ExtractUtil.class);
+
     /**
      * A类IP的正则模式.
      */
@@ -31,7 +37,6 @@ public class ExtractUtil {
      * B类IP的正则模式.
      */
     private static final Pattern IPPatternClassB = Pattern.compile("^([0-9]{1,3})\\.([0-9]{1,3})\\.\\*\\.\\*$");
-
     /**
      * C类IP的正则模式.
      */
@@ -49,23 +54,35 @@ public class ExtractUtil {
     private static final ThreadLocal<DateFormat> yMdHmsFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
 
-    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, ProjectSetting projectSetting, QueryCriteria rawMessage) {
+    /**
+     * 解析单条日志为 LogBean.
+     *
+     * @param json             日志json
+     * @param userAgentAnalyzer UA解析器
+     * @param projectSetting   项目配置
+     * @param region           已解析的地域信息，可为null（由调用方后续解析地域）
+     * @param message          原始消息（project/token/crc/gzip/ua/clientIp）
+     * @param kafkaDataTime    kafka数据时间
+     * @return LogBean
+     */
+    public static LogBean extractToLogBean(JsonNode json, AbstractUserAgentAnalyzer userAgentAnalyzer, ProjectSetting projectSetting, Region region, LogMessage message, String kafkaDataTime) {
 
         LogBean logBean = null;
         try {
             logBean = new LogBean();
-            logBean.setKafkaDataTime(rawMessage.getReceiveTime());
-            if (logBean.getKafkaDataTime() == null) {
-                logBean.setKafkaDataTime(String.valueOf(System.currentTimeMillis() / 1000));
-            }
-            logBean.setProjectName(rawMessage.getProject());
-            logBean.setProjectToken(rawMessage.getToken());
-            logBean.setCrc(rawMessage.getCrc());
+            logBean.setKafkaDataTime(kafkaDataTime);
+            logBean.setProjectName(message.getProject());
+            logBean.setProjectToken(message.getToken());
+            logBean.setCrc(message.getCrc());
             if (logBean.getCrc() == null) {
                 logBean.setCrc("");
             }
-            logBean.setIsCompress(rawMessage.getGzip());
-            logBean.setClientIp(rawMessage.getClientIp());
+            logBean.setIsCompress(message.getGzip());
+            if (region != null && StringUtils.isNotBlank(region.getClientIp())) {
+                logBean.setClientIp(region.getClientIp());
+            } else {
+                logBean.setClientIp(message.getClientIp());
+            }
             logBean.setCreateTime(yMdHmsFormat.get().format(new Timestamp(System.currentTimeMillis())));
             if (json.has("distinct_id")) {
                 logBean.setDistinctId(json.get("distinct_id").asText());
@@ -86,6 +103,7 @@ public class ExtractUtil {
                 logBean.setTrackId(json.get("_track_id").asText());
             }
             if (json.has("time")) {
+                /* 解析日志时间、设置时分秒 */
                 long ltime = 0L;
                 try {
                     ltime = Long.parseLong(json.get("time").asText());
@@ -333,8 +351,8 @@ public class ExtractUtil {
                 if (properties.has("$track_signup_original_id")) {
                     logBean.setTrackSignupOriginalId(properties.get("$track_signup_original_id").asText());
                 }
-                logBean.setUserAgent(rawMessage.getUa());
-                if (StringUtils.isBlank(rawMessage.getUa()) && properties.has("$user_agent")) {
+                logBean.setUserAgent(message.getUa());
+                if (StringUtils.isBlank(message.getUa()) && properties.has("$user_agent")) {
                     logBean.setUserAgent(properties.get("$user_agent").asText());
                 }
                 if (properties.has("$utm_campaign")) {
@@ -372,6 +390,17 @@ public class ExtractUtil {
                 }
                 if (properties.has("$city")) {
                     logBean.setCity(properties.get("$city").asText());
+                }
+                if (region != null) {
+                    if (StringUtils.isNotBlank(region.getCountry())) {
+                        logBean.setCountry(region.getCountry());
+                    }
+                    if (StringUtils.isNotBlank(region.getProvince())) {
+                        logBean.setProvince(region.getProvince());
+                    }
+                    if (StringUtils.isNotBlank(region.getCity())) {
+                        logBean.setCity(region.getCity());
+                    }
                 }
                 if (properties.has("$element_id")) {
                     logBean.setElementId(properties.get("$element_id").asText());
@@ -448,6 +477,7 @@ public class ExtractUtil {
                     String parsedUrlPath = processPathRule(logBean.getUrlPath(), projectSetting);
                     logBean.setUrlPath(parsedUrlPath);
                 }
+
                 if (projectSetting != null) {
                     logBean.setUrl(excludeParamFromUrl(projectSetting, logBean.getUrl(), true));
 
@@ -462,7 +492,7 @@ public class ExtractUtil {
         return logBean;
     }
 
-    private static ProjectSetting getProjectSetting(String globalAppCode, String projectName, HashMap<String, ProjectSetting> htProjectSetting) {
+    public static ProjectSetting getProjectSetting(String globalAppCode, String projectName, HashMap<String, ProjectSetting> htProjectSetting) {
         ProjectSetting projectSetting = htProjectSetting.get(globalAppCode);
         if (htProjectSetting.containsKey(projectName)) {
             projectSetting = htProjectSetting.get(projectName);
@@ -470,66 +500,88 @@ public class ExtractUtil {
         return projectSetting;
     }
 
-    private static boolean filterData(LogBean logBean, ProjectSetting projectSetting) {
-        boolean isAdd = logBean != null;
+    public static boolean filterData(LogBean logBean, ProjectSetting projectSetting) {
+        String err = "";
 
-        if (isAdd) {
+        if (logBean == null) {
+            err = "logBean is null";
+        }
+
+        if (err.isEmpty()) {
             /* 过滤超时的数据 */
             long diff = logBean.getFlushTime() - logBean.getTime();
             if (diff > 60000 || logBean.getFlushTime() <= 0 || logBean.getTime() <= 0) {
-                isAdd = false;
+                err = "flushtime > time +60000 or flushtime<0 or time <0";
             }
         }
-        if (isAdd) {
+        if (err.isEmpty()) {
             /* 过滤anonymouse_id或distinct_id字段为空的 */
             if (StringUtils.isBlank(logBean.getAnonymousId()) || StringUtils.isBlank(logBean.getDistinctId())) {
-                isAdd = false;
+                err = "anonymous_id or distinct_id is null";
             }
         }
-        if (isAdd) {
+        if (err.isEmpty()) {
             /* 过滤logTime字段为空的 */
             if (logBean.getLogTime() == null) {
-                isAdd = false;
+                err = "logBean time is null";
             }
         }
-        if (isAdd) {
-            if (projectSetting != null) {
-                if (isAdd && StringUtils.isNotBlank(projectSetting.getExcludedIp())) {
-                    isAdd = !checkIfIpInExcludedIpList(projectSetting.getExcludedIp(), logBean.getClientIp());
+        if (projectSetting != null) {
+            if (err.isEmpty() && StringUtils.isNotBlank(projectSetting.getExcludedIp())) {
+                if (checkIfIpInExcludedIpList(projectSetting.getExcludedIp(), logBean.getClientIp())) {
+                    err = logBean.getClientIp() + " is in excluded ip list";
                 }
-                if (isAdd && StringUtils.isNotBlank(projectSetting.getExcludedUa())) {
-                    isAdd = !checkIfUaContainsExcludedUa(projectSetting.getExcludedUa(), logBean.getUserAgent());
+            }
+            if (err.isEmpty() && StringUtils.isNotBlank(projectSetting.getExcludedUa())) {
+                if (checkIfUaContainsExcludedUa(projectSetting.getExcludedUa(), logBean.getUserAgent())) {
+                    err = logBean.getUserAgent() + " is in excluded ua list";
                 }
             }
         }
-        return isAdd;
+        if (!err.isEmpty()) {
+            logger.error(logBean.getDistinctId() + " " + logBean.getTime() + " 日志无效原因:" + err);
+        }
+        return err.isEmpty();
     }
 
-    public static List<LogBean> extractToLogBeanList(QueryCriteria rawMessage, String globalAppCode, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, ProjectSetting> htProjectSetting) {
+    /**
+     * 解析整条消息（data 或 data_list）为 LogBean 列表.
+     *
+     * @param message           原始消息
+     * @param globalAppCode     全局项目编码
+     * @param userAgentAnalyzer UA解析器
+     * @param htProjectSetting  项目配置表
+     * @return LogBean 列表
+     */
+    public static List<LogBean> extractToLogBeanList(LogMessage message, String globalAppCode, AbstractUserAgentAnalyzer userAgentAnalyzer, HashMap<String, ProjectSetting> htProjectSetting) {
         List<LogBean> logBeanList = new ArrayList<>();
         String data = "";
         try {
+            String projectName = message.getProject();
 
-            String projectName = rawMessage.getProject();
-
-            data = rawMessage.getData();
+            data = message.getData();
             if (data == null) {
-                data = rawMessage.getData_list();
+                data = message.getData_list();
             }
             ObjectMapperUtil objectMapper = new ObjectMapperUtil();
             JsonNode json = objectMapper.readTree(data);
             ProjectSetting projectSetting = getProjectSetting(globalAppCode, projectName, htProjectSetting);
 
+            String kafkaDataTime = message.getReceiveTime();
+            if (kafkaDataTime == null) {
+                kafkaDataTime = String.valueOf(System.currentTimeMillis() / 1000);
+            }
+
             if (json instanceof ArrayNode) {
                 ArrayNode arrayNode = (ArrayNode) json;
                 for (int i = 0; i < arrayNode.size(); i++) {
-                    LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, projectSetting, rawMessage);
+                    LogBean logBean = extractToLogBean(arrayNode.get(i), userAgentAnalyzer, projectSetting, null, message, kafkaDataTime);
                     if (filterData(logBean, projectSetting)) {
                         logBeanList.add(logBean);
                     }
                 }
             } else {
-                LogBean logBean = extractToLogBean(json, userAgentAnalyzer, projectSetting, rawMessage);
+                LogBean logBean = extractToLogBean(json, userAgentAnalyzer, projectSetting, null, message, kafkaDataTime);
                 if (filterData(logBean, projectSetting)) {
                     logBeanList.add(logBean);
                 }
@@ -834,7 +886,13 @@ public class ExtractUtil {
         return value;
     }
 
-
+    /**
+     * 地域信息中英文转换.
+     *
+     * @param region    地域信息
+     * @param htForCity 城市中英文映射表
+     * @return 地域信息
+     */
     public static Region translateRegion(Region region, Map<String, String> htForCity) {
         Region translatedRegion = null;
         if (region != null) {

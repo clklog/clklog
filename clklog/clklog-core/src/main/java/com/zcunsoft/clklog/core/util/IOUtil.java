@@ -1,4 +1,4 @@
-package com.zcunsoft.clklog.manage.utils;
+package com.zcunsoft.clklog.core.util;
 
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;

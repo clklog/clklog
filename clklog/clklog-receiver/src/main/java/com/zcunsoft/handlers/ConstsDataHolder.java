@@ -1,6 +1,6 @@
 package com.zcunsoft.handlers;
 
-import com.zcunsoft.model.ProjectSetting;
+import com.zcunsoft.clklog.core.bean.ProjectSetting;
 import com.zcunsoft.model.RawMessage;
 import lombok.Data;
 

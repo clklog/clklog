@@ -117,6 +117,14 @@ jobs:
         run: |
           set -euo pipefail
           rc=0
+          # clklog-core 作为公共依赖先行 install（receiver/processing/manage 的单测依赖它）
+          echo "=========== [clklog-core] mvn clean install ==========="
+          if ( cd "clklog/clklog-core" && mvn -B -ntp \
+                 -Duser.timezone=Asia/Shanghai clean install -DskipTests ); then
+            echo "[clklog-core] OK"
+          else
+            echo "[clklog-core] FAILED"; exit 1
+          fi
           for d in clklog-manage clklog-api clklog-receiver clklog-init clklog-processing; do
             echo "=========== [${d}] mvn clean test ==========="
             MVN_CMD="mvn -B -ntp"

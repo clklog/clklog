@@ -1,10 +1,16 @@
 package com.zcunsoft.clklog.analysis.function;
 
-import com.zcunsoft.clklog.analysis.bean.*;
+import com.zcunsoft.clklog.analysis.bean.LogBeanCollection;
+import com.zcunsoft.clklog.analysis.bean.QueryCriteria;
 import com.zcunsoft.clklog.analysis.cfg.RedisSettings;
-import com.zcunsoft.clklog.analysis.utils.ExtractUtil;
 import com.zcunsoft.clklog.analysis.utils.IPUtil;
-import com.zcunsoft.clklog.analysis.utils.ObjectMapperUtil;
+import com.zcunsoft.clklog.core.bean.LogBean;
+import com.zcunsoft.clklog.core.bean.ProjectSetting;
+import com.zcunsoft.clklog.core.bean.Region;
+import com.zcunsoft.clklog.core.util.ExtractUtil;
+import com.zcunsoft.clklog.core.util.ObjectMapperUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
@@ -12,8 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;

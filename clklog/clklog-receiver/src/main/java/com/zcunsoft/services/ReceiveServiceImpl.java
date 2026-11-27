@@ -8,10 +8,11 @@ import com.zcunsoft.cfg.KafkaSetting;
 import com.zcunsoft.cfg.ReceiverSetting;
 import com.zcunsoft.cfg.RedisConstsConfig;
 import com.zcunsoft.handlers.ConstsDataHolder;
-import com.zcunsoft.model.LogBean;
-import com.zcunsoft.model.ProjectSetting;
+import com.zcunsoft.clklog.core.bean.LogBean;
+import com.zcunsoft.clklog.core.bean.ProjectSetting;
+import com.zcunsoft.clklog.core.bean.Region;
+import com.zcunsoft.clklog.core.util.*;
 import com.zcunsoft.model.RawMessage;
-import com.zcunsoft.model.Region;
 import com.zcunsoft.model.enums.ErrorType;
 import com.zcunsoft.util.*;
 import nl.basjes.parse.useragent.AbstractUserAgentAnalyzer;
@@ -427,14 +428,14 @@ public class ReceiveServiceImpl implements IReceiveService {
             }
             if (array.isArray()) {
                 for (JsonNode jn : array) {
-                    LogBean logBean = ExtractUtil.extractToLogBean(jn, userAgentAnalyzer, projectSetting, region, rawMessage);
+                    LogBean logBean = ExtractUtil.extractToLogBean(jn, userAgentAnalyzer, projectSetting, region, rawMessage, String.valueOf(System.currentTimeMillis() / 1000));
                     if (ExtractUtil.filterData(logBean, projectSetting)) {
                         logBeanList.add(logBean);
                     }
                 }
 
             } else {
-                LogBean logBean = ExtractUtil.extractToLogBean(array, userAgentAnalyzer, projectSetting, region, rawMessage);
+                LogBean logBean = ExtractUtil.extractToLogBean(array, userAgentAnalyzer, projectSetting, region, rawMessage, String.valueOf(System.currentTimeMillis() / 1000));
                 if (ExtractUtil.filterData(logBean, projectSetting)) {
                     logBeanList.add(logBean);
                 }

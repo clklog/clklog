@@ -1,9 +1,10 @@
 package com.zcunsoft.clklog.analysis.bean;
 
+import com.zcunsoft.clklog.core.bean.LogMessage;
 import lombok.Data;
 
 @Data
-public class QueryCriteria {
+public class QueryCriteria implements LogMessage {
 
     private String data_list;
 

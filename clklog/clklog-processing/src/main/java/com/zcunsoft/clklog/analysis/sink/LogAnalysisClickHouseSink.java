@@ -1,9 +1,9 @@
 package com.zcunsoft.clklog.analysis.sink;
 
 
-import com.zcunsoft.clklog.analysis.bean.LogBean;
 import com.zcunsoft.clklog.analysis.bean.LogBeanCollection;
 import com.zcunsoft.clklog.analysis.utils.ClickHouseUtil;
+import com.zcunsoft.clklog.core.bean.LogBean;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;

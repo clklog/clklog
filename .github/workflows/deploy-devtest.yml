@@ -47,6 +47,12 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: 构建 clklog-core（公共模块先行 install）
+        if: ${{ github.event.inputs.skip_build != 'true' }}
+        run: |
+          cd clklog/clklog-core
+          mvn -B -ntp clean install -DskipTests -DskipITs
+
       - name: 构建后端 JAR
         if: ${{ github.event.inputs.skip_build != 'true' }}
         run: |

@@ -1,8 +1,8 @@
 package com.zcunsoft.services;
 
-import com.zcunsoft.model.LogBean;
+import com.zcunsoft.clklog.core.bean.LogBean;
+import com.zcunsoft.clklog.core.bean.Region;
 import com.zcunsoft.model.RawMessage;
-import com.zcunsoft.model.Region;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

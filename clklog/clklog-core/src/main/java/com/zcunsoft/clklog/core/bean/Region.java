@@ -1,4 +1,4 @@
-package com.zcunsoft.clklog.analysis.bean;
+package com.zcunsoft.clklog.core.bean;
 
 import lombok.Data;
 
