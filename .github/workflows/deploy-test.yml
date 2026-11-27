@@ -22,7 +22,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  JAVA_VERSION: "8"
+  JAVA_VERSION: "17"
   JAVA_DISTRO: "temurin"
   NODE_VERSION: "18"
   AITEST_BUMP: "2026-09-09T13:15:00+08:00"
@@ -204,7 +204,7 @@ jobs:
             :
           else
             NEED_UPDATE=1
-            INSTALL_PKGS="$INSTALL_PKGS openjdk-8-jdk"
+            INSTALL_PKGS="$INSTALL_PKGS openjdk-17-jdk"
           fi
 
           if command -v mvn >/dev/null 2>&1; then
@@ -263,7 +263,7 @@ jobs:
 
           JH=""
           if [ -d /usr/lib/jvm ]; then
-            for d in /usr/lib/jvm/java-8-openjdk* /usr/lib/jvm/java-1.8.0-openjdk*; do
+            for d in /usr/lib/jvm/java-17-openjdk* /usr/lib/jvm/java-1.17.0-openjdk*; do
               if [ -d "$d" ] && [ -x "$d/bin/java" ]; then JH="$d"; break; fi
             done
           fi
@@ -542,29 +542,6 @@ jobs:
           else
             echo "  clklog-ui: dist 不存在（SKIP_LOCAL_BUILD=true 时将导致 compose ui stage COPY 失败）"
           fi
-
-      - name: 修复 Java Dockerfile FROM openjdk:8（Docker Hub 已 2023 废弃 → Official Temurin 8 JDK）
-        working-directory: clklog
-        shell: bash
-        run: |
-          set -euo pipefail
-          for sub in manage api receiver init processing; do
-            f="clklog-${sub}/Dockerfile"
-            if [ ! -f "$f" ]; then echo "  skip clklog-${sub}: no Dockerfile at ${f}"; continue; fi
-            ORIG="$(head -1 "$f")"
-            sed -i -E 's|^FROM openjdk:8[^ ]*|FROM eclipse-temurin:8u422-b05-jdk|' "$f"
-            NEW="$(head -1 "$f")"
-            echo "  clklog-${sub}: FROM [${ORIG}] → [${NEW}]"
-          done
-          echo "=== 替换后验证（5 个首行 grep）==="
-          for sub in manage api receiver init processing; do
-            f="clklog-${sub}/Dockerfile"
-            [ -f "$f" ] && echo "  - $(head -1 "$f")  # ${f}" || true
-          done
-          EXPECT_TEMURIN=4
-          ACTUAL_TEMURIN=$(grep -l 'eclipse-temurin:8u422-b05-jdk' clklog-manage/Dockerfile clklog-api/Dockerfile clklog-receiver/Dockerfile clklog-init/Dockerfile clklog-processing/Dockerfile 2>/dev/null | wc -l)
-          echo "✅ Temurin 命中=${ACTUAL_TEMURIN}/${EXPECT_TEMURIN}（processing 保持 flink:1.16-java8 正常）"
-          echo "✅ 5 个 Java Dockerfile FROM openjdk → temurin 修复完成（仅 Runner 工作目录临时修改，不入库）"
 
       # ==================================================
       # 部署阶段：Docker Compose 本地 build + up -d + health + Smoke 5 条 HTTP

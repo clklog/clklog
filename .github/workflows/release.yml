@@ -32,7 +32,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  JAVA_VERSION: "8"
+  JAVA_VERSION: "17"
   JAVA_DISTRO: "temurin"
   NODE_VERSION: "18"
   UI_DIR: clklog/clklog-ui
@@ -170,18 +170,6 @@ jobs:
           npm ci
           npm run test:unit --if-present -- --ci --passWithNoTests
           npm run build --if-present
-
-      - name: 修复 Dockerfile Base Image（java 非 processing · 仅 Runner 内存修改，不入库）
-        if: matrix.lang == 'java' && matrix.name != 'clklog-processing'
-        working-directory: ${{ matrix.dir }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          ls -la Dockerfile
-          ORIG="$(head -1 Dockerfile)"
-          sed -i -E 's/^FROM openjdk:8(u[0-9]+-[a-z]+)?$/FROM eclipse-temurin:8u422-b05-jdk/' Dockerfile
-          NEW="$(head -1 Dockerfile)"
-          echo "FROM line: [$ORIG] -> [$NEW]"
 
       - name: 上传服务产物（jar/dist + Dockerfile + 版本号，供 docker job 使用）
         uses: actions/upload-artifact@v4

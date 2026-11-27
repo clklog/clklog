@@ -10,7 +10,6 @@ import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
-import org.apache.flink.shaded.guava30.com.google.common.collect.Lists;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -70,7 +69,8 @@ public class JieXiJson {
         SingleOutputStreamOperator<List<LogBeanCollection>> valueInWindow = value.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(timeWindow))).apply(new AllWindowFunction<LogBeanCollection, List<LogBeanCollection>, TimeWindow>() {
             @Override
             public void apply(TimeWindow window, Iterable<LogBeanCollection> values, Collector<List<LogBeanCollection>> out) {
-                ArrayList<LogBeanCollection> logBeanCollectionList = Lists.newArrayList(values);
+                ArrayList<LogBeanCollection> logBeanCollectionList = new ArrayList<>();
+                values.forEach(logBeanCollectionList::add);
                 if (!logBeanCollectionList.isEmpty()) {
                     out.collect(logBeanCollectionList);
                 }

@@ -25,6 +25,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisSentinelPool;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
@@ -202,7 +203,14 @@ public class LogRichMapper extends RichMapFunction<String, LogBeanCollection> {
 
     @Override
     public void open(Configuration configuration) throws IOException {
-        ParameterTool parameters = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+        // Application Mode 下全局参数为 MapBasedJobParameters，无法强转 ParameterTool，
+        // 此时回退到从挂载的 config.properties 直接加载（与 main 入口同源）
+        ParameterTool parameters;
+        try {
+            parameters = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+        } catch (ClassCastException e) {
+            parameters = ParameterTool.fromPropertiesFile(System.getProperty("user.dir") + File.separator + "config.properties");
+        }
 
         /* 获取redis配置 */
         redisSetting = new RedisSettings();

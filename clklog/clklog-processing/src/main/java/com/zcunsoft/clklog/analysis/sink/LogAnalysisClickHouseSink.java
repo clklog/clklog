@@ -10,6 +10,8 @@ import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -49,7 +51,22 @@ public class LogAnalysisClickHouseSink extends RichSinkFunction<List<LogBeanColl
 
     @Override
     public void open(Configuration config) throws SQLException {
-        ParameterTool parameters = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+        ParameterTool parameters;
+        try {
+            parameters = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
+        } catch (ClassCastException e) {
+            // Application Mode 下回退到挂载的 config.properties
+            try {
+                parameters = ParameterTool.fromPropertiesFile(System.getProperty("user.dir") + File.separator + "config.properties");
+            } catch (IOException ioe) {
+                throw new RuntimeException("加载 config.properties 失败", ioe);
+            }
+        }
+
+        // clickhouse 客户端按线程上下文类加载器加载连接实现类，
+        // Application Mode 下 TCCL 未指向用户类加载器，需显式设置（用完不还原，本线程仅服务本作业）
+        ClassLoader originalTccl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
         String clickhouseHost = parameters.get("clickhouse.host");
         String clickhouseDb = parameters.get("clickhouse.database");

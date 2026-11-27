@@ -30,7 +30,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  JAVA_VERSION: "8"
+  JAVA_VERSION: "17"
   JAVA_DISTRO: "temurin"
   NODE_VERSION: "18"
   MAVEN_OPTS: "-Duser.timezone=Asia/Shanghai -Dfile.encoding=UTF-8"
@@ -51,13 +51,13 @@ jobs:
         # 且 job 级 if/name 都不允许引用 env 与 matrix 上下文；
         # matrix_rounds 输入改为在每个 job 末尾的 gate 步骤内做数值比较来控制（见下方"轮次闸"）。
         round: [1, 2, 3]
-        jdk:   [8, 11]
+        jdk:   [17, 21]
         mysql: ["8.0", "5.7"]
         ch:    ["22.3", "23.3"]
         exclude:
-          # 已知不兼容组合：JDK8 配 CH23.3 / JDK11 配 CH22.3 = 交叉 2 组排除
-          - { jdk: 8,  ch: "23.3" }
-          - { jdk: 11, ch: "22.3" }
+          # 已知不兼容组合：JDK17 配 CH23.3 / JDK21 配 CH22.3 = 交叉 2 组排除
+          - { jdk: 17, ch: "23.3" }
+          - { jdk: 21, ch: "22.3" }
     outputs:
       job_count:  ${{ steps.sanity.outputs.matrix_total }}
       passed:     ${{ steps.sanity.outputs.matrix_passed }}

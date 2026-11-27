@@ -58,6 +58,9 @@ def flatten(src, dst):
         zout.writestr("META-INF/MANIFEST.MF", manifest)
         for name in order:
             zout.writestr(name, out[name])
+    # mkstemp 固定以 0600 创建文件；保留源 jar 的权限位，否则镜像内 COPY 出的
+    # jar 为 root:600，flink(9999) 用户无法读取导致 ClassNotFoundException
+    os.chmod(tmp, os.stat(src).st_mode & 0o7777)
     os.replace(tmp, dst)
     print("flatten 完成：%d 个条目（提升 %d 个 versions 条目）" % (len(out) + 1, len(ver_entries)))
 
